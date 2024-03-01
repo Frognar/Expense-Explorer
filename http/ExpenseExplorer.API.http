@@ -1,0 +1,6 @@
+@ExpenseExplorer.API_HostAddress = http://localhost:5126
+
+GET {{ExpenseExplorer.API_HostAddress}}/hello-world/
+Accept: application/json
+
+###

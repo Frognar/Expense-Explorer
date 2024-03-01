@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.API", "src\ExpenseExplorer.API\ExpenseExplorer.API.csproj", "{022DC1F1-789B-4794-BF36-163F17BA4756}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{74FEB020-4690-4D99-A72F-BCE3EA8953F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.API.Tests", "tests\ExpenseExplorer.API.Tests\ExpenseExplorer.API.Tests.csproj", "{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HttpRequests", "HttpRequests", "{9FD21FFE-F893-4946-B156-C2103ED6C240}"
+	ProjectSection(SolutionItems) = preProject
+		http\ExpenseExplorer.API.http = http\ExpenseExplorer.API.http
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{022DC1F1-789B-4794-BF36-163F17BA4756}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{022DC1F1-789B-4794-BF36-163F17BA4756}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{022DC1F1-789B-4794-BF36-163F17BA4756}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{022DC1F1-789B-4794-BF36-163F17BA4756}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{022DC1F1-789B-4794-BF36-163F17BA4756} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
+		{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB} = {74FEB020-4690-4D99-A72F-BCE3EA8953F9}
+		{9FD21FFE-F893-4946-B156-C2103ED6C240} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
+	EndGlobalSection
+EndGlobal
