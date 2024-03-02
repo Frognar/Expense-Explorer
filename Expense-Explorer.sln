@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HttpRequests", "HttpRequest
 		http\ExpenseExplorer.API.http = http\ExpenseExplorer.API.http
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.API.Contract", "src\ExpenseExplorer.API.Contract\ExpenseExplorer.API.Contract.csproj", "{F6E7DF79-D16C-46F4-9871-65567C729E5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,10 +29,15 @@ Global
 		{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6E7DF79-D16C-46F4-9871-65567C729E5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6E7DF79-D16C-46F4-9871-65567C729E5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6E7DF79-D16C-46F4-9871-65567C729E5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6E7DF79-D16C-46F4-9871-65567C729E5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{022DC1F1-789B-4794-BF36-163F17BA4756} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
 		{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB} = {74FEB020-4690-4D99-A72F-BCE3EA8953F9}
 		{9FD21FFE-F893-4946-B156-C2103ED6C240} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
+		{F6E7DF79-D16C-46F4-9871-65567C729E5D} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
 	EndGlobalSection
 EndGlobal

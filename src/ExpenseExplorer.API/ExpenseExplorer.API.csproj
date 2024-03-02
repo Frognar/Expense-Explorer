@@ -20,4 +20,8 @@
         <InternalsVisibleTo Include="ExpenseExplorer.API.Tests"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\ExpenseExplorer.API.Contract\ExpenseExplorer.API.Contract.csproj"/>
+    </ItemGroup>
+
 </Project>
