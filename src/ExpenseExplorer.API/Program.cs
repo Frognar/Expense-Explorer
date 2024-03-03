@@ -8,7 +8,6 @@ WebApplication app = builder.Build();
 
 app.UseHttpsRedirection();
 
-app.MapGet("/hello-world", () => "Hello World!");
 app.MapPost("/api/receipts", (OpenNewReceiptRequest r) => Results.Ok(r));
 
 app.Run();
