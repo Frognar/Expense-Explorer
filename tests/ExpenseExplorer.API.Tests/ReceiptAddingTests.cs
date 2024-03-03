@@ -32,7 +32,7 @@ public class ReceiptAddingTests {
   }
 
   private static Task<HttpResponseMessage> Send(OpenNewReceiptRequest request) {
-    WebApplicationFactory<Program> webAppFactory = new();
+    WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
     HttpClient client = webAppFactory.CreateClient();
     return client.PostAsJsonAsync("/api/receipts", request);
   }

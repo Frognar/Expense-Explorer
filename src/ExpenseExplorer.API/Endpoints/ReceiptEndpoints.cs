@@ -8,8 +8,8 @@ public static class ReceiptEndpoints {
     return endpointRouteBuilder;
   }
 
-  private static IResult OpenNewReceipt(OpenNewReceiptRequest request) {
-    if (request.PurchaseDate > DateOnly.FromDateTime(DateTime.Now)) {
+  private static IResult OpenNewReceipt(OpenNewReceiptRequest request, TimeProvider timeProvider) {
+    if (request.PurchaseDate > DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime)) {
       return Results.BadRequest();
     }
 
