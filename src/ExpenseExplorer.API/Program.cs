@@ -1,4 +1,4 @@
-using ExpenseExplorer.API.Contract;
+using ExpenseExplorer.API.Endpoints;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +8,6 @@ WebApplication app = builder.Build();
 
 app.UseHttpsRedirection();
 
-app.MapPost("/api/receipts", (OpenNewReceiptRequest r) => Results.Ok(r));
+app.MapEndpoints();
 
 app.Run();
