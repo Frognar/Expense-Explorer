@@ -4,3 +4,13 @@ GET {{ExpenseExplorer.API_HostAddress}}/hello-world/
 Accept: application/json
 
 ###
+
+POST {{ExpenseExplorer.API_HostAddress}}/api/receipts
+Content-Type: application/json
+
+{
+  "storeName": "Store",
+  "purchaseDate": "2024-03-01"
+}
+
+###
