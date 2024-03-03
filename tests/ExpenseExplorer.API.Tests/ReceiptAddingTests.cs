@@ -15,21 +15,25 @@ public class ReceiptAddingTests {
 
   [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 10)]
   public async Task CanAddReceipt(string storeName, DateOnly purchaseDate) {
-    WebApplicationFactory<Program> webAppFactory = new();
-    HttpClient client = webAppFactory.CreateClient();
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await client.PostAsJsonAsync("/api/receipts", request);
+    HttpResponseMessage response = await Send(request);
+
     response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(FutureDateOnlyGenerator)], MaxTest = 10)]
   public async Task IsBadRequestWhenReceiptInFuture(string storeName, DateOnly purchaseDate) {
-    WebApplicationFactory<Program> webAppFactory = new();
-    HttpClient client = webAppFactory.CreateClient();
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await client.PostAsJsonAsync("/api/receipts", request);
+    HttpResponseMessage response = await Send(request);
+
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+  }
+
+  private static Task<HttpResponseMessage> Send(OpenNewReceiptRequest request) {
+    WebApplicationFactory<Program> webAppFactory = new();
+    HttpClient client = webAppFactory.CreateClient();
+    return client.PostAsJsonAsync("/api/receipts", request);
   }
 }
