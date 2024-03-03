@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 using ExpenseExplorer.API.Contract;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace ExpenseExplorer.API.Tests;
+namespace ExpenseExplorer.API.Tests.Receipts;
 
 public class ReceiptAddingTests {
   [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(DateOnlyGenerator)])]
