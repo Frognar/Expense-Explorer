@@ -2,7 +2,7 @@ namespace ExpenseExplorer.API.Tests.Generators;
 
 public class NonEmptyStringGenerator {
   public static Arbitrary<string> NonEmptyStringGen() {
-    return Arb.Default.NonEmptyString()
+    return ArbMap.Default.ArbFor<NonEmptyString>()
       .Generator
       .Select(s => s.Get)
       .ToArbitrary();
