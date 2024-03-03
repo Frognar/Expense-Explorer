@@ -22,4 +22,14 @@ public class ReceiptAddingTests {
     HttpResponseMessage response = await client.PostAsJsonAsync("/api/receipts", request);
     response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
+
+  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(FutureDateOnlyGenerator)], MaxTest = 10)]
+  public async Task IsBadRequestWhenReceiptInFuture(string storeName, DateOnly purchaseDate) {
+    WebApplicationFactory<Program> webAppFactory = new();
+    HttpClient client = webAppFactory.CreateClient();
+    OpenNewReceiptRequest request = new(storeName, purchaseDate);
+
+    HttpResponseMessage response = await client.PostAsJsonAsync("/api/receipts", request);
+    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+  }
 }
