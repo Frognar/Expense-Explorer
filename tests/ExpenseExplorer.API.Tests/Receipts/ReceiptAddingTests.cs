@@ -31,6 +31,15 @@ public class ReceiptAddingTests {
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
   }
 
+  [Property(Arbitrary = [typeof(EmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 10)]
+  public async Task IsBadRequestWhenStoreNameIsEmpty(string storeName, DateOnly purchaseDate) {
+    OpenNewReceiptRequest request = new(storeName, purchaseDate);
+
+    HttpResponseMessage response = await Send(request);
+
+    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+  }
+
   private static Task<HttpResponseMessage> Send(OpenNewReceiptRequest request) {
     WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
     HttpClient client = webAppFactory.CreateClient();

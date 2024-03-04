@@ -13,6 +13,10 @@ public static class ReceiptEndpoints {
       return Results.BadRequest();
     }
 
+    if (string.IsNullOrWhiteSpace(request.StoreName)) {
+      return Results.BadRequest();
+    }
+
     return Results.Ok(request);
   }
 }
