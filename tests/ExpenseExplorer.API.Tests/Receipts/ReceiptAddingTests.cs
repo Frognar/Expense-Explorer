@@ -27,8 +27,10 @@ public class ReceiptAddingTests {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
     HttpResponseMessage response = await Send(request);
+    string responseContent = await response.Content.ReadAsStringAsync();
 
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    responseContent.Should().Contain("PurchaseDate").And.Contain("FUTURE_DATE");
   }
 
   [Property(Arbitrary = [typeof(EmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 10)]
@@ -36,8 +38,10 @@ public class ReceiptAddingTests {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
     HttpResponseMessage response = await Send(request);
+    string responseContent = await response.Content.ReadAsStringAsync();
 
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    responseContent.Should().Contain("StoreName").And.Contain("EMPTY_STORE_NAME");
   }
 
   private static Task<HttpResponseMessage> Send(OpenNewReceiptRequest request) {
