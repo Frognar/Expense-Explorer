@@ -44,6 +44,21 @@ public class ReceiptAddingTests {
     responseContent.Should().Contain("StoreName").And.Contain("EMPTY_STORE_NAME");
   }
 
+  [Property(Arbitrary = [typeof(EmptyStringGenerator), typeof(FutureDateOnlyGenerator)], MaxTest = 10)]
+  public async Task AllValidationErrorsAreCollectedAndReturnedTogether(string storeName, DateOnly purchaseDate) {
+    OpenNewReceiptRequest request = new(storeName, purchaseDate);
+
+    HttpResponseMessage response = await Send(request);
+    string responseContent = await response.Content.ReadAsStringAsync();
+
+    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    responseContent.Should()
+      .Contain("StoreName")
+      .And.Contain("EMPTY_STORE_NAME")
+      .And.Contain("PurchaseDate")
+      .And.Contain("FUTURE_DATE");
+  }
+
   private static Task<HttpResponseMessage> Send(OpenNewReceiptRequest request) {
     WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
     HttpClient client = webAppFactory.CreateClient();

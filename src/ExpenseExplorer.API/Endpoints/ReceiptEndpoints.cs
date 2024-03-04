@@ -9,14 +9,17 @@ public static class ReceiptEndpoints {
   }
 
   private static IResult OpenNewReceipt(OpenNewReceiptRequest request, TimeProvider timeProvider) {
+    List<ValidationError> errors = [];
     if (request.PurchaseDate > DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime)) {
-      return Results.BadRequest(new ValidationError("PurchaseDate", "FUTURE_DATE"));
+      errors.Add(new ValidationError("PurchaseDate", "FUTURE_DATE"));
     }
 
     if (string.IsNullOrWhiteSpace(request.StoreName)) {
-      return Results.BadRequest(new ValidationError("StoreName", "EMPTY_STORE_NAME"));
+      errors.Add(new ValidationError("StoreName", "EMPTY_STORE_NAME"));
     }
 
-    return Results.Ok(request);
+    return errors.Any()
+      ? Results.BadRequest(errors)
+      : Results.Ok(request);
   }
 }
