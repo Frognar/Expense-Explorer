@@ -9,17 +9,35 @@ public static class ReceiptEndpoints {
   }
 
   private static IResult OpenNewReceipt(OpenNewReceiptRequest request, TimeProvider timeProvider) {
-    List<ValidationError> errors = [];
-    if (request.PurchaseDate > DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime)) {
-      errors.Add(new ValidationError("PurchaseDate", "FUTURE_DATE"));
-    }
-
-    if (string.IsNullOrWhiteSpace(request.StoreName)) {
-      errors.Add(new ValidationError("StoreName", "EMPTY_STORE_NAME"));
-    }
-
+    IEnumerable<ValidationError> errors = CollectErrors(request, timeProvider).ToList();
     return errors.Any()
-      ? Results.BadRequest(errors)
+      ? Handle(errors)
       : Results.Ok(request);
+  }
+
+  private static IEnumerable<ValidationError> CollectErrors(OpenNewReceiptRequest request, TimeProvider timeProvider) {
+    IEnumerable<(Func<OpenNewReceiptRequest, bool> isInvalid, ValidationError error)> validations = [
+      (r => string.IsNullOrWhiteSpace(r.StoreName),
+        new ValidationError("StoreName", "EMPTY_STORE_NAME")),
+      (r => r.PurchaseDate > DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime),
+        new ValidationError("PurchaseDate", "FUTURE_DATE"))
+    ];
+
+    return validations
+      .Where(v => v.isInvalid(request))
+      .Select(v => v.error);
+  }
+
+  private static IResult Handle(IEnumerable<ValidationError> errors) {
+    return Results.BadRequest(
+      new {
+        Errors = errors
+          .GroupBy(e => e.Property)
+          .ToDictionary(
+            e => e.Key,
+            e => e.Select(m => m.ErrorCode)
+          )
+      }
+    );
   }
 }
