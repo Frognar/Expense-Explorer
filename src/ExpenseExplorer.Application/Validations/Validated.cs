@@ -9,6 +9,9 @@ public class Validated<S> {
 
   public bool IsValid => validation.Match(_ => false, _ => true);
 
+  public T Match<T>(Func<IEnumerable<ValidationError>, T> onFailure, Func<S, T> onSuccess)
+    => validation.Match(onFailure, onSuccess);
+
   internal static Validated<S> Success(S value) => new(new Succeeded(value));
   internal static Validated<S> Fail(IEnumerable<ValidationError> errors) => new(new Failed(errors));
 
