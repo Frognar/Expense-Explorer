@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using ExpenseExplorer.Application.Validations;
 
 namespace ExpenseExplorer.Application.Tests;
@@ -49,21 +48,27 @@ public class ValidatedTests {
         .Apply(Validate(value1))
         .Apply(Validate(value2));
 
-    validatedResult.IsValid.Should().Be(value1 >= 0 && value2 >= 0);
+    validatedResult
+      .Match(AggregateErrors, v => v.ToString())
+      .Should()
+      .Be(GetExpectedString(value1, value2));
   }
 
-  [Property(Arbitrary = [typeof(ValidationErrorGenerator)])]
-  public void ConcatErrorsWhenApplyingTwoValidated(ValidationError error1, ValidationError error2) {
-    Func<int, int, string> toString = (a, b) => (a + b).ToString();
+  private static string GetExpectedString(int value, params int[] values) {
+    IEnumerable<ValidationError> errors = CreateErrors(CountInvalid(value, values)).ToList();
+    return errors.Any() ? AggregateErrors(errors) : Sum(value, values).ToString();
+  }
 
-    Validated<string> validatedResult =
-      toString
-        .Apply(Validation.Failed<int>([error1]))
-        .Apply(Validation.Failed<int>([error2]));
+  private static int CountInvalid(int value, params int[] values) {
+    return values.Count(v => v < 0) + (value < 0 ? 1 : 0);
+  }
 
-    validatedResult.Match(AggregateErrors, _ => throw new UnreachableException())
-      .Should()
-      .Be(AggregateErrors([error1, error2]));
+  private static IEnumerable<ValidationError> CreateErrors(int count) {
+    return Enumerable.Repeat(ValidationError.Create("value", "NEGATIVE_VALUE"), count);
+  }
+
+  private static int Sum(int value, params int[] values) {
+    return values.Sum() + value;
   }
 
   private static string AggregateErrors(IEnumerable<ValidationError> errors)
