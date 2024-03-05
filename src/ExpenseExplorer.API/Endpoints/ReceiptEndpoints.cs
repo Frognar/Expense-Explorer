@@ -1,4 +1,5 @@
 using ExpenseExplorer.API.Contract;
+using ExpenseExplorer.Application.Validations;
 
 namespace ExpenseExplorer.API.Endpoints;
 
@@ -18,9 +19,9 @@ public static class ReceiptEndpoints {
   private static IEnumerable<ValidationError> CollectErrors(OpenNewReceiptRequest request, TimeProvider timeProvider) {
     IEnumerable<(Func<OpenNewReceiptRequest, bool> isInvalid, ValidationError error)> validations = [
       (r => string.IsNullOrWhiteSpace(r.StoreName),
-        new ValidationError("StoreName", "EMPTY_STORE_NAME")),
+        ValidationError.Create("StoreName", "EMPTY_STORE_NAME")),
       (r => r.PurchaseDate > DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime),
-        new ValidationError("PurchaseDate", "FUTURE_DATE"))
+        ValidationError.Create("PurchaseDate", "FUTURE_DATE"))
     ];
 
     return validations
