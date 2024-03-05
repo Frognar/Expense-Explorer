@@ -28,4 +28,19 @@ public class ValidatedTests {
       .Should()
       .Be(value < 0 ? "value: NEGATIVE_VALUE" : value.ToString());
   }
+
+  [Property]
+  public void ApplyWithOneValidated(int value) {
+    Validated<int> validated = value < 0
+      ? Validated<int>.Fail([new ValidationError("value", "NEGATIVE_VALUE")])
+      : Validated<int>.Success(value);
+
+    Func<int, string> toString = x => x.ToString();
+
+    Validated<string> validatedResult =
+      toString
+        .Apply(validated);
+
+    validatedResult.IsValid.Should().Be(value >= 0);
+  }
 }
