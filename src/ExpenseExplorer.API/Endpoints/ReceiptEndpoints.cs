@@ -10,23 +10,28 @@ public static class ReceiptEndpoints {
   }
 
   private static IResult OpenNewReceipt(OpenNewReceiptRequest request, TimeProvider timeProvider) {
-    IEnumerable<ValidationError> errors = CollectErrors(request, timeProvider).ToList();
-    return errors.Any()
-      ? Handle(errors)
-      : Results.Ok(request);
+    Func<string, DateOnly, OpenNewReceiptResponse> createRequest = (storeName, purchaseDate)
+      => new OpenNewReceiptResponse(Guid.NewGuid().ToString("N"), storeName, purchaseDate);
+
+    return createRequest
+      .Apply(Validate(request.StoreName))
+      .Apply(Validate(request.PurchaseDate, timeProvider))
+      .Match(
+        Handle,
+        Results.Ok
+      );
   }
 
-  private static IEnumerable<ValidationError> CollectErrors(OpenNewReceiptRequest request, TimeProvider timeProvider) {
-    IEnumerable<(Func<OpenNewReceiptRequest, bool> isInvalid, ValidationError error)> validations = [
-      (r => string.IsNullOrWhiteSpace(r.StoreName),
-        ValidationError.Create("StoreName", "EMPTY_STORE_NAME")),
-      (r => r.PurchaseDate > DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime),
-        ValidationError.Create("PurchaseDate", "FUTURE_DATE"))
-    ];
+  private static Validated<string> Validate(string storeName) {
+    return string.IsNullOrWhiteSpace(storeName)
+      ? Validation.Failed<string>([ValidationError.Create("StoreName", "EMPTY_STORE_NAME")])
+      : Validation.Succeeded(storeName.Trim());
+  }
 
-    return validations
-      .Where(v => v.isInvalid(request))
-      .Select(v => v.error);
+  private static Validated<DateOnly> Validate(DateOnly purchaseDate, TimeProvider timeProvider) {
+    return purchaseDate > DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime)
+      ? Validation.Failed<DateOnly>([ValidationError.Create("PurchaseDate", "FUTURE_DATE")])
+      : Validation.Succeeded(purchaseDate);
   }
 
   private static IResult Handle(IEnumerable<ValidationError> errors) {

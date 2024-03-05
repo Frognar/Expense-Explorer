@@ -19,7 +19,7 @@ public class ReceiptAddingTests {
 
     HttpResponseMessage response = await Send(request);
 
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    response.EnsureSuccessStatusCode();
   }
 
   [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(FutureDateOnlyGenerator)], MaxTest = 10)]
@@ -57,6 +57,18 @@ public class ReceiptAddingTests {
       .And.Contain("EMPTY_STORE_NAME")
       .And.Contain("PurchaseDate")
       .And.Contain("FUTURE_DATE");
+  }
+
+  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 10)]
+  public async Task ReturnsCreatedReceiptWhenValid(string storeName, DateOnly purchaseDate) {
+    OpenNewReceiptRequest request = new(storeName, purchaseDate);
+
+    HttpResponseMessage response = await Send(request);
+    OpenNewReceiptResponse receipt = (await response.Content.ReadFromJsonAsync<OpenNewReceiptResponse>())!;
+
+    receipt.Id.Should().NotBeEmpty();
+    receipt.StoreName.Should().Be(storeName.Trim());
+    receipt.PurchaseDate.Should().Be(purchaseDate);
   }
 
   private static Task<HttpResponseMessage> Send(OpenNewReceiptRequest request) {
