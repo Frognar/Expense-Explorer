@@ -1,16 +1,28 @@
 namespace ExpenseExplorer.Application.Validations;
 
 public class Validated<S> {
-  private Validated(S value) {
-    IsValid = true;
+  private readonly Validation validation;
+
+  private Validated(Validation validation) {
+    this.validation = validation;
   }
 
-  private Validated(IEnumerable<ValidationError> errors) {
-    IsValid = false;
+  public bool IsValid => validation.Match(_ => false, _ => true);
+
+  internal static Validated<S> Success(S value) => new(new Succeeded(value));
+  internal static Validated<S> Fail(IEnumerable<ValidationError> errors) => new(new Failed(errors));
+
+  private interface Validation {
+    public T Match<T>(Func<IEnumerable<ValidationError>, T> onFailure, Func<S, T> onSuccess);
   }
 
-  public bool IsValid { get; init; }
+  private readonly record struct Succeeded(S Value) : Validation {
+    public S Value { get; } = Value;
+    public T Match<T>(Func<IEnumerable<ValidationError>, T> onFailure, Func<S, T> onSuccess) => onSuccess(Value);
+  }
 
-  internal static Validated<S> Success(S value) => new(value);
-  internal static Validated<S> Fail(IEnumerable<ValidationError> errors) => new(errors);
+  private readonly record struct Failed(IEnumerable<ValidationError> Errors) : Validation {
+    public IEnumerable<ValidationError> Errors { get; } = Errors;
+    public T Match<T>(Func<IEnumerable<ValidationError>, T> onFailure, Func<S, T> onSuccess) => onFailure(Errors);
+  }
 }
