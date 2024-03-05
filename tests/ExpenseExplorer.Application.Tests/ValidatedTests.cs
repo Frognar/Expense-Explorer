@@ -14,4 +14,10 @@ public class ValidatedTests {
     Validated<string> result = new(value);
     result.IsValid.Should().BeTrue();
   }
+
+  [Property(Arbitrary = [typeof(ValidationErrorGenerator)])]
+  public void IsInvalidWithErrors(ValidationError error) {
+    Validated<string> result = new([error]);
+    result.IsValid.Should().BeFalse();
+  }
 }
