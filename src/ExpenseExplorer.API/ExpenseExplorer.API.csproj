@@ -16,6 +16,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ExpenseExplorer.API.Contract\ExpenseExplorer.API.Contract.csproj"/>
+        <ProjectReference Include="..\ExpenseExplorer.Application\ExpenseExplorer.Application.csproj"/>
     </ItemGroup>
 
 </Project>
