@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ExpenseExplorer.Application.Validations;
 
 namespace ExpenseExplorer.Application.Tests;
@@ -37,6 +38,32 @@ public class ValidatedTests {
         .Apply(validated);
 
     validatedResult.IsValid.Should().Be(value >= 0);
+  }
+
+  [Property]
+  public void ApplyWithTwoValidated(int value1, int value2) {
+    Func<int, int, string> toString = (a, b) => (a + b).ToString();
+
+    Validated<string> validatedResult =
+      toString
+        .Apply(Validate(value1))
+        .Apply(Validate(value2));
+
+    validatedResult.IsValid.Should().Be(value1 >= 0 && value2 >= 0);
+  }
+
+  [Property(Arbitrary = [typeof(ValidationErrorGenerator)])]
+  public void ConcatErrorsWhenApplyingTwoValidated(ValidationError error1, ValidationError error2) {
+    Func<int, int, string> toString = (a, b) => (a + b).ToString();
+
+    Validated<string> validatedResult =
+      toString
+        .Apply(Validation.Failed<int>([error1]))
+        .Apply(Validation.Failed<int>([error2]));
+
+    validatedResult.Match(AggregateErrors, _ => throw new UnreachableException())
+      .Should()
+      .Be(AggregateErrors([error1, error2]));
   }
 
   private static string AggregateErrors(IEnumerable<ValidationError> errors)
