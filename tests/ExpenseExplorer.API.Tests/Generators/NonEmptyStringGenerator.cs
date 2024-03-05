@@ -2,9 +2,9 @@ namespace ExpenseExplorer.API.Tests.Generators;
 
 public class NonEmptyStringGenerator {
   public static Arbitrary<string> NonEmptyStringGen() {
-    return ArbMap.Default.ArbFor<NonEmptyString>()
+    return ArbMap.Default.ArbFor<NonWhiteSpaceString>()
       .Generator
-      .Select(s => s.Get)
+      .Select(str => str.Item)
       .ToArbitrary();
   }
 }
