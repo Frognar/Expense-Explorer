@@ -17,12 +17,10 @@ public class ValidatedTests {
 
   [Property]
   public void MatchValidated(int value) {
-    Validated<int> validated = value < 0
-      ? Validated<int>.Fail([new ValidationError("value", "NEGATIVE_VALUE")])
-      : Validated<int>.Success(value);
+    Validated<int> validated = Validate(value);
 
     validated.Match(
-        errors => string.Join(", ", errors.Select(e => $"{e.Property}: {e.ErrorCode}")),
+        AggregateErrors,
         v => v.ToString()
       )
       .Should()
@@ -31,10 +29,7 @@ public class ValidatedTests {
 
   [Property]
   public void ApplyWithOneValidated(int value) {
-    Validated<int> validated = value < 0
-      ? Validated<int>.Fail([new ValidationError("value", "NEGATIVE_VALUE")])
-      : Validated<int>.Success(value);
-
+    Validated<int> validated = Validate(value);
     Func<int, string> toString = x => x.ToString();
 
     Validated<string> validatedResult =
@@ -43,4 +38,12 @@ public class ValidatedTests {
 
     validatedResult.IsValid.Should().Be(value >= 0);
   }
+
+  private static string AggregateErrors(IEnumerable<ValidationError> errors)
+    => string.Join(", ", errors.Select(e => $"{e.Property}: {e.ErrorCode}"));
+
+  private static Validated<int> Validate(int value)
+    => value < 0
+      ? Validated<int>.Fail([new ValidationError("value", "NEGATIVE_VALUE")])
+      : Validated<int>.Success(value);
 }
