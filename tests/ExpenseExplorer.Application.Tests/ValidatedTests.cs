@@ -8,4 +8,10 @@ public class ValidatedTests {
     Validated<string> result = new(value);
     result.Should().NotBeNull();
   }
+
+  [Property]
+  public void IsValidWithNoErrors(string value) {
+    Validated<string> result = new(value);
+    result.IsValid.Should().BeTrue();
+  }
 }
