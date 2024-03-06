@@ -24,4 +24,8 @@
         <Using Include="Xunit"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\shared\ExpenseExplorer.Tests.Shared\ExpenseExplorer.Tests.Shared.csproj"/>
+    </ItemGroup>
+
 </Project>

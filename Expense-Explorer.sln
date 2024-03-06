@@ -23,6 +23,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.Domain.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.Domain", "src\ExpenseExplorer.Domain\ExpenseExplorer.Domain.csproj", "{F3A96BEE-07CA-4500-AA29-0A6DAD93C706}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.Tests.Shared", "tests\shared\ExpenseExplorer.Tests.Shared\ExpenseExplorer.Tests.Shared.csproj", "{CAD8EEE1-446A-46C9-9109-18DBC60EB38D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{B42E0D8F-9456-40A6-8E43-3A07209E5D40}"
+	ProjectSection(SolutionItems) = preProject
+		tests\shared\Directory.Build.props = tests\shared\Directory.Build.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +64,10 @@ Global
 		{F3A96BEE-07CA-4500-AA29-0A6DAD93C706}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3A96BEE-07CA-4500-AA29-0A6DAD93C706}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3A96BEE-07CA-4500-AA29-0A6DAD93C706}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAD8EEE1-446A-46C9-9109-18DBC60EB38D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAD8EEE1-446A-46C9-9109-18DBC60EB38D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAD8EEE1-446A-46C9-9109-18DBC60EB38D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAD8EEE1-446A-46C9-9109-18DBC60EB38D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{022DC1F1-789B-4794-BF36-163F17BA4756} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
@@ -67,5 +78,7 @@ Global
 		{1E970A66-8A9B-4CA6-9B84-5E639FBAB9EF} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
 		{9B5B200B-C28C-4C74-A291-0316224FF4B3} = {74FEB020-4690-4D99-A72F-BCE3EA8953F9}
 		{F3A96BEE-07CA-4500-AA29-0A6DAD93C706} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
+		{B42E0D8F-9456-40A6-8E43-3A07209E5D40} = {74FEB020-4690-4D99-A72F-BCE3EA8953F9}
+		{CAD8EEE1-446A-46C9-9109-18DBC60EB38D} = {B42E0D8F-9456-40A6-8E43-3A07209E5D40}
 	EndGlobalSection
 EndGlobal

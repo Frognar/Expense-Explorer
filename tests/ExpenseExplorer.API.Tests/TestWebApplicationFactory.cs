@@ -1,4 +1,3 @@
-using FluentAssertions.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +20,7 @@ internal class TestWebApplicationFactory : WebApplicationFactory<Program> {
 
   private class TestTimeProvider : TimeProvider {
     public override DateTimeOffset GetUtcNow() {
-      return today.ToDateTimeOffset();
+      return new DateTimeOffset(today, TimeSpan.Zero);
     }
   }
 }

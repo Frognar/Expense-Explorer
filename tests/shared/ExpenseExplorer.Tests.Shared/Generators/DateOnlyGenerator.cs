@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.API.Tests.Generators;
+namespace ExpenseExplorer.Tests.Shared.Generators;
 
 public class DateOnlyGenerator {
   public static Arbitrary<DateOnly> DateOnlyGen() {

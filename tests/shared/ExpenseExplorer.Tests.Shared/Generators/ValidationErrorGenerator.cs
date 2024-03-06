@@ -1,6 +1,6 @@
 using ExpenseExplorer.Application.Validations;
 
-namespace ExpenseExplorer.Application.Tests.Generators;
+namespace ExpenseExplorer.Tests.Shared.Generators;
 
 public class ValidationErrorGenerator {
   public static Arbitrary<ValidationError> ValidationErrorGen() {
