@@ -5,9 +5,16 @@ Expense Explorer is a simple expense tracking application designed to run on a h
 ## Features
 
 - **Add Receipts:** Users can easily add receipts along with all items.
+- **Edit Receipts:** Receipts can be edited to update details or add/remove items.
 - **Category Assignment:** Items can be assigned to specific categories during entry into the system by users.
 - **Browse Receipts:** Users can browse through saved receipts effortlessly.
-- **Expense Reports:** Generate reports to visualize total spending and spending by category within any given time range (<date_start>, <date_end>).
+- **Expense Reports:** Generate reports to visualize total spending and spending by category within any given time range.
+
+## Nice to Have
+
+- **GUI:** A simple web-based GUI to interact with the application.
+- **OCR Integration:** Automatically extract receipt details using OCR.
+- **Income Tracking:** Track income and compare with expenses.
 
 ## Note
 
