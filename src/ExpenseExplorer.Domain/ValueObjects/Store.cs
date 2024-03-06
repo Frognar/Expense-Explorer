@@ -7,4 +7,8 @@ public class Store {
   }
 
   public string Name { get; }
+
+  public static Store Create(string name) {
+    return new Store(name);
+  }
 }
