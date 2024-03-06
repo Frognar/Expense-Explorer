@@ -1,7 +1,7 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-public class Store {
-  public Store(string name) {
+public record Store {
+  private Store(string name) {
     ArgumentException.ThrowIfNullOrWhiteSpace(name);
     Name = name.Trim();
   }
