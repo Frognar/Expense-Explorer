@@ -8,4 +8,10 @@ public class StoreTests {
     Store store = new(name);
     store.Name.Should().Be(name);
   }
+
+  [Property(Arbitrary = [typeof(EmptyStringGenerator)])]
+  public void ThrowsExceptionWhenNameIsEmpty(string name) {
+    Action act = () => _ = new Store(name);
+    act.Should().Throw<ArgumentException>();
+  }
 }
