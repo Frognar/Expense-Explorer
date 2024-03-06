@@ -8,4 +8,10 @@ public class PurchaseDateTests {
     PurchaseDate purchaseDate = PurchaseDate.Create(date, todayDateOnly);
     purchaseDate.Date.Should().Be(date);
   }
+
+  [Property(Arbitrary = [typeof(FutureDateOnlyGenerator)])]
+  public void ThrowsExceptionWhenDateIsInTheFuture(DateOnly date) {
+    Action act = () => _ = PurchaseDate.Create(date, todayDateOnly);
+    act.Should().Throw<ArgumentException>();
+  }
 }
