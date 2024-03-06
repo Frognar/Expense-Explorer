@@ -3,7 +3,7 @@ namespace ExpenseExplorer.Domain.ValueObjects;
 public class Store {
   public Store(string name) {
     ArgumentException.ThrowIfNullOrWhiteSpace(name);
-    Name = name;
+    Name = name.Trim();
   }
 
   public string Name { get; }
