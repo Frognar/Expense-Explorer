@@ -17,7 +17,7 @@ public class ReceiptAddingTests {
   public async Task CanAddReceipt(string storeName, DateOnly purchaseDate) {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await Send(request);
+    HttpResponseMessage response = await Send(request).ConfigureAwait(false);
 
     response.EnsureSuccessStatusCode();
   }
@@ -26,8 +26,8 @@ public class ReceiptAddingTests {
   public async Task IsBadRequestWhenReceiptInFuture(string storeName, DateOnly purchaseDate) {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await Send(request);
-    string responseContent = await response.Content.ReadAsStringAsync();
+    HttpResponseMessage response = await Send(request).ConfigureAwait(false);
+    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     responseContent.Should().Contain("PurchaseDate").And.Contain("FUTURE_DATE");
@@ -37,8 +37,8 @@ public class ReceiptAddingTests {
   public async Task IsBadRequestWhenStoreNameIsEmpty(string storeName, DateOnly purchaseDate) {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await Send(request);
-    string responseContent = await response.Content.ReadAsStringAsync();
+    HttpResponseMessage response = await Send(request).ConfigureAwait(false);
+    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     responseContent.Should().Contain("StoreName").And.Contain("EMPTY_STORE_NAME");
@@ -48,8 +48,8 @@ public class ReceiptAddingTests {
   public async Task AllValidationErrorsAreCollectedAndReturnedTogether(string storeName, DateOnly purchaseDate) {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await Send(request);
-    string responseContent = await response.Content.ReadAsStringAsync();
+    HttpResponseMessage response = await Send(request).ConfigureAwait(false);
+    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     responseContent.Should()
@@ -63,17 +63,18 @@ public class ReceiptAddingTests {
   public async Task ReturnsCreatedReceiptWhenValid(string storeName, DateOnly purchaseDate) {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await Send(request);
-    OpenNewReceiptResponse receipt = (await response.Content.ReadFromJsonAsync<OpenNewReceiptResponse>())!;
+    HttpResponseMessage response = await Send(request).ConfigureAwait(false);
+    OpenNewReceiptResponse receipt
+      = (await response.Content.ReadFromJsonAsync<OpenNewReceiptResponse>().ConfigureAwait(false))!;
 
     receipt.Id.Should().NotBeEmpty();
     receipt.StoreName.Should().Be(storeName.Trim());
     receipt.PurchaseDate.Should().Be(purchaseDate);
   }
 
-  private static Task<HttpResponseMessage> Send(OpenNewReceiptRequest request) {
-    WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
+  private static async Task<HttpResponseMessage> Send(OpenNewReceiptRequest request) {
+    using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
     HttpClient client = webAppFactory.CreateClient();
-    return client.PostAsJsonAsync("/api/receipts", request);
+    return await client.PostAsJsonAsync("/api/receipts", request).ConfigureAwait(false);
   }
 }

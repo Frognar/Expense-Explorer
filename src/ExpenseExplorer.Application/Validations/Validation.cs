@@ -9,6 +9,7 @@ public static class Validation {
   }
 
   public static Validated<S> Apply<T, S>(this Validated<Func<T, S>> selector, Validated<T> source) {
+    ArgumentNullException.ThrowIfNull(selector);
     return selector.Match(
       errors => source.Match(
         otherErrors => Failed<S>(errors.Concat(otherErrors)),
@@ -26,6 +27,7 @@ public static class Validation {
   }
 
   public static Validated<Func<T1, S>> Apply<T, T1, S>(this Validated<Func<T, T1, S>> selector, Validated<T> source) {
+    ArgumentNullException.ThrowIfNull(selector);
     return selector.Match(
       errors => source.Match(
         otherErrors => Failed<Func<T1, S>>(errors.Concat(otherErrors)),
@@ -46,6 +48,7 @@ public static class Validation {
     this Validated<Func<T, T1, T2, S>> selector,
     Validated<T> source
   ) {
+    ArgumentNullException.ThrowIfNull(selector);
     return selector.Match(
       errors => source.Match(
         otherErrors => Failed<Func<T1, T2, S>>(errors.Concat(otherErrors)),
@@ -69,6 +72,7 @@ public static class Validation {
     this Validated<Func<T, T1, T2, T3, S>> selector,
     Validated<T> source
   ) {
+    ArgumentNullException.ThrowIfNull(selector);
     return selector.Match(
       errors => source.Match(
         otherErrors => Failed<Func<T1, T2, T3, S>>(errors.Concat(otherErrors)),
@@ -92,6 +96,7 @@ public static class Validation {
     this Validated<Func<T, T1, T2, T3, T4, S>> selector,
     Validated<T> source
   ) {
+    ArgumentNullException.ThrowIfNull(selector);
     return selector.Match(
       errors => source.Match(
         otherErrors => Failed<Func<T1, T2, T3, T4, S>>(errors.Concat(otherErrors)),
@@ -115,6 +120,7 @@ public static class Validation {
     this Validated<Func<T, T1, T2, T3, T4, T5, S>> selector,
     Validated<T> source
   ) {
+    ArgumentNullException.ThrowIfNull(selector);
     return selector.Match(
       errors => source.Match(
         otherErrors => Failed<Func<T1, T2, T3, T4, T5, S>>(errors.Concat(otherErrors)),
@@ -138,6 +144,7 @@ public static class Validation {
     this Validated<Func<T, T1, T2, T3, T4, T5, T6, S>> selector,
     Validated<T> source
   ) {
+    ArgumentNullException.ThrowIfNull(selector);
     return selector.Match(
       errors => source.Match(
         otherErrors => Failed<Func<T1, T2, T3, T4, T5, T6, S>>(errors.Concat(otherErrors)),
@@ -161,6 +168,7 @@ public static class Validation {
     this Validated<Func<T, T1, T2, T3, T4, T5, T6, T7, S>> selector,
     Validated<T> source
   ) {
+    ArgumentNullException.ThrowIfNull(selector);
     return selector.Match(
       errors => source.Match(
         otherErrors => Failed<Func<T1, T2, T3, T4, T5, T6, T7, S>>(errors.Concat(otherErrors)),
@@ -184,6 +192,7 @@ public static class Validation {
     this Validated<Func<T, T1, T2, T3, T4, T5, T6, T7, T8, S>> selector,
     Validated<T> source
   ) {
+    ArgumentNullException.ThrowIfNull(selector);
     return selector.Match(
       errors => source.Match(
         otherErrors => Failed<Func<T1, T2, T3, T4, T5, T6, T7, T8, S>>(errors.Concat(otherErrors)),
@@ -209,6 +218,7 @@ public static class Validation {
     this Validated<Func<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, S>> selector,
     Validated<T> source
   ) {
+    ArgumentNullException.ThrowIfNull(selector);
     return selector.Match(
       errors => source.Match(
         otherErrors => Failed<Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, S>>(errors.Concat(otherErrors)),

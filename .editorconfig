@@ -53,3 +53,7 @@ resharper_wrap_linq_expressions = chop_always
 [*.cs]
 indent_style = space
 indent_size = 2
+
+# NET.CodeAnalyzers
+#CA1715: Prefix generic type parameters with 'T'
+dotnet_diagnostic.CA1715.severity = suggestion

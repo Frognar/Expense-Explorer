@@ -6,6 +6,7 @@ public readonly record struct Id {
   }
 
   public Id(string value) {
+    ArgumentNullException.ThrowIfNull(value);
     Value = value.Trim();
   }
 
