@@ -3,10 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.API", "src\ExpenseExplorer.API\ExpenseExplorer.API.csproj", "{022DC1F1-789B-4794-BF36-163F17BA4756}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{74FEB020-4690-4D99-A72F-BCE3EA8953F9}"
 	ProjectSection(SolutionItems) = preProject
 		tests\.editorconfig = tests\.editorconfig
+		tests\Directory.Build.props = tests\Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.API.Tests", "tests\ExpenseExplorer.API.Tests\ExpenseExplorer.API.Tests.csproj", "{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB}"
@@ -31,6 +35,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{B42E0D8F-9456-40A6-8E43-3A07209E5D40}"
 	ProjectSection(SolutionItems) = preProject
 		tests\shared\Directory.Build.props = tests\shared\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{E2227429-4E8C-4B1A-8E99-E59392779B0A}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		build.sh = build.sh
 	EndProjectSection
 EndProject
 Global
