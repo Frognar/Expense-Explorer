@@ -7,6 +7,8 @@
         <Nullable>enable</Nullable>
         <LangVersion>default</LangVersion>
         <Authors>Frognar</Authors>
+        <AnalysisMode>All</AnalysisMode>
+        <AnalysisLevel>latest</AnalysisLevel>
     </PropertyGroup>
 
 </Project>
