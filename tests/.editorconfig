@@ -1,0 +1,8 @@
+[*.cs]
+# NET.CodeAnalyzers
+#CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none
+
+[Usings.cs]
+# SA1200: Using directives must be placed correctly
+dotnet_diagnostic.SA1200.severity = none

@@ -5,6 +5,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{74FEB020-4690-4D99-A72F-BCE3EA8953F9}"
+	ProjectSection(SolutionItems) = preProject
+		tests\.editorconfig = tests\.editorconfig
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.API.Tests", "tests\ExpenseExplorer.API.Tests\ExpenseExplorer.API.Tests.csproj", "{3E71719D-8754-4CF2-BF3B-F1C48FD1BEEB}"
 EndProject

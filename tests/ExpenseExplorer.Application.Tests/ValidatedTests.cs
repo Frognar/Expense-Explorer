@@ -1,36 +1,41 @@
-using ExpenseExplorer.Application.Validations;
-
 namespace ExpenseExplorer.Application.Tests;
 
-public class ValidatedTests {
+using System.Globalization;
+using ExpenseExplorer.Application.Validations;
+
+public class ValidatedTests
+{
   [Property]
-  public void IsValidWithNoErrors(string value) {
+  public void IsValidWithNoErrors(string value)
+  {
     Validated<string> validated = Validation.Succeeded(value);
     validated.IsValid.Should().BeTrue();
   }
 
   [Property(Arbitrary = [typeof(ValidationErrorGenerator)])]
-  public void IsInvalidWithErrors(ValidationError error) {
+  public void IsInvalidWithErrors(ValidationError error)
+  {
     Validated<string> validated = Validation.Failed<string>([error]);
     validated.IsValid.Should().BeFalse();
   }
 
   [Property]
-  public void MatchValidated(int value) {
+  public void MatchValidated(int value)
+  {
     Validated<int> validated = Validate(value);
 
     validated.Match(
         AggregateErrors,
-        v => v.ToString()
-      )
+        ToInvariantString)
       .Should()
-      .Be(value < 0 ? "value: NEGATIVE_VALUE" : value.ToString());
+      .Be(value < 0 ? "value: NEGATIVE_VALUE" : ToInvariantString(value));
   }
 
   [Property]
-  public void ApplyWithOneValidated(int value) {
+  public void ApplyWithOneValidated(int value)
+  {
     Validated<int> validated = Validate(value);
-    Func<int, string> toString = x => x.ToString();
+    Func<int, string> toString = ToInvariantString;
 
     Validated<string> validatedResult =
       toString
@@ -40,8 +45,9 @@ public class ValidatedTests {
   }
 
   [Property]
-  public void ApplyWithTwoValidated(int v1, int v2) {
-    Func<int, int, string> toString = (a, b) => (a + b).ToString();
+  public void ApplyWithTwoValidated(int v1, int v2)
+  {
+    Func<int, int, string> toString = (a, b) => ToInvariantString(a + b);
 
     Validated<string> validatedResult =
       toString
@@ -55,8 +61,9 @@ public class ValidatedTests {
   }
 
   [Property]
-  public void ApplyWithThreeValidated(int v1, int v2, int v3) {
-    Func<int, int, int, string> toString = (a, b, c) => (a + b + c).ToString();
+  public void ApplyWithThreeValidated(int v1, int v2, int v3)
+  {
+    Func<int, int, int, string> toString = (a, b, c) => ToInvariantString(a + b + c);
 
     Validated<string> validatedResult =
       toString
@@ -71,8 +78,9 @@ public class ValidatedTests {
   }
 
   [Property]
-  public void ApplyWithFourValidated(int v1, int v2, int v3, int v4) {
-    Func<int, int, int, int, string> toString = (a, b, c, d) => (a + b + c + d).ToString();
+  public void ApplyWithFourValidated(int v1, int v2, int v3, int v4)
+  {
+    Func<int, int, int, int, string> toString = (a, b, c, d) => ToInvariantString(a + b + c + d);
 
     Validated<string> validatedResult =
       toString
@@ -88,8 +96,9 @@ public class ValidatedTests {
   }
 
   [Property]
-  public void ApplyWithFiveValidated(int v1, int v2, int v3, int v4, int v5) {
-    Func<int, int, int, int, int, string> toString = (a, b, c, d, e) => (a + b + c + d + e).ToString();
+  public void ApplyWithFiveValidated(int v1, int v2, int v3, int v4, int v5)
+  {
+    Func<int, int, int, int, int, string> toString = (a, b, c, d, e) => ToInvariantString(a + b + c + d + e);
 
     Validated<string> validatedResult =
       toString
@@ -106,8 +115,10 @@ public class ValidatedTests {
   }
 
   [Property]
-  public void ApplyWithSixValidated(int v1, int v2, int v3, int v4, int v5, int v6) {
-    Func<int, int, int, int, int, int, string> toString = (a, b, c, d, e, f) => (a + b + c + d + e + f).ToString();
+  public void ApplyWithSixValidated(int v1, int v2, int v3, int v4, int v5, int v6)
+  {
+    Func<int, int, int, int, int, int, string>
+      toString = (a, b, c, d, e, f) => ToInvariantString(a + b + c + d + e + f);
 
     Validated<string> validatedResult =
       toString
@@ -125,9 +136,10 @@ public class ValidatedTests {
   }
 
   [Property]
-  public void ApplyWithSevenValidated(int v1, int v2, int v3, int v4, int v5, int v6, int v7) {
+  public void ApplyWithSevenValidated(int v1, int v2, int v3, int v4, int v5, int v6, int v7)
+  {
     Func<int, int, int, int, int, int, int, string> toString = (a, b, c, d, e, f, g)
-      => (a + b + c + d + e + f + g).ToString();
+      => ToInvariantString(a + b + c + d + e + f + g);
 
     Validated<string> validatedResult =
       toString
@@ -146,9 +158,10 @@ public class ValidatedTests {
   }
 
   [Property]
-  public void ApplyWithEightValidated(int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8) {
+  public void ApplyWithEightValidated(int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8)
+  {
     Func<int, int, int, int, int, int, int, int, string> toString = (a, b, c, d, e, f, g, h)
-      => (a + b + c + d + e + f + g + h).ToString();
+      => ToInvariantString(a + b + c + d + e + f + g + h);
 
     Validated<string> validatedResult =
       toString
@@ -168,9 +181,10 @@ public class ValidatedTests {
   }
 
   [Property]
-  public void ApplyWithNineValidated(int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9) {
+  public void ApplyWithNineValidated(int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9)
+  {
     Func<int, int, int, int, int, int, int, int, int, string> toString = (a, b, c, d, e, f, g, h, i)
-      => (a + b + c + d + e + f + g + h + i).ToString();
+      => ToInvariantString(a + b + c + d + e + f + g + h + i);
 
     Validated<string> validatedResult =
       toString
@@ -191,9 +205,10 @@ public class ValidatedTests {
   }
 
   [Property]
-  public void ApplyWithTenValidated(int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int v0) {
+  public void ApplyWithTenValidated(int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int v0)
+  {
     Func<int, int, int, int, int, int, int, int, int, int, string> toString = (a, b, c, d, e, f, g, h, i, j)
-      => (a + b + c + d + e + f + g + h + i + j).ToString();
+      => ToInvariantString(a + b + c + d + e + f + g + h + i + j);
 
     Validated<string> validatedResult =
       toString
@@ -214,20 +229,24 @@ public class ValidatedTests {
       .Be(GetExpectedString(v1, v2, v3, v4, v5, v6, v7, v8, v9, v0));
   }
 
-  private static string GetExpectedString(int value, params int[] values) {
+  private static string GetExpectedString(int value, params int[] values)
+  {
     IEnumerable<ValidationError> errors = CreateErrors(CountInvalid(value, values)).ToList();
-    return errors.Any() ? AggregateErrors(errors) : Sum(value, values).ToString();
+    return errors.Any() ? AggregateErrors(errors) : ToInvariantString(Sum(value, values));
   }
 
-  private static int CountInvalid(int value, params int[] values) {
+  private static int CountInvalid(int value, params int[] values)
+  {
     return values.Count(v => v < 0) + (value < 0 ? 1 : 0);
   }
 
-  private static IEnumerable<ValidationError> CreateErrors(int count) {
+  private static IEnumerable<ValidationError> CreateErrors(int count)
+  {
     return Enumerable.Repeat(ValidationError.Create("value", "NEGATIVE_VALUE"), count);
   }
 
-  private static int Sum(int value, params int[] values) {
+  private static int Sum(int value, params int[] values)
+  {
     return values.Sum() + value;
   }
 
@@ -238,4 +257,6 @@ public class ValidatedTests {
     => value < 0
       ? Validated<int>.Fail([new ValidationError("value", "NEGATIVE_VALUE")])
       : Validated<int>.Success(value);
+
+  private static string ToInvariantString(int value) => value.ToString(CultureInfo.InvariantCulture);
 }
