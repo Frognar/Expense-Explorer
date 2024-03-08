@@ -2,7 +2,7 @@ namespace ExpenseExplorer.Domain.ValueObjects;
 
 public record Id
 {
-  public Id(string value)
+  private Id(string value)
   {
     ArgumentNullException.ThrowIfNull(value);
     Value = value.Trim();
@@ -13,5 +13,10 @@ public record Id
   public static Id Unique()
   {
     return new Id(Guid.NewGuid().ToString("N"));
+  }
+
+  public static Id Create(string value)
+  {
+    return new Id(value);
   }
 }
