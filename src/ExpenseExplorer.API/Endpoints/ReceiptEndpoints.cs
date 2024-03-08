@@ -17,13 +17,11 @@ public static class ReceiptEndpoints
   private static IResult OpenNewReceipt(OpenNewReceiptRequest request, TimeProvider timeProvider)
   {
     Func<Store, PurchaseDate, Receipt> createReceipt = Receipt.New;
-
     return createReceipt
       .Apply(Validate(request.StoreName))
       .Apply(Validate(request.PurchaseDate, timeProvider))
-      .Match(
-        Handle,
-        r => Results.Ok(r.MapToResponse()));
+      .Map(r => r.MapToResponse())
+      .Match(Handle, Results.Ok);
   }
 
   private static Validated<Store> Validate(string storeName)
