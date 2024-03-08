@@ -73,6 +73,10 @@ dotnet_diagnostic.sa1600.severity = none
 #SA1633: File should have header
 dotnet_diagnostic.sa1633.severity = none
 
+#SonarAnalyzer.CSharp
+#S2094: Classes should not be empty
+dotnet_diagnostic.s2094.severity = none
+
 # NET.CodeAnalyzers
 #CA1715: Prefix generic type parameters with 'T'
 dotnet_diagnostic.ca1715.severity = suggestion

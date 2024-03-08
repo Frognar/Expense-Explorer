@@ -5,10 +5,13 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public class Receipt
 {
+  private readonly List<Fact> changes = [];
+
   private Receipt(Id id, Store store, PurchaseDate purchaseDate)
   {
     ReceiptCreated fact = new(id, store, purchaseDate);
     Apply(fact);
+    changes.Add(fact);
   }
 
   public Id Id { get; private set; } = null!;
@@ -16,6 +19,8 @@ public class Receipt
   public Store Store { get; private set; } = null!;
 
   public PurchaseDate PurchaseDate { get; private set; } = null!;
+
+  public IEnumerable<Fact> UnsavedChanges => changes;
 
   public static Receipt New(Store store, PurchaseDate purchaseDate)
   {

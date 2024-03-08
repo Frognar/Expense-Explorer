@@ -2,7 +2,7 @@ namespace ExpenseExplorer.Domain.Receipts.Events;
 
 using ExpenseExplorer.Domain.ValueObjects;
 
-public class ReceiptCreated
+public class ReceiptCreated : Fact
 {
   public ReceiptCreated(Id id, Store store, PurchaseDate purchaseDate)
   {
