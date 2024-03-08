@@ -44,6 +44,23 @@ public class ValidatedTests
       .Be(GetExpectedString(value));
   }
 
+  [Property]
+  public void MapValidatedWithQuerySyntax(int value)
+  {
+    Validated<int> validated = Validate(value);
+
+    Validated<string> validatedResult =
+      from v in validated
+      select ToInvariantString(v);
+
+    validatedResult
+      .Match(
+        AggregateErrors,
+        v => v)
+      .Should()
+      .Be(GetExpectedString(value));
+  }
+
   private static string GetExpectedString(int value) => value < 0 ? "value: NEGATIVE_VALUE" : ToInvariantString(value);
 
   private static string AggregateErrors(IEnumerable<ValidationError> errors)

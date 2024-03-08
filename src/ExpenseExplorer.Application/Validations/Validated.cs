@@ -18,6 +18,8 @@ public class Validated<S>
 
   public Validated<T> Map<T>(Func<S, T> map) => Match(Validated<T>.Fail, value => Validated<T>.Success(map(value)));
 
+  public Validated<T> Select<T>(Func<S, T> selector) => Map(selector);
+
   public T Match<T>(Func<IEnumerable<ValidationError>, T> onFailure, Func<S, T> onSuccess)
     => validation.Match(onFailure, onSuccess);
 
