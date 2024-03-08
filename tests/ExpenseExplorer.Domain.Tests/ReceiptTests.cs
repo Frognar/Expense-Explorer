@@ -26,4 +26,23 @@ public class ReceiptTests
     receiptCreated.Store.Should().Be(receipt.Store);
     receiptCreated.PurchaseDate.Should().Be(receipt.PurchaseDate);
   }
+
+  [Property(Arbitrary = [typeof(NonFutureDateOnlyGenerator), typeof(NonEmptyStringGenerator)])]
+  public void CanCorrectStore(DateOnly purchaseDate, string store, string newStore)
+  {
+    Receipt receipt = Receipt.New(Store.Create(store), PurchaseDate.Create(purchaseDate, todayDateOnly));
+    receipt = receipt.CorrectStore(Store.Create(newStore));
+    receipt.Store.Should().Be(Store.Create(newStore));
+  }
+
+  [Property(Arbitrary = [typeof(NonFutureDateOnlyGenerator), typeof(NonEmptyStringGenerator)])]
+  public void ProducesStoreUpdatedEventWhenStoreUpdated(DateOnly purchaseDate, string store, string newStore)
+  {
+    Receipt receipt = Receipt.New(Store.Create(store), PurchaseDate.Create(purchaseDate, todayDateOnly));
+    receipt = receipt.CorrectStore(Store.Create(newStore));
+    receipt.UnsavedChanges.Count().Should().Be(2);
+    StoreCorrected storeCorrected = receipt.UnsavedChanges.OfType<StoreCorrected>().Single();
+    storeCorrected.Id.Should().Be(receipt.Id);
+    storeCorrected.Store.Should().Be(receipt.Store);
+  }
 }

@@ -5,7 +5,7 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public class Receipt
 {
-  private readonly List<Fact> changes;
+  private readonly IEnumerable<Fact> changes;
 
   private Receipt(Id id, Store store, PurchaseDate purchaseDate, List<Fact> changes)
   {
@@ -26,6 +26,14 @@ public class Receipt
   public static Receipt New(Store store, PurchaseDate purchaseDate)
   {
     Id id = Id.Unique();
-    return new Receipt(id, store, purchaseDate, [new ReceiptCreated(id, store, purchaseDate)]);
+    Fact receiptCreated = new ReceiptCreated(id, store, purchaseDate);
+    return new Receipt(id, store, purchaseDate, [receiptCreated]);
+  }
+
+  public Receipt CorrectStore(Store store)
+  {
+    Fact storeCorrected = new StoreCorrected(Id, store);
+    List<Fact> allChanges = changes.Append(storeCorrected).ToList();
+    return new Receipt(Id, store, PurchaseDate, allChanges);
   }
 }
