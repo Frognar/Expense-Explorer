@@ -5,32 +5,27 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public class Receipt
 {
-  private readonly List<Fact> changes = [];
+  private readonly List<Fact> changes;
 
-  private Receipt(Id id, Store store, PurchaseDate purchaseDate)
+  private Receipt(Id id, Store store, PurchaseDate purchaseDate, List<Fact> changes)
   {
-    ReceiptCreated fact = new(id, store, purchaseDate);
-    Apply(fact);
-    changes.Add(fact);
+    Id = id;
+    Store = store;
+    PurchaseDate = purchaseDate;
+    this.changes = changes;
   }
 
-  public Id Id { get; private set; } = null!;
+  public Id Id { get; }
 
-  public Store Store { get; private set; } = null!;
+  public Store Store { get; }
 
-  public PurchaseDate PurchaseDate { get; private set; } = null!;
+  public PurchaseDate PurchaseDate { get; }
 
   public IEnumerable<Fact> UnsavedChanges => changes;
 
   public static Receipt New(Store store, PurchaseDate purchaseDate)
   {
-    return new Receipt(Id.Unique(), store, purchaseDate);
-  }
-
-  private void Apply(ReceiptCreated e)
-  {
-    Id = e.Id;
-    Store = e.Store;
-    PurchaseDate = e.PurchaseDate;
+    Id id = Id.Unique();
+    return new Receipt(id, store, purchaseDate, [new ReceiptCreated(id, store, purchaseDate)]);
   }
 }
