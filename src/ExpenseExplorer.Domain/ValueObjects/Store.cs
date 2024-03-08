@@ -1,10 +1,12 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
+using ExpenseExplorer.Domain.Exceptions;
+
 public record Store
 {
   private Store(string name)
   {
-    ArgumentException.ThrowIfNullOrWhiteSpace(name);
+    EmptyStoreNameException.ThrowIfEmpty(name);
     Name = name.Trim();
   }
 

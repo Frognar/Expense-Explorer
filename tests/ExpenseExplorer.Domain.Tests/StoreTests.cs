@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.Domain.Tests;
 
+using ExpenseExplorer.Domain.Exceptions;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public class StoreTests
@@ -8,7 +9,7 @@ public class StoreTests
   public void ThrowsExceptionWhenNameIsEmpty(string name)
   {
     Action act = () => _ = Store.Create(name);
-    act.Should().Throw<ArgumentException>();
+    act.Should().Throw<EmptyStoreNameException>();
   }
 
   [Property(Arbitrary = [typeof(NonEmptyStringGenerator)])]
