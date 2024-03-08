@@ -1,14 +1,12 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
+using ExpenseExplorer.Domain.Exceptions;
+
 public record PurchaseDate
 {
   private PurchaseDate(DateOnly date, DateOnly today)
   {
-    if (date > today)
-    {
-      throw new ArgumentException("Purchase date cannot be in the future");
-    }
-
+    FutureDateException.ThrowIfFutureDate(date, today);
     Date = date;
   }
 

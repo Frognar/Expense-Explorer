@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.Domain.Tests;
 
+using ExpenseExplorer.Domain.Exceptions;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public class PurchaseDateTests
@@ -15,7 +16,7 @@ public class PurchaseDateTests
   public void ThrowsExceptionWhenDateIsInTheFuture(DateOnly date)
   {
     Action act = () => _ = CreatePurchaseDate(date);
-    act.Should().Throw<ArgumentException>();
+    act.Should().Throw<FutureDateException>();
   }
 
   private static PurchaseDate CreatePurchaseDate(DateOnly date)
