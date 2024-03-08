@@ -16,6 +16,8 @@ public class Validated<S>
 
   public bool IsValid => validation.Match(_ => false, _ => true);
 
+  public Validated<T> Map<T>(Func<S, T> map) => Match(Validated<T>.Fail, value => Validated<T>.Success(map(value)));
+
   public T Match<T>(Func<IEnumerable<ValidationError>, T> onFailure, Func<S, T> onSuccess)
     => validation.Match(onFailure, onSuccess);
 

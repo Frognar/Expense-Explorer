@@ -28,8 +28,23 @@ public class ValidatedTests
         AggregateErrors,
         ToInvariantString)
       .Should()
-      .Be(value < 0 ? "value: NEGATIVE_VALUE" : ToInvariantString(value));
+      .Be(GetExpectedString(value));
   }
+
+  [Property]
+  public void MapValidated(int value)
+  {
+    Validated<int> validated = Validate(value);
+
+    validated.Map(ToInvariantString)
+      .Match(
+        AggregateErrors,
+        v => v)
+      .Should()
+      .Be(GetExpectedString(value));
+  }
+
+  private static string GetExpectedString(int value) => value < 0 ? "value: NEGATIVE_VALUE" : ToInvariantString(value);
 
   private static string AggregateErrors(IEnumerable<ValidationError> errors)
     => string.Join(", ", errors.Select(e => $"{e.Property}: {e.ErrorCode}"));
