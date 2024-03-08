@@ -1,7 +1,10 @@
 namespace ExpenseExplorer.API.Endpoints;
 
 using ExpenseExplorer.API.Contract;
+using ExpenseExplorer.API.Mappers;
 using ExpenseExplorer.Application.Validations;
+using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.Domain.ValueObjects;
 
 public static class ReceiptEndpoints
 {
@@ -13,29 +16,29 @@ public static class ReceiptEndpoints
 
   private static IResult OpenNewReceipt(OpenNewReceiptRequest request, TimeProvider timeProvider)
   {
-    Func<string, DateOnly, OpenNewReceiptResponse> createRequest = (storeName, purchaseDate)
-      => new OpenNewReceiptResponse(Guid.NewGuid().ToString("N"), storeName, purchaseDate);
+    Func<Store, PurchaseDate, Receipt> createReceipt = Receipt.New;
 
-    return createRequest
+    return createReceipt
       .Apply(Validate(request.StoreName))
       .Apply(Validate(request.PurchaseDate, timeProvider))
       .Match(
         Handle,
-        Results.Ok);
+        r => Results.Ok(r.MapToResponse()));
   }
 
-  private static Validated<string> Validate(string storeName)
+  private static Validated<Store> Validate(string storeName)
   {
     return string.IsNullOrWhiteSpace(storeName)
-      ? Validation.Failed<string>([ValidationError.Create("StoreName", "EMPTY_STORE_NAME")])
-      : Validation.Succeeded(storeName.Trim());
+      ? Validation.Failed<Store>([ValidationError.Create("StoreName", "EMPTY_STORE_NAME")])
+      : Validation.Succeeded(Store.Create(storeName));
   }
 
-  private static Validated<DateOnly> Validate(DateOnly purchaseDate, TimeProvider timeProvider)
+  private static Validated<PurchaseDate> Validate(DateOnly purchaseDate, TimeProvider timeProvider)
   {
-    return purchaseDate > DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime)
-      ? Validation.Failed<DateOnly>([ValidationError.Create("PurchaseDate", "FUTURE_DATE")])
-      : Validation.Succeeded(purchaseDate);
+    DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
+    return purchaseDate > today
+      ? Validation.Failed<PurchaseDate>([ValidationError.Create("PurchaseDate", "FUTURE_DATE")])
+      : Validation.Succeeded(PurchaseDate.Create(purchaseDate, today));
   }
 
   private static IResult Handle(IEnumerable<ValidationError> errors)
