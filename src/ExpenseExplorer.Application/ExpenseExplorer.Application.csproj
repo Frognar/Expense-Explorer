@@ -4,4 +4,8 @@
         <InternalsVisibleTo Include="ExpenseExplorer.Application.Tests"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\ExpenseExplorer.Domain\ExpenseExplorer.Domain.csproj"/>
+    </ItemGroup>
+
 </Project>

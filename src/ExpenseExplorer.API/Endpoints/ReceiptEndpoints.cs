@@ -2,9 +2,8 @@ namespace ExpenseExplorer.API.Endpoints;
 
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
+using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Application.Validations;
-using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.ValueObjects;
 
 public static class ReceiptEndpoints
 {
@@ -16,27 +15,13 @@ public static class ReceiptEndpoints
 
   private static IResult OpenNewReceipt(OpenNewReceiptRequest request, TimeProvider timeProvider)
   {
-    Func<Store, PurchaseDate, Receipt> createReceipt = Receipt.New;
-    return createReceipt
-      .Apply(Validate(request.StoreName))
-      .Apply(Validate(request.PurchaseDate, timeProvider))
-      .Map(r => r.MapToResponse())
-      .Match(Handle, Results.Ok);
-  }
-
-  private static Validated<Store> Validate(string storeName)
-  {
-    return string.IsNullOrWhiteSpace(storeName)
-      ? Validation.Failed<Store>([ValidationError.Create("StoreName", "EMPTY_STORE_NAME")])
-      : Validation.Succeeded(Store.Create(storeName));
-  }
-
-  private static Validated<PurchaseDate> Validate(DateOnly purchaseDate, TimeProvider timeProvider)
-  {
     DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
-    return purchaseDate > today
-      ? Validation.Failed<PurchaseDate>([ValidationError.Create("PurchaseDate", "FUTURE_DATE")])
-      : Validation.Succeeded(PurchaseDate.Create(purchaseDate, today));
+    Validated<OpenNewReceiptResponse> validatedResponse =
+      from receipt in ReceiptValidator.Validate(request.StoreName, request.PurchaseDate, today)
+      select receipt.MapToResponse();
+
+    return validatedResponse
+      .Match(Handle, Results.Ok);
   }
 
   private static IResult Handle(IEnumerable<ValidationError> errors)
