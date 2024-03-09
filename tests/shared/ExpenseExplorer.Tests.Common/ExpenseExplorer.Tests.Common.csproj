@@ -1,7 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <RootNamespace>ExpenseExplorer.Tests.Common</RootNamespace>
-    </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\ExpenseExplorer.API.Contract\ExpenseExplorer.API.Contract.csproj"/>
         <ProjectReference Include="..\..\..\src\ExpenseExplorer.Application\ExpenseExplorer.Application.csproj"/>

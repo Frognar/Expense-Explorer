@@ -30,7 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\shared\ExpenseExplorer.Tests.Shared\ExpenseExplorer.Tests.Shared.csproj"/>
+        <ProjectReference Include="..\shared\ExpenseExplorer.Tests.Common\ExpenseExplorer.Tests.Common.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
