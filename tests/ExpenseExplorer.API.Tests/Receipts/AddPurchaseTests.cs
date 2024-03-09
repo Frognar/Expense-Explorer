@@ -32,25 +32,9 @@ public class AddPurchaseTests
     request.Description.Should().Be(description);
   }
 
-  [Property(
-    Arbitrary = [typeof(NonEmptyStringGenerator), typeof(NonFutureDateOnlyGenerator), typeof(PositiveDecimalGenerator)],
-    MaxTest = 10)]
-  public async Task CanAddReceipt(
-    string productName,
-    string productCategory,
-    decimal quantity,
-    decimal unitPrice,
-    decimal? totalDiscount,
-    string? description)
+  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 10)]
+  public async Task CanAddReceipt(AddPurchaseRequest request)
   {
-    AddPurchaseRequest request = new(
-      productName,
-      productCategory,
-      quantity,
-      unitPrice,
-      totalDiscount,
-      description);
-
     HttpResponseMessage response = await Send("1234", request).ConfigureAwait(false);
 
     response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);

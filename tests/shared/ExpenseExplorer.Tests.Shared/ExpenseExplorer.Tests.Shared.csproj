@@ -1,5 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
+        <ProjectReference Include="..\..\..\src\ExpenseExplorer.API.Contract\ExpenseExplorer.API.Contract.csproj"/>
         <ProjectReference Include="..\..\..\src\ExpenseExplorer.Application\ExpenseExplorer.Application.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="Generators\NonNegativeDecimalGenerator.cs"/>
+        <Compile Remove="Generators\NonNegativeNullableDecimalGenerator.cs"/>
     </ItemGroup>
 </Project>
