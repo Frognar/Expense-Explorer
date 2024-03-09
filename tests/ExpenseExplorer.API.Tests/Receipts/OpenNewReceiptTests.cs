@@ -5,7 +5,7 @@ using System.Net.Http.Json;
 using ExpenseExplorer.API.Contract;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-public class ReceiptAddingTests
+public class OpenNewReceiptTests
 {
   [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(DateOnlyGenerator)])]
   public void ContainsDataGivenDuringConstruction(string storeName, DateOnly purchaseDate)
