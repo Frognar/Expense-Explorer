@@ -1,4 +1,5 @@
 @ExpenseExplorer.API_HostAddress = http://localhost:5126
+@receiptId = {{$uuid}}
 
 POST {{ExpenseExplorer.API_HostAddress}}/api/receipts
 Content-Type: application/json
@@ -9,3 +10,15 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}
+Content-Type: application/json
+
+{
+  "productName": "Item",
+  "productCategory": "General",
+  "quantity": 1,
+  "unitPrice": 1.56,
+  "totalDiscount": null,
+  "description": null
+}
