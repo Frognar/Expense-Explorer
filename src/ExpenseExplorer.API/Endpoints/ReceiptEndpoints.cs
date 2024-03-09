@@ -9,7 +9,9 @@ public static class ReceiptEndpoints
 {
   public static IEndpointRouteBuilder MapReceiptEndpoints(this IEndpointRouteBuilder endpointRouteBuilder)
   {
-    endpointRouteBuilder.MapPost("/api/receipts", OpenNewReceipt);
+    RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/receipts");
+    group.MapPost("/", OpenNewReceipt);
+    group.MapPost("/{receiptId}", AddPurchase);
     return endpointRouteBuilder;
   }
 
@@ -22,6 +24,11 @@ public static class ReceiptEndpoints
 
     return validatedResponse
       .Match(Handle, Results.Ok);
+  }
+
+  private static IResult AddPurchase(string receiptId, AddPurchaseRequest request)
+  {
+    return Results.Ok(new { receiptId, request });
   }
 
   private static IResult Handle(IEnumerable<ValidationError> errors)

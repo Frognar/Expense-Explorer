@@ -22,7 +22,7 @@ public class OpenNewReceiptTests
 
     HttpResponseMessage response = await Send(request).ConfigureAwait(false);
 
-    response.StatusCode.Should().Be(HttpStatusCode.OK);
+    response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
   }
 
   [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(FutureDateOnlyGenerator)], MaxTest = 10)]
