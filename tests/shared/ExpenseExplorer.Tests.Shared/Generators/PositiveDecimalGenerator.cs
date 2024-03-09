@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Tests.Shared.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators;
 
-public class PositiveDecimalGenerator
+public static class PositiveDecimalGenerator
 {
   public static Arbitrary<decimal> PositiveDecimalGen()
   {

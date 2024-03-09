@@ -1,7 +1,9 @@
-namespace ExpenseExplorer.Tests.Shared.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators;
 
-public class DateOnlyGenerator {
-  public static Arbitrary<DateOnly> DateOnlyGen() {
+public static class DateOnlyGenerator
+{
+  public static Arbitrary<DateOnly> DateOnlyGen()
+  {
     return ArbMap.Default.ArbFor<DateTime>()
       .Generator
       .Select(DateOnly.FromDateTime)

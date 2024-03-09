@@ -1,9 +1,11 @@
+namespace ExpenseExplorer.Tests.Common.Generators;
+
 using ExpenseExplorer.Application.Validations;
 
-namespace ExpenseExplorer.Tests.Shared.Generators;
-
-public class ValidationErrorGenerator {
-  public static Arbitrary<ValidationError> ValidationErrorGen() {
+public static class ValidationErrorGenerator
+{
+  public static Arbitrary<ValidationError> ValidationErrorGen()
+  {
     return ArbMap.Default.ArbFor<NonEmptyString>()
       .Generator
       .Select(CreateError)

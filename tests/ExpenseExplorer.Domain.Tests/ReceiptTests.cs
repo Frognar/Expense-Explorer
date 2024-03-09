@@ -9,17 +9,17 @@ public class ReceiptTests
   [Property(Arbitrary = [typeof(NonFutureDateOnlyGenerator), typeof(NonEmptyStringGenerator)])]
   public void CanBeCreated(DateOnly purchaseDate, string store)
   {
-    Receipt receipt = Receipt.New(Store.Create(store), PurchaseDate.Create(purchaseDate, todayDateOnly));
+    Receipt receipt = Receipt.New(Store.Create(store), PurchaseDate.Create(purchaseDate, TodayDateOnly));
     receipt.Should().NotBeNull();
     receipt.Id.Should().NotBeNull();
     receipt.Store.Should().Be(Store.Create(store));
-    receipt.PurchaseDate.Should().Be(PurchaseDate.Create(purchaseDate, todayDateOnly));
+    receipt.PurchaseDate.Should().Be(PurchaseDate.Create(purchaseDate, TodayDateOnly));
   }
 
   [Property(Arbitrary = [typeof(NonFutureDateOnlyGenerator), typeof(NonEmptyStringGenerator)])]
   public void ProducesReceiptCreatedEventWhenCreated(DateOnly purchaseDate, string store)
   {
-    Receipt receipt = Receipt.New(Store.Create(store), PurchaseDate.Create(purchaseDate, todayDateOnly));
+    Receipt receipt = Receipt.New(Store.Create(store), PurchaseDate.Create(purchaseDate, TodayDateOnly));
     receipt.UnsavedChanges.Count().Should().Be(1);
     ReceiptCreated receiptCreated = receipt.UnsavedChanges.OfType<ReceiptCreated>().Single();
     receiptCreated.Id.Should().Be(receipt.Id);
@@ -30,7 +30,7 @@ public class ReceiptTests
   [Property(Arbitrary = [typeof(NonFutureDateOnlyGenerator), typeof(NonEmptyStringGenerator)])]
   public void CanCorrectStore(DateOnly purchaseDate, string store, string newStore)
   {
-    Receipt receipt = Receipt.New(Store.Create(store), PurchaseDate.Create(purchaseDate, todayDateOnly));
+    Receipt receipt = Receipt.New(Store.Create(store), PurchaseDate.Create(purchaseDate, TodayDateOnly));
     receipt = receipt.CorrectStore(Store.Create(newStore));
     receipt.Store.Should().Be(Store.Create(newStore));
   }
@@ -38,7 +38,7 @@ public class ReceiptTests
   [Property(Arbitrary = [typeof(NonFutureDateOnlyGenerator), typeof(NonEmptyStringGenerator)])]
   public void ProducesStoreUpdatedEventWhenStoreUpdated(DateOnly purchaseDate, string store, string newStore)
   {
-    Receipt receipt = Receipt.New(Store.Create(store), PurchaseDate.Create(purchaseDate, todayDateOnly));
+    Receipt receipt = Receipt.New(Store.Create(store), PurchaseDate.Create(purchaseDate, TodayDateOnly));
     receipt = receipt.CorrectStore(Store.Create(newStore));
     receipt.UnsavedChanges.Count().Should().Be(2);
     StoreCorrected storeCorrected = receipt.UnsavedChanges.OfType<StoreCorrected>().Single();

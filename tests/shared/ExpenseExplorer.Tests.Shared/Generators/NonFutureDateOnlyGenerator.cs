@@ -1,9 +1,11 @@
-namespace ExpenseExplorer.Tests.Shared.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators;
 
-public class NonFutureDateOnlyGenerator {
-  public static Arbitrary<DateOnly> NonFutureDateOnlyGen() {
+public static class NonFutureDateOnlyGenerator
+{
+  public static Arbitrary<DateOnly> NonFutureDateOnlyGen()
+  {
     return ArbMap.Default.ArbFor<DateTime>()
-      .Filter(dt => dt.Date <= today)
+      .Filter(dt => dt.Date <= Today)
       .Generator
       .Select(DateOnly.FromDateTime)
       .ToArbitrary();

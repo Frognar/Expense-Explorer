@@ -1,4 +1,4 @@
-global using ExpenseExplorer.Tests.Shared.Generators;
+global using ExpenseExplorer.Tests.Common.Generators;
 global using FluentAssertions;
 global using FsCheck;
 global using FsCheck.Fluent;

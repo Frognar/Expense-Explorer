@@ -1,14 +1,14 @@
-namespace ExpenseExplorer.Tests.Shared.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators;
 
-using API.Contract;
+using ExpenseExplorer.API.Contract;
 
-public class AddPurchaseRequestWithInvalidProductNameGenerator
+public static class AddPurchaseRequestWithInvalidProductNameGenerator
 {
   public static Arbitrary<AddPurchaseRequest> AddPurchaseRequestWithInvalidProductNameGen()
   {
-    return (AddPurchaseRequestGenerators.valid with
+    return (AddPurchaseRequestGenerators.Valid with
     {
-      ProductName = ArbMap.Default.ArbFor<string>().Filter(string.IsNullOrWhiteSpace).Generator
+      ProductName = ArbMap.Default.ArbFor<string>().Filter(string.IsNullOrWhiteSpace).Generator,
     }).Arbitrary;
   }
 }

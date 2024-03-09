@@ -28,7 +28,7 @@ internal sealed class TestWebApplicationFactory : WebApplicationFactory<Program>
   {
     public override DateTimeOffset GetUtcNow()
     {
-      return new DateTimeOffset(today, TimeSpan.Zero);
+      return new DateTimeOffset(Today, TimeSpan.Zero);
     }
   }
 }

@@ -65,7 +65,7 @@ public class AddPurchaseTests
   {
     using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
     HttpClient client = webAppFactory.CreateClient();
-    OpenNewReceiptRequest request = new("Store", todayDateOnly);
+    OpenNewReceiptRequest request = new("Store", TodayDateOnly);
     HttpResponseMessage response = await client.PostAsJsonAsync("/api/receipts", request).ConfigureAwait(false);
     OpenNewReceiptResponse receipt
       = (await response.Content.ReadFromJsonAsync<OpenNewReceiptResponse>().ConfigureAwait(false))!;

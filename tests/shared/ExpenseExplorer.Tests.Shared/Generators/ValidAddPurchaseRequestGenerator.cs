@@ -1,11 +1,11 @@
-namespace ExpenseExplorer.Tests.Shared.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators;
 
-using API.Contract;
+using ExpenseExplorer.API.Contract;
 
-public class ValidAddPurchaseRequestGenerator
+public static class ValidAddPurchaseRequestGenerator
 {
   public static Arbitrary<AddPurchaseRequest> ValidAddPurchaseRequestGen()
   {
-    return AddPurchaseRequestGenerators.valid.Arbitrary;
+    return AddPurchaseRequestGenerators.Valid.Arbitrary;
   }
 }
