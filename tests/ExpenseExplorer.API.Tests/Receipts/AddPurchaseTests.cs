@@ -35,9 +35,23 @@ public class AddPurchaseTests
   [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 10)]
   public async Task CanAddReceipt(AddPurchaseRequest request)
   {
-    HttpResponseMessage response = await Send("1234", request).ConfigureAwait(false);
+    string validReceiptId = await GetValidReceiptId().ConfigureAwait(false);
+
+    HttpResponseMessage response = await Send(validReceiptId, request).ConfigureAwait(false);
 
     response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
+  }
+
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidProductNameGenerator)], MaxTest = 10)]
+  public async Task IsBadRequestWhenProductNameIsInvalid(AddPurchaseRequest request)
+  {
+    string validReceiptId = await GetValidReceiptId().ConfigureAwait(false);
+
+    HttpResponseMessage response = await Send(validReceiptId, request).ConfigureAwait(false);
+    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    responseContent.Should().Contain("ProductName").And.Contain("EMPTY_PRODUCT_NAME");
   }
 
   private static async Task<HttpResponseMessage> Send(string receiptId, AddPurchaseRequest request)
@@ -45,5 +59,17 @@ public class AddPurchaseTests
     using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
     HttpClient client = webAppFactory.CreateClient();
     return await client.PostAsJsonAsync($"/api/receipts/{receiptId}", request).ConfigureAwait(false);
+  }
+
+  private static async Task<string> GetValidReceiptId()
+  {
+    using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
+    HttpClient client = webAppFactory.CreateClient();
+    OpenNewReceiptRequest request = new("Store", todayDateOnly);
+    HttpResponseMessage response = await client.PostAsJsonAsync("/api/receipts", request).ConfigureAwait(false);
+    OpenNewReceiptResponse receipt
+      = (await response.Content.ReadFromJsonAsync<OpenNewReceiptResponse>().ConfigureAwait(false))!;
+
+    return receipt.Id;
   }
 }
