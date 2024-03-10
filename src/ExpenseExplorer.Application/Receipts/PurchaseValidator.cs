@@ -4,13 +4,18 @@ using ExpenseExplorer.Application.Validations;
 
 public static class PurchaseValidator
 {
-  public static Validated<object> Validate(string productName, string productCategory, decimal quantity)
+  public static Validated<object> Validate(
+    string productName,
+    string productCategory,
+    decimal quantity,
+    decimal unitPrice)
   {
-    Func<string, string, decimal, object> createResponse = (n, c, q) => new { n, c, q };
+    Func<string, string, decimal, decimal, object> createResponse = (n, c, q, u) => new { n, c, q, u };
     return createResponse
       .Apply(ValidateProduct(productName))
       .Apply(ValidateCategory(productCategory))
-      .Apply(ValidateQuantity(quantity));
+      .Apply(ValidateQuantity(quantity))
+      .Apply(ValidateUnitPrice(unitPrice));
   }
 
   private static Validated<string> ValidateProduct(string productName)
@@ -32,5 +37,12 @@ public static class PurchaseValidator
     return quantity <= 0
       ? Validation.Failed<decimal>([ValidationError.Create("Quantity", "NON_POSITIVE_QUANTITY")])
       : Validation.Succeeded(quantity);
+  }
+
+  private static Validated<decimal> ValidateUnitPrice(decimal unitPrice)
+  {
+    return unitPrice < 0
+      ? Validation.Failed<decimal>([ValidationError.Create("UnitPrice", "NEGATIVE_UNIT_PRICE")])
+      : Validation.Succeeded(unitPrice);
   }
 }
