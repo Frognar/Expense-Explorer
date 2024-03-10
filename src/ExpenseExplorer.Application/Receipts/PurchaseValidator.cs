@@ -9,14 +9,16 @@ public static class PurchaseValidator
     string productCategory,
     decimal quantity,
     decimal unitPrice,
-    decimal? totalDiscount)
+    decimal? totalDiscount,
+    string? description)
   {
-    Func<string, string, decimal, decimal, decimal?, object> createResponse = (n, c, q, u, d) => new
+    Func<string, string, decimal, decimal, decimal?, string?, object> createResponse = (pn, pc, q, up, td, d) => new
     {
-      n,
-      c,
+      pn,
+      pc,
       q,
-      u,
+      up,
+      td,
       d,
     };
 
@@ -25,7 +27,8 @@ public static class PurchaseValidator
       .Apply(ValidateCategory(productCategory))
       .Apply(ValidateQuantity(quantity))
       .Apply(ValidateUnitPrice(unitPrice))
-      .Apply(ValidateTotalDiscount(totalDiscount));
+      .Apply(ValidateTotalDiscount(totalDiscount))
+      .Apply(ValidateDescription(description));
   }
 
   private static Validated<string> ValidateProduct(string productName)
@@ -61,5 +64,12 @@ public static class PurchaseValidator
     return totalDiscount is < 0
       ? Validation.Failed<decimal?>([ValidationError.Create("TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT")])
       : Validation.Succeeded(totalDiscount);
+  }
+
+  private static Validated<string?> ValidateDescription(string? description)
+  {
+    return description is not null && description.Trim().Length == 0
+      ? Validation.Failed<string?>([ValidationError.Create("Description", "EMPTY_DESCRIPTION")])
+      : Validation.Succeeded(description);
   }
 }

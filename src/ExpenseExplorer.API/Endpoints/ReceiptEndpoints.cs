@@ -33,7 +33,8 @@ public static class ReceiptEndpoints
         request.ProductCategory,
         request.Quantity,
         request.UnitPrice,
-        request.TotalDiscount)
+        request.TotalDiscount,
+        request.Description)
       .Match(Handle, _ => Results.Ok(new { receiptId, request }));
   }
 

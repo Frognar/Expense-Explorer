@@ -74,6 +74,13 @@ public class AddPurchaseTests
     await AssertBadRequest(response, ["TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT"]).ConfigureAwait(false);
   }
 
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidDescriptionGenerator)], MaxTest = 10)]
+  public async Task IsBadRequestWhenTotalDescriptionIsInvalid(AddPurchaseRequest request)
+  {
+    HttpResponseMessage response = await SendWithValidReceiptId(request).ConfigureAwait(false);
+    await AssertBadRequest(response, ["Description", "EMPTY_DESCRIPTION"]).ConfigureAwait(false);
+  }
+
   private static async Task<HttpResponseMessage> SendWithValidReceiptId(AddPurchaseRequest request)
   {
     using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
