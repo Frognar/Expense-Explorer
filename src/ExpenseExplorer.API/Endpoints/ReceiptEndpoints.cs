@@ -28,7 +28,12 @@ public static class ReceiptEndpoints
 
   private static IResult AddPurchase(string receiptId, AddPurchaseRequest request)
   {
-    return PurchaseValidator.Validate(request.ProductName, request.ProductCategory, request.Quantity, request.UnitPrice)
+    return PurchaseValidator.Validate(
+        request.ProductName,
+        request.ProductCategory,
+        request.Quantity,
+        request.UnitPrice,
+        request.TotalDiscount)
       .Match(Handle, _ => Results.Ok(new { receiptId, request }));
   }
 

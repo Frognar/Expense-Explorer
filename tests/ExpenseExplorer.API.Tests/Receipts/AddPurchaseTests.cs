@@ -67,6 +67,13 @@ public class AddPurchaseTests
     await AssertBadRequest(response, ["UnitPrice", "NEGATIVE_UNIT_PRICE"]).ConfigureAwait(false);
   }
 
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidTotalDiscountGenerator)], MaxTest = 10)]
+  public async Task IsBadRequestWhenTotalDiscountIsInvalid(AddPurchaseRequest request)
+  {
+    HttpResponseMessage response = await SendWithValidReceiptId(request).ConfigureAwait(false);
+    await AssertBadRequest(response, ["TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT"]).ConfigureAwait(false);
+  }
+
   private static async Task<HttpResponseMessage> SendWithValidReceiptId(AddPurchaseRequest request)
   {
     using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
