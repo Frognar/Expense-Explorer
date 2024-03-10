@@ -53,6 +53,13 @@ public class AddPurchaseTests
     await AssertBadRequest(response, ["ProductCategory", "EMPTY_PRODUCT_CATEGORY"]).ConfigureAwait(false);
   }
 
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidQuantityGenerator)], MaxTest = 10)]
+  public async Task IsBadRequestWhenQuantityIsInvalid(AddPurchaseRequest request)
+  {
+    HttpResponseMessage response = await SendWithValidReceiptId(request).ConfigureAwait(false);
+    await AssertBadRequest(response, ["Quantity", "NON_POSITIVE_QUANTITY"]).ConfigureAwait(false);
+  }
+
   private static async Task<HttpResponseMessage> SendWithValidReceiptId(AddPurchaseRequest request)
   {
     using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
