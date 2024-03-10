@@ -28,8 +28,8 @@ public static class ReceiptEndpoints
 
   private static IResult AddPurchase(string receiptId, AddPurchaseRequest request)
   {
-    Validated<string> validatedProductName = PurchaseValidator.Validate(request.ProductName);
-    return validatedProductName.Match(Handle, _ => Results.Ok(new { receiptId, request }));
+    return PurchaseValidator.Validate(request.ProductName, request.ProductCategory)
+      .Match(Handle, _ => Results.Ok(new { receiptId, request }));
   }
 
   private static IResult Handle(IEnumerable<ValidationError> errors)

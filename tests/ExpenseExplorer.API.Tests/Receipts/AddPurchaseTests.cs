@@ -54,6 +54,18 @@ public class AddPurchaseTests
     responseContent.Should().Contain("ProductName").And.Contain("EMPTY_PRODUCT_NAME");
   }
 
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidProductCategoryGenerator)], MaxTest = 10)]
+  public async Task IsBadRequestWhenProductCategoryIsInvalid(AddPurchaseRequest request)
+  {
+    string validReceiptId = await GetValidReceiptId().ConfigureAwait(false);
+
+    HttpResponseMessage response = await Send(validReceiptId, request).ConfigureAwait(false);
+    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    responseContent.Should().Contain("ProductCategory").And.Contain("EMPTY_PRODUCT_CATEGORY");
+  }
+
   private static async Task<HttpResponseMessage> Send(string receiptId, AddPurchaseRequest request)
   {
     using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
