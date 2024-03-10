@@ -35,53 +35,42 @@ public class AddPurchaseTests
   [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 10)]
   public async Task CanAddReceipt(AddPurchaseRequest request)
   {
-    string validReceiptId = await GetValidReceiptId().ConfigureAwait(false);
-
-    HttpResponseMessage response = await Send(validReceiptId, request).ConfigureAwait(false);
-
+    HttpResponseMessage response = await SendWithValidReceiptId(request).ConfigureAwait(false);
     response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
   }
 
   [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidProductNameGenerator)], MaxTest = 10)]
   public async Task IsBadRequestWhenProductNameIsInvalid(AddPurchaseRequest request)
   {
-    string validReceiptId = await GetValidReceiptId().ConfigureAwait(false);
-
-    HttpResponseMessage response = await Send(validReceiptId, request).ConfigureAwait(false);
-    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    responseContent.Should().Contain("ProductName").And.Contain("EMPTY_PRODUCT_NAME");
+    HttpResponseMessage response = await SendWithValidReceiptId(request).ConfigureAwait(false);
+    await AssertBadRequest(response, ["ProductName", "EMPTY_PRODUCT_NAME"]).ConfigureAwait(false);
   }
 
   [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidProductCategoryGenerator)], MaxTest = 10)]
   public async Task IsBadRequestWhenProductCategoryIsInvalid(AddPurchaseRequest request)
   {
-    string validReceiptId = await GetValidReceiptId().ConfigureAwait(false);
-
-    HttpResponseMessage response = await Send(validReceiptId, request).ConfigureAwait(false);
-    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    responseContent.Should().Contain("ProductCategory").And.Contain("EMPTY_PRODUCT_CATEGORY");
+    HttpResponseMessage response = await SendWithValidReceiptId(request).ConfigureAwait(false);
+    await AssertBadRequest(response, ["ProductCategory", "EMPTY_PRODUCT_CATEGORY"]).ConfigureAwait(false);
   }
 
-  private static async Task<HttpResponseMessage> Send(string receiptId, AddPurchaseRequest request)
+  private static async Task<HttpResponseMessage> SendWithValidReceiptId(AddPurchaseRequest request)
   {
     using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
     HttpClient client = webAppFactory.CreateClient();
-    return await client.PostAsJsonAsync($"/api/receipts/{receiptId}", request).ConfigureAwait(false);
-  }
+    OpenNewReceiptRequest openReceiptRequest = new("Store", TodayDateOnly);
+    HttpResponseMessage response
+      = await client.PostAsJsonAsync("/api/receipts", openReceiptRequest).ConfigureAwait(false);
 
-  private static async Task<string> GetValidReceiptId()
-  {
-    using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
-    HttpClient client = webAppFactory.CreateClient();
-    OpenNewReceiptRequest request = new("Store", TodayDateOnly);
-    HttpResponseMessage response = await client.PostAsJsonAsync("/api/receipts", request).ConfigureAwait(false);
     OpenNewReceiptResponse receipt
       = (await response.Content.ReadFromJsonAsync<OpenNewReceiptResponse>().ConfigureAwait(false))!;
 
-    return receipt.Id;
+    return await client.PostAsJsonAsync($"/api/receipts/{receipt.Id}", request).ConfigureAwait(false);
+  }
+
+  private static async Task AssertBadRequest(HttpResponseMessage response, List<string> errorsToCheck)
+  {
+    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    errorsToCheck.ForEach(e => responseContent.Should().Contain(e));
   }
 }
