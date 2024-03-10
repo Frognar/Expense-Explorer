@@ -19,7 +19,7 @@ public static class ReceiptEndpoints
   {
     DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
     Validated<OpenNewReceiptResponse> validatedResponse =
-      from receipt in ReceiptValidator.Validate(request.StoreName, request.PurchaseDate, today)
+      from receipt in ReceiptValidator.Validate(request.MapToCommand(today))
       select receipt.MapToResponse();
 
     return validatedResponse
@@ -28,14 +28,12 @@ public static class ReceiptEndpoints
 
   private static IResult AddPurchase(string receiptId, AddPurchaseRequest request)
   {
-    return PurchaseValidator.Validate(
-        request.ProductName,
-        request.ProductCategory,
-        request.Quantity,
-        request.UnitPrice,
-        request.TotalDiscount,
-        request.Description)
-      .Match(Handle, _ => Results.Ok(new { receiptId, request }));
+    Validated<object> validatedResponse =
+      from response in PurchaseValidator.Validate(request.MapToCommand(receiptId))
+      select response;
+
+    return validatedResponse
+      .Match(Handle, Results.Ok);
   }
 
   private static IResult Handle(IEnumerable<ValidationError> errors)

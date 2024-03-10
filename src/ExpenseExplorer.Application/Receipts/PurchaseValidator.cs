@@ -1,17 +1,13 @@
 namespace ExpenseExplorer.Application.Receipts;
 
+using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Validations;
 
 public static class PurchaseValidator
 {
-  public static Validated<object> Validate(
-    string productName,
-    string productCategory,
-    decimal quantity,
-    decimal unitPrice,
-    decimal? totalDiscount,
-    string? description)
+  public static Validated<object> Validate(AddPurchaseCommand command)
   {
+    ArgumentNullException.ThrowIfNull(command);
     Func<string, string, decimal, decimal, decimal?, string?, object> createResponse = (pn, pc, q, up, td, d) => new
     {
       pn,
@@ -23,12 +19,12 @@ public static class PurchaseValidator
     };
 
     return createResponse
-      .Apply(ValidateProduct(productName))
-      .Apply(ValidateCategory(productCategory))
-      .Apply(ValidateQuantity(quantity))
-      .Apply(ValidateUnitPrice(unitPrice))
-      .Apply(ValidateTotalDiscount(totalDiscount))
-      .Apply(ValidateDescription(description));
+      .Apply(ValidateProduct(command.ProductName))
+      .Apply(ValidateCategory(command.ProductCategory))
+      .Apply(ValidateQuantity(command.Quantity))
+      .Apply(ValidateUnitPrice(command.UnitPrice))
+      .Apply(ValidateTotalDiscount(command.TotalDiscount))
+      .Apply(ValidateDescription(command.Description));
   }
 
   private static Validated<string> ValidateProduct(string productName)

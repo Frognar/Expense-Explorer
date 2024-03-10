@@ -1,17 +1,19 @@
 namespace ExpenseExplorer.Application.Receipts;
 
+using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public static class ReceiptValidator
 {
-  public static Validated<Receipt> Validate(string storeName, DateOnly purchaseDate, DateOnly today)
+  public static Validated<Receipt> Validate(OpenNewReceiptCommand command)
   {
+    ArgumentNullException.ThrowIfNull(command);
     Func<Store, PurchaseDate, Receipt> createReceipt = Receipt.New;
     return createReceipt
-      .Apply(Validate(storeName))
-      .Apply(Validate(purchaseDate, today));
+      .Apply(Validate(command.StoreName))
+      .Apply(Validate(command.PurchaseDate, command.Today));
   }
 
   private static Validated<Store> Validate(string storeName)
