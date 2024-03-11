@@ -33,7 +33,7 @@ public class AddPurchaseTests
   }
 
   [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 10)]
-  public async Task CanAddReceipt(AddPurchaseRequest request)
+  public async Task CanAddPurchaseToReceipt(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request).ConfigureAwait(false);
     response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
@@ -79,6 +79,17 @@ public class AddPurchaseTests
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request).ConfigureAwait(false);
     await AssertBadRequest(response, ["Description", "EMPTY_DESCRIPTION"]).ConfigureAwait(false);
+  }
+
+  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)])]
+  public async Task IsNotFoundWhenReceiptIdIsInvalid(AddPurchaseRequest request)
+  {
+    using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
+    HttpClient client = webAppFactory.CreateClient();
+    HttpResponseMessage response
+      = await client.PostAsJsonAsync("/api/receipts/invalid-id", request).ConfigureAwait(false);
+
+    response.StatusCode.Should().Be(HttpStatusCode.NotFound);
   }
 
   private static async Task<HttpResponseMessage> SendWithValidReceiptId(AddPurchaseRequest request)
