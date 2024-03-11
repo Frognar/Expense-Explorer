@@ -30,6 +30,11 @@ public class Receipt
     return new Receipt(id, store, purchaseDate, [receiptCreated]);
   }
 
+  public Receipt ClearChanges()
+  {
+    return new Receipt(Id, Store, PurchaseDate, []);
+  }
+
   public Receipt CorrectStore(Store store)
   {
     Fact storeCorrected = new StoreCorrected(Id, store);

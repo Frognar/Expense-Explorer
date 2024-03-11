@@ -45,4 +45,15 @@ public class ReceiptTests
     storeCorrected.Id.Should().Be(receipt.Id);
     storeCorrected.Store.Should().Be(receipt.Store);
   }
+
+  [Property(Arbitrary = [typeof(NonFutureDateOnlyGenerator), typeof(NonEmptyStringGenerator)])]
+  public void HasNoUnsavedChangesAfterClearingChanges(DateOnly purchaseDate, string store, string newStore)
+  {
+    Receipt.New(Store.Create(store), PurchaseDate.Create(purchaseDate, TodayDateOnly))
+      .CorrectStore(Store.Create(newStore))
+      .ClearChanges()
+      .UnsavedChanges
+      .Should()
+      .BeEmpty();
+  }
 }
