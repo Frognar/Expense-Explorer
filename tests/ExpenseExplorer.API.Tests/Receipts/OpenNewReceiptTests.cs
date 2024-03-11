@@ -20,7 +20,7 @@ public class OpenNewReceiptTests
   {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await Send(request).ConfigureAwait(false);
+    HttpResponseMessage response = await Send(request);
 
     response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
   }
@@ -30,8 +30,8 @@ public class OpenNewReceiptTests
   {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await Send(request).ConfigureAwait(false);
-    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+    HttpResponseMessage response = await Send(request);
+    string responseContent = await response.Content.ReadAsStringAsync();
 
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     responseContent.Should().Contain("PurchaseDate").And.Contain("FUTURE_DATE");
@@ -42,8 +42,8 @@ public class OpenNewReceiptTests
   {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await Send(request).ConfigureAwait(false);
-    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+    HttpResponseMessage response = await Send(request);
+    string responseContent = await response.Content.ReadAsStringAsync();
 
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     responseContent.Should().Contain("StoreName").And.Contain("EMPTY_STORE_NAME");
@@ -54,8 +54,8 @@ public class OpenNewReceiptTests
   {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await Send(request).ConfigureAwait(false);
-    string responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+    HttpResponseMessage response = await Send(request);
+    string responseContent = await response.Content.ReadAsStringAsync();
 
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     responseContent.Should()
@@ -70,9 +70,9 @@ public class OpenNewReceiptTests
   {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
 
-    HttpResponseMessage response = await Send(request).ConfigureAwait(false);
+    HttpResponseMessage response = await Send(request);
     OpenNewReceiptResponse receipt
-      = (await response.Content.ReadFromJsonAsync<OpenNewReceiptResponse>().ConfigureAwait(false))!;
+      = (await response.Content.ReadFromJsonAsync<OpenNewReceiptResponse>())!;
 
     receipt.Id.Should().NotBeEmpty();
     receipt.StoreName.Should().Be(storeName.Trim());
@@ -83,6 +83,6 @@ public class OpenNewReceiptTests
   {
     using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
     HttpClient client = webAppFactory.CreateClient();
-    return await client.PostAsJsonAsync("/api/receipts", request).ConfigureAwait(false);
+    return await client.PostAsJsonAsync("/api/receipts", request);
   }
 }

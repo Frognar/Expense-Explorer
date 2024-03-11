@@ -28,7 +28,7 @@ public static class ReceiptEndpoints
     {
       Receipt receipt = validated.Match(_ => throw new UnreachableException(), r => r);
       InMemoryEventStore eventStore = new();
-      await eventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges).ConfigureAwait(false);
+      await eventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges);
     }
 
     return validated.Select(r => r.MapToResponse())
@@ -44,7 +44,7 @@ public static class ReceiptEndpoints
     if (validatedResponse.IsValid)
     {
       InMemoryEventStore eventStore = new();
-      IEnumerable<Fact> events = await eventStore.GetEvents(Id.Create(receiptId)).ConfigureAwait(false);
+      IEnumerable<Fact> events = await eventStore.GetEvents(Id.Create(receiptId));
       if (!events.Any())
       {
         return Results.NotFound();

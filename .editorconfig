@@ -80,3 +80,6 @@ dotnet_diagnostic.s2094.severity = none
 # NET.CodeAnalyzers
 #CA1715: Prefix generic type parameters with 'T'
 dotnet_diagnostic.ca1715.severity = suggestion
+
+#CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.ca2007.severity = none
