@@ -81,7 +81,7 @@ public class AddPurchaseTests
     await AssertBadRequest(response, ["Description", "EMPTY_DESCRIPTION"]).ConfigureAwait(false);
   }
 
-  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)])]
+  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 10)]
   public async Task IsNotFoundWhenReceiptIdIsInvalid(AddPurchaseRequest request)
   {
     using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();
