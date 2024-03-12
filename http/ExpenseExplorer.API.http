@@ -15,8 +15,8 @@ POST {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}
 Content-Type: application/json
 
 {
-  "productName": "Item",
-  "productCategory": "General",
+  "item": "Item",
+  "Category": "General",
   "quantity": 1,
   "unitPrice": 1.56,
   "totalDiscount": null,
