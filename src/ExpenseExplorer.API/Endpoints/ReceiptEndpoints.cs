@@ -37,11 +37,8 @@ public static class ReceiptEndpoints
 
   private static async Task<IResult> AddPurchase(string receiptId, AddPurchaseRequest request)
   {
-    Validated<object> validatedResponse =
-      from response in PurchaseValidator.Validate(request.MapToCommand(receiptId))
-      select response;
-
-    if (validatedResponse.IsValid)
+    Validated<Purchase> validated = PurchaseValidator.Validate(request.MapToCommand(receiptId));
+    if (validated.IsValid)
     {
       InMemoryEventStore eventStore = new();
       IEnumerable<Fact> events = await eventStore.GetEvents(Id.Create(receiptId));
@@ -51,7 +48,7 @@ public static class ReceiptEndpoints
       }
     }
 
-    return validatedResponse
+    return validated
       .Match(Handle, Results.Ok);
   }
 
