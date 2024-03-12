@@ -17,8 +17,8 @@ public static class ReceiptMapper
     ArgumentNullException.ThrowIfNull(request);
     return new AddPurchaseCommand(
       receiptId,
-      request.ProductName,
-      request.ProductCategory,
+      request.Item,
+      request.Category,
       request.Quantity,
       request.UnitPrice,
       request.TotalDiscount,

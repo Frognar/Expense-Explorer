@@ -2,8 +2,8 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 
 public record AddPurchaseCommand(
   string ReceiptId,
-  string ProductName,
-  string ProductCategory,
+  string Item,
+  string Category,
   decimal Quantity,
   decimal UnitPrice,
   decimal? TotalDiscount,

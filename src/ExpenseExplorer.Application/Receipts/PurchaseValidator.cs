@@ -19,26 +19,26 @@ public static class PurchaseValidator
     };
 
     return createResponse
-      .Apply(ValidateProduct(command.ProductName))
-      .Apply(ValidateCategory(command.ProductCategory))
+      .Apply(ValidateItem(command.Item))
+      .Apply(ValidateCategory(command.Category))
       .Apply(ValidateQuantity(command.Quantity))
       .Apply(ValidateUnitPrice(command.UnitPrice))
       .Apply(ValidateTotalDiscount(command.TotalDiscount))
       .Apply(ValidateDescription(command.Description));
   }
 
-  private static Validated<string> ValidateProduct(string productName)
+  private static Validated<string> ValidateItem(string item)
   {
-    return string.IsNullOrWhiteSpace(productName)
-      ? Validation.Failed<string>([ValidationError.Create("ProductName", "EMPTY_PRODUCT_NAME")])
-      : Validation.Succeeded(productName);
+    return string.IsNullOrWhiteSpace(item)
+      ? Validation.Failed<string>([ValidationError.Create("Item", "EMPTY_ITEM_NAME")])
+      : Validation.Succeeded(item);
   }
 
-  private static Validated<string> ValidateCategory(string productCategory)
+  private static Validated<string> ValidateCategory(string category)
   {
-    return string.IsNullOrWhiteSpace(productCategory)
-      ? Validation.Failed<string>([ValidationError.Create("ProductCategory", "EMPTY_PRODUCT_CATEGORY")])
-      : Validation.Succeeded(productCategory);
+    return string.IsNullOrWhiteSpace(category)
+      ? Validation.Failed<string>([ValidationError.Create("Category", "EMPTY_CATEGORY")])
+      : Validation.Succeeded(category);
   }
 
   private static Validated<decimal> ValidateQuantity(decimal quantity)

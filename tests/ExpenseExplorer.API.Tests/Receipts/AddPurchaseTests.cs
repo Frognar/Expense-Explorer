@@ -24,8 +24,8 @@ public class AddPurchaseTests
       totalDiscount,
       description);
 
-    request.ProductName.Should().Be(productName);
-    request.ProductCategory.Should().Be(productCategory);
+    request.Item.Should().Be(productName);
+    request.Category.Should().Be(productCategory);
     request.Quantity.Should().Be(quantity);
     request.UnitPrice.Should().Be(unitPrice);
     request.TotalDiscount.Should().Be(totalDiscount);
@@ -43,14 +43,14 @@ public class AddPurchaseTests
   public async Task IsBadRequestWhenProductNameIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
-    await AssertBadRequest(response, ["ProductName", "EMPTY_PRODUCT_NAME"]);
+    await AssertBadRequest(response, ["Item", "EMPTY_ITEM_NAME"]);
   }
 
   [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidProductCategoryGenerator)], MaxTest = 25)]
   public async Task IsBadRequestWhenProductCategoryIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
-    await AssertBadRequest(response, ["ProductCategory", "EMPTY_PRODUCT_CATEGORY"]);
+    await AssertBadRequest(response, ["Category", "EMPTY_CATEGORY"]);
   }
 
   [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidQuantityGenerator)], MaxTest = 25)]

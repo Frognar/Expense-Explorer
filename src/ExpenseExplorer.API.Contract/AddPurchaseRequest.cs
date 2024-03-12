@@ -1,8 +1,8 @@
 namespace ExpenseExplorer.API.Contract;
 
 public record AddPurchaseRequest(
-  string ProductName,
-  string ProductCategory,
+  string Item,
+  string Category,
   decimal Quantity,
   decimal UnitPrice,
   decimal? TotalDiscount,
