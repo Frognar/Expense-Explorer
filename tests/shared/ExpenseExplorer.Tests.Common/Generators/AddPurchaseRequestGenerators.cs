@@ -8,7 +8,7 @@ public record AddPurchaseRequestGenerators(
   Gen<decimal> Quantity,
   Gen<decimal> UnitPrice,
   Gen<decimal?> TotalDiscount,
-  Gen<string?> Description)
+  Gen<string> Description)
 {
   public static readonly AddPurchaseRequestGenerators Valid = new(
     NonEmptyStringGenerator.NonEmptyStringGen().Generator,
@@ -16,7 +16,7 @@ public record AddPurchaseRequestGenerators(
     PositiveDecimalGenerator.PositiveDecimalGen().Generator,
     NonNegativeDecimalGenerator.NonNegativeDecimalGen().Generator,
     ArbMap.Default.ArbFor<decimal?>().Filter(d => !d.HasValue || d.Value >= 0).Generator,
-    ArbMap.Default.ArbFor<string?>().Filter(s => s == null || s.Length > 0).Generator);
+    ArbMap.Default.ArbFor<string>().Generator);
 
   public Arbitrary<AddPurchaseRequest> Arbitrary
     => (
