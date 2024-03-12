@@ -17,4 +17,10 @@ public class MoneyTests
   {
     Money.Create(value).Value.Should().Be(Math.Round(value, 3));
   }
+
+  [Property]
+  public void ValueIsZeroWhenCreatedWithZero()
+  {
+    Money.Zero.Value.Should().Be(0);
+  }
 }

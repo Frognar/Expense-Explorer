@@ -4,6 +4,8 @@ using ExpenseExplorer.Domain.Exceptions;
 
 public record Money
 {
+  public static readonly Money Zero = new(0);
+
   private Money(decimal value)
   {
     NegativeMoneyException.ThrowIfNegative(value);
