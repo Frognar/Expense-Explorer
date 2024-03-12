@@ -32,56 +32,56 @@ public class AddPurchaseTests
     request.Description.Should().Be(description);
   }
 
-  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 25)]
   public async Task CanAddPurchaseToReceipt(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
     response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
   }
 
-  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidProductNameGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidProductNameGenerator)], MaxTest = 25)]
   public async Task IsBadRequestWhenProductNameIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
     await AssertBadRequest(response, ["ProductName", "EMPTY_PRODUCT_NAME"]);
   }
 
-  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidProductCategoryGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidProductCategoryGenerator)], MaxTest = 25)]
   public async Task IsBadRequestWhenProductCategoryIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
     await AssertBadRequest(response, ["ProductCategory", "EMPTY_PRODUCT_CATEGORY"]);
   }
 
-  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidQuantityGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidQuantityGenerator)], MaxTest = 25)]
   public async Task IsBadRequestWhenQuantityIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
     await AssertBadRequest(response, ["Quantity", "NON_POSITIVE_QUANTITY"]);
   }
 
-  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidUnitPriceGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidUnitPriceGenerator)], MaxTest = 25)]
   public async Task IsBadRequestWhenUnitPriceIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
     await AssertBadRequest(response, ["UnitPrice", "NEGATIVE_UNIT_PRICE"]);
   }
 
-  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidTotalDiscountGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidTotalDiscountGenerator)], MaxTest = 25)]
   public async Task IsBadRequestWhenTotalDiscountIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
     await AssertBadRequest(response, ["TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT"]);
   }
 
-  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidDescriptionGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidDescriptionGenerator)], MaxTest = 25)]
   public async Task IsBadRequestWhenTotalDescriptionIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
     await AssertBadRequest(response, ["Description", "EMPTY_DESCRIPTION"]);
   }
 
-  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 25)]
   public async Task IsNotFoundWhenReceiptIdIsInvalid(AddPurchaseRequest request)
   {
     using WebApplicationFactory<Program> webAppFactory = new TestWebApplicationFactory();

@@ -14,7 +14,7 @@ public record AddPurchaseRequestGenerators(
     NonEmptyStringGenerator.NonEmptyStringGen().Generator,
     NonEmptyStringGenerator.NonEmptyStringGen().Generator,
     PositiveDecimalGenerator.PositiveDecimalGen().Generator,
-    ArbMap.Default.ArbFor<decimal>().Filter(d => d >= 0).Generator,
+    NonNegativeDecimalGenerator.NonNegativeDecimalGen().Generator,
     ArbMap.Default.ArbFor<decimal?>().Filter(d => !d.HasValue || d.Value >= 0).Generator,
     ArbMap.Default.ArbFor<string?>().Filter(s => s == null || s.Length > 0).Generator);
 

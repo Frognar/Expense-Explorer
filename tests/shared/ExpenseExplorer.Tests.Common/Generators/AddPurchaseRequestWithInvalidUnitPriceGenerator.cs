@@ -8,7 +8,7 @@ public static class AddPurchaseRequestWithInvalidUnitPriceGenerator
   {
     return (AddPurchaseRequestGenerators.Valid with
     {
-      UnitPrice = ArbMap.Default.ArbFor<decimal>().Filter(d => d < 0).Generator,
+      UnitPrice = NegativeDecimalGenerator.NegativeDecimalGen().Generator,
     }).Arbitrary;
   }
 }

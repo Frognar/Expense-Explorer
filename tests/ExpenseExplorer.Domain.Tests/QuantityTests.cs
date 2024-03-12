@@ -15,7 +15,6 @@ public class QuantityTests
   [Property(Arbitrary = [typeof(PositiveDecimalGenerator)])]
   public void ValueIsRoundTo4DecimalPlaces(decimal value)
   {
-    Quantity quantity = Quantity.Create(value);
-    quantity.Value.Should().Be(Math.Round(value, 4));
+    Quantity.Create(value).Value.Should().Be(Math.Round(value, 4));
   }
 }

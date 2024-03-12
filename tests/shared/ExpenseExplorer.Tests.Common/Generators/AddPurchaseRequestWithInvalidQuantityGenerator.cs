@@ -8,7 +8,7 @@ public static class AddPurchaseRequestWithInvalidQuantityGenerator
   {
     return (AddPurchaseRequestGenerators.Valid with
     {
-      Quantity = ArbMap.Default.ArbFor<decimal>().Filter(d => d <= 0).Generator,
+      Quantity = NonPositiveDecimalGenerator.NonPositiveGen().Generator,
     }).Arbitrary;
   }
 }

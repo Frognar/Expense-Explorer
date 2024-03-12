@@ -15,7 +15,6 @@ public class StoreTests
   [Property(Arbitrary = [typeof(NonEmptyStringGenerator)])]
   public void NameIsTrimmed(string name)
   {
-    Store store = Store.Create(name);
-    store.Name.Should().Be(name.Trim());
+    Store.Create(name).Name.Should().Be(name.Trim());
   }
 }

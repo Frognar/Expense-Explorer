@@ -15,7 +15,6 @@ public class CategoryTests
   [Property(Arbitrary = [typeof(NonEmptyStringGenerator)])]
   public void NameIsTrimmed(string name)
   {
-    Category category = Category.Create(name);
-    category.Name.Should().Be(name.Trim());
+    Category.Create(name).Name.Should().Be(name.Trim());
   }
 }

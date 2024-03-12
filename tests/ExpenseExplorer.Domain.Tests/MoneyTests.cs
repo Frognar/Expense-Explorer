@@ -15,7 +15,6 @@ public class MoneyTests
   [Property(Arbitrary = [typeof(NonNegativeDecimalGenerator)])]
   public void ValueIsRoundTo3DecimalPlaces(decimal value)
   {
-    Money money = Money.Create(value);
-    money.Value.Should().Be(Math.Round(value, 3));
+    Money.Create(value).Value.Should().Be(Math.Round(value, 3));
   }
 }

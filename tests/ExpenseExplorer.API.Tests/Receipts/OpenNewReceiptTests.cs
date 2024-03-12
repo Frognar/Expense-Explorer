@@ -15,7 +15,7 @@ public class OpenNewReceiptTests
     request.PurchaseDate.Should().Be(purchaseDate);
   }
 
-  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 25)]
   public async Task CanAddReceipt(string storeName, DateOnly purchaseDate)
   {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
@@ -25,7 +25,7 @@ public class OpenNewReceiptTests
     response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
   }
 
-  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(FutureDateOnlyGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(FutureDateOnlyGenerator)], MaxTest = 25)]
   public async Task IsBadRequestWhenReceiptInFuture(string storeName, DateOnly purchaseDate)
   {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
@@ -37,7 +37,7 @@ public class OpenNewReceiptTests
     responseContent.Should().Contain("PurchaseDate").And.Contain("FUTURE_DATE");
   }
 
-  [Property(Arbitrary = [typeof(EmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(EmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 25)]
   public async Task IsBadRequestWhenStoreNameIsEmpty(string storeName, DateOnly purchaseDate)
   {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
@@ -49,7 +49,7 @@ public class OpenNewReceiptTests
     responseContent.Should().Contain("StoreName").And.Contain("EMPTY_STORE_NAME");
   }
 
-  [Property(Arbitrary = [typeof(EmptyStringGenerator), typeof(FutureDateOnlyGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(EmptyStringGenerator), typeof(FutureDateOnlyGenerator)], MaxTest = 25)]
   public async Task AllValidationErrorsAreCollectedAndReturnedTogether(string storeName, DateOnly purchaseDate)
   {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
@@ -65,7 +65,7 @@ public class OpenNewReceiptTests
       .And.Contain("FUTURE_DATE");
   }
 
-  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 10)]
+  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 25)]
   public async Task ReturnsCreatedReceiptWhenValid(string storeName, DateOnly purchaseDate)
   {
     OpenNewReceiptRequest request = new(storeName, purchaseDate);
