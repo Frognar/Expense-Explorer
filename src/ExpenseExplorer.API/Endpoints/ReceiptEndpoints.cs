@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.API.Endpoints;
 
 using System.Diagnostics;
+using System.Net;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
 using ExpenseExplorer.Application.Receipts;
@@ -44,20 +45,24 @@ public static class ReceiptEndpoints
       IEnumerable<Fact> events = await eventStore.GetEvents(Id.Create(receiptId));
       if (!events.Any())
       {
-        return Results.NotFound();
+        return Results.Problem(
+          detail: $"Receipt with id '{receiptId}' not found.",
+          statusCode: (int)HttpStatusCode.NotFound,
+          extensions: new Dictionary<string, object?> { ["ReceiptId"] = receiptId, });
       }
     }
 
-    return validated
-      .Match(Handle, Results.Ok);
+    return validated.Match(Handle, Results.Ok);
   }
 
   private static IResult Handle(IEnumerable<ValidationError> errors)
   {
-    return Results.BadRequest(
-      new
+    return Results.Problem(
+      detail: "One or more validation errors occurred.",
+      statusCode: (int)HttpStatusCode.BadRequest,
+      extensions: new Dictionary<string, object?>
       {
-        Errors = errors
+        ["Errors"] = errors
           .GroupBy(e => e.Property)
           .ToDictionary(
             e => e.Key,
