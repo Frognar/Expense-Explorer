@@ -27,6 +27,34 @@ Expense Explorer is a simple expense tracking application designed to run on a h
 
 The project is currently under development. Stay tuned for future updates on setup and usage instructions.
 
+1. **Clone the Repository:** Begin by cloning the Expense Explorer repository to your local machine:
+    ```bash
+    git clone https://github.com/Frognar/Expense-Explorer.git
+    ```
+2. **Set Up Environment:** Ensure you have the necessary environment set up to run the project. This includes having the
+   .NET SDK installed. You can download it from [here](https://dotnet.microsoft.com/download).
+
+3. **Build and Run:** Navigate to the solution directory and run *build.sh* script to build the project:
+    ```bash
+    ./build.sh
+    ```
+
+   Once the build process is complete, you can execute *run.sh* script to start the application:
+    ```bash
+    ./run.sh
+    ```
+
+   The application should now be running and accessible at `http://localhost:5000`.
+4. **Explore API Endpoints:** With the application running, you can explore the API endpoints provided. For example, you
+   can interact with the receipt endpoints by sending HTTP requests to `/api/receipts`. You can use tools like Postman
+   or curl to make requests.
+
+Request:
+> ![add receipt request](imgs/addReceiptRequest.png)
+
+Response:
+> ![add receipt response](imgs/addReceiptResponse.png)
+
 ## Contributing
 
 Contributions to Expense Explorer are welcome! Whether it's bug fixes, new features, or enhancements, feel free to submit pull requests.

@@ -41,6 +41,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{E2
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		build.sh = build.sh
+		README.md = README.md
+		run.sh = run.sh
 	EndProjectSection
 EndProject
 Global
