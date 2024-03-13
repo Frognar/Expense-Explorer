@@ -27,29 +27,29 @@ public class ReceiptTests
     receiptCreated.PurchaseDate.Should().Be(receipt.PurchaseDate);
   }
 
-  [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator)])]
-  public void CanCorrectStore(PurchaseDate purchaseDate, Store store, Store newStore)
+  [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(StoreGenerator)])]
+  public void CanCorrectStore(Receipt receipt, Store newStore)
   {
-    Receipt receipt = Receipt.New(store, purchaseDate);
-    receipt = receipt.CorrectStore(newStore);
-    receipt.Store.Should().Be(newStore);
+    receipt
+      .CorrectStore(newStore)
+      .Store
+      .Should()
+      .Be(newStore);
   }
 
-  [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator)])]
-  public void ProducesStoreUpdatedEventWhenStoreUpdated(PurchaseDate purchaseDate, Store store, Store newStore)
+  [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(StoreGenerator)])]
+  public void ProducesStoreUpdatedEventWhenStoreUpdated(Receipt receipt, Store newStore)
   {
-    Receipt receipt = Receipt.New(store, purchaseDate);
     receipt = receipt.CorrectStore(newStore);
-    receipt.UnsavedChanges.Count().Should().Be(2);
     StoreCorrected storeCorrected = receipt.UnsavedChanges.OfType<StoreCorrected>().Single();
     storeCorrected.Id.Should().Be(receipt.Id);
     storeCorrected.Store.Should().Be(receipt.Store);
   }
 
-  [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator)])]
-  public void HasNoUnsavedChangesAfterClearingChanges(PurchaseDate purchaseDate, Store store, Store newStore)
+  [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(StoreGenerator)])]
+  public void HasNoUnsavedChangesAfterClearingChanges(Receipt receipt, Store newStore)
   {
-    Receipt.New(store, purchaseDate)
+    receipt
       .CorrectStore(newStore)
       .ClearChanges()
       .UnsavedChanges
