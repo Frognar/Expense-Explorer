@@ -42,7 +42,7 @@ public class ReceiptTests
   {
     receipt = receipt.CorrectStore(newStore);
     StoreCorrected storeCorrected = receipt.UnsavedChanges.OfType<StoreCorrected>().Single();
-    storeCorrected.Id.Should().Be(receipt.Id);
+    storeCorrected.ReceiptId.Should().Be(receipt.Id);
     storeCorrected.Store.Should().Be(receipt.Store);
   }
 
@@ -65,5 +65,14 @@ public class ReceiptTests
       .Purchases
       .Should()
       .Contain(purchase);
+  }
+
+  [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(PurchaseGenerator)])]
+  public void ProducesPurchaseAddedEventWhenPurchaseAdded(Receipt receipt, Purchase purchase)
+  {
+    receipt = receipt.AddPurchase(purchase);
+    PurchaseAdded purchaseAdded = receipt.UnsavedChanges.OfType<PurchaseAdded>().Single();
+    purchaseAdded.ReceiptId.Should().Be(receipt.Id);
+    purchaseAdded.Purchase.Should().Be(receipt.Purchases.Last());
   }
 }

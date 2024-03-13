@@ -2,15 +2,15 @@ namespace ExpenseExplorer.Domain.Receipts.Events;
 
 using ExpenseExplorer.Domain.ValueObjects;
 
-public class StoreCorrected : Fact
+public class PurchaseAdded : Fact
 {
-  public StoreCorrected(Id receiptId, Store store)
+  public PurchaseAdded(Id receiptId, Purchase purchase)
   {
     ReceiptId = receiptId;
-    Store = store;
+    Purchase = purchase;
   }
 
   public Id ReceiptId { get; }
 
-  public Store Store { get; }
+  public Purchase Purchase { get; }
 }

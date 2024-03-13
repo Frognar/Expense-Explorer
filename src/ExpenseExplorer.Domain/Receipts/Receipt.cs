@@ -47,6 +47,9 @@ public class Receipt
 
   public Receipt AddPurchase(Purchase purchase)
   {
-    return new Receipt(Id, Store, PurchaseDate, Purchases.Append(purchase).ToList(), changes.ToList());
+    Fact purchaseAdded = new PurchaseAdded(Id, purchase);
+    List<Fact> allChanges = changes.Append(purchaseAdded).ToList();
+    List<Purchase> allPurchases = Purchases.Append(purchase).ToList();
+    return new Receipt(Id, Store, PurchaseDate, allPurchases, allChanges);
   }
 }
