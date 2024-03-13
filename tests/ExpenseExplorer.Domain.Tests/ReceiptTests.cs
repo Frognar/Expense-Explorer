@@ -56,4 +56,14 @@ public class ReceiptTests
       .Should()
       .BeEmpty();
   }
+
+  [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(PurchaseGenerator)])]
+  public void CanAddPurchase(Receipt receipt, Purchase purchase)
+  {
+    receipt
+      .AddPurchase(purchase)
+      .Purchases
+      .Should()
+      .Contain(purchase);
+  }
 }
