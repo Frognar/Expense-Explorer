@@ -19,6 +19,12 @@ public class PurchaseDateTests
     act.Should().Throw<FutureDateException>();
   }
 
+  [Fact]
+  public void CanCreateMinimumDate()
+  {
+    PurchaseDate.MinValue.Date.Should().Be(DateOnly.MinValue);
+  }
+
   private static PurchaseDate CreatePurchaseDate(DateOnly date)
   {
     return PurchaseDate.Create(date, TodayDateOnly);

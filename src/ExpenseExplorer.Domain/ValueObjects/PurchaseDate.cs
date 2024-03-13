@@ -4,6 +4,8 @@ using ExpenseExplorer.Domain.Exceptions;
 
 public record PurchaseDate
 {
+  public static readonly PurchaseDate MinValue = new(DateOnly.MinValue, DateOnly.MinValue);
+
   private PurchaseDate(DateOnly date, DateOnly today)
   {
     FutureDateException.ThrowIfFutureDate(date, today);
