@@ -75,4 +75,22 @@ public class ReceiptTests
     purchaseAdded.ReceiptId.Should().Be(receipt.Id);
     purchaseAdded.Purchase.Should().Be(receipt.Purchases.Last());
   }
+
+  [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator), typeof(PurchaseGenerator)])]
+  public void CanBeRecreatedFromEvents(Store store, PurchaseDate purchaseDate, Purchase purchase, Store newStore)
+  {
+    Id receiptId = Id.Unique();
+    IEnumerable<Fact> events = new List<Fact>
+    {
+      new ReceiptCreated(receiptId, store, purchaseDate),
+      new PurchaseAdded(receiptId, purchase),
+      new StoreCorrected(receiptId, newStore),
+    };
+
+    Receipt receipt = Receipt.Recreate(events);
+    receipt.Id.Should().Be(receiptId);
+    receipt.Store.Should().Be(newStore);
+    receipt.PurchaseDate.Should().Be(purchaseDate);
+    receipt.Purchases.Should().Contain(purchase);
+  }
 }
