@@ -39,14 +39,14 @@ public class AddPurchaseTests
     response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
   }
 
-  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidProductNameGenerator)], MaxTest = 25)]
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidItemGenerator)], MaxTest = 25)]
   public async Task IsBadRequestWhenProductNameIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
     await AssertBadRequest(response, ["Item", "EMPTY_ITEM_NAME"]);
   }
 
-  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidProductCategoryGenerator)], MaxTest = 25)]
+  [Property(Arbitrary = [typeof(AddPurchaseRequestWithInvalidCategoryGenerator)], MaxTest = 25)]
   public async Task IsBadRequestWhenProductCategoryIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);

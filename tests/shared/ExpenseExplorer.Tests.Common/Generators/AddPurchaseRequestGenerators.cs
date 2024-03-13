@@ -3,8 +3,8 @@ namespace ExpenseExplorer.Tests.Common.Generators;
 using ExpenseExplorer.API.Contract;
 
 public record AddPurchaseRequestGenerators(
-  Gen<string> ProductName,
-  Gen<string> ProductCategory,
+  Gen<string> Item,
+  Gen<string> Category,
   Gen<decimal> Quantity,
   Gen<decimal> UnitPrice,
   Gen<decimal?> TotalDiscount,
@@ -20,15 +20,15 @@ public record AddPurchaseRequestGenerators(
 
   public Arbitrary<AddPurchaseRequest> Arbitrary
     => (
-      from productName in ProductName
-      from productCategory in ProductCategory
+      from item in Item
+      from category in Category
       from quantity in Quantity
       from unitPrice in UnitPrice
       from totalDiscount in TotalDiscount
       from description in Description
       select new AddPurchaseRequest(
-        productName,
-        productCategory,
+        item,
+        category,
         quantity,
         unitPrice,
         totalDiscount,
