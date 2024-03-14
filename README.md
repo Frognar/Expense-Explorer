@@ -1,4 +1,12 @@
-# Expense Explorer
+<p align="center">
+    <img alt="Expense-Explorer-Logo" src="imgs/Expense-Explorer-Logo-512.png">
+</p>
+
+## Expense-Explorer
+
+[![100 - commitów](https://img.shields.io/badge/100-commitów-2ea44f?logo=csharp)](https://100commitow.pl/)
+[![.net workflow](https://github.com/Frognar/Expense-Explorer/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/Frognar/Expense-Explorer/actions/workflows/dotnet.yml)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Expense Explorer is a simple expense tracking application designed to run on a home server, allowing users to manage their receipts and track expenses conveniently. This project is written in C# and serves as a learning opportunity, particularly exploring concepts like Event-sourcing.
 
