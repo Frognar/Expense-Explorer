@@ -1,4 +1,8 @@
-# Expense Explorer
+<p align="center">
+    <img alt="Expense-Explorer-Logo" src="imgs/Expense-Explorer-Logo-512.png">
+</p>
+
+## Expense-Explorer
 
 Expense Explorer is a simple expense tracking application designed to run on a home server, allowing users to manage their receipts and track expenses conveniently. This project is written in C# and serves as a learning opportunity, particularly exploring concepts like Event-sourcing.
 
