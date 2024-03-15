@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.Application.Tests;
 
 using System.Globalization;
+using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Validations;
 
 public class ApplicativeValidatedTests

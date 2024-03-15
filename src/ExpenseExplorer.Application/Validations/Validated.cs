@@ -1,5 +1,7 @@
 namespace ExpenseExplorer.Application.Validations;
 
+using ExpenseExplorer.Application.Errors;
+
 public class Validated<S>
 {
   private readonly IValidation validation;

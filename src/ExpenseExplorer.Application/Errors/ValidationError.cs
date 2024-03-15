@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Application.Validations;
+namespace ExpenseExplorer.Application.Errors;
 
 public record ValidationError(string Property, string ErrorCode)
 {

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Net;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
+using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Application.Validations;

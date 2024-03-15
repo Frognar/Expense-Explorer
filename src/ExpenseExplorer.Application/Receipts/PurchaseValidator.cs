@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.Application.Receipts;
 
+using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.ValueObjects;
