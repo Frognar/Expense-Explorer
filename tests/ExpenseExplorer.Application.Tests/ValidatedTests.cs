@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.Application.Tests;
 
 using System.Globalization;
+using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Validations;
 
 public class ValidatedTests
@@ -57,6 +58,18 @@ public class ValidatedTests
       .Match(
         AggregateErrors,
         v => v)
+      .Should()
+      .Be(GetExpectedString(value));
+  }
+
+  [Property]
+  public void ChangeToEither(int value)
+  {
+    Validated<int> validated = Validate(value);
+
+    Either<IEnumerable<ValidationError>, int> either = validated.ToEither();
+
+    either.Match(AggregateErrors, v => v.ToString(CultureInfo.InvariantCulture))
       .Should()
       .Be(GetExpectedString(value));
   }
