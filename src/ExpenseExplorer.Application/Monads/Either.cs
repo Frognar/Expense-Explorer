@@ -14,18 +14,16 @@ public sealed class Either<L, R>
     T Match<T>(Func<L, T> onLeft, Func<R, T> onRight);
   }
 
-#pragma warning disable CA1000
-  public static Either<L, R> Left(L left) => new(new EitherLeft(left));
-
-  public static Either<L, R> Right(R right) => new(new EitherRight(right));
-#pragma warning restore CA1000
-
   public T Match<T>(Func<L, T> onLeft, Func<R, T> onRight)
   {
     ArgumentNullException.ThrowIfNull(onLeft);
     ArgumentNullException.ThrowIfNull(onRight);
     return either.Match(onLeft, onRight);
   }
+
+  internal static Either<L, R> Left(L left) => new(new EitherLeft(left));
+
+  internal static Either<L, R> Right(R right) => new(new EitherRight(right));
 
   private sealed class EitherLeft : IEither
   {
