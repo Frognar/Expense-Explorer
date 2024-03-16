@@ -44,4 +44,18 @@ public class EitherTests
       .Should()
       .Be(value < 0 ? value.ToString(CultureInfo.InvariantCulture) : "Negative");
   }
+
+  [Property]
+  public void ProjectsRightWhenRight(int value)
+  {
+    var either = value < 0
+      ? Left.From<int, string>(value)
+      : Right.From<int, string>("Negative");
+
+    var projected = either.SelectRight(s => s.Length);
+
+    projected.Match(l => l, r => r)
+      .Should()
+      .Be(value < 0 ? value : "Negative".Length);
+  }
 }
