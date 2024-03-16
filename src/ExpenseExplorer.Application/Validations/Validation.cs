@@ -7,14 +7,14 @@ public static class Validation
 {
   public static Validated<S> Succeeded<S>(S value) => Validated<S>.Success(value);
 
-  public static Validated<S> Failed<S>(IEnumerable<ValidationError> errors) => Validated<S>.Fail(errors);
+  public static Validated<S> Failed<S>(ValidationFailure errors) => Validated<S>.Fail(errors);
 
-  public static Either<IEnumerable<ValidationError>, S> ToEither<S>(this Validated<S> validated)
+  public static Either<ValidationFailure, S> ToEither<S>(this Validated<S> validated)
   {
     ArgumentNullException.ThrowIfNull(validated);
     return validated.Match(
-      Left.From<IEnumerable<ValidationError>, S>,
-      Right.From<IEnumerable<ValidationError>, S>);
+      Left.From<ValidationFailure, S>,
+      Right.From<ValidationFailure, S>);
   }
 
   public static Validated<S> Apply<T, S>(this Func<T, S> map, Validated<T> source)

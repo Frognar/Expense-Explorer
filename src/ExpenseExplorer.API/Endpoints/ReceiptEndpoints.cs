@@ -35,7 +35,7 @@ public static class ReceiptEndpoints
 
     return validated
       .ToEither()
-      .MapBoth(l => new ValidationFailure(l), r => r.MapToResponse())
+      .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
   }
 
@@ -57,7 +57,6 @@ public static class ReceiptEndpoints
 
     return validated
       .ToEither()
-      .MapLeft(errors => new ValidationFailure(errors))
       .Match(Handle, Results.Ok);
   }
 

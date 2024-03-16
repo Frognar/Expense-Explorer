@@ -23,28 +23,28 @@ public static class PurchaseValidator
   private static Validated<Item> ValidateItem(string item)
   {
     return string.IsNullOrWhiteSpace(item)
-      ? Validation.Failed<Item>([ValidationError.Create("Item", "EMPTY_ITEM_NAME")])
+      ? Validation.Failed<Item>(ValidationFailure.SingleFailure("Item", "EMPTY_ITEM_NAME"))
       : Validation.Succeeded(Item.Create(item));
   }
 
   private static Validated<Category> ValidateCategory(string category)
   {
     return string.IsNullOrWhiteSpace(category)
-      ? Validation.Failed<Category>([ValidationError.Create("Category", "EMPTY_CATEGORY")])
+      ? Validation.Failed<Category>(ValidationFailure.SingleFailure("Category", "EMPTY_CATEGORY"))
       : Validation.Succeeded(Category.Create(category));
   }
 
   private static Validated<Quantity> ValidateQuantity(decimal quantity)
   {
     return quantity <= 0
-      ? Validation.Failed<Quantity>([ValidationError.Create("Quantity", "NON_POSITIVE_QUANTITY")])
+      ? Validation.Failed<Quantity>(ValidationFailure.SingleFailure("Quantity", "NON_POSITIVE_QUANTITY"))
       : Validation.Succeeded(Quantity.Create(quantity));
   }
 
   private static Validated<Money> ValidateUnitPrice(decimal unitPrice)
   {
     return unitPrice < 0
-      ? Validation.Failed<Money>([ValidationError.Create("UnitPrice", "NEGATIVE_UNIT_PRICE")])
+      ? Validation.Failed<Money>(ValidationFailure.SingleFailure("UnitPrice", "NEGATIVE_UNIT_PRICE"))
       : Validation.Succeeded(Money.Create(unitPrice));
   }
 
@@ -52,7 +52,7 @@ public static class PurchaseValidator
   {
     if (totalDiscount is < 0)
     {
-      return Validation.Failed<Money>([ValidationError.Create("TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT")]);
+      return Validation.Failed<Money>(ValidationFailure.SingleFailure("TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT"));
     }
 
     return totalDiscount.HasValue
