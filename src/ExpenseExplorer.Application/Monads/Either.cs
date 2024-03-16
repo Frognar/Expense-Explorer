@@ -63,6 +63,13 @@ public sealed class Either<L, R>
     return Match(leftSelector, rightSelector);
   }
 
+  public Either<L, R1> SelectMany<R1, T>(Func<R, Either<L, T>> selector, Func<R, T, R1> projector)
+  {
+    ArgumentNullException.ThrowIfNull(selector);
+    ArgumentNullException.ThrowIfNull(projector);
+    return FlatMapRight(right => selector(right).MapRight(t => projector(right, t)));
+  }
+
   internal static Either<L, R> Left(L left) => new(new EitherLeft(left));
 
   internal static Either<L, R> Right(R right) => new(new EitherRight(right));

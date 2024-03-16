@@ -135,4 +135,21 @@ public class EitherTests
       .Should()
       .Be(value < 0 ? value : "Negative".Length);
   }
+
+  [Property]
+  public void FlatMapsRightWithQuerySyntax(int value)
+  {
+    var either = value < 0
+      ? Left.From<int, string>(value)
+      : Right.From<int, string>("Negative");
+
+    var projected =
+      from r in either
+      from r1 in either
+      select (r + r1).Length;
+
+    projected.Match(l => l, r => r)
+      .Should()
+      .Be(value < 0 ? value : "NegativeNegative".Length);
+  }
 }
