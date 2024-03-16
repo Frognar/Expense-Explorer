@@ -35,6 +35,15 @@ public sealed class Either<L, R>
 
   public Either<L, R1> Select<R1>(Func<R, R1> selector) => MapRight(selector);
 
+  public Either<L1, R1> MapBoth<L1, R1>(Func<L, L1> leftSelector, Func<R, R1> rightSelector)
+  {
+    ArgumentNullException.ThrowIfNull(leftSelector);
+    ArgumentNullException.ThrowIfNull(rightSelector);
+    return Match(
+      left => Either<L1, R1>.Left(leftSelector(left)),
+      right => Either<L1, R1>.Right(rightSelector(right)));
+  }
+
   internal static Either<L, R> Left(L left) => new(new EitherLeft(left));
 
   internal static Either<L, R> Right(R right) => new(new EitherRight(right));

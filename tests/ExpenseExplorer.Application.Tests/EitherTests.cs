@@ -74,4 +74,20 @@ public class EitherTests
       .Should()
       .Be(value < 0 ? value : "Negative".Length);
   }
+
+  [Property]
+  public void ProjectsBoth(int value)
+  {
+    var either = value < 0
+      ? Left.From<int, string>(value)
+      : Right.From<int, string>("Negative");
+
+    var projected = either.MapBoth(
+      l => l.ToString(CultureInfo.InvariantCulture),
+      r => r.Length);
+
+    projected.Match(l => l.Length, r => r)
+      .Should()
+      .Be(value < 0 ? value.ToString(CultureInfo.InvariantCulture).Length : "Negative".Length);
+  }
 }
