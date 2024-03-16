@@ -21,6 +21,12 @@ public sealed class Either<L, R>
     return either.Match(onLeft, onRight);
   }
 
+  public Either<L1, R> SelectLeft<L1>(Func<L, L1> selector)
+  {
+    ArgumentNullException.ThrowIfNull(selector);
+    return Match(left => Either<L1, R>.Left(selector(left)), Either<L1, R>.Right);
+  }
+
   internal static Either<L, R> Left(L left) => new(new EitherLeft(left));
 
   internal static Either<L, R> Right(R right) => new(new EitherRight(right));

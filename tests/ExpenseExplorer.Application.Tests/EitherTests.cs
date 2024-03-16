@@ -27,6 +27,21 @@ public class EitherTests
       : Right.From<string, int>(value);
 
     either.Match(left => left, right => right.ToString(CultureInfo.InvariantCulture))
-      .Should().Be(value < 0 ? "Negative" : value.ToString(CultureInfo.InvariantCulture));
+      .Should()
+      .Be(value < 0 ? "Negative" : value.ToString(CultureInfo.InvariantCulture));
+  }
+
+  [Property]
+  public void ProjectsLeftWhenLeft(int value)
+  {
+    var either = value < 0
+      ? Left.From<int, string>(value)
+      : Right.From<int, string>("Negative");
+
+    var projected = either.SelectLeft(s => s.ToString(CultureInfo.InvariantCulture));
+
+    projected.Match(l => l, r => r)
+      .Should()
+      .Be(value < 0 ? value.ToString(CultureInfo.InvariantCulture) : "Negative");
   }
 }
