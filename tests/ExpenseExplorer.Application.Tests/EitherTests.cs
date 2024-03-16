@@ -38,7 +38,7 @@ public class EitherTests
       ? Left.From<int, string>(value)
       : Right.From<int, string>("Negative");
 
-    var projected = either.MapLeft(s => s.ToString(CultureInfo.InvariantCulture));
+    var projected = either.MapLeft(l => l.ToString(CultureInfo.InvariantCulture));
 
     projected.Match(l => l, r => r)
       .Should()
@@ -52,7 +52,7 @@ public class EitherTests
       ? Left.From<int, string>(value)
       : Right.From<int, string>("Negative");
 
-    var projected = either.MapRight(s => s.Length);
+    var projected = either.MapRight(r => r.Length);
 
     projected.Match(l => l, r => r)
       .Should()
@@ -99,7 +99,7 @@ public class EitherTests
       : Right.From<int, string>("Negative");
 
     var projected = either
-      .FlatMapLeft(s => Right.From<string, string>(s.ToString(CultureInfo.InvariantCulture)));
+      .FlatMapLeft(l => Right.From<string, string>(l.ToString(CultureInfo.InvariantCulture)));
 
     projected.Match(l => l, r => r)
       .Should()
@@ -114,9 +114,24 @@ public class EitherTests
       : Right.From<int, string>("Negative");
 
     var projected = either
-      .FlatMapRight(s => Left.From<int, int>(s.Length));
+      .FlatMapRight(r => Left.From<int, int>(r.Length));
 
     projected.Match(l => l, r => r)
+      .Should()
+      .Be(value < 0 ? value : "Negative".Length);
+  }
+
+  [Property]
+  public void FlatMapsEitherLeftOrRight(int value)
+  {
+    var either = value < 0
+      ? Left.From<int, string>(value)
+      : Right.From<int, string>("Negative");
+
+    var projected = either
+      .FlatMapBoth(Right.From<string, int>, Left.From<string, int>);
+
+    projected.Match(l => l.Length, r => r)
       .Should()
       .Be(value < 0 ? value : "Negative".Length);
   }
