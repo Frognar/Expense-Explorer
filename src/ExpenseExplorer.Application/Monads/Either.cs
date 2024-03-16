@@ -21,17 +21,19 @@ public sealed class Either<L, R>
     return either.Match(onLeft, onRight);
   }
 
-  public Either<L1, R> SelectLeft<L1>(Func<L, L1> selector)
+  public Either<L1, R> MapLeft<L1>(Func<L, L1> selector)
   {
     ArgumentNullException.ThrowIfNull(selector);
     return Match(left => Either<L1, R>.Left(selector(left)), Either<L1, R>.Right);
   }
 
-  public Either<L, R1> SelectRight<R1>(Func<R, R1> selector)
+  public Either<L, R1> MapRight<R1>(Func<R, R1> selector)
   {
     ArgumentNullException.ThrowIfNull(selector);
     return Match(Either<L, R1>.Left, right => Either<L, R1>.Right(selector(right)));
   }
+
+  public Either<L, R1> Select<R1>(Func<R, R1> selector) => MapRight(selector);
 
   internal static Either<L, R> Left(L left) => new(new EitherLeft(left));
 

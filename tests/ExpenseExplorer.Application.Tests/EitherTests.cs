@@ -38,7 +38,7 @@ public class EitherTests
       ? Left.From<int, string>(value)
       : Right.From<int, string>("Negative");
 
-    var projected = either.SelectLeft(s => s.ToString(CultureInfo.InvariantCulture));
+    var projected = either.MapLeft(s => s.ToString(CultureInfo.InvariantCulture));
 
     projected.Match(l => l, r => r)
       .Should()
@@ -52,7 +52,23 @@ public class EitherTests
       ? Left.From<int, string>(value)
       : Right.From<int, string>("Negative");
 
-    var projected = either.SelectRight(s => s.Length);
+    var projected = either.MapRight(s => s.Length);
+
+    projected.Match(l => l, r => r)
+      .Should()
+      .Be(value < 0 ? value : "Negative".Length);
+  }
+
+  [Property]
+  public void ProjectsRightWithQuerySyntax(int value)
+  {
+    var either = value < 0
+      ? Left.From<int, string>(value)
+      : Right.From<int, string>("Negative");
+
+    var projected =
+      from r in either
+      select r.Length;
 
     projected.Match(l => l, r => r)
       .Should()
