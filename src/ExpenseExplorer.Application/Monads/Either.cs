@@ -44,6 +44,12 @@ public sealed class Either<L, R>
       right => Either<L1, R1>.Right(rightSelector(right)));
   }
 
+  public Either<L1, R> FlatMapLeft<L1>(Func<L, Either<L1, R>> selector)
+  {
+    ArgumentNullException.ThrowIfNull(selector);
+    return Match(selector, Either<L1, R>.Right);
+  }
+
   internal static Either<L, R> Left(L left) => new(new EitherLeft(left));
 
   internal static Either<L, R> Right(R right) => new(new EitherRight(right));

@@ -32,7 +32,7 @@ public class EitherTests
   }
 
   [Property]
-  public void ProjectsLeftWhenLeft(int value)
+  public void MapsLeftWhenLeft(int value)
   {
     var either = value < 0
       ? Left.From<int, string>(value)
@@ -46,7 +46,7 @@ public class EitherTests
   }
 
   [Property]
-  public void ProjectsRightWhenRight(int value)
+  public void MapsRightWhenRight(int value)
   {
     var either = value < 0
       ? Left.From<int, string>(value)
@@ -60,7 +60,7 @@ public class EitherTests
   }
 
   [Property]
-  public void ProjectsRightWithQuerySyntax(int value)
+  public void MapsRightWithQuerySyntax(int value)
   {
     var either = value < 0
       ? Left.From<int, string>(value)
@@ -76,7 +76,7 @@ public class EitherTests
   }
 
   [Property]
-  public void ProjectsBoth(int value)
+  public void MapsEitherLeftOrRight(int value)
   {
     var either = value < 0
       ? Left.From<int, string>(value)
@@ -89,5 +89,20 @@ public class EitherTests
     projected.Match(l => l.Length, r => r)
       .Should()
       .Be(value < 0 ? value.ToString(CultureInfo.InvariantCulture).Length : "Negative".Length);
+  }
+
+  [Property]
+  public void FlatMapsLeftWhenLeft(int value)
+  {
+    var either = value < 0
+      ? Left.From<int, string>(value)
+      : Right.From<int, string>("Negative");
+
+    var projected = either
+      .FlatMapLeft(s => Right.From<string, string>(s.ToString(CultureInfo.InvariantCulture)));
+
+    projected.Match(l => l, r => r)
+      .Should()
+      .Be(value < 0 ? value.ToString(CultureInfo.InvariantCulture) : "Negative");
   }
 }
