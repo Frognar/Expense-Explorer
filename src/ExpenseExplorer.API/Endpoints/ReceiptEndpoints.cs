@@ -33,7 +33,9 @@ public static class ReceiptEndpoints
       await eventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges);
     }
 
-    return validated.Select(r => r.MapToResponse())
+    return validated
+      .ToEither()
+      .MapBoth(l => new ValidationFailure(l), r => r.MapToResponse())
       .Match(Handle, Results.Ok);
   }
 
@@ -53,17 +55,29 @@ public static class ReceiptEndpoints
       }
     }
 
-    return validated.Match(Handle, Results.Ok);
+    return validated
+      .ToEither()
+      .MapLeft(errors => new ValidationFailure(errors))
+      .Match(Handle, Results.Ok);
   }
 
-  private static IResult Handle(IEnumerable<ValidationError> errors)
+  private static IResult Handle(Failure failure)
+  {
+    return failure switch
+    {
+      ValidationFailure validationFailure => HandleValidation(validationFailure),
+      _ => Results.Problem(detail: failure.Message, statusCode: (int)HttpStatusCode.InternalServerError),
+    };
+  }
+
+  private static IResult HandleValidation(ValidationFailure validationFailure)
   {
     return Results.Problem(
-      detail: "One or more validation errors occurred.",
+      detail: validationFailure.Message,
       statusCode: (int)HttpStatusCode.BadRequest,
       extensions: new Dictionary<string, object?>
       {
-        ["Errors"] = errors
+        ["Errors"] = validationFailure.Errors
           .GroupBy(e => e.Property)
           .ToDictionary(
             e => e.Key,
