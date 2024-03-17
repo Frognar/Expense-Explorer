@@ -45,6 +45,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{E2
 		run.sh = run.sh
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.Infrastructure", "src\ExpenseExplorer.Infrastructure\ExpenseExplorer.Infrastructure.csproj", "{25FC5C57-0753-419C-97C4-A57D626010B3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,10 @@ Global
 		{CAD8EEE1-446A-46C9-9109-18DBC60EB38D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAD8EEE1-446A-46C9-9109-18DBC60EB38D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAD8EEE1-446A-46C9-9109-18DBC60EB38D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{25FC5C57-0753-419C-97C4-A57D626010B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25FC5C57-0753-419C-97C4-A57D626010B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25FC5C57-0753-419C-97C4-A57D626010B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25FC5C57-0753-419C-97C4-A57D626010B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{022DC1F1-789B-4794-BF36-163F17BA4756} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
@@ -95,5 +101,6 @@ Global
 		{F3A96BEE-07CA-4500-AA29-0A6DAD93C706} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
 		{B42E0D8F-9456-40A6-8E43-3A07209E5D40} = {74FEB020-4690-4D99-A72F-BCE3EA8953F9}
 		{CAD8EEE1-446A-46C9-9109-18DBC60EB38D} = {B42E0D8F-9456-40A6-8E43-3A07209E5D40}
+		{25FC5C57-0753-419C-97C4-A57D626010B3} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
 	EndGlobalSection
 EndGlobal
