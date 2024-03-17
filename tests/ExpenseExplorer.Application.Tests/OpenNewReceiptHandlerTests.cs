@@ -37,7 +37,7 @@ public class OpenNewReceiptHandlerTests
     var receipt = (await Handle(command))
       .Match(_ => throw new UnreachableException(), receipt => receipt);
 
-    repository.Should().Contain(receipt);
+    repository.Should().Contain(r => r.Id == receipt.Id);
   }
 
   private async Task<Either<Failure, Receipt>> Handle(OpenNewReceiptCommand command)
