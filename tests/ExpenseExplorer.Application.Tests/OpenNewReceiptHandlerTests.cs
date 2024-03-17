@@ -2,28 +2,19 @@ namespace ExpenseExplorer.Application.Tests;
 
 using System.Diagnostics;
 using ExpenseExplorer.Application.Errors;
+using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
+using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
 public class OpenNewReceiptHandlerTests
 {
-  [Fact]
-  public void CanCreateHandler()
-  {
-    IReceiptRepository repository = new InMemoryReceiptRepository();
-    OpenNewReceiptCommandHandler handler = new(repository);
-    handler.Should().NotBeNull();
-  }
-
   [Property(Arbitrary = [typeof(ValidOpenNewReceiptCommandGenerator)])]
   public async Task CanHandleValidCommand(OpenNewReceiptCommand command)
   {
-    IReceiptRepository repository = new InMemoryReceiptRepository();
-    OpenNewReceiptCommandHandler handler = new(repository);
-
-    var response = await handler.HandleAsync(command);
-    var receipt = response.Match(_ => throw new UnreachableException(), receipt => receipt);
+    var receipt = (await Handle(command))
+      .Match(_ => throw new UnreachableException(), receipt => receipt);
 
     receipt.Store.Name.Should().Be(command.StoreName.Trim());
     receipt.PurchaseDate.Date.Should().Be(command.PurchaseDate);
@@ -32,12 +23,16 @@ public class OpenNewReceiptHandlerTests
   [Property(Arbitrary = [typeof(InvalidOpenNewReceiptCommandGenerator)])]
   public async Task CanHandleInvalidCommand(OpenNewReceiptCommand command)
   {
-    IReceiptRepository repository = new InMemoryReceiptRepository();
-    OpenNewReceiptCommandHandler handler = new(repository);
-
-    var response = await handler.HandleAsync(command);
-    var failure = response.Match(failure => failure, _ => throw new UnreachableException());
+    var failure = (await Handle(command))
+      .Match(failure => failure, _ => throw new UnreachableException());
 
     failure.Should().BeOfType<ValidationFailure>();
+  }
+
+  private static async Task<Either<Failure, Receipt>> Handle(OpenNewReceiptCommand command)
+  {
+    IReceiptRepository repository = new InMemoryReceiptRepository();
+    OpenNewReceiptCommandHandler handler = new(repository);
+    return await handler.HandleAsync(command);
   }
 }
