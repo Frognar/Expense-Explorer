@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.Application.Tests;
 
 using System.Diagnostics;
+using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Infrastructure.Receipts.Persistence;
@@ -26,5 +27,17 @@ public class OpenNewReceiptHandlerTests
 
     receipt.Store.Name.Should().Be(command.StoreName.Trim());
     receipt.PurchaseDate.Date.Should().Be(command.PurchaseDate);
+  }
+
+  [Property(Arbitrary = [typeof(InvalidOpenNewReceiptCommandGenerator)])]
+  public async Task CanHandleInvalidCommand(OpenNewReceiptCommand command)
+  {
+    IReceiptRepository repository = new InMemoryReceiptRepository();
+    OpenNewReceiptCommandHandler handler = new(repository);
+
+    var response = await handler.HandleAsync(command);
+    var failure = response.Match(failure => failure, _ => throw new UnreachableException());
+
+    failure.Should().BeOfType<ValidationFailure>();
   }
 }

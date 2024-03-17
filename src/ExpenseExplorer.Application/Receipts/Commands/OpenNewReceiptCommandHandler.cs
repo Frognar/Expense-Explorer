@@ -3,8 +3,8 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Persistence;
+using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.ValueObjects;
 
 public class OpenNewReceiptCommandHandler
 {
@@ -19,10 +19,7 @@ public class OpenNewReceiptCommandHandler
 #pragma warning restore CA1822
   {
     ArgumentNullException.ThrowIfNull(command);
-    var receipt = Receipt.New(
-      Store.Create(command.StoreName),
-      PurchaseDate.Create(command.PurchaseDate, command.Today));
-
-    return Right.From<Failure, Receipt>(receipt);
+    Validated<Receipt> receipt = ReceiptValidator.Validate(command);
+    return receipt.ToEither().MapLeft(f => (Failure)f);
   }
 }
