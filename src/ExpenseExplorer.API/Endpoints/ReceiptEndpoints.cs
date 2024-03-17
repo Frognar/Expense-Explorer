@@ -6,11 +6,11 @@ using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Receipts;
-using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
+using ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
 public static class ReceiptEndpoints
 {

@@ -18,6 +18,7 @@
         <ProjectReference Include="..\ExpenseExplorer.API.Contract\ExpenseExplorer.API.Contract.csproj"/>
         <ProjectReference Include="..\ExpenseExplorer.Application\ExpenseExplorer.Application.csproj"/>
         <ProjectReference Include="..\ExpenseExplorer.Domain\ExpenseExplorer.Domain.csproj"/>
+        <ProjectReference Include="..\ExpenseExplorer.Infrastructure\ExpenseExplorer.Infrastructure.csproj"/>
     </ItemGroup>
 
 </Project>

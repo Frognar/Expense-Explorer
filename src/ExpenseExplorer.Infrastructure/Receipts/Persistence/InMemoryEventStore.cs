@@ -1,5 +1,6 @@
-namespace ExpenseExplorer.Application.Receipts.Persistence;
+namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
+using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
 
