@@ -5,8 +5,11 @@ using ExpenseExplorer.Domain.Receipts;
 
 public class InMemoryReceiptRepository : IReceiptRepository
 {
-  public Task Save(Receipt receipt)
+  private readonly InMemoryEventStore eventStore = new();
+
+  public async Task Save(Receipt receipt)
   {
-    return Task.CompletedTask;
+    ArgumentNullException.ThrowIfNull(receipt);
+    await eventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges);
   }
 }

@@ -1,11 +1,12 @@
 namespace ExpenseExplorer.API.Endpoints;
 
-using System.Diagnostics;
 using System.Net;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
 using ExpenseExplorer.Application.Errors;
+using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts;
+using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Events;
@@ -25,16 +26,9 @@ public static class ReceiptEndpoints
   private static async Task<IResult> OpenNewReceipt(OpenNewReceiptRequest request, TimeProvider timeProvider)
   {
     DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
-    Validated<Receipt> validated = ReceiptValidator.Validate(request.MapToCommand(today));
-    if (validated.IsValid)
-    {
-      Receipt receipt = validated.Match(_ => throw new UnreachableException(), r => r);
-      InMemoryEventStore eventStore = new();
-      await eventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges);
-    }
-
-    return validated
-      .ToEither()
+    OpenNewReceiptCommandHandler handler = new(new InMemoryReceiptRepository());
+    Either<Failure, Receipt> result = await handler.HandleAsync(request.MapToCommand(today));
+    return result
       .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
   }
