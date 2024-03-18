@@ -7,6 +7,7 @@ using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Application.Receipts.Commands;
+using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Events;
@@ -23,10 +24,13 @@ public static class ReceiptEndpoints
     return endpointRouteBuilder;
   }
 
-  private static async Task<IResult> OpenNewReceipt(OpenNewReceiptRequest request, TimeProvider timeProvider)
+  private static async Task<IResult> OpenNewReceipt(
+    OpenNewReceiptRequest request,
+    TimeProvider timeProvider,
+    IReceiptRepository repository)
   {
     DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
-    OpenNewReceiptCommandHandler handler = new(new InMemoryReceiptRepository());
+    OpenNewReceiptCommandHandler handler = new(repository);
     Either<Failure, Receipt> result = await handler.HandleAsync(request.MapToCommand(today));
     return result
       .MapRight(r => r.MapToResponse())
