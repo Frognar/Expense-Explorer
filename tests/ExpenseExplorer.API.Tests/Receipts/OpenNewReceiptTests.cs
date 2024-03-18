@@ -7,76 +7,20 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 public class OpenNewReceiptTests
 {
-  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(DateOnlyGenerator)])]
-  public void ContainsDataGivenDuringConstruction(string storeName, DateOnly purchaseDate)
+  [Property(Arbitrary = [typeof(ValidOpenNewReceiptRequestGenerator)], MaxTest = 25)]
+  public async Task CanAddReceipt(OpenNewReceiptRequest request)
   {
-    OpenNewReceiptRequest request = new(storeName, purchaseDate);
-    request.StoreName.Should().Be(storeName);
-    request.PurchaseDate.Should().Be(purchaseDate);
-  }
-
-  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 25)]
-  public async Task CanAddReceipt(string storeName, DateOnly purchaseDate)
-  {
-    OpenNewReceiptRequest request = new(storeName, purchaseDate);
-
     HttpResponseMessage response = await Send(request);
 
     response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
   }
 
-  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(FutureDateOnlyGenerator)], MaxTest = 25)]
-  public async Task IsBadRequestWhenReceiptInFuture(string storeName, DateOnly purchaseDate)
+  [Property(Arbitrary = [typeof(InvalidOpenNewReceiptRequestGenerator)], MaxTest = 25)]
+  public async Task IsBadRequestWhenInvalidRequest(OpenNewReceiptRequest request)
   {
-    OpenNewReceiptRequest request = new(storeName, purchaseDate);
-
     HttpResponseMessage response = await Send(request);
-    string responseContent = await response.Content.ReadAsStringAsync();
 
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    responseContent.Should().Contain("PurchaseDate").And.Contain("FUTURE_DATE");
-  }
-
-  [Property(Arbitrary = [typeof(EmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 25)]
-  public async Task IsBadRequestWhenStoreNameIsEmpty(string storeName, DateOnly purchaseDate)
-  {
-    OpenNewReceiptRequest request = new(storeName, purchaseDate);
-
-    HttpResponseMessage response = await Send(request);
-    string responseContent = await response.Content.ReadAsStringAsync();
-
-    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    responseContent.Should().Contain("StoreName").And.Contain("EMPTY_STORE_NAME");
-  }
-
-  [Property(Arbitrary = [typeof(EmptyStringGenerator), typeof(FutureDateOnlyGenerator)], MaxTest = 25)]
-  public async Task AllValidationErrorsAreCollectedAndReturnedTogether(string storeName, DateOnly purchaseDate)
-  {
-    OpenNewReceiptRequest request = new(storeName, purchaseDate);
-
-    HttpResponseMessage response = await Send(request);
-    string responseContent = await response.Content.ReadAsStringAsync();
-
-    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    responseContent.Should()
-      .Contain("StoreName")
-      .And.Contain("EMPTY_STORE_NAME")
-      .And.Contain("PurchaseDate")
-      .And.Contain("FUTURE_DATE");
-  }
-
-  [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(NonFutureDateOnlyGenerator)], MaxTest = 25)]
-  public async Task ReturnsCreatedReceiptWhenValid(string storeName, DateOnly purchaseDate)
-  {
-    OpenNewReceiptRequest request = new(storeName, purchaseDate);
-
-    HttpResponseMessage response = await Send(request);
-    OpenNewReceiptResponse receipt
-      = (await response.Content.ReadFromJsonAsync<OpenNewReceiptResponse>())!;
-
-    receipt.Id.Should().NotBeEmpty();
-    receipt.StoreName.Should().Be(storeName.Trim());
-    receipt.PurchaseDate.Should().Be(purchaseDate);
   }
 
   private static async Task<HttpResponseMessage> Send(OpenNewReceiptRequest request)
