@@ -6,6 +6,10 @@ public static class ValidOpenNewReceiptRequestGenerator
 {
   public static Arbitrary<OpenNewReceiptRequest> ValidOpenNewReceiptRequestGen()
   {
-    return OpenNewReceiptRequestGenerator.Valid.Arbitrary;
+    return (
+        from storeName in NonEmptyStringGenerator.NonEmptyStringGen().Generator
+        from purchaseDate in NonFutureDateOnlyGenerator.NonFutureDateOnlyGen().Generator
+        select new OpenNewReceiptRequest(storeName, purchaseDate))
+      .ToArbitrary();
   }
 }

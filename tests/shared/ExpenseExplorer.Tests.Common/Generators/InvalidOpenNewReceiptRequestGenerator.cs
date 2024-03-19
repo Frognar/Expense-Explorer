@@ -6,13 +6,25 @@ public static class InvalidOpenNewReceiptRequestGenerator
 {
   public static Arbitrary<OpenNewReceiptRequest> InvalidOpenNewReceiptRequestGen()
   {
-    var invalidStoreName = EmptyStringGenerator.EmptyStringGen().Generator;
-    var invalidPurchaseDate = FutureDateOnlyGenerator.FutureDateOnlyGen().Generator;
+    var invalidStoreName =
+      from storeName in EmptyStringGenerator.EmptyStringGen().Generator
+      from purchaseDate in NonFutureDateOnlyGenerator.NonFutureDateOnlyGen().Generator
+      select new OpenNewReceiptRequest(storeName, purchaseDate);
+
+    var invalidPurchaseDate =
+      from storeName in NonEmptyStringGenerator.NonEmptyStringGen().Generator
+      from purchaseDate in FutureDateOnlyGenerator.FutureDateOnlyGen().Generator
+      select new OpenNewReceiptRequest(storeName, purchaseDate);
+
+    var invalidStoreNameAndPurchaseDate =
+      from storeName in EmptyStringGenerator.EmptyStringGen().Generator
+      from purchaseDate in FutureDateOnlyGenerator.FutureDateOnlyGen().Generator
+      select new OpenNewReceiptRequest(storeName, purchaseDate);
 
     return Gen.OneOf(
-        (OpenNewReceiptRequestGenerator.Valid with { StoreName = invalidStoreName }).Generator,
-        (OpenNewReceiptRequestGenerator.Valid with { PurchaseDate = invalidPurchaseDate }).Generator,
-        new OpenNewReceiptRequestGenerator(invalidStoreName, invalidPurchaseDate).Generator)
+        invalidStoreName,
+        invalidPurchaseDate,
+        invalidStoreNameAndPurchaseDate)
       .ToArbitrary();
   }
 }
