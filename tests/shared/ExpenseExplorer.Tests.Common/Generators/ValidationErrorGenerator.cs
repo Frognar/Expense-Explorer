@@ -1,7 +1,6 @@
 namespace ExpenseExplorer.Tests.Common.Generators;
 
 using ExpenseExplorer.Application.Errors;
-using ExpenseExplorer.Application.Validations;
 
 public static class ValidationErrorGenerator
 {
@@ -9,9 +8,9 @@ public static class ValidationErrorGenerator
   {
     return ArbMap.Default.ArbFor<NonEmptyString>()
       .Generator
-      .Select(CreateError)
+      .Select(str => CreateError(str.Item))
       .ToArbitrary();
 
-    ValidationError CreateError(NonEmptyString str) => ValidationError.Create("PROP." + str.Item, str.Item);
+    ValidationError CreateError(string str) => ValidationError.Create("PROP." + str, str);
   }
 }
