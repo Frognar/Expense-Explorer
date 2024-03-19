@@ -8,7 +8,7 @@ using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 
-public class OpenNewReceiptHandlerTests
+public class OpenNewReceiptCommandHandlerTests
 {
   private readonly FakeReceiptRepository repository = new();
 
