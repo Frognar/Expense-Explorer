@@ -48,7 +48,7 @@ public class AddPurchaseCommandHandlerTests
 
   private async Task<Either<Failure, Receipt>> Handle(AddPurchaseCommand command)
   {
-    AddPurchaseCommandCommandHandler handler = new(repository);
+    AddPurchaseCommandHandler handler = new(repository);
     return await handler.HandleAsync(command);
   }
 

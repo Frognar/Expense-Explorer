@@ -7,7 +7,7 @@ using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 
-public class AddPurchaseCommandCommandHandler(IReceiptRepository repository)
+public class AddPurchaseCommandHandler(IReceiptRepository repository)
 {
   private readonly IReceiptRepository repository = repository;
 
