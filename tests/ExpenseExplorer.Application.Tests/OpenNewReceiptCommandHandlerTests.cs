@@ -7,6 +7,7 @@ using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.Domain.ValueObjects;
 
 public class OpenNewReceiptCommandHandlerTests
 {
@@ -52,6 +53,11 @@ public class OpenNewReceiptCommandHandlerTests
     {
       Add(receipt);
       return Task.CompletedTask;
+    }
+
+    public Task<Receipt?> GetAsync(Id id)
+    {
+      return Task.FromResult<Receipt?>(null);
     }
   }
 }
