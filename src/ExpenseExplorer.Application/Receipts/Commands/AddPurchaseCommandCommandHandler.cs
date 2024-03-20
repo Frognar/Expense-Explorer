@@ -16,13 +16,7 @@ public class AddPurchaseCommandCommandHandler(IReceiptRepository repository)
     ArgumentNullException.ThrowIfNull(command);
     Validated<Purchase> validated = PurchaseValidator.Validate(command);
     Either<Failure, Purchase> either = validated.ToEither().MapLeft(e => (Failure)e);
-    Id receiptId = Id.Create(command.ReceiptId);
-    Receipt? receipt = await repository.GetAsync(receiptId);
-    if (receipt is null)
-    {
-      return Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", receiptId));
-    }
-
-    return either.MapRight(_ => receipt);
+    Either<Failure, Receipt> receipt = await repository.GetAsync(Id.Create(command.ReceiptId));
+    return either.FlatMapRight(_ => receipt);
   }
 }

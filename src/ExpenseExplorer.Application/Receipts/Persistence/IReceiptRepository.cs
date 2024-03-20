@@ -1,11 +1,13 @@
 namespace ExpenseExplorer.Application.Receipts.Persistence;
 
+using ExpenseExplorer.Application.Errors;
+using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public interface IReceiptRepository
 {
-  Task Save(Receipt receipt);
+  Task<Either<Failure, Unit>> Save(Receipt receipt);
 
-  Task<Receipt?> GetAsync(Id id);
+  Task<Either<Failure, Receipt>> GetAsync(Id id);
 }

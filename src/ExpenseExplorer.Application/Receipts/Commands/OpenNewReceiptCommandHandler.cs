@@ -22,7 +22,7 @@ public class OpenNewReceiptCommandHandler(IReceiptRepository repository)
 
   private async Task<Either<Failure, Receipt>> Save(Receipt receipt)
   {
-    await repository.Save(receipt);
-    return Right.From<Failure, Receipt>(receipt.ClearChanges());
+    var result = await repository.Save(receipt);
+    return result.MapRight(_ => receipt.ClearChanges());
   }
 }

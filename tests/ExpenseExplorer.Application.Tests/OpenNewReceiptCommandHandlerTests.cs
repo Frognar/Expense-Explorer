@@ -49,15 +49,15 @@ public class OpenNewReceiptCommandHandlerTests
 
   private sealed class FakeReceiptRepository : Collection<Receipt>, IReceiptRepository
   {
-    public Task Save(Receipt receipt)
+    public Task<Either<Failure, Unit>> Save(Receipt receipt)
     {
       Add(receipt);
-      return Task.CompletedTask;
+      return Task.FromResult(Right.From<Failure, Unit>(Unit.Instance));
     }
 
-    public Task<Receipt?> GetAsync(Id id)
+    public Task<Either<Failure, Receipt>> GetAsync(Id id)
     {
-      return Task.FromResult<Receipt?>(null);
+      return Task.FromResult(Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id)));
     }
   }
 }
