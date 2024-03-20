@@ -5,8 +5,13 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public class Receipt
 {
-  private static readonly Receipt Empty = New(Store.Create("[EMPTY]"), PurchaseDate.MinValue);
+  private static readonly Receipt Empty = new();
   private readonly IEnumerable<Fact> changes;
+
+  private Receipt()
+    : this(Id.Create("[EMPTY]"), Store.Create("[EMPTY]"), PurchaseDate.MinValue, [], [])
+  {
+  }
 
   private Receipt(Id id, Store store, PurchaseDate purchaseDate, ICollection<Purchase> purchases, List<Fact> changes)
   {

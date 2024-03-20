@@ -93,4 +93,23 @@ public class ReceiptTests
     receipt.PurchaseDate.Should().Be(purchaseDate);
     receipt.Purchases.Should().Contain(purchase);
   }
+
+  [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator), typeof(PurchaseGenerator)])]
+  public void HasNoUnsavedChangesWhenRecreatedFromEvents(
+    Store store,
+    PurchaseDate purchaseDate,
+    Purchase purchase,
+    Store newStore)
+  {
+    Id receiptId = Id.Unique();
+    IEnumerable<Fact> events = new List<Fact>
+    {
+      new ReceiptCreated(receiptId, store, purchaseDate),
+      new PurchaseAdded(receiptId, purchase),
+      new StoreCorrected(receiptId, newStore),
+    };
+
+    Receipt receipt = Receipt.Recreate(events);
+    receipt.UnsavedChanges.Should().BeEmpty();
+  }
 }
