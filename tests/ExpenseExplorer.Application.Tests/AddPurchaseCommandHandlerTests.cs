@@ -17,9 +17,9 @@ public class AddPurchaseCommandHandlerTests
   [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]
   public async Task CanHandleValidCommand(AddPurchaseCommand command)
   {
-    var result = await Handle(command);
-    var receipt = result.Match(_ => throw new UnreachableException(), r => r);
-    receipt.Id.Value.Should().Be(command.ReceiptId);
+    (await HandleValid(command))
+      .Id.Value.Should()
+      .Be(command.ReceiptId);
   }
 
   [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]
@@ -33,17 +33,22 @@ public class AddPurchaseCommandHandlerTests
   [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]
   public async Task AddsPurchaseToReceipt(AddPurchaseCommand command)
   {
-    var result = await Handle(command);
-    var receipt = result.Match(_ => throw new UnreachableException(), r => r);
-    receipt.Purchases.Should().NotBeEmpty();
+    (await HandleValid(command))
+      .Purchases.Should()
+      .NotBeEmpty();
   }
 
   [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]
   public async Task SavesReceiptWhenValidCommand(AddPurchaseCommand command)
   {
-    var result = await Handle(command);
-    var receipt = result.Match(_ => throw new UnreachableException(), r => r);
+    var receipt = await HandleValid(command);
     repository.Should().Contain(r => r.Id == receipt.Id && r.Purchases.Count > 0);
+  }
+
+  private async Task<Receipt> HandleValid(AddPurchaseCommand command)
+  {
+    var result = await Handle(command);
+    return result.Match(_ => throw new UnreachableException(), r => r);
   }
 
   private async Task<Either<Failure, Receipt>> Handle(AddPurchaseCommand command)
