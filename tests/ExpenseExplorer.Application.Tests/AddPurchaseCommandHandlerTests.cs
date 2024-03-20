@@ -30,6 +30,22 @@ public class AddPurchaseCommandHandlerTests
     failure.Message.Should().Contain("Receipt not found");
   }
 
+  [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]
+  public async Task AddsPurchaseToReceipt(AddPurchaseCommand command)
+  {
+    var result = await Handle(command);
+    var receipt = result.Match(_ => throw new UnreachableException(), r => r);
+    receipt.Purchases.Should().NotBeEmpty();
+  }
+
+  [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]
+  public async Task SavesReceiptWhenValidCommand(AddPurchaseCommand command)
+  {
+    var result = await Handle(command);
+    var receipt = result.Match(_ => throw new UnreachableException(), r => r);
+    repository.Should().Contain(r => r.Id == receipt.Id && r.Purchases.Count > 0);
+  }
+
   private async Task<Either<Failure, Receipt>> Handle(AddPurchaseCommand command)
   {
     AddPurchaseCommandCommandHandler handler = new(repository);
@@ -50,6 +66,7 @@ public class AddPurchaseCommandHandlerTests
 
     public Task<Either<Failure, Unit>> Save(Receipt receipt)
     {
+      this[0] = receipt;
       return Task.FromResult(Right.From<Failure, Unit>(Unit.Instance));
     }
 
