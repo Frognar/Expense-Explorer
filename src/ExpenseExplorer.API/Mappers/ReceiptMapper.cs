@@ -3,6 +3,7 @@ namespace ExpenseExplorer.API.Mappers;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.Domain.ValueObjects;
 
 public static class ReceiptMapper
 {
@@ -28,6 +29,23 @@ public static class ReceiptMapper
   public static OpenNewReceiptResponse MapToResponse(this Receipt receipt)
   {
     ArgumentNullException.ThrowIfNull(receipt);
-    return new OpenNewReceiptResponse(receipt.Id.Value, receipt.Store.Name, receipt.PurchaseDate.Date);
+    return new OpenNewReceiptResponse(
+      receipt.Id.Value,
+      receipt.Store.Name,
+      receipt.PurchaseDate.Date,
+      receipt.Purchases.Select(MapToResponse));
+  }
+
+  private static PurchaseResponse MapToResponse(this Purchase purchase, int index)
+  {
+    ArgumentNullException.ThrowIfNull(purchase);
+    return new PurchaseResponse(
+      index + 1,
+      purchase.Item.Name,
+      purchase.Category.Name,
+      purchase.Quantity.Value,
+      purchase.UnitPrice.Value,
+      purchase.TotalDiscount.Value,
+      purchase.Description.Value);
   }
 }

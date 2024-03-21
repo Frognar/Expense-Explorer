@@ -5,14 +5,9 @@ using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
-using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
-using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.Receipts.Events;
-using ExpenseExplorer.Domain.ValueObjects;
-using ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
 public static class ReceiptEndpoints
 {
@@ -37,24 +32,15 @@ public static class ReceiptEndpoints
       .Match(Handle, Results.Ok);
   }
 
-  private static async Task<IResult> AddPurchase(string receiptId, AddPurchaseRequest request)
+  private static async Task<IResult> AddPurchase(
+    string receiptId,
+    AddPurchaseRequest request,
+    IReceiptRepository repository)
   {
-    Validated<Purchase> validated = PurchaseValidator.Validate(request.MapToCommand(receiptId));
-    if (validated.IsValid)
-    {
-      InMemoryEventStore eventStore = new();
-      IEnumerable<Fact> events = await eventStore.GetEvents(Id.Create(receiptId));
-      if (!events.Any())
-      {
-        return Results.Problem(
-          detail: $"Receipt with id '{receiptId}' not found.",
-          statusCode: (int)HttpStatusCode.NotFound,
-          extensions: new Dictionary<string, object?> { ["ReceiptId"] = receiptId, });
-      }
-    }
-
-    return validated
-      .ToEither()
+    AddPurchaseCommandHandler handler = new(repository);
+    Either<Failure, Receipt> result = await handler.HandleAsync(request.MapToCommand(receiptId));
+    return result
+      .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
   }
 
@@ -63,6 +49,7 @@ public static class ReceiptEndpoints
     return failure switch
     {
       ValidationFailure validationFailure => HandleValidation(validationFailure),
+      NotFoundFailure notFoundFailure => HandleNotFound(notFoundFailure),
       _ => Results.Problem(detail: failure.Message, statusCode: (int)HttpStatusCode.InternalServerError),
     };
   }
@@ -80,5 +67,13 @@ public static class ReceiptEndpoints
             e => e.Key,
             e => e.Select(m => m.ErrorCode)),
       });
+  }
+
+  private static IResult HandleNotFound(NotFoundFailure notFoundFailure)
+  {
+    return Results.Problem(
+      detail: notFoundFailure.Message,
+      statusCode: (int)HttpStatusCode.NotFound,
+      extensions: new Dictionary<string, object?> { ["Id"] = notFoundFailure.Id, });
   }
 }
