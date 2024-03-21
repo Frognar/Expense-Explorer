@@ -15,9 +15,7 @@ public class AddPurchaseCommandHandler(IReceiptRepository repository)
   {
     ArgumentNullException.ThrowIfNull(command);
     Validated<Purchase> validated = PurchaseValidator.Validate(command);
-    Either<Failure, Purchase> purchase = validated.ToEither()
-      .MapLeft(e => (Failure)e);
-
+    Either<Failure, Purchase> purchase = validated.ToEither();
     Either<Failure, Receipt> receipt = await repository.GetAsync(Id.Create(command.ReceiptId));
     return await purchase
       .FlatMapRight(e => receipt.MapRight(r => r.AddPurchase(e)))

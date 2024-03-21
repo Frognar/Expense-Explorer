@@ -68,7 +68,7 @@ public class ValidatedTests
   {
     Validated<int> validated = Validate(value);
 
-    Either<ValidationFailure, int> either = validated.ToEither();
+    Either<Failure, int> either = validated.ToEither();
 
     either.Match(AggregateErrors, v => v.ToString(CultureInfo.InvariantCulture))
       .Should()
@@ -76,6 +76,8 @@ public class ValidatedTests
   }
 
   private static string GetExpectedString(int value) => value < 0 ? "value: NEGATIVE_VALUE" : ToInvariantString(value);
+
+  private static string AggregateErrors(Failure errors) => AggregateErrors((ValidationFailure)errors);
 
   private static string AggregateErrors(ValidationFailure errors)
     => string.Join(", ", errors.Errors.Select(e => $"{e.Property}: {e.ErrorCode}"));

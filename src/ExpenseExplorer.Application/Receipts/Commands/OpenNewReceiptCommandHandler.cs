@@ -14,9 +14,7 @@ public class OpenNewReceiptCommandHandler(IReceiptRepository repository)
   {
     ArgumentNullException.ThrowIfNull(command);
     Validated<Receipt> validated = ReceiptValidator.Validate(command);
-    Either<Failure, Receipt> either = validated.ToEither()
-      .MapLeft(f => (Failure)f);
-
+    Either<Failure, Receipt> either = validated.ToEither();
     return await either.FlatMapRight(Save);
   }
 
