@@ -40,6 +40,14 @@ public class AddPurchaseTests
   }
 
   [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 25)]
+  public async Task ContainsAddedPurchaseInResponse(AddPurchaseRequest request)
+  {
+    HttpResponseMessage response = await SendWithValidReceiptId(request);
+    OpenNewReceiptResponse receipt = (await response.Content.ReadFromJsonAsync<OpenNewReceiptResponse>())!;
+    receipt.Purchases.Count().Should().Be(1);
+  }
+
+  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 25)]
   public async Task IsNotFoundWhenReceiptIdIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await Send("/api/receipts/invalid-id", request);

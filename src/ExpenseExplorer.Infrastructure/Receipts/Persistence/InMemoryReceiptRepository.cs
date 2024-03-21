@@ -5,6 +5,7 @@ using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public class InMemoryReceiptRepository : IReceiptRepository
@@ -18,8 +19,11 @@ public class InMemoryReceiptRepository : IReceiptRepository
     return Right.From<Failure, Unit>(Unit.Instance);
   }
 
-  public Task<Either<Failure, Receipt>> GetAsync(Id id)
+  public async Task<Either<Failure, Receipt>> GetAsync(Id id)
   {
-    return Task.FromResult(Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id)));
+    List<Fact> events = (await eventStore.GetEvents(id)).ToList();
+    return events.Count == 0
+      ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
+      : Right.From<Failure, Receipt>(Receipt.Recreate(events));
   }
 }
