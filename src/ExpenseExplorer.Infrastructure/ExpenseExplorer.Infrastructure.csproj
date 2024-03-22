@@ -4,4 +4,8 @@
         <ProjectReference Include="..\ExpenseExplorer.Application\ExpenseExplorer.Application.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="EventStore.Client.Grpc.Streams" Version="23.2.1"/>
+    </ItemGroup>
+
 </Project>
