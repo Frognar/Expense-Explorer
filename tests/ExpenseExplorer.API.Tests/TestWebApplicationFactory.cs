@@ -1,5 +1,7 @@
 namespace ExpenseExplorer.API.Tests;
 
+using ExpenseExplorer.Application.Receipts.Persistence;
+using ExpenseExplorer.Infrastructure.Receipts.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +11,8 @@ internal sealed class TestWebApplicationFactory : WebApplicationFactory<Program>
   protected override void ConfigureWebHost(IWebHostBuilder builder)
   {
     builder.ConfigureServices(sc => Replace<TimeProvider, TestTimeProvider>(sc, new TestTimeProvider()));
+    builder.ConfigureServices(
+      sc => Replace<IReceiptRepository, InMemoryReceiptRepository>(sc, new InMemoryReceiptRepository()));
   }
 
   private static void Replace<T, U>(IServiceCollection services, U replacement)
