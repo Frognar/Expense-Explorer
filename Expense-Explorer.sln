@@ -47,6 +47,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{E2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.Infrastructure", "src\ExpenseExplorer.Infrastructure\ExpenseExplorer.Infrastructure.csproj", "{25FC5C57-0753-419C-97C4-A57D626010B3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "res", "res", "{6AF97930-820B-407C-824D-C1DE857832EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "eventstore", "eventstore", "{8BFB1981-0F8F-418B-95F3-CBD5E5D38B55}"
+	ProjectSection(SolutionItems) = preProject
+		res\eventstore\docker-compose.yaml = res\eventstore\docker-compose.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,5 +109,6 @@ Global
 		{B42E0D8F-9456-40A6-8E43-3A07209E5D40} = {74FEB020-4690-4D99-A72F-BCE3EA8953F9}
 		{CAD8EEE1-446A-46C9-9109-18DBC60EB38D} = {B42E0D8F-9456-40A6-8E43-3A07209E5D40}
 		{25FC5C57-0753-419C-97C4-A57D626010B3} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
+		{8BFB1981-0F8F-418B-95F3-CBD5E5D38B55} = {6AF97930-820B-407C-824D-C1DE857832EE}
 	EndGlobalSection
 EndGlobal
