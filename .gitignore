@@ -482,3 +482,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# EventStore data
+/res/eventstore/data/*
+/res/eventstore/logs/*
