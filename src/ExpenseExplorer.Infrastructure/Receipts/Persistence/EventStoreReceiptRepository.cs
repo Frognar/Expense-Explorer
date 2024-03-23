@@ -5,6 +5,7 @@ using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
 
 #pragma warning disable CA1001
@@ -22,15 +23,9 @@ public class EventStoreReceiptRepository(string connectionString) : IReceiptRepo
 
   public async Task<Either<Failure, Receipt>> GetAsync(Id id)
   {
-    ArgumentNullException.ThrowIfNull(id);
-    var events = await eventStore.GetEvents(id);
-    events = events.ToList();
-    if (!events.Any())
-    {
-      return Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id));
-    }
-
-    var receipt = Receipt.Recreate(events);
-    return Right.From<Failure, Receipt>(receipt);
+    List<Fact> events = (await eventStore.GetEvents(id)).ToList();
+    return events.Count == 0
+      ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
+      : Right.From<Failure, Receipt>(Receipt.Recreate(events));
   }
 }
