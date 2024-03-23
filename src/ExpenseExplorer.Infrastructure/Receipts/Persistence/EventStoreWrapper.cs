@@ -7,11 +7,15 @@ using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
 using static ExpenseExplorer.Domain.Events.EventSerializer;
 
-#pragma warning disable CA1001
-public class EventStoreWrapper(string connectionString) : IEventStore
-#pragma warning restore CA1001
+public class EventStoreWrapper(string connectionString) : IEventStore, IDisposable
 {
   private readonly EventStoreClient client = new(EventStoreClientSettings.Create(connectionString));
+
+  public void Dispose()
+  {
+    Dispose(true);
+    GC.SuppressFinalize(this);
+  }
 
   public Task SaveEvents(Id id, IEnumerable<Fact> events)
   {
@@ -24,6 +28,14 @@ public class EventStoreWrapper(string connectionString) : IEventStore
   {
     ArgumentNullException.ThrowIfNull(id);
     return ReadFromStreamAsync(id.Value);
+  }
+
+  protected virtual void Dispose(bool disposing)
+  {
+    if (disposing)
+    {
+      client.Dispose();
+    }
   }
 
   private static EventData ToEventData(Fact fact)
