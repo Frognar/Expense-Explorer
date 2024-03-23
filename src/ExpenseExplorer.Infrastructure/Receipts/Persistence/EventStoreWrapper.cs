@@ -1,12 +1,11 @@
 namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
-using System.Diagnostics;
-using System.Text;
-using System.Text.Json;
 using EventStore.Client;
 using ExpenseExplorer.Application.Receipts.Persistence;
+using ExpenseExplorer.Domain.Events;
 using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
+using static ExpenseExplorer.Domain.Events.EventSerializer;
 
 #pragma warning disable CA1001
 public class EventStoreWrapper(string connectionString) : IEventStore
@@ -29,27 +28,7 @@ public class EventStoreWrapper(string connectionString) : IEventStore
 
   private static EventData ToEventData(Fact fact)
   {
-    return new EventData(Uuid.NewUuid(), fact.GetType().Name, Serialize(fact));
-  }
-
-  private static byte[] Serialize(Fact fact)
-  {
-    return fact switch
-    {
-      ReceiptCreated receiptCreated => JsonSerializer.SerializeToUtf8Bytes(receiptCreated),
-      PurchaseAdded purchaseAdded => JsonSerializer.SerializeToUtf8Bytes(purchaseAdded),
-      _ => throw new UnreachableException(),
-    };
-  }
-
-  private static Fact Deserialize(string type, byte[] data)
-  {
-    return type switch
-    {
-      nameof(ReceiptCreated) => JsonSerializer.Deserialize<ReceiptCreated>(Encoding.UTF8.GetString(data))!,
-      nameof(PurchaseAdded) => JsonSerializer.Deserialize<PurchaseAdded>(Encoding.UTF8.GetString(data))!,
-      _ => throw new UnreachableException(),
-    };
+    return new EventData(Uuid.NewUuid(), EventTypes.GetType(fact), Serialize(fact));
   }
 
   private async Task AppendToStreamAsync(string stream, IEnumerable<Fact> events)
@@ -68,7 +47,6 @@ public class EventStoreWrapper(string connectionString) : IEventStore
     }
 
     var events = await streamResult.Select(e => e.Event).ToListAsync();
-    var result = events.Select(e => Deserialize(e.EventType, e.Data.ToArray()));
-    return result;
+    return events.Select(e => Deserialize(e.EventType, e.Data.ToArray()));
   }
 }
