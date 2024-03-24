@@ -1,6 +1,5 @@
 namespace ExpenseExplorer.Domain.Tests;
 
-using System.Text.Json;
 using ExpenseExplorer.Domain.Events;
 using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
@@ -21,6 +20,18 @@ public class EventSerializerTests
       .BeEquivalentTo(
         "{\"Id\":{\"Value\":\"id\"},\"Store\":{\"Name\":\"store\"},\"PurchaseDate\":{\"Date\":\"2000-01-01\"}}"u8
           .ToArray());
+  }
+
+  [Fact]
+  public void DeserializeReceiptCreated()
+  {
+    byte[] data
+      = "{\"Id\":{\"Value\":\"id\"},\"Store\":{\"Name\":\"store\"},\"PurchaseDate\":{\"Date\":\"2000-01-01\"}}"u8
+        .ToArray();
+
+    Fact fact = EventSerializer.Deserialize(EventTypes.ReceiptCreatedEventType, data);
+
+    fact.Should().BeOfType<ReceiptCreated>();
   }
 
   [Fact]

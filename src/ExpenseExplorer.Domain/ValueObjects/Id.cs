@@ -1,7 +1,10 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
+using System.Text.Json.Serialization;
+
 public record Id
 {
+  [JsonConstructor]
   private Id(string value)
   {
     ArgumentNullException.ThrowIfNull(value);

@@ -1,10 +1,17 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
+using System.Text.Json.Serialization;
 using ExpenseExplorer.Domain.Exceptions;
 
 public record PurchaseDate
 {
   public static readonly PurchaseDate MinValue = new(DateOnly.MinValue, DateOnly.MinValue);
+
+  [JsonConstructor]
+  private PurchaseDate(DateOnly date)
+  {
+    Date = date;
+  }
 
   private PurchaseDate(DateOnly date, DateOnly today)
   {
