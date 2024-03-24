@@ -1,9 +1,11 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
+using System.Text.Json.Serialization;
 using ExpenseExplorer.Domain.Exceptions;
 
 public record Item
 {
+  [JsonConstructor]
   private Item(string name)
   {
     EmptyItemNameException.ThrowIfEmpty(name);

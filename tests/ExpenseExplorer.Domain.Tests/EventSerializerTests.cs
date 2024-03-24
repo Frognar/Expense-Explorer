@@ -54,4 +54,16 @@ public class EventSerializerTests
         "{\"ReceiptId\":{\"Value\":\"id\"},\"Purchase\":{\"Item\":{\"Name\":\"i\"},\"Category\":{\"Name\":\"c\"},\"Quantity\":{\"Value\":1},\"UnitPrice\":{\"Value\":1},\"TotalDiscount\":{\"Value\":0},\"Description\":{\"Value\":\"\"}}}"u8
           .ToArray());
   }
+
+  [Fact]
+  public void DeserializePurchaseAdded()
+  {
+    byte[] data
+      = "{\"ReceiptId\":{\"Value\":\"id\"},\"Purchase\":{\"Item\":{\"Name\":\"i\"},\"Category\":{\"Name\":\"c\"},\"Quantity\":{\"Value\":1},\"UnitPrice\":{\"Value\":1},\"TotalDiscount\":{\"Value\":0},\"Description\":{\"Value\":\"\"}}}"u8
+        .ToArray();
+
+    Fact fact = EventSerializer.Deserialize(EventTypes.PurchaseAddedEventType, data);
+
+    fact.Should().BeOfType<PurchaseAdded>();
+  }
 }
