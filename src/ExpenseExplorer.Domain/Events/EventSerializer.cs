@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using ExpenseExplorer.Domain.Receipts.Events;
+using ExpenseExplorer.Domain.ValueObjects;
 using static ExpenseExplorer.Domain.Events.EventTypes;
 
 public static class EventSerializer
@@ -12,7 +13,7 @@ public static class EventSerializer
   {
     return fact switch
     {
-      Receipts.Events.ReceiptCreated receiptCreated => Serialize(receiptCreated),
+      Receipts.Events.ReceiptCreated receiptCreated => Serialize(Map(receiptCreated)),
       Receipts.Events.PurchaseAdded purchaseAdded => Serialize(purchaseAdded),
       _ => throw new UnreachableException(),
     };
@@ -22,21 +23,36 @@ public static class EventSerializer
   {
     return type switch
     {
-      ReceiptCreatedEventType => Deserialize<ReceiptCreated>(data),
+      ReceiptCreatedEventType => Map(Deserialize<SimpleReceiptCreated>(data)),
       PurchaseAddedEventType => Deserialize<PurchaseAdded>(data),
       _ => throw new UnreachableException(),
     };
   }
 
+  private static ReceiptCreated Map(SimpleReceiptCreated simpleReceiptCreated)
+    => new(
+      Id.Create(simpleReceiptCreated.Id),
+      Store.Create(simpleReceiptCreated.Store),
+      PurchaseDate.Create(simpleReceiptCreated.PurchaseDate, simpleReceiptCreated.CreatedDate),
+      simpleReceiptCreated.CreatedDate);
+
+  private static SimpleReceiptCreated Map(ReceiptCreated receiptCreated)
+    => new(
+      receiptCreated.Id.Value,
+      receiptCreated.Store.Name,
+      receiptCreated.PurchaseDate.Date,
+      receiptCreated.CreatedDate);
+
   private static byte[] Serialize<T>(T @event)
-    where T : Fact
   {
-    return JsonSerializer.SerializeToUtf8Bytes(@event);
+    string json = JsonSerializer.Serialize(@event);
+    return Encoding.UTF8.GetBytes(json);
   }
 
-  private static Fact Deserialize<T>(byte[] data)
-    where T : Fact
+  private static T Deserialize<T>(byte[] data)
   {
     return JsonSerializer.Deserialize<T>(Encoding.UTF8.GetString(data))!;
   }
+
+  private sealed record SimpleReceiptCreated(string Id, string Store, DateOnly PurchaseDate, DateOnly CreatedDate);
 }

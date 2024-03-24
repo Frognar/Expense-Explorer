@@ -64,7 +64,8 @@ public class AddPurchaseCommandHandlerTests
       ReceiptCreated createEvent = new(
         Id.Create("receiptId"),
         Store.Create("store"),
-        PurchaseDate.Create(TodayDateOnly, TodayDateOnly));
+        PurchaseDate.Create(TodayDateOnly, TodayDateOnly),
+        TodayDateOnly);
 
       Add(Receipt.Recreate([createEvent]));
     }

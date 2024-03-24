@@ -9,7 +9,7 @@ public static class ReceiptGenerator
     return (
         from store in StoreGenerator.StoreGen().Generator
         from purchaseDate in PurchaseDateGenerator.PurchaseDateGen().Generator
-        select Receipt.New(store, purchaseDate).ClearChanges())
+        select Receipt.New(store, purchaseDate, TodayDateOnly).ClearChanges())
       .ToArbitrary();
   }
 }

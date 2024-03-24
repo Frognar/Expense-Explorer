@@ -9,7 +9,7 @@ public class ReceiptTests
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator)])]
   public void CanBeCreated(PurchaseDate purchaseDate, Store store)
   {
-    Receipt receipt = Receipt.New(store, purchaseDate);
+    Receipt receipt = Receipt.New(store, purchaseDate, TodayDateOnly);
     receipt.Should().NotBeNull();
     receipt.Id.Should().NotBeNull();
     receipt.Store.Should().Be(store);
@@ -19,7 +19,7 @@ public class ReceiptTests
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator)])]
   public void ProducesReceiptCreatedEventWhenCreated(PurchaseDate purchaseDate, Store store)
   {
-    Receipt receipt = Receipt.New(store, purchaseDate);
+    Receipt receipt = Receipt.New(store, purchaseDate, TodayDateOnly);
     receipt.UnsavedChanges.Count().Should().Be(1);
     ReceiptCreated receiptCreated = receipt.UnsavedChanges.OfType<ReceiptCreated>().Single();
     receiptCreated.Id.Should().Be(receipt.Id);
@@ -82,7 +82,7 @@ public class ReceiptTests
     Id receiptId = Id.Unique();
     IEnumerable<Fact> events = new List<Fact>
     {
-      new ReceiptCreated(receiptId, store, purchaseDate),
+      new ReceiptCreated(receiptId, store, purchaseDate, TodayDateOnly),
       new PurchaseAdded(receiptId, purchase),
       new StoreCorrected(receiptId, newStore),
     };
@@ -104,7 +104,7 @@ public class ReceiptTests
     Id receiptId = Id.Unique();
     IEnumerable<Fact> events = new List<Fact>
     {
-      new ReceiptCreated(receiptId, store, purchaseDate),
+      new ReceiptCreated(receiptId, store, purchaseDate, TodayDateOnly),
       new PurchaseAdded(receiptId, purchase),
       new StoreCorrected(receiptId, newStore),
     };

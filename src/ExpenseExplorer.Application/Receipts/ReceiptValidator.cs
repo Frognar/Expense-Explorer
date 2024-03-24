@@ -11,10 +11,11 @@ public static class ReceiptValidator
   public static Validated<Receipt> Validate(OpenNewReceiptCommand command)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Func<Store, PurchaseDate, Receipt> createReceipt = Receipt.New;
+    Func<Store, PurchaseDate, DateOnly, Receipt> createReceipt = Receipt.New;
     return createReceipt
       .Apply(Validate(command.StoreName))
-      .Apply(Validate(command.PurchaseDate, command.Today));
+      .Apply(Validate(command.PurchaseDate, command.Today))
+      .Apply(Validation.Succeeded(command.Today));
   }
 
   private static Validated<Store> Validate(string storeName)

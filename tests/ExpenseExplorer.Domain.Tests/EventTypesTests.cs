@@ -12,7 +12,8 @@ public class EventTypesTests
     Fact fact = new ReceiptCreated(
       Id.Unique(),
       Store.Create("store"),
-      PurchaseDate.Create(new DateOnly(2000, 1, 1), new DateOnly(2000, 1, 1)));
+      PurchaseDate.Create(new DateOnly(2000, 1, 1), TodayDateOnly),
+      TodayDateOnly);
 
     AssertEventType(fact, EventTypes.ReceiptCreatedEventType);
   }

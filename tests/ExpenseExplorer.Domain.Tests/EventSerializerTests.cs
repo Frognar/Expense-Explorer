@@ -12,13 +12,14 @@ public class EventSerializerTests
     Fact fact = new ReceiptCreated(
       Id.Create("id"),
       Store.Create("store"),
-      PurchaseDate.Create(new DateOnly(2000, 1, 1), new DateOnly(2000, 1, 1)));
+      PurchaseDate.Create(new DateOnly(2000, 1, 1), TodayDateOnly),
+      TodayDateOnly);
 
     byte[] data = EventSerializer.Serialize(fact);
 
     data.Should()
       .BeEquivalentTo(
-        "{\"Id\":{\"Value\":\"id\"},\"Store\":{\"Name\":\"store\"},\"PurchaseDate\":{\"Date\":\"2000-01-01\"}}"u8
+        "{\"Id\":\"id\",\"Store\":\"store\",\"PurchaseDate\":\"2000-01-01\",\"CreatedDate\":\"2000-01-01\"}"u8
           .ToArray());
   }
 
@@ -26,7 +27,7 @@ public class EventSerializerTests
   public void DeserializeReceiptCreated()
   {
     byte[] data
-      = "{\"Id\":{\"Value\":\"id\"},\"Store\":{\"Name\":\"store\"},\"PurchaseDate\":{\"Date\":\"2000-01-01\"}}"u8
+      = "{\"Id\":\"id\",\"Store\":\"store\",\"PurchaseDate\":\"2000-01-01\",\"CreatedDate\":\"2000-01-01\"}"u8
         .ToArray();
 
     Fact fact = EventSerializer.Deserialize(EventTypes.ReceiptCreatedEventType, data);

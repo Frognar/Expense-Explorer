@@ -32,10 +32,10 @@ public class Receipt
 
   public IEnumerable<Fact> UnsavedChanges => changes;
 
-  public static Receipt New(Store store, PurchaseDate purchaseDate)
+  public static Receipt New(Store store, PurchaseDate purchaseDate, DateOnly createdDate)
   {
     Id id = Id.Unique();
-    Fact receiptCreated = new ReceiptCreated(id, store, purchaseDate);
+    Fact receiptCreated = new ReceiptCreated(id, store, purchaseDate, createdDate);
     return new Receipt(id, store, purchaseDate, [], [receiptCreated]);
   }
 
