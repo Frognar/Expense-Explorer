@@ -8,7 +8,7 @@ using ExpenseExplorer.Domain.ValueObjects;
 public class EventSerializerTests
 {
   [Fact]
-  public void GetTypeForReceiptCreated()
+  public void SerializeReceiptCreated()
   {
     Fact fact = new ReceiptCreated(
       Id.Create("id"),
@@ -24,7 +24,7 @@ public class EventSerializerTests
   }
 
   [Fact]
-  public void GetTypeForPurchaseAdded()
+  public void SerializePurchaseAdded()
   {
     Fact fact = new PurchaseAdded(
       Id.Create("id"),
