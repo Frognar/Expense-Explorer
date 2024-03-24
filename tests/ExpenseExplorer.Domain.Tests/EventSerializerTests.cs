@@ -52,7 +52,7 @@ public class EventSerializerTests
 
     data.Should()
       .BeEquivalentTo(
-        "{\"ReceiptId\":{\"Value\":\"id\"},\"Purchase\":{\"Item\":{\"Name\":\"i\"},\"Category\":{\"Name\":\"c\"},\"Quantity\":{\"Value\":1},\"UnitPrice\":{\"Value\":1},\"TotalDiscount\":{\"Value\":0},\"Description\":{\"Value\":\"\"}}}"u8
+        "{\"ReceiptId\":\"id\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
           .ToArray());
   }
 
@@ -60,7 +60,7 @@ public class EventSerializerTests
   public void DeserializePurchaseAdded()
   {
     byte[] data
-      = "{\"ReceiptId\":{\"Value\":\"id\"},\"Purchase\":{\"Item\":{\"Name\":\"i\"},\"Category\":{\"Name\":\"c\"},\"Quantity\":{\"Value\":1},\"UnitPrice\":{\"Value\":1},\"TotalDiscount\":{\"Value\":0},\"Description\":{\"Value\":\"\"}}}"u8
+      = "{\"ReceiptId\":\"id\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
         .ToArray();
 
     Fact fact = EventSerializer.Deserialize(EventTypes.PurchaseAddedEventType, data);

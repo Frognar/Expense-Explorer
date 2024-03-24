@@ -14,7 +14,7 @@ public static class EventSerializer
     return fact switch
     {
       Receipts.Events.ReceiptCreated receiptCreated => Serialize(Map(receiptCreated)),
-      Receipts.Events.PurchaseAdded purchaseAdded => Serialize(purchaseAdded),
+      Receipts.Events.PurchaseAdded purchaseAdded => Serialize(Map(purchaseAdded)),
       _ => throw new UnreachableException(),
     };
   }
@@ -24,7 +24,7 @@ public static class EventSerializer
     return type switch
     {
       ReceiptCreatedEventType => Map(Deserialize<SimpleReceiptCreated>(data)),
-      PurchaseAddedEventType => Deserialize<PurchaseAdded>(data),
+      PurchaseAddedEventType => Map(Deserialize<SimplePurchaseAdded>(data)),
       _ => throw new UnreachableException(),
     };
   }
@@ -43,6 +43,27 @@ public static class EventSerializer
       receiptCreated.PurchaseDate.Date,
       receiptCreated.CreatedDate);
 
+  private static PurchaseAdded Map(SimplePurchaseAdded simplePurchaseAdded)
+    => new(
+      Id.Create(simplePurchaseAdded.ReceiptId),
+      Purchase.Create(
+        Item.Create(simplePurchaseAdded.Item),
+        Category.Create(simplePurchaseAdded.Category),
+        Quantity.Create(simplePurchaseAdded.Quantity),
+        Money.Create(simplePurchaseAdded.UnitPrice),
+        Money.Create(simplePurchaseAdded.TotalDiscount),
+        Description.Create(simplePurchaseAdded.Description)));
+
+  private static SimplePurchaseAdded Map(PurchaseAdded purchaseAdded)
+    => new(
+      purchaseAdded.ReceiptId.Value,
+      purchaseAdded.Purchase.Item.Name,
+      purchaseAdded.Purchase.Category.Name,
+      purchaseAdded.Purchase.Quantity.Value,
+      purchaseAdded.Purchase.UnitPrice.Value,
+      purchaseAdded.Purchase.TotalDiscount.Value,
+      purchaseAdded.Purchase.Description.Value);
+
   private static byte[] Serialize<T>(T @event)
   {
     string json = JsonSerializer.Serialize(@event);
@@ -55,4 +76,13 @@ public static class EventSerializer
   }
 
   private sealed record SimpleReceiptCreated(string Id, string Store, DateOnly PurchaseDate, DateOnly CreatedDate);
+
+  private sealed record SimplePurchaseAdded(
+    string ReceiptId,
+    string Item,
+    string Category,
+    decimal Quantity,
+    decimal UnitPrice,
+    decimal TotalDiscount,
+    string Description);
 }
