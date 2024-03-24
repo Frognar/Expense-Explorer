@@ -8,14 +8,13 @@ using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
 
-public class EventStoreReceiptRepository(string connectionString) : IReceiptRepository, IDisposable
+public sealed class EventStoreReceiptRepository(string connectionString) : IReceiptRepository, IDisposable
 {
   private readonly EventStoreWrapper eventStore = new(connectionString);
 
   public void Dispose()
   {
-    Dispose(true);
-    GC.SuppressFinalize(this);
+    eventStore.Dispose();
   }
 
   public async Task<Either<Failure, Unit>> Save(Receipt receipt)
@@ -31,13 +30,5 @@ public class EventStoreReceiptRepository(string connectionString) : IReceiptRepo
     return events.Count == 0
       ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
       : Right.From<Failure, Receipt>(Receipt.Recreate(events));
-  }
-
-  protected virtual void Dispose(bool disposing)
-  {
-    if (disposing)
-    {
-      eventStore.Dispose();
-    }
   }
 }
