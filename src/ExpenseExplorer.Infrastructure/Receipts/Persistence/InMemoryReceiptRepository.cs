@@ -2,6 +2,7 @@ namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Errors;
+using ExpenseExplorer.Application.Exceptions;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
@@ -12,16 +13,30 @@ public class InMemoryReceiptRepository : IReceiptRepository
 {
   public async Task<Either<Failure, Unit>> Save(Receipt receipt)
   {
-    ArgumentNullException.ThrowIfNull(receipt);
-    await InMemoryEventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges);
-    return Right.From<Failure, Unit>(Unit.Instance);
+    try
+    {
+      ArgumentNullException.ThrowIfNull(receipt);
+      await InMemoryEventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges);
+      return Right.From<Failure, Unit>(Unit.Instance);
+    }
+    catch (EventSaveException ex)
+    {
+      return Left.From<Failure, Unit>(new Failure(ex.Message));
+    }
   }
 
   public async Task<Either<Failure, Receipt>> GetAsync(Id id)
   {
-    List<Fact> events = (await InMemoryEventStore.GetEvents(id)).ToList();
-    return events.Count == 0
-      ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
-      : Right.From<Failure, Receipt>(Receipt.Recreate(events));
+    try
+    {
+      List<Fact> events = (await InMemoryEventStore.GetEvents(id)).ToList();
+      return events.Count == 0
+        ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
+        : Right.From<Failure, Receipt>(Receipt.Recreate(events));
+    }
+    catch (EventReadException ex)
+    {
+      return Left.From<Failure, Receipt>(new Failure(ex.Message));
+    }
   }
 }
