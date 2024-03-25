@@ -1,13 +1,12 @@
 namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
 using EventStore.Client;
-using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Events;
 using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
 using static ExpenseExplorer.Domain.Events.EventSerializer;
 
-public class EventStoreWrapper(string connectionString) : IEventStore, IDisposable
+public class EventStoreWrapper(string connectionString) : IDisposable
 {
   private readonly EventStoreClient client = new(EventStoreClientSettings.Create(connectionString));
 

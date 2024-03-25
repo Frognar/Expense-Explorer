@@ -10,18 +10,16 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public class InMemoryReceiptRepository : IReceiptRepository
 {
-  private readonly InMemoryEventStore eventStore = new();
-
   public async Task<Either<Failure, Unit>> Save(Receipt receipt)
   {
     ArgumentNullException.ThrowIfNull(receipt);
-    await eventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges);
+    await InMemoryEventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges);
     return Right.From<Failure, Unit>(Unit.Instance);
   }
 
   public async Task<Either<Failure, Receipt>> GetAsync(Id id)
   {
-    List<Fact> events = (await eventStore.GetEvents(id)).ToList();
+    List<Fact> events = (await InMemoryEventStore.GetEvents(id)).ToList();
     return events.Count == 0
       ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
       : Right.From<Failure, Receipt>(Receipt.Recreate(events));
