@@ -7,14 +7,13 @@ using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
 using static ExpenseExplorer.Domain.Events.EventSerializer;
 
-public class EventStoreWrapper(string connectionString) : IDisposable
+public sealed class EventStoreWrapper(string connectionString) : IDisposable
 {
   private readonly EventStoreClient client = new(EventStoreClientSettings.Create(connectionString));
 
   public void Dispose()
   {
-    Dispose(true);
-    GC.SuppressFinalize(this);
+    client.Dispose();
   }
 
   public Task SaveEvents(Id id, IEnumerable<Fact> events)
@@ -41,14 +40,6 @@ public class EventStoreWrapper(string connectionString) : IDisposable
     catch (Exception ex)
     {
       throw EventReadException.Wrap(ex);
-    }
-  }
-
-  protected virtual void Dispose(bool disposing)
-  {
-    if (disposing)
-    {
-      client.Dispose();
     }
   }
 
