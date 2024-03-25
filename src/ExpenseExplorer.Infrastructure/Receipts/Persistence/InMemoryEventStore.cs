@@ -10,10 +10,17 @@ public static class InMemoryEventStore
 
   public static Task<IEnumerable<Fact>> GetEvents(Id id)
   {
-    return Task.FromResult(
-      Events
-        .Where(x => x.Id == id)
-        .Select(x => x.Fact));
+    try
+    {
+      return Task.FromResult(
+        Events
+          .Where(x => x.Id == id)
+          .Select(x => x.Fact));
+    }
+    catch (Exception ex)
+    {
+      throw EventReadException.Wrap(ex);
+    }
   }
 
   public static Task SaveEvents(Id id, IEnumerable<Fact> events)

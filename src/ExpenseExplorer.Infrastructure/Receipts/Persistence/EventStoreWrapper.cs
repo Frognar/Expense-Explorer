@@ -33,8 +33,15 @@ public class EventStoreWrapper(string connectionString) : IDisposable
 
   public Task<IEnumerable<Fact>> GetEvents(Id id)
   {
-    ArgumentNullException.ThrowIfNull(id);
-    return ReadFromStreamAsync(id.Value);
+    try
+    {
+      ArgumentNullException.ThrowIfNull(id);
+      return ReadFromStreamAsync(id.Value);
+    }
+    catch (Exception ex)
+    {
+      throw EventReadException.Wrap(ex);
+    }
   }
 
   protected virtual void Dispose(bool disposing)
