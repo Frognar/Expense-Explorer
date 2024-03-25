@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
 using EventStore.Client;
+using ExpenseExplorer.Application.Exceptions;
 using ExpenseExplorer.Domain.Events;
 using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
@@ -18,9 +19,16 @@ public class EventStoreWrapper(string connectionString) : IDisposable
 
   public Task SaveEvents(Id id, IEnumerable<Fact> events)
   {
-    ArgumentNullException.ThrowIfNull(id);
-    ArgumentNullException.ThrowIfNull(events);
-    return AppendToStreamAsync(id.Value, events);
+    try
+    {
+      ArgumentNullException.ThrowIfNull(id);
+      ArgumentNullException.ThrowIfNull(events);
+      return AppendToStreamAsync(id.Value, events);
+    }
+    catch (Exception ex)
+    {
+      throw EventSaveException.Wrap(ex);
+    }
   }
 
   public Task<IEnumerable<Fact>> GetEvents(Id id)

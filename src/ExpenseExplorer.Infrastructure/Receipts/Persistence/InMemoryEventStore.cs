@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
+using ExpenseExplorer.Application.Exceptions;
 using ExpenseExplorer.Domain.Receipts.Events;
 using ExpenseExplorer.Domain.ValueObjects;
 
@@ -17,7 +18,14 @@ public static class InMemoryEventStore
 
   public static Task SaveEvents(Id id, IEnumerable<Fact> events)
   {
-    Events.AddRange(events.Select(fact => (id, fact)));
-    return Task.CompletedTask;
+    try
+    {
+      Events.AddRange(events.Select(fact => (id, fact)));
+      return Task.CompletedTask;
+    }
+    catch (Exception ex)
+    {
+      throw EventSaveException.Wrap(ex);
+    }
   }
 }
