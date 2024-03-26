@@ -3,6 +3,10 @@ using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddConfiguration(
+  new ConfigurationBuilder().SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+    .AddJsonFile("appsettings.json")
+    .Build());
 
 builder.Services.AddEndpointsApiExplorer();
 
