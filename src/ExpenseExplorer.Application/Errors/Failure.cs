@@ -1,3 +1,3 @@
 namespace ExpenseExplorer.Application.Errors;
 
-public record Failure(string Message);
+public abstract record Failure(string Message);

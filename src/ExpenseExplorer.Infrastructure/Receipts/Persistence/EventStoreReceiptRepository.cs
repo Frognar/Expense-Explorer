@@ -28,7 +28,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     }
     catch (EventSaveException ex)
     {
-      return Left.From<Failure, Unit>(new Failure(ex.Message));
+      return Left.From<Failure, Unit>(new FatalFailure(ex));
     }
   }
 
@@ -43,7 +43,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     }
     catch (EventReadException ex)
     {
-      return Left.From<Failure, Receipt>(new Failure(ex.Message));
+      return Left.From<Failure, Receipt>(new FatalFailure(ex));
     }
   }
 }

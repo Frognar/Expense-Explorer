@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.API.Endpoints;
 
+using System.Diagnostics;
 using System.Net;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
@@ -50,7 +51,8 @@ public static class ReceiptEndpoints
     {
       ValidationFailure validationFailure => HandleValidation(validationFailure),
       NotFoundFailure notFoundFailure => HandleNotFound(notFoundFailure),
-      _ => Results.Problem(detail: failure.Message, statusCode: (int)HttpStatusCode.InternalServerError),
+      FatalFailure fatal => Results.Problem(detail: fatal.Message, statusCode: (int)HttpStatusCode.InternalServerError),
+      _ => throw new UnreachableException(),
     };
   }
 
