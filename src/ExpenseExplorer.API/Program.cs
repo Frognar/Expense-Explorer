@@ -18,3 +18,10 @@ app.UseHttpsRedirection();
 app.MapEndpoints();
 
 app.Run();
+
+/// <summary>
+/// For integration tests.
+/// </summary>
+#pragma warning disable S1118
+public partial class Program;
+#pragma warning restore S1118
