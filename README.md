@@ -39,8 +39,9 @@ The project is currently under development. Stay tuned for future updates on set
     ```bash
     git clone https://github.com/Frognar/Expense-Explorer.git
     ```
-2. **Set Up Environment:** Ensure you have the necessary environment set up to run the project. This includes having the
-   .NET SDK installed. You can download it from [here](https://dotnet.microsoft.com/download).
+2. **Set Up Environment:** Ensure you have the necessary environment set up to run the project.
+    - [.NET SDK ](https://dotnet.microsoft.com/download)
+    - [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 3. **Build and Run:** Navigate to the solution directory and run *build.sh* script to build the project:
     ```bash
