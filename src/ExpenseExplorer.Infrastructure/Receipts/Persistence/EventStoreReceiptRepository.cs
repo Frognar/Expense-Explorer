@@ -23,7 +23,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     try
     {
       ArgumentNullException.ThrowIfNull(receipt);
-      await eventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges);
+      await eventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges, cancellationToken);
       return Right.From<Failure, Unit>(Unit.Instance);
     }
     catch (EventSaveException ex)
@@ -36,7 +36,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
   {
     try
     {
-      List<Fact> events = (await eventStore.GetEvents(id)).ToList();
+      List<Fact> events = (await eventStore.GetEvents(id, cancellationToken)).ToList();
       return events.Count == 0
         ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
         : Right.From<Failure, Receipt>(Receipt.Recreate(events));

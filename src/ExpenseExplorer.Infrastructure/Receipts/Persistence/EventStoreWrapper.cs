@@ -16,13 +16,13 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
     client.Dispose();
   }
 
-  public Task SaveEvents(Id id, IEnumerable<Fact> events)
+  public Task SaveEvents(Id id, IEnumerable<Fact> events, CancellationToken cancellationToken)
   {
     try
     {
       ArgumentNullException.ThrowIfNull(id);
       ArgumentNullException.ThrowIfNull(events);
-      return AppendToStreamAsync(id.Value, events);
+      return AppendToStreamAsync(id.Value, events, cancellationToken);
     }
     catch (Exception ex)
     {
@@ -30,12 +30,12 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
     }
   }
 
-  public Task<IEnumerable<Fact>> GetEvents(Id id)
+  public Task<IEnumerable<Fact>> GetEvents(Id id, CancellationToken cancellationToken)
   {
     try
     {
       ArgumentNullException.ThrowIfNull(id);
-      return ReadFromStreamAsync(id.Value);
+      return ReadFromStreamAsync(id.Value, cancellationToken);
     }
     catch (Exception ex)
     {
@@ -48,22 +48,27 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
     return new EventData(Uuid.NewUuid(), EventTypes.GetType(fact), Serialize(fact));
   }
 
-  private async Task AppendToStreamAsync(string stream, IEnumerable<Fact> events)
+  private async Task AppendToStreamAsync(string stream, IEnumerable<Fact> events, CancellationToken cancellationToken)
   {
     var data = events.Select(ToEventData);
-    _ = await client.AppendToStreamAsync(stream, StreamState.Any, data);
+    _ = await client.AppendToStreamAsync(stream, StreamState.Any, data, cancellationToken: cancellationToken);
   }
 
-  private async Task<IEnumerable<Fact>> ReadFromStreamAsync(string stream)
+  private async Task<IEnumerable<Fact>> ReadFromStreamAsync(string stream, CancellationToken cancellationToken)
   {
     const Direction direction = Direction.Forwards;
-    var streamResult = client.ReadStreamAsync(direction, stream, StreamPosition.Start);
+    var streamResult = client.ReadStreamAsync(
+      direction,
+      stream,
+      StreamPosition.Start,
+      cancellationToken: cancellationToken);
+
     if (await streamResult.ReadState == ReadState.StreamNotFound)
     {
       return Enumerable.Empty<Fact>();
     }
 
-    var events = await streamResult.Select(e => e.Event).ToListAsync();
+    var events = await streamResult.Select(e => e.Event).ToListAsync(cancellationToken);
     return events.Select(e => Deserialize(e.EventType, e.Data.ToArray()));
   }
 }
