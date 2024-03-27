@@ -1,6 +1,5 @@
 using ExpenseExplorer.API.Endpoints;
-using ExpenseExplorer.Application.Receipts.Persistence;
-using ExpenseExplorer.Infrastructure.Receipts.Persistence;
+using ExpenseExplorer.Infrastructure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddConfiguration(
@@ -11,9 +10,7 @@ builder.Configuration.AddConfiguration(
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddScoped<TimeProvider>(_ => TimeProvider.System);
-string? connectionString = builder.Configuration.GetConnectionString("EventStore");
-ArgumentNullException.ThrowIfNull(connectionString);
-builder.Services.AddScoped<IReceiptRepository>(_ => new EventStoreReceiptRepository(connectionString));
+builder.Services.AddInfrastructure(builder.Configuration);
 
 WebApplication app = builder.Build();
 
