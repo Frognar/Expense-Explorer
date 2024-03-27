@@ -1,5 +1,5 @@
 <p align="center">
-    <img alt="Expense-Explorer-Logo" src="imgs/Expense-Explorer-Logo-512.png">
+    <img alt="Expense-Explorer-Logo" src="res/imgs/Expense-Explorer-Logo-512.png">
 </p>
 
 ## Expense-Explorer
@@ -59,10 +59,10 @@ The project is currently under development. Stay tuned for future updates on set
    or curl to make requests.
 
 Request:
-> ![add receipt request](imgs/addReceiptRequest.png)
+> ![add receipt request](res/imgs/addReceiptRequest.png)
 
 Response:
-> ![add receipt response](imgs/addReceiptResponse.png)
+> ![add receipt response](res/imgs/addReceiptResponse.png)
 
 ## Contributing
 
