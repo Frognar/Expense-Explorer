@@ -10,19 +10,19 @@ using Testcontainers.EventStoreDb;
 
 public class ReceiptApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-  private readonly EventStoreDbContainer container = new EventStoreDbBuilder()
+  private readonly EventStoreDbContainer _container = new EventStoreDbBuilder()
     .WithImage("eventstore/eventstore:24.2.0-jammy")
     .Build();
 
   public Task InitializeAsync()
   {
-    return container.StartAsync();
+    return _container.StartAsync();
   }
 
   public new async Task DisposeAsync()
   {
-    await container.StopAsync();
-    await container.DisposeAsync();
+    await _container.StopAsync();
+    await _container.DisposeAsync();
   }
 
   protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -31,7 +31,7 @@ public class ReceiptApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
       sc =>
       {
         sc.RemoveAll(typeof(IReceiptRepository));
-        sc.AddScoped<IReceiptRepository>(_ => new EventStoreReceiptRepository(container.GetConnectionString()));
+        sc.AddScoped<IReceiptRepository>(_ => new EventStoreReceiptRepository(_container.GetConnectionString()));
       });
   }
 }
