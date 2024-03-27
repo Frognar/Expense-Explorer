@@ -18,7 +18,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     eventStore.Dispose();
   }
 
-  public async Task<Either<Failure, Unit>> Save(Receipt receipt)
+  public async Task<Either<Failure, Unit>> Save(Receipt receipt, CancellationToken cancellationToken)
   {
     try
     {
@@ -32,7 +32,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     }
   }
 
-  public async Task<Either<Failure, Receipt>> GetAsync(Id id)
+  public async Task<Either<Failure, Receipt>> GetAsync(Id id, CancellationToken cancellationToken)
   {
     try
     {

@@ -70,14 +70,16 @@ public class AddPurchaseCommandHandlerTests
       Add(Receipt.Recreate([createEvent]));
     }
 
-    public Task<Either<Failure, Unit>> Save(Receipt receipt)
+    public Task<Either<Failure, Unit>> Save(Receipt receipt, CancellationToken cancellationToken)
     {
+      cancellationToken.ThrowIfCancellationRequested();
       this[0] = receipt;
       return Task.FromResult(Right.From<Failure, Unit>(Unit.Instance));
     }
 
-    public Task<Either<Failure, Receipt>> GetAsync(Id id)
+    public Task<Either<Failure, Receipt>> GetAsync(Id id, CancellationToken cancellationToken)
     {
+      cancellationToken.ThrowIfCancellationRequested();
       Receipt? receipt = this.SingleOrDefault(r => r.Id == id);
       return receipt is null
         ? Task.FromResult(Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id)))
