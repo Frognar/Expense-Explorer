@@ -2,11 +2,11 @@
 
 public sealed class Either<L, R>
 {
-  private readonly IEither either;
+  private readonly IEither _either;
 
   private Either(IEither either)
   {
-    this.either = either;
+    _either = either;
   }
 
   private interface IEither
@@ -18,7 +18,7 @@ public sealed class Either<L, R>
   {
     ArgumentNullException.ThrowIfNull(onLeft);
     ArgumentNullException.ThrowIfNull(onRight);
-    return either.Match(onLeft, onRight);
+    return _either.Match(onLeft, onRight);
   }
 
   public Either<L1, R> MapLeft<L1>(Func<L, L1> selector)
@@ -76,19 +76,19 @@ public sealed class Either<L, R>
 
   private sealed class EitherLeft : IEither
   {
-    private readonly L left;
+    private readonly L _left;
 
-    public EitherLeft(L left) => this.left = left;
+    public EitherLeft(L left) => _left = left;
 
-    public T Match<T>(Func<L, T> onLeft, Func<R, T> onRight) => onLeft(left);
+    public T Match<T>(Func<L, T> onLeft, Func<R, T> onRight) => onLeft(_left);
   }
 
   private sealed class EitherRight : IEither
   {
-    private readonly R right;
+    private readonly R _right;
 
-    public EitherRight(R right) => this.right = right;
+    public EitherRight(R right) => _right = right;
 
-    public T Match<T>(Func<L, T> onLeft, Func<R, T> onRight) => onRight(right);
+    public T Match<T>(Func<L, T> onLeft, Func<R, T> onRight) => onRight(_right);
   }
 }

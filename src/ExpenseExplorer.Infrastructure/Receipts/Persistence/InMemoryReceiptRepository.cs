@@ -17,7 +17,7 @@ public class InMemoryReceiptRepository : IReceiptRepository
     {
       cancellationToken.ThrowIfCancellationRequested();
       ArgumentNullException.ThrowIfNull(receipt);
-      await InMemoryEventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges);
+      await InMemoryEventStore.SaveEvents(receipt.Id, receipt.UnsavedUnsavedChanges);
       return Right.From<Failure, Unit>(Unit.Instance);
     }
     catch (EventSaveException ex)

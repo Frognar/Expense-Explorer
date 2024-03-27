@@ -12,7 +12,7 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public class AddPurchaseCommandHandlerTests
 {
-  private readonly FakeReceiptRepository repository = new();
+  private readonly FakeReceiptRepository _receiptRepository = new();
 
   [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]
   public async Task CanHandleValidCommand(AddPurchaseCommand command)
@@ -42,7 +42,7 @@ public class AddPurchaseCommandHandlerTests
   public async Task SavesReceiptWhenValidCommand(AddPurchaseCommand command)
   {
     var receipt = await HandleValid(command);
-    repository.Should().Contain(r => r.Id == receipt.Id && r.Purchases.Count > 0);
+    _receiptRepository.Should().Contain(r => r.Id == receipt.Id && r.Purchases.Count > 0);
   }
 
   private async Task<Receipt> HandleValid(AddPurchaseCommand command)
@@ -53,7 +53,7 @@ public class AddPurchaseCommandHandlerTests
 
   private async Task<Either<Failure, Receipt>> Handle(AddPurchaseCommand command)
   {
-    AddPurchaseCommandHandler handler = new(repository);
+    AddPurchaseCommandHandler handler = new(_receiptRepository);
     return await handler.HandleAsync(command);
   }
 

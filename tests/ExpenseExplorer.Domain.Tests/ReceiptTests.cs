@@ -20,8 +20,8 @@ public class ReceiptTests
   public void ProducesReceiptCreatedEventWhenCreated(PurchaseDate purchaseDate, Store store)
   {
     Receipt receipt = Receipt.New(store, purchaseDate, TodayDateOnly);
-    receipt.UnsavedChanges.Count().Should().Be(1);
-    ReceiptCreated receiptCreated = receipt.UnsavedChanges.OfType<ReceiptCreated>().Single();
+    receipt.UnsavedUnsavedChanges.Count().Should().Be(1);
+    ReceiptCreated receiptCreated = receipt.UnsavedUnsavedChanges.OfType<ReceiptCreated>().Single();
     receiptCreated.Id.Should().Be(receipt.Id);
     receiptCreated.Store.Should().Be(receipt.Store);
     receiptCreated.PurchaseDate.Should().Be(receipt.PurchaseDate);
@@ -41,7 +41,7 @@ public class ReceiptTests
   public void ProducesStoreUpdatedEventWhenStoreUpdated(Receipt receipt, Store newStore)
   {
     receipt = receipt.CorrectStore(newStore);
-    StoreCorrected storeCorrected = receipt.UnsavedChanges.OfType<StoreCorrected>().Single();
+    StoreCorrected storeCorrected = receipt.UnsavedUnsavedChanges.OfType<StoreCorrected>().Single();
     storeCorrected.ReceiptId.Should().Be(receipt.Id);
     storeCorrected.Store.Should().Be(receipt.Store);
   }
@@ -52,7 +52,7 @@ public class ReceiptTests
     receipt
       .CorrectStore(newStore)
       .ClearChanges()
-      .UnsavedChanges
+      .UnsavedUnsavedChanges
       .Should()
       .BeEmpty();
   }
@@ -71,7 +71,7 @@ public class ReceiptTests
   public void ProducesPurchaseAddedEventWhenPurchaseAdded(Receipt receipt, Purchase purchase)
   {
     receipt = receipt.AddPurchase(purchase);
-    PurchaseAdded purchaseAdded = receipt.UnsavedChanges.OfType<PurchaseAdded>().Single();
+    PurchaseAdded purchaseAdded = receipt.UnsavedUnsavedChanges.OfType<PurchaseAdded>().Single();
     purchaseAdded.ReceiptId.Should().Be(receipt.Id);
     purchaseAdded.Purchase.Should().Be(receipt.Purchases.Last());
   }
@@ -110,6 +110,6 @@ public class ReceiptTests
     };
 
     Receipt receipt = Receipt.Recreate(events);
-    receipt.UnsavedChanges.Should().BeEmpty();
+    receipt.UnsavedUnsavedChanges.Should().BeEmpty();
   }
 }

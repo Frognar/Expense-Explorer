@@ -6,9 +6,9 @@ using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
 
-public class OpenNewReceiptCommandHandler(IReceiptRepository repository)
+public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
 {
-  private readonly IReceiptRepository repository = repository;
+  private readonly IReceiptRepository _receiptRepository = receiptRepository;
 
   public async Task<Either<Failure, Receipt>> HandleAsync(
     OpenNewReceiptCommand command,
@@ -22,7 +22,7 @@ public class OpenNewReceiptCommandHandler(IReceiptRepository repository)
 
   private async Task<Either<Failure, Receipt>> Save(Receipt receipt, CancellationToken cancellationToken)
   {
-    var result = await repository.Save(receipt, cancellationToken);
+    var result = await _receiptRepository.Save(receipt, cancellationToken);
     return result.MapRight(_ => receipt.ClearChanges());
   }
 }

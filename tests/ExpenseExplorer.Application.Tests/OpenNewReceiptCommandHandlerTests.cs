@@ -11,7 +11,7 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public class OpenNewReceiptCommandHandlerTests
 {
-  private readonly FakeReceiptRepository repository = new();
+  private readonly FakeReceiptRepository _receiptRepository = new();
 
   [Property(Arbitrary = [typeof(ValidOpenNewReceiptCommandGenerator)])]
   public async Task CanHandleValidCommand(OpenNewReceiptCommand command)
@@ -38,12 +38,12 @@ public class OpenNewReceiptCommandHandlerTests
     var receipt = (await Handle(command))
       .Match(_ => throw new UnreachableException(), receipt => receipt);
 
-    repository.Should().Contain(r => r.Id == receipt.Id);
+    _receiptRepository.Should().Contain(r => r.Id == receipt.Id);
   }
 
   private async Task<Either<Failure, Receipt>> Handle(OpenNewReceiptCommand command)
   {
-    OpenNewReceiptCommandHandler handler = new(repository);
+    OpenNewReceiptCommandHandler handler = new(_receiptRepository);
     return await handler.HandleAsync(command);
   }
 

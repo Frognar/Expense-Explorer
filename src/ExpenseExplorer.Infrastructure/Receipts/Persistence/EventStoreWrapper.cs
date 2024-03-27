@@ -9,11 +9,11 @@ using static ExpenseExplorer.Domain.Events.EventSerializer;
 
 public sealed class EventStoreWrapper(string connectionString) : IDisposable
 {
-  private readonly EventStoreClient client = new(EventStoreClientSettings.Create(connectionString));
+  private readonly EventStoreClient _client = new(EventStoreClientSettings.Create(connectionString));
 
   public void Dispose()
   {
-    client.Dispose();
+    _client.Dispose();
   }
 
   public Task SaveEvents(Id id, IEnumerable<Fact> events, CancellationToken cancellationToken)
@@ -51,13 +51,13 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
   private async Task AppendToStreamAsync(string stream, IEnumerable<Fact> events, CancellationToken cancellationToken)
   {
     var data = events.Select(ToEventData);
-    _ = await client.AppendToStreamAsync(stream, StreamState.Any, data, cancellationToken: cancellationToken);
+    _ = await _client.AppendToStreamAsync(stream, StreamState.Any, data, cancellationToken: cancellationToken);
   }
 
   private async Task<IEnumerable<Fact>> ReadFromStreamAsync(string stream, CancellationToken cancellationToken)
   {
     const Direction direction = Direction.Forwards;
-    var streamResult = client.ReadStreamAsync(
+    var streamResult = _client.ReadStreamAsync(
       direction,
       stream,
       StreamPosition.Start,

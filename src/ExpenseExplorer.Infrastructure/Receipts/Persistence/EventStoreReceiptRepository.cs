@@ -11,11 +11,11 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public sealed class EventStoreReceiptRepository(string connectionString) : IReceiptRepository, IDisposable
 {
-  private readonly EventStoreWrapper eventStore = new(connectionString);
+  private readonly EventStoreWrapper _eventStore = new(connectionString);
 
   public void Dispose()
   {
-    eventStore.Dispose();
+    _eventStore.Dispose();
   }
 
   public async Task<Either<Failure, Unit>> Save(Receipt receipt, CancellationToken cancellationToken)
@@ -23,7 +23,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     try
     {
       ArgumentNullException.ThrowIfNull(receipt);
-      await eventStore.SaveEvents(receipt.Id, receipt.UnsavedChanges, cancellationToken);
+      await _eventStore.SaveEvents(receipt.Id, receipt.UnsavedUnsavedChanges, cancellationToken);
       return Right.From<Failure, Unit>(Unit.Instance);
     }
     catch (EventSaveException ex)
@@ -36,7 +36,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
   {
     try
     {
-      List<Fact> events = (await eventStore.GetEvents(id, cancellationToken)).ToList();
+      List<Fact> events = (await _eventStore.GetEvents(id, cancellationToken)).ToList();
       return events.Count == 0
         ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
         : Right.From<Failure, Receipt>(Receipt.Recreate(events));

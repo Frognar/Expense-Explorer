@@ -4,11 +4,11 @@ using ExpenseExplorer.Application.Errors;
 
 public class Validated<S>
 {
-  private readonly IValidation validation;
+  private readonly IValidation _validation;
 
   private Validated(IValidation validation)
   {
-    this.validation = validation;
+    _validation = validation;
   }
 
   private interface IValidation
@@ -16,14 +16,14 @@ public class Validated<S>
     public T Match<T>(Func<ValidationFailure, T> onFailure, Func<S, T> onSuccess);
   }
 
-  public bool IsValid => validation.Match(_ => false, _ => true);
+  public bool IsValid => _validation.Match(_ => false, _ => true);
 
   public Validated<T> Map<T>(Func<S, T> map) => Match(Validated<T>.Fail, value => Validated<T>.Success(map(value)));
 
   public Validated<T> Select<T>(Func<S, T> selector) => Map(selector);
 
   public T Match<T>(Func<ValidationFailure, T> onFailure, Func<S, T> onSuccess)
-    => validation.Match(onFailure, onSuccess);
+    => _validation.Match(onFailure, onSuccess);
 
   internal static Validated<S> Success(S value) => new(new Succeeded(value));
 

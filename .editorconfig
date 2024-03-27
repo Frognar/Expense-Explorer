@@ -57,12 +57,24 @@ resharper_wrap_linq_expressions = chop_always
 indent_style = space
 indent_size = 2
 
+# Enforce _ prefix for private fields
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.require_underscore_prefix_and_camel_case.required_prefix = _
+dotnet_naming_style.require_underscore_prefix_and_camel_case.capitalization = camel_case
+dotnet_naming_rule.private_fields_must_begin_with_underscore_and_be_in_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_must_begin_with_underscore_and_be_in_camel_case.style = require_underscore_prefix_and_camel_case
+dotnet_naming_rule.private_fields_must_begin_with_underscore_and_be_in_camel_case.severity = error
+
 # StyleCop.Analyzers
 #SA0001: XML comment analysis is disabled
 dotnet_diagnostic.sa0001.severity = none
 
 #SA1101: Prefix local calls with 'this'
 dotnet_diagnostic.sa1101.severity = none
+
+#SA1309: Field names should not begin with an underscore
+dotnet_diagnostic.sa1309.severity = none
 
 #SA1314: Type parameter names should begin with T
 dotnet_diagnostic.sa1314.severity = none

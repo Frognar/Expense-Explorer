@@ -5,21 +5,26 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public class Receipt
 {
-  private static readonly Receipt Empty = new();
-  private readonly IEnumerable<Fact> changes;
+  private static readonly Receipt _empty = new();
+  private readonly IEnumerable<Fact> _unsavedChanges;
 
   private Receipt()
     : this(Id.Create("[EMPTY]"), Store.Create("[EMPTY]"), PurchaseDate.MinValue, [], [])
   {
   }
 
-  private Receipt(Id id, Store store, PurchaseDate purchaseDate, ICollection<Purchase> purchases, List<Fact> changes)
+  private Receipt(
+    Id id,
+    Store store,
+    PurchaseDate purchaseDate,
+    ICollection<Purchase> purchases,
+    IEnumerable<Fact> unsavedChanges)
   {
     Id = id;
     Store = store;
     PurchaseDate = purchaseDate;
     Purchases = purchases;
-    this.changes = changes;
+    _unsavedChanges = unsavedChanges;
   }
 
   public Id Id { get; }
@@ -30,7 +35,7 @@ public class Receipt
 
   public ICollection<Purchase> Purchases { get; }
 
-  public IEnumerable<Fact> UnsavedChanges => changes;
+  public IEnumerable<Fact> UnsavedUnsavedChanges => _unsavedChanges;
 
   public static Receipt New(Store store, PurchaseDate purchaseDate, DateOnly createdDate)
   {
@@ -41,7 +46,7 @@ public class Receipt
 
   public static Receipt Recreate(IEnumerable<Fact> events)
   {
-    return events.Aggregate(Empty, (receipt, fact) => receipt.ApplyEvent(fact));
+    return events.Aggregate(_empty, (receipt, fact) => receipt.ApplyEvent(fact));
   }
 
   public Receipt ClearChanges()
@@ -52,14 +57,14 @@ public class Receipt
   public Receipt CorrectStore(Store store)
   {
     Fact storeCorrected = new StoreCorrected(Id, store);
-    List<Fact> allChanges = changes.Append(storeCorrected).ToList();
+    List<Fact> allChanges = _unsavedChanges.Append(storeCorrected).ToList();
     return new Receipt(Id, store, PurchaseDate, Purchases, allChanges);
   }
 
   public Receipt AddPurchase(Purchase purchase)
   {
     Fact purchaseAdded = new PurchaseAdded(Id, purchase);
-    List<Fact> allChanges = changes.Append(purchaseAdded).ToList();
+    List<Fact> allChanges = _unsavedChanges.Append(purchaseAdded).ToList();
     List<Purchase> allPurchases = Purchases.Append(purchase).ToList();
     return new Receipt(Id, Store, PurchaseDate, allPurchases, allChanges);
   }
@@ -77,16 +82,16 @@ public class Receipt
 
   private Receipt Apply(ReceiptCreated fact)
   {
-    return new Receipt(fact.Id, fact.Store, fact.PurchaseDate, Purchases, changes.ToList());
+    return new Receipt(fact.Id, fact.Store, fact.PurchaseDate, Purchases, _unsavedChanges.ToList());
   }
 
   private Receipt Apply(StoreCorrected fact)
   {
-    return new Receipt(Id, fact.Store, PurchaseDate, Purchases, changes.ToList());
+    return new Receipt(Id, fact.Store, PurchaseDate, Purchases, _unsavedChanges.ToList());
   }
 
   private Receipt Apply(PurchaseAdded fact)
   {
-    return new Receipt(Id, Store, PurchaseDate, Purchases.Append(fact.Purchase).ToList(), changes.ToList());
+    return new Receipt(Id, Store, PurchaseDate, Purchases.Append(fact.Purchase).ToList(), _unsavedChanges.ToList());
   }
 }
