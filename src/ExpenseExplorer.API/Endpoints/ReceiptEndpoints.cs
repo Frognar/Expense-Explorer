@@ -4,10 +4,9 @@ using System.Diagnostics;
 using System.Net;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
+using ExpenseExplorer.Application.Commands;
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
-using ExpenseExplorer.Application.Receipts.Commands;
-using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 
 public static class ReceiptEndpoints
@@ -23,12 +22,11 @@ public static class ReceiptEndpoints
   private static async Task<IResult> OpenNewReceipt(
     OpenNewReceiptRequest request,
     TimeProvider timeProvider,
-    IReceiptRepository repository,
+    ISender sender,
     CancellationToken cancellationToken = default)
   {
     DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
-    OpenNewReceiptCommandHandler handler = new(repository);
-    Either<Failure, Receipt> result = await handler.HandleAsync(request.MapToCommand(today), cancellationToken);
+    Either<Failure, Receipt> result = await sender.SendAsync(request.MapToCommand(today), cancellationToken);
     return result
       .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
@@ -37,11 +35,10 @@ public static class ReceiptEndpoints
   private static async Task<IResult> AddPurchase(
     string receiptId,
     AddPurchaseRequest request,
-    IReceiptRepository repository,
+    ISender sender,
     CancellationToken cancellationToken = default)
   {
-    AddPurchaseCommandHandler handler = new(repository);
-    Either<Failure, Receipt> result = await handler.HandleAsync(request.MapToCommand(receiptId), cancellationToken);
+    Either<Failure, Receipt> result = await sender.SendAsync(request.MapToCommand(receiptId), cancellationToken);
     return result
       .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);

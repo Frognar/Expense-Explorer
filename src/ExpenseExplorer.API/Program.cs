@@ -1,4 +1,5 @@
 using ExpenseExplorer.API.Endpoints;
+using ExpenseExplorer.Application;
 using ExpenseExplorer.Infrastructure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddScoped<TimeProvider>(_ => TimeProvider.System);
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 
 WebApplication app = builder.Build();
 

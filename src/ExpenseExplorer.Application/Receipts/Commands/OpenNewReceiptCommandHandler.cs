@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
+using ExpenseExplorer.Application.Commands;
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Persistence;
@@ -7,6 +8,7 @@ using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
 
 public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
+  : ICommandHandler<OpenNewReceiptCommand, Either<Failure, Receipt>>
 {
   private readonly IReceiptRepository _receiptRepository = receiptRepository;
 

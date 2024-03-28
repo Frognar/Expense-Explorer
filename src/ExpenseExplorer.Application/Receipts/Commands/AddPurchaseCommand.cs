@@ -1,5 +1,10 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
+using ExpenseExplorer.Application.Commands;
+using ExpenseExplorer.Application.Errors;
+using ExpenseExplorer.Application.Monads;
+using ExpenseExplorer.Domain.Receipts;
+
 public record AddPurchaseCommand(
   string ReceiptId,
   string Item,
@@ -7,4 +12,4 @@ public record AddPurchaseCommand(
   decimal Quantity,
   decimal UnitPrice,
   decimal? TotalDiscount,
-  string? Description);
+  string? Description) : ICommand<Either<Failure, Receipt>>;
