@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
+using ExpenseExplorer.Application.Commands;
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Persistence;
@@ -8,6 +9,7 @@ using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
+  : ICommandHandler<AddPurchaseCommand, Either<Failure, Receipt>>
 {
   private readonly IReceiptRepository _receiptRepository = receiptRepository;
 
@@ -18,7 +20,10 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
     ArgumentNullException.ThrowIfNull(command);
     Validated<Purchase> validated = PurchaseValidator.Validate(command);
     Either<Failure, Purchase> purchase = validated.ToEither();
-    Either<Failure, Receipt> receipt = await _receiptRepository.GetAsync(Id.Create(command.ReceiptId), cancellationToken);
+    Either<Failure, Receipt> receipt = await _receiptRepository.GetAsync(
+      Id.Create(command.ReceiptId),
+      cancellationToken);
+
     return await purchase
       .FlatMapRight(e => receipt.MapRight(r => r.AddPurchase(e)))
       .FlatMapRight(r => Save(r, cancellationToken));
