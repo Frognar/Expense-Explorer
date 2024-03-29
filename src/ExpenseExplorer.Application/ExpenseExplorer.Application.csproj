@@ -5,6 +5,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\CommandHub.DependencyInjection\CommandHub.DependencyInjection.csproj"/>
         <ProjectReference Include="..\CommandHub\CommandHub.csproj"/>
         <ProjectReference Include="..\ExpenseExplorer.Domain\ExpenseExplorer.Domain.csproj"/>
     </ItemGroup>
