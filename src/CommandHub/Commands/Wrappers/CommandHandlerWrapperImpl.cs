@@ -1,6 +1,12 @@
 namespace CommandHub.Commands.Wrappers;
 
-internal class CommandHandlerWrapperImpl<TCommand, TResponse> : CommandHandlerWrapper<TResponse>
+using System.Diagnostics.CodeAnalysis;
+
+[SuppressMessage(
+  "Performance",
+  "CA1812:Avoid uninstantiated internal classes",
+  Justification = "Instantiated via reflection.")]
+internal sealed class CommandHandlerWrapperImpl<TCommand, TResponse> : CommandHandlerWrapper<TResponse>
   where TCommand : ICommand<TResponse>
 {
   private readonly Type _handlerType = typeof(ICommandHandler<TCommand, TResponse>);

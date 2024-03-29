@@ -2,7 +2,7 @@ namespace CommandHub.Commands;
 
 using CommandHub.Commands.Wrappers;
 
-internal class Sender(
+internal sealed class Sender(
   Func<Type, object> serviceProvider,
   IDictionary<Type, BaseCommandHandlerWrapper> commandHandlerWrappers)
   : ISender
