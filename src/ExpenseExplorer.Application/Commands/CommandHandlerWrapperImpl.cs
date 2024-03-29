@@ -10,18 +10,7 @@ internal class CommandHandlerWrapperImpl<TCommand, TResponse> : CommandHandlerWr
     IServiceProvider serviceProvider,
     CancellationToken cancellationToken)
   {
-    return Handler();
-
-    Task<TResponse> Handler()
-      => serviceProvider.GetRequiredService<ICommandHandler<TCommand, TResponse>>()
-        .HandleAsync((TCommand)command, cancellationToken);
-  }
-
-  public override async Task<object?> HandleAsync(
-    object command,
-    IServiceProvider serviceProvider,
-    CancellationToken cancellationToken)
-  {
-    return await HandleAsync((ICommand<TResponse>)command, serviceProvider, cancellationToken);
+    return serviceProvider.GetRequiredService<ICommandHandler<TCommand, TResponse>>()
+      .HandleAsync((TCommand)command, cancellationToken);
   }
 }
