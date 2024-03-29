@@ -2,9 +2,9 @@ namespace ExpenseExplorer.API.Endpoints;
 
 using System.Diagnostics;
 using System.Net;
+using CommandHub.Commands;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
-using ExpenseExplorer.Application.Commands;
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Domain.Receipts;

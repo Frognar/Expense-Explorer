@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
-using ExpenseExplorer.Application.Commands;
+using CommandHub.Commands;
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Domain.Receipts;

@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Application.Commands;
+namespace CommandHub.Commands;
 
 using System.Diagnostics.CodeAnalysis;
 

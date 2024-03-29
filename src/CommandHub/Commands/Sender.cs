@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Application.Commands;
+namespace CommandHub.Commands;
 
-using ExpenseExplorer.Application.Commands.Wrappers;
+using CommandHub.Commands.Wrappers;
 
 internal class Sender(
   Func<Type, object> serviceProvider,

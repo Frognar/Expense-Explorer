@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Application.Commands.Wrappers;
+namespace CommandHub.Commands.Wrappers;
 
 internal class CommandHandlerWrapperImpl<TCommand, TResponse> : CommandHandlerWrapper<TResponse>
   where TCommand : ICommand<TResponse>

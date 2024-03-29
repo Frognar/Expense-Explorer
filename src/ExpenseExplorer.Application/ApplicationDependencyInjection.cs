@@ -1,7 +1,7 @@
 namespace ExpenseExplorer.Application;
 
 using System.Reflection;
-using ExpenseExplorer.Application.Commands;
+using CommandHub.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

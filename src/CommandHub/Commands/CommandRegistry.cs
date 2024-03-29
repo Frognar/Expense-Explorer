@@ -1,7 +1,7 @@
-namespace ExpenseExplorer.Application.Commands;
+namespace CommandHub.Commands;
 
 using System.Reflection;
-using ExpenseExplorer.Application.Commands.Wrappers;
+using CommandHub.Commands.Wrappers;
 
 public static class CommandRegistry
 {

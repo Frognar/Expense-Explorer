@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Application.Commands;
+namespace CommandHub.Commands;
 
 public interface ICommandHandler<in TCommand, TResponse>
   where TCommand : ICommand<TResponse>
