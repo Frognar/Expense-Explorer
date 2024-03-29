@@ -4,6 +4,6 @@ internal abstract class CommandHandlerWrapper<TResponse> : BaseCommandHandlerWra
 {
   public abstract Task<TResponse> HandleAsync(
     ICommand<TResponse> command,
-    IServiceProvider serviceProvider,
+    Func<Type, object> serviceProvider,
     CancellationToken cancellationToken);
 }

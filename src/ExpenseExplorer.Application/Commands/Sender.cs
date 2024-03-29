@@ -1,11 +1,12 @@
 namespace ExpenseExplorer.Application.Commands;
 
 internal class Sender(
-  IServiceProvider serviceProvider,
+  Func<Type, object> serviceProvider,
   IDictionary<Type, BaseCommandHandlerWrapper> commandHandlerWrappers)
   : ISender
 {
   private readonly IDictionary<Type, BaseCommandHandlerWrapper> _commandHandlerWrappers = commandHandlerWrappers;
+  private readonly Func<Type, object> _serviceProvider = serviceProvider;
 
   public Task<TResponse> SendAsync<TResponse>(
     ICommand<TResponse> command,
@@ -18,6 +19,7 @@ internal class Sender(
       throw new InvalidOperationException($"No command handler wrapper found for command of type {requestType}.");
     }
 
-    return ((CommandHandlerWrapper<TResponse>)wrapper).HandleAsync(command, serviceProvider, cancellationToken);
+    return ((CommandHandlerWrapper<TResponse>)wrapper)
+      .HandleAsync(command, _serviceProvider, cancellationToken);
   }
 }

@@ -10,7 +10,7 @@ public static class ApplicationDependencyInjection
   {
     services.RegisterCommandHandlers();
     Dictionary<Type, BaseCommandHandlerWrapper> wrappers = CreateCommandHandlerWrappers();
-    services.AddScoped<ISender>(sp => new Sender(sp, wrappers));
+    services.AddScoped<ISender>(sp => new Sender(sp.GetRequiredService, wrappers));
   }
 
   private static void RegisterCommandHandlers(this IServiceCollection services)
