@@ -67,4 +67,24 @@ public class EventSerializerTests
 
     fact.Should().BeOfType<PurchaseAdded>();
   }
+
+  [Fact]
+  public void SerializeStoreCorrected()
+  {
+    Fact fact = new StoreCorrected(Id.Create("id"), Store.Create("store"));
+
+    byte[] data = EventSerializer.Serialize(fact);
+
+    data.Should().BeEquivalentTo("{\"ReceiptId\":\"id\",\"Store\":\"store\"}"u8.ToArray());
+  }
+
+  [Fact]
+  public void DeserializeStoreCorrected()
+  {
+    byte[] data = "{\"ReceiptId\":\"id\",\"Store\":\"store\"}"u8.ToArray();
+
+    Fact fact = EventSerializer.Deserialize(EventTypes.StoreCorrectedEventType, data);
+
+    fact.Should().BeOfType<StoreCorrected>();
+  }
 }

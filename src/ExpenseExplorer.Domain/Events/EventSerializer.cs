@@ -15,6 +15,7 @@ public static class EventSerializer
     {
       Receipts.Events.ReceiptCreated receiptCreated => Serialize(Map(receiptCreated)),
       Receipts.Events.PurchaseAdded purchaseAdded => Serialize(Map(purchaseAdded)),
+      Receipts.Events.StoreCorrected storeCorrected => Serialize(Map(storeCorrected)),
       _ => throw new UnreachableException(),
     };
   }
@@ -25,6 +26,7 @@ public static class EventSerializer
     {
       ReceiptCreatedEventType => Map(Deserialize<SimpleReceiptCreated>(data)),
       PurchaseAddedEventType => Map(Deserialize<SimplePurchaseAdded>(data)),
+      StoreCorrectedEventType => Map(Deserialize<SimpleStoreCorrected>(data)),
       _ => throw new UnreachableException(),
     };
   }
@@ -64,6 +66,12 @@ public static class EventSerializer
       purchaseAdded.Purchase.TotalDiscount.Value,
       purchaseAdded.Purchase.Description.Value);
 
+  private static StoreCorrected Map(SimpleStoreCorrected simpleStoreCorrected)
+    => new(Id.Create(simpleStoreCorrected.ReceiptId), Store.Create(simpleStoreCorrected.Store));
+
+  private static SimpleStoreCorrected Map(StoreCorrected storeCorrected)
+    => new(storeCorrected.ReceiptId.Value, storeCorrected.Store.Name);
+
   private static byte[] Serialize<T>(T @event)
   {
     string json = JsonSerializer.Serialize(@event);
@@ -85,4 +93,6 @@ public static class EventSerializer
     decimal UnitPrice,
     decimal TotalDiscount,
     string Description);
+
+  private sealed record SimpleStoreCorrected(string ReceiptId, string Store);
 }
