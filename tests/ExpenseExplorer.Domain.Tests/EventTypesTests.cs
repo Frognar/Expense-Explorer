@@ -34,6 +34,13 @@ public class EventTypesTests
     AssertEventType(fact, EventTypes.PurchaseAddedEventType);
   }
 
+  [Fact]
+  public void GetTypeForStoreCorrected()
+  {
+    Fact fact = new StoreCorrected(Id.Unique(), Store.Create("store"));
+    AssertEventType(fact, EventTypes.StoreCorrectedEventType);
+  }
+
   private static void AssertEventType(Fact fact, string expectedType)
   {
     string type = EventTypes.GetType(fact);
