@@ -1,5 +1,7 @@
 namespace ExpenseExplorer.Application.Commands;
 
+using ExpenseExplorer.Application.Commands.Wrappers;
+
 internal class Sender(
   Func<Type, object> serviceProvider,
   IDictionary<Type, BaseCommandHandlerWrapper> commandHandlerWrappers)

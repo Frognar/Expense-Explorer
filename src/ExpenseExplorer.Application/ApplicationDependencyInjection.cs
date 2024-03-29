@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.Application;
 
 using ExpenseExplorer.Application.Commands;
+using ExpenseExplorer.Application.Commands.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
