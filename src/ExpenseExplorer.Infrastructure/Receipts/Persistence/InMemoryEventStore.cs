@@ -8,7 +8,7 @@ public static class InMemoryEventStore
 {
   private static readonly List<(Id Id, Fact Fact)> _events = new();
 
-  public static Task<IEnumerable<Fact>> GetEvents(Id id)
+  public static Task<IEnumerable<Fact>> GetEventsAsync(Id id)
   {
     try
     {
@@ -23,7 +23,7 @@ public static class InMemoryEventStore
     }
   }
 
-  public static Task SaveEvents(Id id, IEnumerable<Fact> events)
+  public static Task SaveEventsAsync(Id id, IEnumerable<Fact> events)
   {
     try
     {

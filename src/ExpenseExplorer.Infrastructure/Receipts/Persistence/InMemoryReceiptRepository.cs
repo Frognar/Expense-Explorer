@@ -17,7 +17,7 @@ public class InMemoryReceiptRepository : IReceiptRepository
     {
       cancellationToken.ThrowIfCancellationRequested();
       ArgumentNullException.ThrowIfNull(receipt);
-      await InMemoryEventStore.SaveEvents(receipt.Id, receipt.UnsavedUnsavedChanges);
+      await InMemoryEventStore.SaveEventsAsync(receipt.Id, receipt.UnsavedUnsavedChanges);
       return Right.From<Failure, Unit>(Unit.Instance);
     }
     catch (EventSaveException ex)
@@ -31,7 +31,7 @@ public class InMemoryReceiptRepository : IReceiptRepository
     try
     {
       cancellationToken.ThrowIfCancellationRequested();
-      List<Fact> events = (await InMemoryEventStore.GetEvents(id)).ToList();
+      List<Fact> events = (await InMemoryEventStore.GetEventsAsync(id)).ToList();
       return events.Count == 0
         ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
         : Right.From<Failure, Receipt>(Receipt.Recreate(events));

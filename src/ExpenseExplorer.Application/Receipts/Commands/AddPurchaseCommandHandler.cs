@@ -26,7 +26,7 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
 
     return await purchase
       .FlatMapRight(e => receipt.MapRight(r => r.AddPurchase(e)))
-      .FlatMapRight(r => SaveAsync(r, cancellationToken));
+      .FlatMapRightAsync(r => SaveAsync(r, cancellationToken));
   }
 
   private async Task<Either<Failure, Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)

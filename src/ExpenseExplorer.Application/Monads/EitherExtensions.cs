@@ -2,7 +2,7 @@ namespace ExpenseExplorer.Application.Monads;
 
 public static class EitherExtensions
 {
-  public static async Task<Either<L, R1>> FlatMapRight<L, R, R1>(
+  public static async Task<Either<L, R1>> FlatMapRightAsync<L, R, R1>(
     this Either<L, R> either,
     Func<R, Task<Either<L, R1>>> selector)
   {

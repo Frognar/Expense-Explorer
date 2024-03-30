@@ -14,12 +14,12 @@ public static class ReceiptEndpoints
   public static IEndpointRouteBuilder MapReceiptEndpoints(this IEndpointRouteBuilder endpointRouteBuilder)
   {
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/receipts");
-    group.MapPost("/", OpenNewReceipt);
-    group.MapPost("/{receiptId}", AddPurchase);
+    group.MapPost("/", OpenNewReceiptAsync);
+    group.MapPost("/{receiptId}", AddPurchaseAsync);
     return endpointRouteBuilder;
   }
 
-  private static async Task<IResult> OpenNewReceipt(
+  private static async Task<IResult> OpenNewReceiptAsync(
     OpenNewReceiptRequest request,
     TimeProvider timeProvider,
     ISender sender,
@@ -32,7 +32,7 @@ public static class ReceiptEndpoints
       .Match(Handle, Results.Ok);
   }
 
-  private static async Task<IResult> AddPurchase(
+  private static async Task<IResult> AddPurchaseAsync(
     string receiptId,
     AddPurchaseRequest request,
     ISender sender,

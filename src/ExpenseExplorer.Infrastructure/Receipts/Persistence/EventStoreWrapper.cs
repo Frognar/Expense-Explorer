@@ -16,7 +16,7 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
     _client.Dispose();
   }
 
-  public Task SaveEvents(Id id, IEnumerable<Fact> events, CancellationToken cancellationToken)
+  public Task SaveEventsAsync(Id id, IEnumerable<Fact> events, CancellationToken cancellationToken)
   {
     try
     {
@@ -30,7 +30,7 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
     }
   }
 
-  public Task<IEnumerable<Fact>> GetEvents(Id id, CancellationToken cancellationToken)
+  public Task<IEnumerable<Fact>> GetEventsAsync(Id id, CancellationToken cancellationToken)
   {
     try
     {
