@@ -26,7 +26,7 @@ public class OpenNewReceiptTests
 
     HttpResponseMessage response = await Send(request);
 
-    response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
+    response.StatusCode.ShouldBeIn200Group();
   }
 
   [Theory]
@@ -34,7 +34,6 @@ public class OpenNewReceiptTests
   public async Task IsBadRequestWhenInvalidRequest(OpenNewReceiptRequest request)
   {
     HttpResponseMessage response = await Send(request);
-
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
   }
 

@@ -65,7 +65,7 @@ public class AddPurchaseTests
   public async Task CanAddPurchaseToReceipt(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
-    response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
+    response.StatusCode.ShouldBeIn200Group();
   }
 
   [Theory]
