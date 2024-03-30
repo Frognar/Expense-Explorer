@@ -49,7 +49,7 @@ public class OpenNewReceiptCommandHandlerTests
 
   private sealed class FakeReceiptRepository : Collection<Receipt>, IReceiptRepository
   {
-    public Task<Either<Failure, Unit>> Save(Receipt receipt, CancellationToken cancellationToken)
+    public Task<Either<Failure, Unit>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
     {
       cancellationToken.ThrowIfCancellationRequested();
       Add(receipt);

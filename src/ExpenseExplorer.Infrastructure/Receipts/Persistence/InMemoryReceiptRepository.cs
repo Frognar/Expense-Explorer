@@ -11,7 +11,7 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public class InMemoryReceiptRepository : IReceiptRepository
 {
-  public async Task<Either<Failure, Unit>> Save(Receipt receipt, CancellationToken cancellationToken)
+  public async Task<Either<Failure, Unit>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
     try
     {

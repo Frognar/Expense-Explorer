@@ -26,12 +26,12 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
 
     return await purchase
       .FlatMapRight(e => receipt.MapRight(r => r.AddPurchase(e)))
-      .FlatMapRight(r => Save(r, cancellationToken));
+      .FlatMapRight(r => SaveAsync(r, cancellationToken));
   }
 
-  private async Task<Either<Failure, Receipt>> Save(Receipt receipt, CancellationToken cancellationToken)
+  private async Task<Either<Failure, Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
-    var result = await _receiptRepository.Save(receipt, cancellationToken);
+    var result = await _receiptRepository.SaveAsync(receipt, cancellationToken);
     return result.MapRight(_ => receipt.ClearChanges());
   }
 }

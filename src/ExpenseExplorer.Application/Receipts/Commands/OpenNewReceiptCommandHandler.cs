@@ -19,12 +19,12 @@ public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
     ArgumentNullException.ThrowIfNull(command);
     Validated<Receipt> validated = ReceiptValidator.Validate(command);
     Either<Failure, Receipt> either = validated.ToEither();
-    return await either.FlatMapRight(r => Save(r, cancellationToken));
+    return await either.FlatMapRight(r => SaveAsync(r, cancellationToken));
   }
 
-  private async Task<Either<Failure, Receipt>> Save(Receipt receipt, CancellationToken cancellationToken)
+  private async Task<Either<Failure, Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
-    var result = await _receiptRepository.Save(receipt, cancellationToken);
+    var result = await _receiptRepository.SaveAsync(receipt, cancellationToken);
     return result.MapRight(_ => receipt.ClearChanges());
   }
 }
