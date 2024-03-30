@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\ExpenseExplorer.API\ExpenseExplorer.API.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Testcontainers" Version="3.8.0"/>
+        <PackageReference Include="Testcontainers.EventStoreDb" Version="3.8.0"/>
+    </ItemGroup>
+
+</Project>
