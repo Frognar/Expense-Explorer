@@ -2,16 +2,23 @@ namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
 using System.Net;
 using System.Net.Http.Json;
+using ExpenseExplorer.API.Tests.Integration.Receipts.TestData;
 
 public class OpenNewReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory)
 {
-  [Fact]
-  public async Task CanCreateReceipt()
+  [Theory]
+  [ClassData(typeof(ValidOpenNewRequestData))]
+  public async Task CanCreateReceipt(object request)
   {
-    var result = await Client.PostAsJsonAsync(
-      "api/receipts",
-      new { storeName = "store", purchaseDate = DateOnly.MinValue });
+    var response = await Client.PostAsJsonAsync("api/receipts", request);
+    response.StatusCode.ShouldBeIn200Group();
+  }
 
-    result.StatusCode.Should().Be(HttpStatusCode.OK);
+  [Theory]
+  [ClassData(typeof(InvalidOpenNewRequestData))]
+  public async Task IsBadRequestWhenInvalidRequest(object request)
+  {
+    var response = await Client.PostAsJsonAsync("api/receipts", request);
+    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
   }
 }
