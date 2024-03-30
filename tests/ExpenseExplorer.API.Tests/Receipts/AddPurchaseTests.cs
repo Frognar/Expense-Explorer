@@ -7,6 +7,34 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 public class AddPurchaseTests
 {
+  public static IEnumerable<object[]> ValidAddPurchaseRequestData
+  {
+    get
+    {
+      return new List<object[]>
+      {
+        new object[] { new AddPurchaseRequest("item", "category", 1, 0, 0, null), },
+        new object[] { new AddPurchaseRequest("item", "category", 1, 1, 1, null) },
+        new object[] { new AddPurchaseRequest("item", "category", 1, 1, null, "description") },
+      };
+    }
+  }
+
+  public static IEnumerable<object[]> InvalidAddPurchaseRequestData
+  {
+    get
+    {
+      return new List<object[]>
+      {
+        new object[] { new AddPurchaseRequest(string.Empty, "category", 1, 0, null, null) },
+        new object[] { new AddPurchaseRequest("item", string.Empty, 1, 0, null, null) },
+        new object[] { new AddPurchaseRequest("item", "category", 0, 0, null, null) },
+        new object[] { new AddPurchaseRequest("item", "category", 1, -1, null, null) },
+        new object[] { new AddPurchaseRequest("item", "category", 1, 0, -1, null) },
+      };
+    }
+  }
+
   [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(DateOnlyGenerator), typeof(PositiveDecimalGenerator)])]
   public void ContainsDataGivenDuringConstruction(
     string productName,
@@ -32,14 +60,16 @@ public class AddPurchaseTests
     request.Description.Should().Be(description);
   }
 
-  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 25)]
+  [Theory]
+  [MemberData(nameof(ValidAddPurchaseRequestData))]
   public async Task CanAddPurchaseToReceipt(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
     response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
   }
 
-  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 25)]
+  [Theory]
+  [MemberData(nameof(ValidAddPurchaseRequestData))]
   public async Task ContainsAddedPurchaseInResponse(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
@@ -47,14 +77,16 @@ public class AddPurchaseTests
     receipt.Purchases.Count().Should().Be(1);
   }
 
-  [Property(Arbitrary = [typeof(ValidAddPurchaseRequestGenerator)], MaxTest = 25)]
+  [Theory]
+  [MemberData(nameof(ValidAddPurchaseRequestData))]
   public async Task IsNotFoundWhenReceiptIdIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await Send("/api/receipts/invalid-id", request);
     response.StatusCode.Should().Be(HttpStatusCode.NotFound);
   }
 
-  [Property(Arbitrary = [typeof(InvalidAddPurchaseRequestGenerator)], MaxTest = 25)]
+  [Theory]
+  [MemberData(nameof(InvalidAddPurchaseRequestData))]
   public async Task IsBadRequestWhenRequestIsInvalid(AddPurchaseRequest request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
