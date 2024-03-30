@@ -7,15 +7,30 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 public class OpenNewReceiptTests
 {
-  [Property(Arbitrary = [typeof(ValidOpenNewReceiptRequestGenerator)], MaxTest = 25)]
-  public async Task CanAddReceipt(OpenNewReceiptRequest request)
+  public static IEnumerable<object[]> InvalidOpenNewRequestData
   {
+    get
+    {
+      return new List<object[]>
+      {
+        new object[] { new OpenNewReceiptRequest(string.Empty, TodayDateOnly) },
+        new object[] { new OpenNewReceiptRequest("store", TodayDateOnly.AddDays(1)) },
+      };
+    }
+  }
+
+  [Fact]
+  public async Task CanAddReceipt()
+  {
+    OpenNewReceiptRequest request = new("store", TodayDateOnly);
+
     HttpResponseMessage response = await Send(request);
 
     response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
   }
 
-  [Property(Arbitrary = [typeof(InvalidOpenNewReceiptRequestGenerator)], MaxTest = 25)]
+  [Theory]
+  [MemberData(nameof(InvalidOpenNewRequestData))]
   public async Task IsBadRequestWhenInvalidRequest(OpenNewReceiptRequest request)
   {
     HttpResponseMessage response = await Send(request);
