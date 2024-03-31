@@ -1,7 +1,7 @@
 namespace ExpenseExplorer.Domain.Tests;
 
 using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.Receipts.Events;
+using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public class ReceiptTests
@@ -18,11 +18,11 @@ public class ReceiptTests
   }
 
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator)])]
-  public void ProducesReceiptCreatedEventWhenCreated(PurchaseDate purchaseDate, Store store)
+  public void ProducesReceiptCreatedFactWhenCreated(PurchaseDate purchaseDate, Store store)
   {
     Receipt receipt = Receipt.New(store, purchaseDate, TodayDateOnly);
-    receipt.UnsavedUnsavedChanges.Count().Should().Be(1);
-    ReceiptCreated receiptCreated = receipt.UnsavedUnsavedChanges.OfType<ReceiptCreated>().Single();
+    receipt.UnsavedChanges.Count().Should().Be(1);
+    ReceiptCreated receiptCreated = receipt.UnsavedChanges.OfType<ReceiptCreated>().Single();
     receiptCreated.Id.Should().Be(receipt.Id);
     receiptCreated.Store.Should().Be(receipt.Store);
     receiptCreated.PurchaseDate.Should().Be(receipt.PurchaseDate);
@@ -39,10 +39,10 @@ public class ReceiptTests
   }
 
   [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(StoreGenerator)])]
-  public void ProducesStoreUpdatedEventWhenStoreUpdated(Receipt receipt, Store newStore)
+  public void ProducesStoreUpdatedFactWhenStoreUpdated(Receipt receipt, Store newStore)
   {
     receipt = receipt.CorrectStore(newStore);
-    StoreCorrected storeCorrected = receipt.UnsavedUnsavedChanges.OfType<StoreCorrected>().Single();
+    StoreCorrected storeCorrected = receipt.UnsavedChanges.OfType<StoreCorrected>().Single();
     storeCorrected.ReceiptId.Should().Be(receipt.Id);
     storeCorrected.Store.Should().Be(receipt.Store);
   }
@@ -53,7 +53,7 @@ public class ReceiptTests
     receipt
       .CorrectStore(newStore)
       .ClearChanges()
-      .UnsavedUnsavedChanges
+      .UnsavedChanges
       .Should()
       .BeEmpty();
   }
@@ -69,49 +69,49 @@ public class ReceiptTests
   }
 
   [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(PurchaseGenerator)])]
-  public void ProducesPurchaseAddedEventWhenPurchaseAdded(Receipt receipt, Purchase purchase)
+  public void ProducesPurchaseAddedFactWhenPurchaseAdded(Receipt receipt, Purchase purchase)
   {
     receipt = receipt.AddPurchase(purchase);
-    PurchaseAdded purchaseAdded = receipt.UnsavedUnsavedChanges.OfType<PurchaseAdded>().Single();
+    PurchaseAdded purchaseAdded = receipt.UnsavedChanges.OfType<PurchaseAdded>().Single();
     purchaseAdded.ReceiptId.Should().Be(receipt.Id);
     purchaseAdded.Purchase.Should().Be(receipt.Purchases.Last());
   }
 
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator), typeof(PurchaseGenerator)])]
-  public void CanBeRecreatedFromEvents(Store store, PurchaseDate purchaseDate, Purchase purchase, Store newStore)
+  public void CanBeRecreatedFromFacts(Store store, PurchaseDate purchaseDate, Purchase purchase, Store newStore)
   {
     Id receiptId = Id.Unique();
-    List<Fact> events =
+    List<Fact> facts =
     [
       new ReceiptCreated(receiptId, store, purchaseDate, TodayDateOnly),
       new PurchaseAdded(receiptId, purchase),
       new StoreCorrected(receiptId, newStore)
     ];
 
-    Receipt receipt = Receipt.Recreate(events, Version.Create((ulong)(events.Count - 1)));
+    Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
     receipt.Id.Should().Be(receiptId);
     receipt.Store.Should().Be(newStore);
     receipt.PurchaseDate.Should().Be(purchaseDate);
     receipt.Purchases.Should().Contain(purchase);
-    receipt.Version.Should().Be(Version.Create((ulong)(events.Count - 1)));
+    receipt.Version.Should().Be(Version.Create((ulong)(facts.Count - 1)));
   }
 
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator), typeof(PurchaseGenerator)])]
-  public void HasNoUnsavedChangesWhenRecreatedFromEvents(
+  public void HasNoUnsavedChangesWhenRecreatedFromFacts(
     Store store,
     PurchaseDate purchaseDate,
     Purchase purchase,
     Store newStore)
   {
     Id receiptId = Id.Unique();
-    List<Fact> events =
+    List<Fact> facts =
     [
       new ReceiptCreated(receiptId, store, purchaseDate, TodayDateOnly),
       new PurchaseAdded(receiptId, purchase),
       new StoreCorrected(receiptId, newStore)
     ];
 
-    Receipt receipt = Receipt.Recreate(events, Version.Create((ulong)(events.Count - 1)));
-    receipt.UnsavedUnsavedChanges.Should().BeEmpty();
+    Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    receipt.UnsavedChanges.Should().BeEmpty();
   }
 }

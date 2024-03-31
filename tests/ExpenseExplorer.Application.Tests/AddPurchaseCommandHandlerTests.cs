@@ -7,7 +7,7 @@ using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.Receipts.Events;
+using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public class AddPurchaseCommandHandlerTests
@@ -61,13 +61,13 @@ public class AddPurchaseCommandHandlerTests
   {
     public FakeReceiptRepository()
     {
-      ReceiptCreated createEvent = new(
+      ReceiptCreated createFact = new(
         Id.Create("receiptId"),
         Store.Create("store"),
         PurchaseDate.Create(TodayDateOnly, TodayDateOnly),
         TodayDateOnly);
 
-      Add(Receipt.Recreate([createEvent], default));
+      Add(Receipt.Recreate([createFact], default));
     }
 
     public Task<Either<Failure, Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)

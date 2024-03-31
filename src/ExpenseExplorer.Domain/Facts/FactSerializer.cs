@@ -1,21 +1,20 @@
-namespace ExpenseExplorer.Domain.Events;
+namespace ExpenseExplorer.Domain.Facts;
 
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using ExpenseExplorer.Domain.Receipts.Events;
+using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
-using static ExpenseExplorer.Domain.Events.EventTypes;
 
-public static class EventSerializer
+public static class FactSerializer
 {
   public static byte[] Serialize(Fact fact)
   {
     return fact switch
     {
-      Receipts.Events.ReceiptCreated receiptCreated => Serialize(Map(receiptCreated)),
-      Receipts.Events.PurchaseAdded purchaseAdded => Serialize(Map(purchaseAdded)),
-      Receipts.Events.StoreCorrected storeCorrected => Serialize(Map(storeCorrected)),
+      Receipts.Facts.ReceiptCreated receiptCreated => Serialize(Map(receiptCreated)),
+      Receipts.Facts.PurchaseAdded purchaseAdded => Serialize(Map(purchaseAdded)),
+      Receipts.Facts.StoreCorrected storeCorrected => Serialize(Map(storeCorrected)),
       _ => throw new UnreachableException(),
     };
   }
@@ -24,9 +23,9 @@ public static class EventSerializer
   {
     return type switch
     {
-      ReceiptCreatedEventType => Map(Deserialize<SimpleReceiptCreated>(data)),
-      PurchaseAddedEventType => Map(Deserialize<SimplePurchaseAdded>(data)),
-      StoreCorrectedEventType => Map(Deserialize<SimpleStoreCorrected>(data)),
+      FactTypes.ReceiptCreatedFactType => Map(Deserialize<SimpleReceiptCreated>(data)),
+      FactTypes.PurchaseAddedFactType => Map(Deserialize<SimplePurchaseAdded>(data)),
+      FactTypes.StoreCorrectedFactType => Map(Deserialize<SimpleStoreCorrected>(data)),
       _ => throw new UnreachableException(),
     };
   }
@@ -72,9 +71,9 @@ public static class EventSerializer
   private static SimpleStoreCorrected Map(StoreCorrected storeCorrected)
     => new(storeCorrected.ReceiptId.Value, storeCorrected.Store.Name);
 
-  private static byte[] Serialize<T>(T @event)
+  private static byte[] Serialize<T>(T fact)
   {
-    string json = JsonSerializer.Serialize(@event);
+    string json = JsonSerializer.Serialize(fact);
     return Encoding.UTF8.GetBytes(json);
   }
 

@@ -1,10 +1,10 @@
 namespace ExpenseExplorer.Domain.Tests;
 
-using ExpenseExplorer.Domain.Events;
-using ExpenseExplorer.Domain.Receipts.Events;
+using ExpenseExplorer.Domain.Facts;
+using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
-public class EventSerializerTests
+public class FactSerializerTests
 {
   [Fact]
   public void SerializeReceiptCreated()
@@ -15,7 +15,7 @@ public class EventSerializerTests
       PurchaseDate.Create(new DateOnly(2000, 1, 1), TodayDateOnly),
       TodayDateOnly);
 
-    byte[] data = EventSerializer.Serialize(fact);
+    byte[] data = FactSerializer.Serialize(fact);
 
     data.Should()
       .BeEquivalentTo(
@@ -30,7 +30,7 @@ public class EventSerializerTests
       = "{\"Id\":\"id\",\"Store\":\"store\",\"PurchaseDate\":\"2000-01-01\",\"CreatedDate\":\"2000-01-01\"}"u8
         .ToArray();
 
-    Fact fact = EventSerializer.Deserialize(EventTypes.ReceiptCreatedEventType, data);
+    Fact fact = FactSerializer.Deserialize(FactTypes.ReceiptCreatedFactType, data);
 
     fact.Should().BeOfType<ReceiptCreated>();
   }
@@ -48,7 +48,7 @@ public class EventSerializerTests
         Money.Zero,
         Description.Create(null)));
 
-    byte[] data = EventSerializer.Serialize(fact);
+    byte[] data = FactSerializer.Serialize(fact);
 
     data.Should()
       .BeEquivalentTo(
@@ -63,7 +63,7 @@ public class EventSerializerTests
       = "{\"ReceiptId\":\"id\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
         .ToArray();
 
-    Fact fact = EventSerializer.Deserialize(EventTypes.PurchaseAddedEventType, data);
+    Fact fact = FactSerializer.Deserialize(FactTypes.PurchaseAddedFactType, data);
 
     fact.Should().BeOfType<PurchaseAdded>();
   }
@@ -73,7 +73,7 @@ public class EventSerializerTests
   {
     Fact fact = new StoreCorrected(Id.Create("id"), Store.Create("store"));
 
-    byte[] data = EventSerializer.Serialize(fact);
+    byte[] data = FactSerializer.Serialize(fact);
 
     data.Should().BeEquivalentTo("{\"ReceiptId\":\"id\",\"Store\":\"store\"}"u8.ToArray());
   }
@@ -83,7 +83,7 @@ public class EventSerializerTests
   {
     byte[] data = "{\"ReceiptId\":\"id\",\"Store\":\"store\"}"u8.ToArray();
 
-    Fact fact = EventSerializer.Deserialize(EventTypes.StoreCorrectedEventType, data);
+    Fact fact = FactSerializer.Deserialize(FactTypes.StoreCorrectedFactType, data);
 
     fact.Should().BeOfType<StoreCorrected>();
   }

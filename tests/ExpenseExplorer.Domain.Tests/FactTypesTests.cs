@@ -1,10 +1,10 @@
 namespace ExpenseExplorer.Domain.Tests;
 
-using ExpenseExplorer.Domain.Events;
-using ExpenseExplorer.Domain.Receipts.Events;
+using ExpenseExplorer.Domain.Facts;
+using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
-public class EventTypesTests
+public class FactTypesTests
 {
   [Fact]
   public void GetTypeForReceiptCreated()
@@ -15,7 +15,7 @@ public class EventTypesTests
       PurchaseDate.Create(new DateOnly(2000, 1, 1), TodayDateOnly),
       TodayDateOnly);
 
-    AssertEventType(fact, EventTypes.ReceiptCreatedEventType);
+    AssertFactType(fact, FactTypes.ReceiptCreatedFactType);
   }
 
   [Fact]
@@ -31,19 +31,19 @@ public class EventTypesTests
         Money.Zero,
         Description.Create(null)));
 
-    AssertEventType(fact, EventTypes.PurchaseAddedEventType);
+    AssertFactType(fact, FactTypes.PurchaseAddedFactType);
   }
 
   [Fact]
   public void GetTypeForStoreCorrected()
   {
     Fact fact = new StoreCorrected(Id.Unique(), Store.Create("store"));
-    AssertEventType(fact, EventTypes.StoreCorrectedEventType);
+    AssertFactType(fact, FactTypes.StoreCorrectedFactType);
   }
 
-  private static void AssertEventType(Fact fact, string expectedType)
+  private static void AssertFactType(Fact fact, string expectedType)
   {
-    string type = EventTypes.GetType(fact);
+    string type = FactTypes.GetFactType(fact);
     type.Should().Be(expectedType);
   }
 }

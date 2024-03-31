@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Domain.Receipts;
 
-using ExpenseExplorer.Domain.Receipts.Events;
+using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public class Receipt
@@ -37,7 +37,7 @@ public class Receipt
 
   public ICollection<Purchase> Purchases { get; }
 
-  public IEnumerable<Fact> UnsavedUnsavedChanges => _unsavedChanges;
+  public IEnumerable<Fact> UnsavedChanges => _unsavedChanges;
 
   public Version Version { get; }
 
@@ -48,9 +48,9 @@ public class Receipt
     return new Receipt(id, store, purchaseDate, [], [receiptCreated], Version.New());
   }
 
-  public static Receipt Recreate(IEnumerable<Fact> events, Version version)
+  public static Receipt Recreate(IEnumerable<Fact> facts, Version version)
   {
-    Receipt receipt = events.Aggregate(_empty, (receipt, fact) => receipt.ApplyEvent(fact));
+    Receipt receipt = facts.Aggregate(_empty, (receipt, fact) => receipt.ApplyFact(fact));
     return receipt.WithVersion(version);
   }
 
@@ -79,7 +79,7 @@ public class Receipt
     return new Receipt(Id, Store, PurchaseDate, Purchases, _unsavedChanges, version);
   }
 
-  private Receipt ApplyEvent(Fact fact)
+  private Receipt ApplyFact(Fact fact)
   {
     return fact switch
     {

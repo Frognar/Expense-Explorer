@@ -5,7 +5,7 @@ using ExpenseExplorer.Application.Exceptions;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.Receipts.Events;
+using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public sealed class EventStoreReceiptRepository(string connectionString) : IReceiptRepository, IDisposable
@@ -25,12 +25,12 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
       Version version = await _eventStore.SaveEventsAsync(
         receipt.Id,
         receipt.Version,
-        receipt.UnsavedUnsavedChanges,
+        receipt.UnsavedChanges,
         cancellationToken);
 
       return Right.From<Failure, Version>(version);
     }
-    catch (EventSaveException ex)
+    catch (FactSaveException ex)
     {
       return Left.From<Failure, Version>(new FatalFailure(ex));
     }
@@ -40,12 +40,12 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
   {
     try
     {
-      (List<Fact> events, Version version) = await _eventStore.GetEventsAsync(id, cancellationToken);
-      return events.Count == 0
+      (List<Fact> facts, Version version) = await _eventStore.GetEventsAsync(id, cancellationToken);
+      return facts.Count == 0
         ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
-        : Right.From<Failure, Receipt>(Receipt.Recreate(events, version));
+        : Right.From<Failure, Receipt>(Receipt.Recreate(facts, version));
     }
-    catch (EventReadException ex)
+    catch (FactReadException ex)
     {
       return Left.From<Failure, Receipt>(new FatalFailure(ex));
     }

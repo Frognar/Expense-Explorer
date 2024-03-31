@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Domain.Receipts.Events;
+namespace ExpenseExplorer.Domain.Receipts.Facts;
 
 using ExpenseExplorer.Domain.ValueObjects;
 

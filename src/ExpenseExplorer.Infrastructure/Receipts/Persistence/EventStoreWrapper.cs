@@ -2,10 +2,10 @@ namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
 using EventStore.Client;
 using ExpenseExplorer.Application.Exceptions;
-using ExpenseExplorer.Domain.Events;
-using ExpenseExplorer.Domain.Receipts.Events;
+using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
-using static ExpenseExplorer.Domain.Events.EventSerializer;
+using static ExpenseExplorer.Domain.Facts.FactSerializer;
+using static ExpenseExplorer.Domain.Facts.FactTypes;
 
 public sealed class EventStoreWrapper(string connectionString) : IDisposable
 {
@@ -19,20 +19,20 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
   public async Task<Version> SaveEventsAsync(
     Id id,
     Version expectedVersion,
-    IEnumerable<Fact> events,
+    IEnumerable<Fact> facts,
     CancellationToken cancellationToken)
   {
     try
     {
       ArgumentNullException.ThrowIfNull(id);
-      ArgumentNullException.ThrowIfNull(events);
-      WriteRequest request = new(id.Value, new StreamRevision(expectedVersion.Value), events.Select(ToEventData));
+      ArgumentNullException.ThrowIfNull(facts);
+      WriteRequest request = new(id.Value, new StreamRevision(expectedVersion.Value), facts.Select(ToEventData));
       WriteResult result = await AppendToStreamAsync(request, cancellationToken);
       return Version.Create(result.Version);
     }
     catch (Exception ex)
     {
-      throw EventSaveException.Wrap(ex);
+      throw FactSaveException.Wrap(ex);
     }
   }
 
@@ -47,13 +47,13 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
     }
     catch (Exception ex)
     {
-      throw EventReadException.Wrap(ex);
+      throw FactReadException.Wrap(ex);
     }
   }
 
   private static EventData ToEventData(Fact fact)
   {
-    return new EventData(Uuid.NewUuid(), EventTypes.GetType(fact), Serialize(fact));
+    return new EventData(Uuid.NewUuid(), GetFactType(fact), Serialize(fact));
   }
 
   private async Task<WriteResult> AppendToStreamAsync(WriteRequest request, CancellationToken cancellationToken)
