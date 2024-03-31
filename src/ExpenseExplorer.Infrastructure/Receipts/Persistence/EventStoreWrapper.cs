@@ -16,13 +16,24 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
     _client.Dispose();
   }
 
-  public Task SaveEventsAsync(Id id, IEnumerable<Fact> events, CancellationToken cancellationToken)
+  public async Task<Version> SaveEventsAsync(
+    Id id,
+    Version expectedVersion,
+    IEnumerable<Fact> events,
+    CancellationToken cancellationToken)
   {
     try
     {
       ArgumentNullException.ThrowIfNull(id);
       ArgumentNullException.ThrowIfNull(events);
-      return AppendToStreamAsync(id.Value, events, cancellationToken);
+      var data = events.Select(ToEventData);
+      var streamRevision = await AppendToStreamAsync(
+        id.Value,
+        new StreamRevision(expectedVersion.Value),
+        data,
+        cancellationToken);
+
+      return Version.Create(streamRevision.ToUInt64());
     }
     catch (Exception ex)
     {
@@ -30,12 +41,15 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
     }
   }
 
-  public Task<IEnumerable<Fact>> GetEventsAsync(Id id, CancellationToken cancellationToken)
+  public async Task<(List<Fact> Facts, Version Version)> GetEventsAsync(Id id, CancellationToken cancellationToken)
   {
     try
     {
       ArgumentNullException.ThrowIfNull(id);
-      return ReadFromStreamAsync(id.Value, cancellationToken);
+      (List<EventRecord> events, StreamPosition position) = await ReadFromStreamAsync(id.Value, cancellationToken);
+      List<Fact> facts = events.Select(e => Deserialize(e.EventType, e.Data.ToArray())).ToList();
+      Version version = Version.Create(position.ToUInt64());
+      return (facts, version);
     }
     catch (Exception ex)
     {
@@ -48,13 +62,19 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
     return new EventData(Uuid.NewUuid(), EventTypes.GetType(fact), Serialize(fact));
   }
 
-  private async Task AppendToStreamAsync(string stream, IEnumerable<Fact> events, CancellationToken cancellationToken)
+  private async Task<StreamRevision> AppendToStreamAsync(
+    string stream,
+    StreamRevision revision,
+    IEnumerable<EventData> events,
+    CancellationToken cancellationToken)
   {
-    var data = events.Select(ToEventData);
-    _ = await _client.AppendToStreamAsync(stream, StreamState.Any, data, cancellationToken: cancellationToken);
+    var writeResult = await _client.AppendToStreamAsync(stream, revision, events, cancellationToken: cancellationToken);
+    return writeResult.NextExpectedStreamRevision;
   }
 
-  private async Task<IEnumerable<Fact>> ReadFromStreamAsync(string stream, CancellationToken cancellationToken)
+  private async Task<(List<EventRecord> Events, StreamPosition Position)> ReadFromStreamAsync(
+    string stream,
+    CancellationToken cancellationToken)
   {
     const Direction direction = Direction.Forwards;
     var streamResult = _client.ReadStreamAsync(
@@ -65,10 +85,11 @@ public sealed class EventStoreWrapper(string connectionString) : IDisposable
 
     if (await streamResult.ReadState == ReadState.StreamNotFound)
     {
-      return Enumerable.Empty<Fact>();
+      return ([], StreamPosition.Start);
     }
 
-    var events = await streamResult.Select(e => e.Event).ToListAsync(cancellationToken);
-    return events.Select(e => Deserialize(e.EventType, e.Data.ToArray()));
+    List<EventRecord> events = await streamResult.Select(e => e.Event).ToListAsync(cancellationToken);
+    StreamPosition position = events.Max(e => e.EventNumber);
+    return (events, position);
   }
 }

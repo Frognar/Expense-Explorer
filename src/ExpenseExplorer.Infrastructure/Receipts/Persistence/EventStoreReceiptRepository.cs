@@ -1,6 +1,5 @@
 namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
-using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Exceptions;
 using ExpenseExplorer.Application.Monads;
@@ -18,17 +17,22 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     _eventStore.Dispose();
   }
 
-  public async Task<Either<Failure, Unit>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
+  public async Task<Either<Failure, Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
     try
     {
       ArgumentNullException.ThrowIfNull(receipt);
-      await _eventStore.SaveEventsAsync(receipt.Id, receipt.UnsavedUnsavedChanges, cancellationToken);
-      return Right.From<Failure, Unit>(Unit.Instance);
+      Version version = await _eventStore.SaveEventsAsync(
+        receipt.Id,
+        receipt.Version,
+        receipt.UnsavedUnsavedChanges,
+        cancellationToken);
+
+      return Right.From<Failure, Version>(version);
     }
     catch (EventSaveException ex)
     {
-      return Left.From<Failure, Unit>(new FatalFailure(ex));
+      return Left.From<Failure, Version>(new FatalFailure(ex));
     }
   }
 
@@ -36,10 +40,10 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
   {
     try
     {
-      List<Fact> events = (await _eventStore.GetEventsAsync(id, cancellationToken)).ToList();
+      (List<Fact> events, Version version) = await _eventStore.GetEventsAsync(id, cancellationToken);
       return events.Count == 0
         ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
-        : Right.From<Failure, Receipt>(Receipt.Recreate(events, default));
+        : Right.From<Failure, Receipt>(Receipt.Recreate(events, version));
     }
     catch (EventReadException ex)
     {

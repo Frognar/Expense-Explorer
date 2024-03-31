@@ -7,7 +7,7 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public interface IReceiptRepository
 {
-  Task<Either<Failure, Unit>> SaveAsync(Receipt receipt, CancellationToken cancellationToken);
+  Task<Either<Failure, Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken);
 
   Task<Either<Failure, Receipt>> GetAsync(Id id, CancellationToken cancellationToken);
 }

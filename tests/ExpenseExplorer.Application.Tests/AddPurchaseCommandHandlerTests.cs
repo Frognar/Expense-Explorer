@@ -70,11 +70,11 @@ public class AddPurchaseCommandHandlerTests
       Add(Receipt.Recreate([createEvent], default));
     }
 
-    public Task<Either<Failure, Unit>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
+    public Task<Either<Failure, Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
     {
       cancellationToken.ThrowIfCancellationRequested();
       this[0] = receipt;
-      return Task.FromResult(Right.From<Failure, Unit>(Unit.Instance));
+      return Task.FromResult(Right.From<Failure, Version>(receipt.Version.Next()));
     }
 
     public Task<Either<Failure, Receipt>> GetAsync(Id id, CancellationToken cancellationToken)
