@@ -14,6 +14,7 @@ public class ReceiptTests
     receipt.Id.Should().NotBeNull();
     receipt.Store.Should().Be(store);
     receipt.PurchaseDate.Should().Be(purchaseDate);
+    receipt.Version.Should().Be(Version.Create(ulong.MaxValue));
   }
 
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator)])]
@@ -80,18 +81,19 @@ public class ReceiptTests
   public void CanBeRecreatedFromEvents(Store store, PurchaseDate purchaseDate, Purchase purchase, Store newStore)
   {
     Id receiptId = Id.Unique();
-    IEnumerable<Fact> events = new List<Fact>
-    {
+    List<Fact> events =
+    [
       new ReceiptCreated(receiptId, store, purchaseDate, TodayDateOnly),
       new PurchaseAdded(receiptId, purchase),
-      new StoreCorrected(receiptId, newStore),
-    };
+      new StoreCorrected(receiptId, newStore)
+    ];
 
-    Receipt receipt = Receipt.Recreate(events);
+    Receipt receipt = Receipt.Recreate(events, Version.Create((ulong)(events.Count - 1)));
     receipt.Id.Should().Be(receiptId);
     receipt.Store.Should().Be(newStore);
     receipt.PurchaseDate.Should().Be(purchaseDate);
     receipt.Purchases.Should().Contain(purchase);
+    receipt.Version.Should().Be(Version.Create((ulong)(events.Count - 1)));
   }
 
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator), typeof(PurchaseGenerator)])]
@@ -102,14 +104,14 @@ public class ReceiptTests
     Store newStore)
   {
     Id receiptId = Id.Unique();
-    IEnumerable<Fact> events = new List<Fact>
-    {
+    List<Fact> events =
+    [
       new ReceiptCreated(receiptId, store, purchaseDate, TodayDateOnly),
       new PurchaseAdded(receiptId, purchase),
-      new StoreCorrected(receiptId, newStore),
-    };
+      new StoreCorrected(receiptId, newStore)
+    ];
 
-    Receipt receipt = Receipt.Recreate(events);
+    Receipt receipt = Receipt.Recreate(events, Version.Create((ulong)(events.Count - 1)));
     receipt.UnsavedUnsavedChanges.Should().BeEmpty();
   }
 }

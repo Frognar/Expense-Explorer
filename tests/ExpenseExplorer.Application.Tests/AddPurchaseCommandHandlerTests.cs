@@ -67,7 +67,7 @@ public class AddPurchaseCommandHandlerTests
         PurchaseDate.Create(TodayDateOnly, TodayDateOnly),
         TodayDateOnly);
 
-      Add(Receipt.Recreate([createEvent]));
+      Add(Receipt.Recreate([createEvent], default));
     }
 
     public Task<Either<Failure, Unit>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)

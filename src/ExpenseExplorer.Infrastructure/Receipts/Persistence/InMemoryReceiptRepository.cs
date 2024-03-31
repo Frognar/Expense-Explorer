@@ -34,7 +34,7 @@ public class InMemoryReceiptRepository : IReceiptRepository
       List<Fact> events = (await InMemoryEventStore.GetEventsAsync(id)).ToList();
       return events.Count == 0
         ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
-        : Right.From<Failure, Receipt>(Receipt.Recreate(events));
+        : Right.From<Failure, Receipt>(Receipt.Recreate(events, default));
     }
     catch (EventReadException ex)
     {
