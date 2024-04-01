@@ -22,7 +22,7 @@ public static class ReceiptEndpoints
 
   private static Task<IResult> GetReceiptsAsync()
   {
-    return Task.FromResult(Results.Ok());
+    return Task.FromResult(Results.Ok(new GetReceiptsResponse(15)));
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(
