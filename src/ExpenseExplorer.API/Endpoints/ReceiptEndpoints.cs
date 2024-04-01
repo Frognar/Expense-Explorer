@@ -14,9 +14,15 @@ public static class ReceiptEndpoints
   public static IEndpointRouteBuilder MapReceiptEndpoints(this IEndpointRouteBuilder endpointRouteBuilder)
   {
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/receipts");
+    group.MapGet("/", GetReceiptsAsync);
     group.MapPost("/", OpenNewReceiptAsync);
     group.MapPost("/{receiptId}", AddPurchaseAsync);
     return endpointRouteBuilder;
+  }
+
+  private static Task<IResult> GetReceiptsAsync()
+  {
+    return Task.FromResult(Results.Ok());
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(
