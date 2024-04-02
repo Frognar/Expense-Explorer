@@ -22,7 +22,9 @@ public static class ReceiptEndpoints
 
   private static Task<IResult> GetReceiptsAsync()
   {
-    return Task.FromResult(Results.Ok(new GetReceiptsResponse(15)));
+    var receipts = Enumerable.Range(0, 10).Select(_ => (ReceiptResponse)null!);
+    var response = new GetReceiptsResponse(receipts, 15);
+    return Task.FromResult(Results.Ok(response));
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(

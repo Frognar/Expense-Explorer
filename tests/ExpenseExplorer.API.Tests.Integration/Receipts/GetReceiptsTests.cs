@@ -32,9 +32,21 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   [Fact]
   public async Task ReturnsTotalCountInResponse()
   {
+    var response = await GetReceipts();
+    response.TotalCount.Should().Be(15);
+  }
+
+  [Fact]
+  public async Task ReturnsPageOfReceipts()
+  {
+    var response = await GetReceipts();
+    response.Receipts.Should().HaveCount(10);
+  }
+
+  private async Task<GetReceiptsResponse> GetReceipts()
+  {
     Uri uri = new("api/receipts", UriKind.Relative);
     var result = await Client.GetAsync(uri);
-    var response = await result.Content.ReadFromJsonAsync<GetReceiptsResponse>();
-    response!.TotalCount.Should().Be(15);
+    return (await result.Content.ReadFromJsonAsync<GetReceiptsResponse>())!;
   }
 }
