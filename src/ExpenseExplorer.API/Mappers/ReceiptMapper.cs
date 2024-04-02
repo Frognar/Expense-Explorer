@@ -26,10 +26,10 @@ public static class ReceiptMapper
       request.Description);
   }
 
-  public static OpenNewReceiptResponse MapToResponse(this Receipt receipt)
+  public static ReceiptResponse MapToResponse(this Receipt receipt)
   {
     ArgumentNullException.ThrowIfNull(receipt);
-    return new OpenNewReceiptResponse(
+    return new ReceiptResponse(
       receipt.Id.Value,
       receipt.Store.Name,
       receipt.PurchaseDate.Date,

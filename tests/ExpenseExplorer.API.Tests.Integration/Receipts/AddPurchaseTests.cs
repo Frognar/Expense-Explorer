@@ -20,7 +20,7 @@ public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   public async Task ContainsAddedPurchaseInResponse(object request)
   {
     HttpResponseMessage response = await SendWithValidReceiptId(request);
-    OpenNewReceiptResponse receipt = (await response.Content.ReadFromJsonAsync<OpenNewReceiptResponse>())!;
+    ReceiptResponse receipt = (await response.Content.ReadFromJsonAsync<ReceiptResponse>())!;
     receipt.Purchases.Count().Should().Be(1);
   }
 
@@ -44,7 +44,7 @@ public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   {
     object openNewRequest = new { storeName = "store", purchaseDate = DateOnly.MinValue };
     HttpResponseMessage newReceiptResponse = await Client.PostAsJsonAsync("/api/receipts", openNewRequest);
-    OpenNewReceiptResponse receipt = (await newReceiptResponse.Content.ReadFromJsonAsync<OpenNewReceiptResponse>())!;
+    ReceiptResponse receipt = (await newReceiptResponse.Content.ReadFromJsonAsync<ReceiptResponse>())!;
     return await Client.PostAsJsonAsync($"/api/receipts/{receipt.Id}", request);
   }
 }
