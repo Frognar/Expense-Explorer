@@ -1,3 +1,4 @@
+using CommandHub.DependencyInjection;
 using ExpenseExplorer.API.Endpoints;
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Infrastructure;
@@ -12,7 +13,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddScoped<TimeProvider>(_ => TimeProvider.System);
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddApplication();
+builder.Services.AddCommandHub(typeof(ApplicationDependencyInjection).Assembly, typeof(Program).Assembly);
 
 WebApplication app = builder.Build();
 

@@ -3,9 +3,9 @@ namespace ExpenseExplorer.API.Endpoints;
 using System.Diagnostics;
 using System.Net;
 using CommandHub;
-using CommandHub.Commands;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
+using ExpenseExplorer.API.Queries;
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Domain.Receipts;
@@ -21,11 +21,11 @@ public static class ReceiptEndpoints
     return endpointRouteBuilder;
   }
 
-  private static Task<IResult> GetReceiptsAsync()
+  private static async Task<IResult> GetReceiptsAsync(
+    ISender sender,
+    CancellationToken cancellationToken = default)
   {
-    var receipts = Enumerable.Range(0, 10).Select(_ => (ReceiptResponse)null!);
-    var response = new GetReceiptsResponse(receipts, 15);
-    return Task.FromResult(Results.Ok(response));
+    return Results.Ok(await sender.SendAsync(new GetReceiptQuery(), cancellationToken));
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(
