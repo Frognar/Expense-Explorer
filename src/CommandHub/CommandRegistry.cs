@@ -2,7 +2,7 @@ namespace CommandHub;
 
 using System.Reflection;
 using CommandHub.Commands;
-using CommandHub.Commands.Wrappers;
+using CommandHub.Wrappers;
 
 public static class CommandRegistry
 {

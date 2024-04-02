@@ -1,4 +1,6 @@
-namespace CommandHub.Commands.Wrappers;
+namespace CommandHub.Wrappers;
+
+using CommandHub.Commands;
 
 internal abstract class CommandHandlerWrapper<TResponse> : BaseCommandHandlerWrapper
 {

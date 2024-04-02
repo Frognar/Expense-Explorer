@@ -1,3 +1,3 @@
-namespace CommandHub.Commands.Wrappers;
+namespace CommandHub.Wrappers;
 
 internal abstract class BaseCommandHandlerWrapper;
