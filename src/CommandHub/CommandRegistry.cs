@@ -1,6 +1,7 @@
-namespace CommandHub.Commands;
+namespace CommandHub;
 
 using System.Reflection;
+using CommandHub.Commands;
 using CommandHub.Commands.Wrappers;
 
 public static class CommandRegistry

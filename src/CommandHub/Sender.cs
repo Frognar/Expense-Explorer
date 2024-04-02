@@ -1,5 +1,6 @@
-namespace CommandHub.Commands;
+namespace CommandHub;
 
+using CommandHub.Commands;
 using CommandHub.Commands.Wrappers;
 
 internal sealed class Sender(

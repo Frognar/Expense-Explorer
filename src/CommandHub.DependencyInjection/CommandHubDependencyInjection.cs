@@ -1,7 +1,6 @@
 ﻿namespace CommandHub.DependencyInjection;
 
 using System.Reflection;
-using CommandHub.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

@@ -1,4 +1,6 @@
-namespace CommandHub.Commands;
+namespace CommandHub;
+
+using CommandHub.Commands;
 
 public interface ISender
 {

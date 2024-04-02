@@ -2,6 +2,7 @@ namespace ExpenseExplorer.API.Endpoints;
 
 using System.Diagnostics;
 using System.Net;
+using CommandHub;
 using CommandHub.Commands;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
