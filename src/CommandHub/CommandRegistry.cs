@@ -17,13 +17,13 @@ public static class CommandRegistry
       .Select(type => (type.GetInterface(typeof(ICommandHandler<,>).Name)!, type));
   }
 
-  private static Dictionary<Type, BaseCommandHandlerWrapper> CreateWrappers(IEnumerable<Assembly> assemblies)
+  private static Dictionary<Type, BaseHandlerWrapper> CreateWrappers(IEnumerable<Assembly> assemblies)
   {
     return GetClassesImplementing(typeof(ICommand<>), assemblies)
       .ToDictionary(command => command, CreateWrapper);
   }
 
-  private static BaseCommandHandlerWrapper CreateWrapper(Type commandType)
+  private static BaseHandlerWrapper CreateWrapper(Type commandType)
   {
     Type wrapperType = typeof(CommandHandlerWrapperImpl<,>).MakeGenericType(
       commandType,
@@ -32,7 +32,7 @@ public static class CommandRegistry
     object wrapper = Activator.CreateInstance(wrapperType)
                      ?? throw new InvalidOperationException($"Failed to create instance of {wrapperType}.");
 
-    return (BaseCommandHandlerWrapper)wrapper;
+    return (BaseHandlerWrapper)wrapper;
   }
 
   private static IEnumerable<Type> GetClassesImplementing(Type interfaceType, IEnumerable<Assembly> assemblies)
