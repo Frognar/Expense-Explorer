@@ -9,7 +9,7 @@ public static class CommandHubDependencyInjection
   public static void AddCommandHub(this IServiceCollection services, params Assembly[] assemblies)
   {
     services.RegisterHandlers(assemblies);
-    services.AddScoped<ISender>(sp => CommandRegistry.CreateSender(sp.GetRequiredService, assemblies));
+    services.AddSingleton<ISender>(sp => CommandRegistry.CreateSender(sp.GetRequiredService, assemblies));
   }
 
   private static void RegisterHandlers(this IServiceCollection services, Assembly[] assemblies)
