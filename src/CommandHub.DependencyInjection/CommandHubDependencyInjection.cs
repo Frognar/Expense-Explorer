@@ -21,7 +21,7 @@ public static class CommandHubDependencyInjection
   private static void RegisterHandlers(this IServiceCollection services, Assembly[] assemblies)
   {
     var descriptors = CommandRegistry.GetHandlerTypes(assemblies)
-      .Select(t => new ServiceDescriptor(t.Interface, t.Implementation, ServiceLifetime.Scoped));
+      .Select(t => new ServiceDescriptor(t.Interface, t.Implementation, ServiceLifetime.Transient));
 
     services.TryAdd(descriptors);
   }
