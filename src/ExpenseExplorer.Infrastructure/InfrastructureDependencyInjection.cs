@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.Infrastructure;
 
+using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Infrastructure.Receipts.Persistence;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,9 @@ public static class InfrastructureDependencyInjection
   {
     string? connectionString = configuration.GetConnectionString("EventStore");
     ArgumentNullException.ThrowIfNull(connectionString);
+    serviceCollection.AddSingleton<InMemoryMessageQueue>();
+    serviceCollection.AddSingleton<IFactBus, FactBus>();
     serviceCollection.AddScoped<IReceiptRepository>(_ => new EventStoreReceiptRepository(connectionString));
+    serviceCollection.AddHostedService<FactProcessorJob>();
   }
 }
