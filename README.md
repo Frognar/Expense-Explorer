@@ -30,6 +30,7 @@ Expense Explorer is a simple expense tracking application designed to run on a h
 - The primary purpose of this project is to explore and learn new technologies, specifically Event Sourcing in this case.
 - Future development may include additional features.
 
+I know that instead of implementing certain functionalities myself, I should use ready-made solutions (for example, MediatR for handling requests), but I also wanted to use this project to expand my knowledge of how such libraries work. It is possible that in the future, I will replace my own implementations with better, more tested packages.
 
 ## Getting Started
 
