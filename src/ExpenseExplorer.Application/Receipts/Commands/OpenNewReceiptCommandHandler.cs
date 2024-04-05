@@ -37,7 +37,7 @@ public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository, 
   {
     var eitherFailureOrVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
     await Task.WhenAll(receipt.UnsavedChanges.Select(PublishTask(cancellationToken)));
-    return eitherFailureOrVersion.MapRight(_ => receipt.ClearChanges());
+    return eitherFailureOrVersion.MapRight(v => receipt.WithVersion(v).ClearChanges());
   }
 
   private Func<Fact, Task> PublishTask(CancellationToken cancellationToken)

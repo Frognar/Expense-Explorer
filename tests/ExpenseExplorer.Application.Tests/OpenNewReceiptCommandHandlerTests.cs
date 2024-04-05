@@ -23,6 +23,7 @@ public class OpenNewReceiptCommandHandlerTests
 
     receipt.Store.Name.Should().Be(command.StoreName.Trim());
     receipt.PurchaseDate.Date.Should().Be(command.PurchaseDate);
+    receipt.Version.Value.Should().Be(0);
   }
 
   [Property(Arbitrary = [typeof(ValidOpenNewReceiptCommandGenerator)])]
@@ -65,7 +66,7 @@ public class OpenNewReceiptCommandHandlerTests
     {
       cancellationToken.ThrowIfCancellationRequested();
       Add(receipt);
-      return Task.FromResult(Right.From<Failure, Version>(Version.Create(0)));
+      return Task.FromResult(Right.From<Failure, Version>(Version.Create(receipt.Version.Value + 1)));
     }
 
     public Task<Either<Failure, Receipt>> GetAsync(Id id, CancellationToken cancellationToken)
