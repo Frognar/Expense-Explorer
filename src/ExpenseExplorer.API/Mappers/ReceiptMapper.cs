@@ -33,7 +33,8 @@ public static class ReceiptMapper
       receipt.Id.Value,
       receipt.Store.Name,
       receipt.PurchaseDate.Date,
-      receipt.Purchases.Select(MapToResponse));
+      receipt.Purchases.Select(MapToResponse),
+      receipt.Version.Value);
   }
 
   private static PurchaseResponse MapToResponse(this Purchase purchase, int index)

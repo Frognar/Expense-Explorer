@@ -4,4 +4,5 @@ public record ReceiptResponse(
   string Id,
   string StoreName,
   DateOnly PurchaseDate,
-  IEnumerable<PurchaseResponse> Purchases);
+  IEnumerable<PurchaseResponse> Purchases,
+  ulong Version);
