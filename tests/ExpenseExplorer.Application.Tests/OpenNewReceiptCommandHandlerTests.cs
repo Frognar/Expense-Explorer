@@ -7,10 +7,12 @@ using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public class OpenNewReceiptCommandHandlerTests
 {
+  private readonly FakeFactBus _factBus = new();
   private readonly FakeReceiptRepository _receiptRepository = new();
 
   [Property(Arbitrary = [typeof(ValidOpenNewReceiptCommandGenerator)])]
@@ -21,6 +23,16 @@ public class OpenNewReceiptCommandHandlerTests
 
     receipt.Store.Name.Should().Be(command.StoreName.Trim());
     receipt.PurchaseDate.Date.Should().Be(command.PurchaseDate);
+  }
+
+  [Property(Arbitrary = [typeof(ValidOpenNewReceiptCommandGenerator)])]
+  public async Task PublishesReceiptCreatedWhenValidCommand(OpenNewReceiptCommand command)
+  {
+    var receipt = (await Handle(command))
+      .Match(_ => throw new UnreachableException(), receipt => receipt);
+
+    _factBus.Should()
+      .ContainEquivalentOf(new ReceiptCreated(receipt.Id, receipt.Store, receipt.PurchaseDate, TodayDateOnly));
   }
 
   [Property(Arbitrary = [typeof(InvalidOpenNewReceiptCommandGenerator)])]
@@ -43,7 +55,7 @@ public class OpenNewReceiptCommandHandlerTests
 
   private async Task<Either<Failure, Receipt>> Handle(OpenNewReceiptCommand command)
   {
-    OpenNewReceiptCommandHandler handler = new(_receiptRepository);
+    OpenNewReceiptCommandHandler handler = new(_receiptRepository, _factBus);
     return await handler.HandleAsync(command);
   }
 
@@ -60,6 +72,16 @@ public class OpenNewReceiptCommandHandlerTests
     {
       cancellationToken.ThrowIfCancellationRequested();
       return Task.FromResult(Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id)));
+    }
+  }
+
+  private sealed class FakeFactBus : Collection<Fact>, IFactBus
+  {
+    public Task PublishAsync<T>(T fact, CancellationToken cancellationToken = default)
+      where T : Fact
+    {
+      Add(fact);
+      return Task.CompletedTask;
     }
   }
 }
