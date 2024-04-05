@@ -17,9 +17,10 @@ public class AddPurchaseCommandHandlerTests
   [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]
   public async Task CanHandleValidCommand(AddPurchaseCommand command)
   {
-    (await HandleValid(command))
-      .Id.Value.Should()
-      .Be(command.ReceiptId);
+    var result = await HandleValid(command);
+
+    result.Id.Value.Should().Be(command.ReceiptId);
+    result.Version.Value.Should().BeGreaterThan(0);
   }
 
   [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]
@@ -73,8 +74,8 @@ public class AddPurchaseCommandHandlerTests
     public Task<Either<Failure, Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
     {
       cancellationToken.ThrowIfCancellationRequested();
-      this[0] = receipt;
-      return Task.FromResult(Right.From<Failure, Version>(receipt.Version.Next()));
+      this[0] = receipt.WithVersion(Version.Create(receipt.Version.Value + 1));
+      return Task.FromResult(Right.From<Failure, Version>(Version.Create(receipt.Version.Value + 1)));
     }
 
     public Task<Either<Failure, Receipt>> GetAsync(Id id, CancellationToken cancellationToken)

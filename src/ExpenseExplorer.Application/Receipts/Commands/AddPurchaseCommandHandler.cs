@@ -55,6 +55,6 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
   private async Task<Either<Failure, Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
     var eitherFailureOrVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
-    return eitherFailureOrVersion.MapRight(_ => receipt.ClearChanges());
+    return eitherFailureOrVersion.MapRight(v => receipt.WithVersion(v).ClearChanges());
   }
 }
