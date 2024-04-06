@@ -65,6 +65,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.API.Tests.I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.Infrastructure.Tests.Integration", "tests\ExpenseExplorer.Infrastructure.Tests.Integration\ExpenseExplorer.Infrastructure.Tests.Integration.csproj", "{E89977BC-21A6-43EF-BD78-E7ACD3FF77E3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "postgresql", "postgresql", "{F3D98435-23DB-4843-93F7-50B35D6F46F7}"
+	ProjectSection(SolutionItems) = preProject
+		res\postgresql\docker-compose.yaml = res\postgresql\docker-compose.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,5 +148,6 @@ Global
 		{0E110C70-4217-4D92-AFB2-5327C3B95F7E} = {D6D2E4BD-EC45-49DE-B202-C4E1408BB024}
 		{F569D1F7-3269-43B8-8C2E-BC28333BF885} = {74FEB020-4690-4D99-A72F-BCE3EA8953F9}
 		{E89977BC-21A6-43EF-BD78-E7ACD3FF77E3} = {74FEB020-4690-4D99-A72F-BCE3EA8953F9}
+		{F3D98435-23DB-4843-93F7-50B35D6F46F7} = {6AF97930-820B-407C-824D-C1DE857832EE}
 	EndGlobalSection
 EndGlobal
