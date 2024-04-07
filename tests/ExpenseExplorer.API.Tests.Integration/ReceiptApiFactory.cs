@@ -45,6 +45,8 @@ public class ReceiptApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
         sc.RemoveAll(typeof(ExpenseExplorerContext));
         sc.AddScoped(_ => new ExpenseExplorerContext(_postgreSqlContainer.GetConnectionString()));
+
+        sc.RemoveAll(typeof(FactProcessor));
       });
   }
 }
