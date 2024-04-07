@@ -2,6 +2,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\ExpenseExplorer.API\ExpenseExplorer.API.csproj"/>
+        <ProjectReference Include="..\..\src\ExpenseExplorer.ReadModel\ExpenseExplorer.ReadModel.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

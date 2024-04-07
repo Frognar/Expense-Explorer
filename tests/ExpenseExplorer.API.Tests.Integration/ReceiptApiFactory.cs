@@ -2,7 +2,7 @@ namespace ExpenseExplorer.API.Tests.Integration;
 
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Infrastructure.Receipts.Persistence;
-using ExpenseExplorer.Infrastructure.Receipts.Projections;
+using ExpenseExplorer.ReadModel;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;

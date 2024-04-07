@@ -6,12 +6,10 @@ using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.Receipts.Facts;
 
-public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository, IFactBus factBus)
+public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<OpenNewReceiptCommand, Either<Failure, Receipt>>
 {
-  private readonly IFactBus _factBus = factBus;
   private readonly IReceiptRepository _receiptRepository = receiptRepository;
 
   public async Task<Either<Failure, Receipt>> HandleAsync(
@@ -36,10 +34,6 @@ public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository, 
   private async Task<Either<Failure, Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
     var eitherFailureOrVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
-    await Task.WhenAll(receipt.UnsavedChanges.Select(PublishTask(cancellationToken)));
     return eitherFailureOrVersion.MapRight(v => receipt.WithVersion(v).ClearChanges());
   }
-
-  private Func<Fact, Task> PublishTask(CancellationToken cancellationToken)
-    => fact => _factBus.PublishAsync(fact, cancellationToken);
 }
