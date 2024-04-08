@@ -17,7 +17,6 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
   private const string _file = "lastProcessedPosition.txt";
   private readonly EventStoreClient _client = new(EventStoreClientSettings.Create(connectionString));
   private readonly ISender _sender = sender;
-  private Position _lastProcessedPosition = GetLastProcessedPosition();
 
   public override void Dispose()
   {
@@ -27,8 +26,9 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
 
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
   {
+    Position lastProcessedPosition = GetLastProcessedPosition();
     EventStoreClient.StreamSubscriptionResult result = _client.SubscribeToAll(
-      FromAll.After(_lastProcessedPosition),
+      FromAll.After(lastProcessedPosition),
       cancellationToken: stoppingToken);
 
     await foreach (ResolvedEvent resolvedEvent in result.WithCancellation(stoppingToken))
@@ -40,8 +40,8 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
       };
 
       await task;
-      _lastProcessedPosition = resolvedEvent.Event.Position;
-      await File.WriteAllTextAsync(_file, _lastProcessedPosition.ToString(), stoppingToken);
+      lastProcessedPosition = resolvedEvent.Event.Position;
+      await File.WriteAllTextAsync(_file, lastProcessedPosition.ToString(), stoppingToken);
     }
   }
 
