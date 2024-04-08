@@ -43,6 +43,11 @@ public class ReceiptApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         sc.AddScoped<IReceiptRepository>(
           _ => new EventStoreReceiptRepository(_eventStoreDbContainer.GetConnectionString()));
 
+        ServiceDescriptor serviceDescriptor = sc.Single(
+          d => d.ImplementationFactory?.GetType() == typeof(Func<IServiceProvider, FactProcessor>));
+
+        sc.Remove(serviceDescriptor);
+
         sc.RemoveAll(typeof(ExpenseExplorerContext));
         sc.AddScoped(_ => new ExpenseExplorerContext(_postgreSqlContainer.GetConnectionString()));
       });
