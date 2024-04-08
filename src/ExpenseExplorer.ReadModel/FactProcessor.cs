@@ -26,7 +26,7 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
 
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
   {
-    Position lastProcessedPosition = GetLastProcessedPosition();
+    Position lastProcessedPosition = await GetLastProcessedPositionAsync();
     EventStoreClient.StreamSubscriptionResult result = _client.SubscribeToAll(
       FromAll.After(lastProcessedPosition),
       cancellationToken: stoppingToken);
@@ -45,15 +45,15 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
     }
   }
 
-  private static Position GetLastProcessedPosition()
+  private static async Task<Position> GetLastProcessedPositionAsync()
     => FileWithPositionExists()
-      ? ReadPositionFromFile()
+      ? await ReadPositionFromFileAsync()
       : Position.Start;
 
   private static bool FileWithPositionExists() => File.Exists(_file);
 
-  private static Position ReadPositionFromFile()
-    => Position.TryParse(File.ReadAllText(_file), out Position? position)
+  private static async Task<Position> ReadPositionFromFileAsync()
+    => Position.TryParse(await File.ReadAllTextAsync(_file), out Position? position)
       ? position ?? Position.Start
       : Position.Start;
 
