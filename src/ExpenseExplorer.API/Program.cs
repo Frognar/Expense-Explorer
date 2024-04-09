@@ -18,7 +18,6 @@ builder.Services.AddReadModel(builder.Configuration);
 
 builder.Services.AddCommandHub(
   typeof(ApplicationDependencyInjection).Assembly,
-  typeof(Program).Assembly,
   typeof(ReadModelDependencyInjection).Assembly);
 
 WebApplication app = builder.Build();
