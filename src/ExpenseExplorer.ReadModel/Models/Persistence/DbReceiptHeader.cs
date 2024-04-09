@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.ReadModel.Models;
+namespace ExpenseExplorer.ReadModel.Models.Persistence;
 
 using System.Diagnostics.CodeAnalysis;
 

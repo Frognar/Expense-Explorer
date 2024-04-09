@@ -2,7 +2,7 @@ namespace ExpenseExplorer.ReadModel.Commands;
 
 using System.Diagnostics.CodeAnalysis;
 using CommandHub.Commands;
-using ExpenseExplorer.ReadModel.Models;
+using ExpenseExplorer.ReadModel.Models.Persistence;
 
 [SuppressMessage(
   "Performance",

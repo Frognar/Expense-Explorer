@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.ReadModel;
 
-using ExpenseExplorer.ReadModel.Models;
+using ExpenseExplorer.ReadModel.Models.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class ExpenseExplorerContext(string connectionString) : DbContext
