@@ -4,6 +4,7 @@ using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
+using ExpenseExplorer.ReadModel.Models;
 
 public static class ReceiptMapper
 {
@@ -24,6 +25,12 @@ public static class ReceiptMapper
       request.UnitPrice,
       request.TotalDiscount,
       request.Description);
+  }
+
+  public static GetReceiptsResponse MapToResponse(this PageOf<ReceiptHeaders> page)
+  {
+    ArgumentNullException.ThrowIfNull(page);
+    return new GetReceiptsResponse(page.Items.Select(_ => (ReceiptHeaderResponse)null!), page.TotalCount);
   }
 
   public static ReceiptResponse MapToResponse(this Receipt receipt)

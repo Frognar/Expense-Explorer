@@ -5,10 +5,10 @@ using System.Net;
 using CommandHub;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
-using ExpenseExplorer.API.Queries;
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.ReadModel.Queries;
 
 public static class ReceiptEndpoints
 {
@@ -25,7 +25,9 @@ public static class ReceiptEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    return Results.Ok(await sender.SendAsync(new GetReceiptQuery(), cancellationToken));
+    var pageOfReceiptHeaders = await sender.SendAsync(new GetReceiptQuery(), cancellationToken);
+    var result = pageOfReceiptHeaders.MapToResponse();
+    return Results.Ok(result);
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(
