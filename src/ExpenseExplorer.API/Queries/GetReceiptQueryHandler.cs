@@ -7,7 +7,7 @@ public class GetReceiptQueryHandler : IQueryHandler<GetReceiptQuery, GetReceipts
 {
   public Task<GetReceiptsResponse> HandleAsync(GetReceiptQuery query, CancellationToken cancellationToken = default)
   {
-    var receipts = Enumerable.Range(0, 10).Select(_ => (ReceiptResponse)null!);
+    var receipts = Enumerable.Range(0, 10).Select(_ => (ReceiptHeaderResponse)null!);
     var response = new GetReceiptsResponse(receipts, 15);
     return Task.FromResult(response);
   }
