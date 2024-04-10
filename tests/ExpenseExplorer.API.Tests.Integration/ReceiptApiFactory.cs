@@ -5,6 +5,7 @@ using ExpenseExplorer.Infrastructure.Receipts.Persistence;
 using ExpenseExplorer.ReadModel;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Testcontainers.EventStoreDb;
@@ -24,6 +25,9 @@ public class ReceiptApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
   {
     await _eventStoreDbContainer.StartAsync();
     await _postgreSqlContainer.StartAsync();
+    using var scope = Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ExpenseExplorerContext>();
+    await dbContext.Database.MigrateAsync();
   }
 
   public new async Task DisposeAsync()
