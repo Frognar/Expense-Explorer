@@ -1,18 +1,32 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
 using System.Net.Http.Json;
+using CommandHub.Commands;
 using ExpenseExplorer.API.Contract;
+using ExpenseExplorer.ReadModel;
+using ExpenseExplorer.ReadModel.Commands;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
   public async Task InitializeAsync()
   {
     DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+    var scope = ServiceScopeFactory.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ExpenseExplorerContext>();
+    if (await dbContext.ReceiptHeaders.AnyAsync())
+    {
+      return;
+    }
+
+    var createReceiptCommandHandler
+      = scope.ServiceProvider.GetRequiredService<ICommandHandler<CreateReceiptCommand, Unit>>();
+
     _ = await AsyncEnumerable.Range(1, 15)
       .SelectAwait(
-        async i => await Client.PostAsJsonAsync(
-          "api/receipts",
-          new { storeName = $"store_{i}", purchaseDate = today }))
+        async i => await createReceiptCommandHandler.HandleAsync(
+          new CreateReceiptCommand(Guid.NewGuid().ToString("N"), $"store_{i}", today)))
       .ToListAsync();
   }
 
