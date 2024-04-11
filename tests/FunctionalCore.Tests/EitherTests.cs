@@ -1,7 +1,7 @@
-﻿namespace ExpenseExplorer.Application.Tests;
+﻿namespace FunctionalCore.Tests;
 
 using System.Globalization;
-using ExpenseExplorer.Application.Monads;
+using FunctionalCore.Monads;
 
 public class EitherTests
 {

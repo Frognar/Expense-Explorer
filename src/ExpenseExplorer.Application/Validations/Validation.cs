@@ -1,7 +1,7 @@
 namespace ExpenseExplorer.Application.Validations;
 
 using ExpenseExplorer.Application.Errors;
-using ExpenseExplorer.Application.Monads;
+using FunctionalCore.Monads;
 
 public static class Validation
 {

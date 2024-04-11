@@ -2,11 +2,11 @@ namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
 using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Exceptions;
-using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore.Monads;
 
 public sealed class EventStoreReceiptRepository(string connectionString) : IReceiptRepository, IDisposable
 {

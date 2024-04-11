@@ -1,4 +1,4 @@
-﻿namespace ExpenseExplorer.Application.Monads;
+﻿namespace FunctionalCore.Monads;
 
 public sealed class Either<L, R>
 {

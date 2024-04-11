@@ -2,11 +2,11 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using CommandHub.Commands;
 using ExpenseExplorer.Application.Errors;
-using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore.Monads;
 
 public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<AddPurchaseCommand, Either<Failure, Receipt>>
@@ -30,7 +30,7 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
     CancellationToken cancellationToken)
   {
     return await eitherFailureOrPurchase.Match(
-      failure => Task.FromResult(Either<Failure, Receipt>.Left(failure)),
+      failure => Task.FromResult(Left.From<Failure, Receipt>(failure)),
       purchase => AddPurchaseAsync(purchase, Id.Create(receiptId), cancellationToken));
   }
 

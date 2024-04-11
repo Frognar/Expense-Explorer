@@ -3,12 +3,12 @@ namespace ExpenseExplorer.Application.Tests;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using ExpenseExplorer.Application.Errors;
-using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore.Monads;
 
 public class AddPurchaseCommandHandlerTests
 {

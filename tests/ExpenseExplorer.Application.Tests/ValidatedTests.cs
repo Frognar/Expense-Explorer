@@ -2,8 +2,8 @@ namespace ExpenseExplorer.Application.Tests;
 
 using System.Globalization;
 using ExpenseExplorer.Application.Errors;
-using ExpenseExplorer.Application.Monads;
 using ExpenseExplorer.Application.Validations;
+using FunctionalCore.Monads;
 
 public class ValidatedTests
 {
