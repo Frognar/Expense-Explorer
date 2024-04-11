@@ -2,10 +2,10 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using CommandHub.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
-using ExpenseExplorer.Application.Validations;
 using ExpenseExplorer.Domain.Receipts;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
+using FunctionalCore.Validations;
 
 public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<OpenNewReceiptCommand, Either<Failure, Receipt>>

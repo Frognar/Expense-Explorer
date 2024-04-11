@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.Application.Tests;
+namespace FunctionalCore.Tests;
 
 using System.Globalization;
-using ExpenseExplorer.Application.Validations;
 using FunctionalCore.Failures;
+using FunctionalCore.Validations;
 
 public class ApplicativeValidatedTests
 {
@@ -230,8 +230,8 @@ public class ApplicativeValidatedTests
 
   private static Validated<int> Validate(int value)
     => value < 0
-      ? Validated<int>.Fail(ValidationFailure.SingleFailure("value", "NEGATIVE_VALUE"))
-      : Validated<int>.Success(value);
+      ? Validation.Failed<int>(ValidationFailure.SingleFailure("value", "NEGATIVE_VALUE"))
+      : Validation.Succeeded(value);
 
   private static string ToInvariantString(int value) => value.ToString(CultureInfo.InvariantCulture);
 }

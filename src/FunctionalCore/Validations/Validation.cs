@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Application.Validations;
+namespace FunctionalCore.Validations;
 
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
