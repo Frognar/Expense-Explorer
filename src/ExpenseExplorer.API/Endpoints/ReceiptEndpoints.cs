@@ -25,9 +25,10 @@ public static class ReceiptEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    var pageOfReceiptHeaders = await sender.SendAsync(new GetReceiptQuery(), cancellationToken);
-    var result = pageOfReceiptHeaders.MapToResponse();
-    return Results.Ok(result);
+    var result = await sender.SendAsync(new GetReceiptQuery(), cancellationToken);
+    return result
+      .MapRight(r => r.MapToResponse())
+      .Match(Handle, Results.Ok);
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(
