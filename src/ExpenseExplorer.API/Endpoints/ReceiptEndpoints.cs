@@ -5,9 +5,9 @@ using System.Net;
 using CommandHub;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
-using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.ReadModel.Queries;
+using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
 public static class ReceiptEndpoints

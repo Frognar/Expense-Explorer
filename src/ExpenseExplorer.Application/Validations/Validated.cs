@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Application.Validations;
 
-using ExpenseExplorer.Application.Errors;
+using FunctionalCore.Failures;
 
 public class Validated<S>
 {

@@ -2,12 +2,12 @@ namespace ExpenseExplorer.Application.Tests;
 
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
 public class AddPurchaseCommandHandlerTests
@@ -83,7 +83,7 @@ public class AddPurchaseCommandHandlerTests
       cancellationToken.ThrowIfCancellationRequested();
       Receipt? receipt = this.SingleOrDefault(r => r.Id == id);
       return receipt is null
-        ? Task.FromResult(Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id)))
+        ? Task.FromResult(Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id.Value)))
         : Task.FromResult(Right.From<Failure, Receipt>(receipt));
     }
   }

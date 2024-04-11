@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Tests.Common.Generators;
 
-using ExpenseExplorer.Application.Errors;
+using FunctionalCore.Failures;
 
 public static class ValidationErrorGenerator
 {

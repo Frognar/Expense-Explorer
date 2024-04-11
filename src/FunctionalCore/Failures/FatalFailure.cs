@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Application.Errors;
+namespace FunctionalCore.Failures;
 
 public record FatalFailure(Exception Exception) : Failure(Exception.ToString())
 {

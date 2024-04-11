@@ -1,8 +1,8 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using CommandHub.Commands;
-using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Domain.Receipts;
+using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
 public record AddPurchaseCommand(

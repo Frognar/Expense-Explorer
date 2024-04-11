@@ -2,11 +2,11 @@ namespace ExpenseExplorer.Application.Tests;
 
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
 public class OpenNewReceiptCommandHandlerTests
@@ -60,7 +60,7 @@ public class OpenNewReceiptCommandHandlerTests
     public Task<Either<Failure, Receipt>> GetAsync(Id id, CancellationToken cancellationToken)
     {
       cancellationToken.ThrowIfCancellationRequested();
-      return Task.FromResult(Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id)));
+      return Task.FromResult(Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id.Value)));
     }
   }
 }

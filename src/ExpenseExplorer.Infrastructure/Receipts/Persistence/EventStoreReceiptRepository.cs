@@ -1,11 +1,11 @@
 namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
-using ExpenseExplorer.Application.Errors;
 using ExpenseExplorer.Application.Exceptions;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
 public sealed class EventStoreReceiptRepository(string connectionString) : IReceiptRepository, IDisposable
@@ -42,7 +42,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     {
       (List<Fact> facts, Version version) = await _eventStore.GetEventsAsync(id, cancellationToken);
       return facts.Count == 0
-        ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id))
+        ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id.Value))
         : Right.From<Failure, Receipt>(Receipt.Recreate(facts, version));
     }
     catch (FactReadException ex)
