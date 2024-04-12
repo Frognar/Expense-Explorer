@@ -54,11 +54,23 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
     response.Receipts.Should().HaveCount(10);
   }
 
-  [Fact]
-  public async Task CanDefinePageSize()
+  [Theory]
+  [InlineData(1)]
+  [InlineData(5)]
+  [InlineData(25)]
+  public async Task CanDefinePageSize(int pageSize)
   {
-    var response = await GetReceipts("?pageSize=5");
-    response.Receipts.Should().HaveCount(5);
+    var response = await GetReceipts($"?pageSize={pageSize}");
+    response.Receipts.Should().HaveCount(pageSize);
+  }
+
+  [Theory]
+  [InlineData(0)]
+  [InlineData(-1)]
+  public async Task ReturnsDefaultPageSizeWhenInvalid(int pageSize)
+  {
+    var response = await GetReceipts($"?pageSize={pageSize}");
+    response.Receipts.Should().HaveCount(10);
   }
 
   private async Task<GetReceiptsResponse> GetReceipts(string parameters = "")

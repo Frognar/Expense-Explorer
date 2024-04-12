@@ -26,10 +26,20 @@ public static class ReceiptEndpoints
     int pageSize = 10,
     CancellationToken cancellationToken = default)
   {
-    var result = await sender.SendAsync(new GetReceiptsQuery(pageSize), cancellationToken);
+    GetReceiptsQuery query = new(GetPageSize(pageSize));
+    var result = await sender.SendAsync(query, cancellationToken);
     return result
       .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
+  }
+
+  private static int GetPageSize(int pageSize)
+  {
+    return pageSize switch
+    {
+      < 1 => 10,
+      _ => pageSize,
+    };
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(
