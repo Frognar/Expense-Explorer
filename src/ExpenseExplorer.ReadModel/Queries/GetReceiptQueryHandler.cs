@@ -19,10 +19,11 @@ public class GetReceiptQueryHandler(ExpenseExplorerContext context)
   {
     try
     {
+      ArgumentNullException.ThrowIfNull(query);
       var receipts = await _context.ReceiptHeaders.AsNoTracking()
         .OrderBy(r => r.PurchaseDate)
         .Skip(0)
-        .Take(10)
+        .Take(query.PageSize)
         .Select(r => new ReceiptHeaders(r.Id, r.Store, r.PurchaseDate, r.Total))
         .ToListAsync(cancellationToken);
 

@@ -5,4 +5,4 @@ using ExpenseExplorer.ReadModel.Models;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
-public record GetReceiptQuery : IQuery<Either<Failure, PageOf<ReceiptHeaders>>>;
+public record GetReceiptQuery(int PageSize) : IQuery<Either<Failure, PageOf<ReceiptHeaders>>>;
