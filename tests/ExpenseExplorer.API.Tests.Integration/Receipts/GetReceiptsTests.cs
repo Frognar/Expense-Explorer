@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
+  private const int _totalReceipts = 51;
+
   public async Task InitializeAsync()
   {
     DateOnly today = DateOnly.FromDateTime(DateTime.Today);
@@ -19,10 +21,9 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
       return;
     }
 
-    await dbContext.ReceiptHeaders.AddRangeAsync(
-      Enumerable.Range(1, 15)
-        .Select(i => new DbReceiptHeader(Guid.NewGuid().ToString("N"), $"store_{i}", today, 0)));
-
+    DbReceiptHeader CreateReceiptHeader(int i) => new(Guid.NewGuid().ToString("N"), $"store_{i}", today, 0);
+    IEnumerable<DbReceiptHeader> receiptHeaders = Enumerable.Range(1, _totalReceipts).Select(CreateReceiptHeader);
+    await dbContext.ReceiptHeaders.AddRangeAsync(receiptHeaders);
     await dbContext.SaveChangesAsync();
   }
 
@@ -43,7 +44,7 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   public async Task ReturnsTotalCountInResponse()
   {
     var response = await GetReceipts();
-    response.TotalCount.Should().Be(15);
+    response.TotalCount.Should().Be(_totalReceipts);
   }
 
   [Fact]
