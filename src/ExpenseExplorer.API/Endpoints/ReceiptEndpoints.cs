@@ -23,9 +23,10 @@ public static class ReceiptEndpoints
 
   private static async Task<IResult> GetReceiptsAsync(
     ISender sender,
+    int pageSize = 10,
     CancellationToken cancellationToken = default)
   {
-    var result = await sender.SendAsync(new GetReceiptsQuery(10), cancellationToken);
+    var result = await sender.SendAsync(new GetReceiptsQuery(pageSize), cancellationToken);
     return result
       .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
