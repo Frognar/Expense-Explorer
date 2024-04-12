@@ -8,13 +8,13 @@ using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
-public class GetReceiptQueryHandler(ExpenseExplorerContext context)
-  : IQueryHandler<GetReceiptQuery, Either<Failure, PageOf<ReceiptHeaders>>>
+public class GetReceiptsQueryHandler(ExpenseExplorerContext context)
+  : IQueryHandler<GetReceiptsQuery, Either<Failure, PageOf<ReceiptHeaders>>>
 {
   private readonly ExpenseExplorerContext _context = context;
 
   public async Task<Either<Failure, PageOf<ReceiptHeaders>>> HandleAsync(
-    GetReceiptQuery query,
+    GetReceiptsQuery query,
     CancellationToken cancellationToken = default)
   {
     try
