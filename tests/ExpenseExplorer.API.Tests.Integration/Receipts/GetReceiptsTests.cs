@@ -1,10 +1,9 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
 using System.Net.Http.Json;
-using CommandHub.Commands;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.ReadModel;
-using ExpenseExplorer.ReadModel.Commands;
+using ExpenseExplorer.ReadModel.Models.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,14 +19,11 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
       return;
     }
 
-    var createReceiptCommandHandler
-      = scope.ServiceProvider.GetRequiredService<ICommandHandler<CreateReceiptCommand, Unit>>();
+    await dbContext.ReceiptHeaders.AddRangeAsync(
+      Enumerable.Range(1, 15)
+        .Select(i => new DbReceiptHeader(Guid.NewGuid().ToString("N"), $"store_{i}", today, 0)));
 
-    _ = await AsyncEnumerable.Range(1, 15)
-      .SelectAwait(
-        async i => await createReceiptCommandHandler.HandleAsync(
-          new CreateReceiptCommand(Guid.NewGuid().ToString("N"), $"store_{i}", today)))
-      .ToListAsync();
+    await dbContext.SaveChangesAsync();
   }
 
   public Task DisposeAsync()
