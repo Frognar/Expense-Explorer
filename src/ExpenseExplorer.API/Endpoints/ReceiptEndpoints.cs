@@ -38,6 +38,7 @@ public static class ReceiptEndpoints
     return pageSize switch
     {
       < 1 => 10,
+      > 50 => 50,
       _ => pageSize,
     };
   }

@@ -73,6 +73,13 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
     response.Receipts.Should().HaveCount(10);
   }
 
+  [Fact]
+  public async Task ReturnsMaxPageSize()
+  {
+    var response = await GetReceipts("?pageSize=100");
+    response.Receipts.Should().HaveCount(50);
+  }
+
   private async Task<GetReceiptsResponse> GetReceipts(string parameters = "")
   {
     Uri uri = new("api/receipts" + parameters, UriKind.Relative);
