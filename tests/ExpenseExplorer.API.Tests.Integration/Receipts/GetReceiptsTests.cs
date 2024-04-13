@@ -4,6 +4,7 @@ using System.Net.Http.Json;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.ReadModel;
 using ExpenseExplorer.ReadModel.Models.Persistence;
+using ExpenseExplorer.ReadModel.Queries;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -51,7 +52,7 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   public async Task ReturnsPageOfReceipts()
   {
     var response = await GetReceipts();
-    response.Receipts.Should().HaveCount(10);
+    response.Receipts.Should().HaveCount(GetReceiptsQuery.DefaultPageSize);
   }
 
   [Theory]
@@ -70,14 +71,14 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   public async Task ReturnsDefaultPageSizeWhenInvalid(int pageSize)
   {
     var response = await GetReceipts($"?pageSize={pageSize}");
-    response.Receipts.Should().HaveCount(10);
+    response.Receipts.Should().HaveCount(GetReceiptsQuery.DefaultPageSize);
   }
 
   [Fact]
   public async Task ReturnsMaxPageSize()
   {
-    var response = await GetReceipts("?pageSize=100");
-    response.Receipts.Should().HaveCount(50);
+    var response = await GetReceipts($"?pageSize={GetReceiptsQuery.MaxPageSize + 1}");
+    response.Receipts.Should().HaveCount(GetReceiptsQuery.MaxPageSize);
   }
 
   private async Task<GetReceiptsResponse> GetReceipts(string parameters = "")
