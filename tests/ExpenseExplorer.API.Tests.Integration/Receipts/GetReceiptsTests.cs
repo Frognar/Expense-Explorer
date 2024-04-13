@@ -58,6 +58,18 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
     response.PageSize.Should().Be(expectedPageSize);
   }
 
+  [Property]
+  public async Task ReturnsPageCountInResponse(int pageSize)
+  {
+    pageSize = pageSize < 1
+      ? GetReceiptsQuery.DefaultPageSize
+      : Math.Min(pageSize, GetReceiptsQuery.MaxPageSize);
+
+    GetReceiptsResponse response = await GetReceipts($"?pageSize={pageSize}");
+    int expectedPageCount = (int)Math.Ceiling((double)_totalReceipts / pageSize);
+    response.PageCount.Should().Be(expectedPageCount);
+  }
+
   [Fact]
   public async Task ReturnsPageOfReceipts()
   {
