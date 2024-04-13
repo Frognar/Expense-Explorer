@@ -32,7 +32,8 @@ public static class ReceiptMapper
     ArgumentNullException.ThrowIfNull(page);
     return new GetReceiptsResponse(
       page.Items.Select(r => new ReceiptHeaderResponse(r.Id, r.Store, r.PurchaseDate, r.Total)),
-      page.TotalCount);
+      page.TotalCount,
+      page.PageSize);
   }
 
   public static ReceiptResponse MapToResponse(this Receipt receipt)

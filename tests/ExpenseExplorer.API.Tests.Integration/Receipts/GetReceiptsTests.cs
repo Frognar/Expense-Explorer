@@ -36,22 +36,32 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   [Fact]
   public async Task CanGetReceipts()
   {
-    Uri uri = new("api/receipts", UriKind.Relative);
-    var result = await Client.GetAsync(uri);
+    HttpResponseMessage result = await Get();
     result.StatusCode.ShouldBeIn200Group();
   }
 
   [Fact]
   public async Task ReturnsTotalCountInResponse()
   {
-    var response = await GetReceipts();
+    GetReceiptsResponse response = await GetReceipts();
     response.TotalCount.Should().Be(_totalReceipts);
+  }
+
+  [Property]
+  public async Task ReturnsPageSizeInResponse(int pageSize)
+  {
+    int expectedPageSize = pageSize < 1
+      ? GetReceiptsQuery.DefaultPageSize
+      : Math.Min(pageSize, GetReceiptsQuery.MaxPageSize);
+
+    GetReceiptsResponse response = await GetReceipts($"?pageSize={pageSize}");
+    response.PageSize.Should().Be(expectedPageSize);
   }
 
   [Fact]
   public async Task ReturnsPageOfReceipts()
   {
-    var response = await GetReceipts();
+    GetReceiptsResponse response = await GetReceipts();
     response.Receipts.Should().HaveCount(GetReceiptsQuery.DefaultPageSize);
   }
 
@@ -61,7 +71,7 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   [InlineData(25)]
   public async Task CanDefinePageSize(int pageSize)
   {
-    var response = await GetReceipts($"?pageSize={pageSize}");
+    GetReceiptsResponse response = await GetReceipts($"?pageSize={pageSize}");
     response.Receipts.Should().HaveCount(pageSize);
   }
 
@@ -70,21 +80,26 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   [InlineData(-1)]
   public async Task ReturnsDefaultPageSizeWhenInvalid(int pageSize)
   {
-    var response = await GetReceipts($"?pageSize={pageSize}");
+    GetReceiptsResponse response = await GetReceipts($"?pageSize={pageSize}");
     response.Receipts.Should().HaveCount(GetReceiptsQuery.DefaultPageSize);
   }
 
   [Fact]
   public async Task ReturnsMaxPageSize()
   {
-    var response = await GetReceipts($"?pageSize={GetReceiptsQuery.MaxPageSize + 1}");
+    GetReceiptsResponse response = await GetReceipts($"?pageSize={GetReceiptsQuery.MaxPageSize + 1}");
     response.Receipts.Should().HaveCount(GetReceiptsQuery.MaxPageSize);
   }
 
   private async Task<GetReceiptsResponse> GetReceipts(string parameters = "")
   {
-    Uri uri = new("api/receipts" + parameters, UriKind.Relative);
-    var result = await Client.GetAsync(uri);
+    HttpResponseMessage result = await Get(parameters);
     return (await result.Content.ReadFromJsonAsync<GetReceiptsResponse>())!;
+  }
+
+  private async Task<HttpResponseMessage> Get(string parameters = "")
+  {
+    Uri uri = new("api/receipts" + parameters, UriKind.Relative);
+    return await Client.GetAsync(uri);
   }
 }
