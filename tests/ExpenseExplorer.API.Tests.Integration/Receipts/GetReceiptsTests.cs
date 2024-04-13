@@ -70,6 +70,24 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
     response.PageCount.Should().Be(expectedPageCount);
   }
 
+  [Theory]
+  [InlineData(1)]
+  [InlineData(2)]
+  public async Task ReturnsPageNumberInResponse(int pageNumber)
+  {
+    GetReceiptsResponse response = await GetReceipts($"?pageNumber={pageNumber}");
+    response.PageNumber.Should().Be(pageNumber);
+  }
+
+  [Theory]
+  [InlineData(0)]
+  [InlineData(-1)]
+  public async Task ReturnsFirstPageWhenInvalidPageNumber(int pageNumber)
+  {
+    GetReceiptsResponse response = await GetReceipts($"?pageNumber={pageNumber}");
+    response.PageNumber.Should().Be(1);
+  }
+
   [Fact]
   public async Task ReturnsPageOfReceipts()
   {

@@ -28,7 +28,7 @@ public class GetReceiptsQueryHandler(ExpenseExplorerContext context)
         .ToListAsync(cancellationToken);
 
       int totalCount = await _context.ReceiptHeaders.CountAsync(cancellationToken);
-      var response = Page.Of(receipts, totalCount, query.PageSize);
+      var response = Page.Of(receipts, totalCount, query.PageSize, query.PageNumber);
       return Right.From<Failure, PageOf<ReceiptHeaders>>(response);
     }
     catch (DbException ex)

@@ -34,6 +34,7 @@ public static class ReceiptMapper
       page.Items.Select(r => new ReceiptHeaderResponse(r.Id, r.Store, r.PurchaseDate, r.Total)),
       page.TotalCount,
       page.PageSize,
+      page.PageNumber,
       page.PageCount);
   }
 
