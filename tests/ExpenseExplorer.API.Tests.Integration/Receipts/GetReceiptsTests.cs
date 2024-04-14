@@ -104,7 +104,7 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
     GetReceiptsResponse response = await GetReceipts("?pageSize=50");
     response.Receipts.Should()
       .BeInAscendingOrder(r => r.PurchaseDate)
-      .And.ThenBeInAscendingOrder(r => r.Id);
+      .And.ThenBeInDescendingOrder(r => r.Id);
   }
 
   [Fact]

@@ -24,7 +24,7 @@ public class GetReceiptsQueryHandler(ExpenseExplorerContext context)
       List<ReceiptHeaders> receipts = await _context.ReceiptHeaders.AsNoTracking()
         .OrderByMany(
           Order.AscendingBy<DbReceiptHeader>(r => r.PurchaseDate),
-          Order.AscendingBy<DbReceiptHeader>(r => r.Id))
+          Order.DescendingBy<DbReceiptHeader>(r => r.Id))
         .GetPage(query.PageNumber, query.PageSize)
         .Select(r => new ReceiptHeaders(r.Id, r.Store, r.PurchaseDate, r.Total))
         .ToListAsync(cancellationToken);
