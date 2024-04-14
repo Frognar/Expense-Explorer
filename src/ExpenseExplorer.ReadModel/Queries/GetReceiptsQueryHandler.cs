@@ -4,6 +4,7 @@ using System.Data.Common;
 using CommandHub.Queries;
 using ExpenseExplorer.ReadModel.Extensions;
 using ExpenseExplorer.ReadModel.Models;
+using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
@@ -21,10 +22,10 @@ public class GetReceiptsQueryHandler(ExpenseExplorerContext context)
     {
       ArgumentNullException.ThrowIfNull(query);
       List<ReceiptHeaders> receipts = await _context.ReceiptHeaders.AsNoTracking()
-        .OrderBy(r => r.PurchaseDate)
-        .ThenBy(r => r.Id)
-        .Skip(query.PageSize * (query.PageNumber - 1))
-        .Take(query.PageSize)
+        .OrderByMany(
+          Order.AscendingBy<DbReceiptHeader>(r => r.PurchaseDate),
+          Order.AscendingBy<DbReceiptHeader>(r => r.Id))
+        .GetPage(query.PageNumber, query.PageSize)
         .Select(r => new ReceiptHeaders(r.Id, r.Store, r.PurchaseDate, r.Total))
         .ToListAsync(cancellationToken);
 
