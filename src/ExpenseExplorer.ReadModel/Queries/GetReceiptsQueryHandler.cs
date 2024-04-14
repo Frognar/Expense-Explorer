@@ -20,15 +20,16 @@ public class GetReceiptsQueryHandler(ExpenseExplorerContext context)
     try
     {
       ArgumentNullException.ThrowIfNull(query);
-      var receipts = await _context.ReceiptHeaders.AsNoTracking()
+      List<ReceiptHeaders> receipts = await _context.ReceiptHeaders.AsNoTracking()
         .OrderBy(r => r.PurchaseDate)
-        .Skip(0)
+        .ThenBy(r => r.Id)
+        .Skip(query.PageSize * (query.PageNumber - 1))
         .Take(query.PageSize)
         .Select(r => new ReceiptHeaders(r.Id, r.Store, r.PurchaseDate, r.Total))
         .ToListAsync(cancellationToken);
 
       int totalCount = await _context.ReceiptHeaders.CountAsync(cancellationToken);
-      var response = Page.Of(receipts, totalCount, query.PageSize, query.PageNumber);
+      PageOf<ReceiptHeaders> response = Page.Of(receipts, totalCount, query.PageSize, query.PageNumber);
       return Right.From<Failure, PageOf<ReceiptHeaders>>(response);
     }
     catch (DbException ex)

@@ -14,15 +14,18 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
 
   public async Task InitializeAsync()
   {
-    DateOnly today = DateOnly.FromDateTime(DateTime.Today);
-    var scope = ServiceScopeFactory.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<ExpenseExplorerContext>();
+    IServiceScope scope = ServiceScopeFactory.CreateScope();
+    ExpenseExplorerContext dbContext = scope.ServiceProvider.GetRequiredService<ExpenseExplorerContext>();
     if (await dbContext.ReceiptHeaders.AnyAsync())
     {
       return;
     }
 
-    DbReceiptHeader CreateReceiptHeader(int i) => new(Guid.NewGuid().ToString("N"), $"store_{i}", today, 0);
+    DateOnly date = DateOnly.FromDateTime(DateTime.Today).AddDays(-_totalReceipts);
+
+    DbReceiptHeader CreateReceiptHeader(int i)
+      => new(Guid.NewGuid().ToString("N"), $"store_{i}", date.AddDays(i % 5), 0);
+
     IEnumerable<DbReceiptHeader> receiptHeaders = Enumerable.Range(1, _totalReceipts).Select(CreateReceiptHeader);
     await dbContext.ReceiptHeaders.AddRangeAsync(receiptHeaders);
     await dbContext.SaveChangesAsync();
@@ -93,6 +96,24 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   {
     GetReceiptsResponse response = await GetReceipts();
     response.Receipts.Should().HaveCount(GetReceiptsQuery.DefaultPageSize);
+  }
+
+  [Fact]
+  public async Task OrdersReceiptsByPurchaseDateByDefault()
+  {
+    GetReceiptsResponse response = await GetReceipts("?pageSize=50");
+    response.Receipts.Should()
+      .BeInAscendingOrder(r => r.PurchaseDate)
+      .And.ThenBeInAscendingOrder(r => r.Id);
+  }
+
+  [Fact]
+  public async Task CanRetrieveNextPage()
+  {
+    GetReceiptsResponse firstPage = await GetReceipts();
+    GetReceiptsResponse secondPage = await GetReceipts("?pageNumber=2");
+    firstPage.Receipts.Should()
+      .NotContain(r => secondPage.Receipts.Any(r2 => r.Id == r2.Id));
   }
 
   [Theory]
