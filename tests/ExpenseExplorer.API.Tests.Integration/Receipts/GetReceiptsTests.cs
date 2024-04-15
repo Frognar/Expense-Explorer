@@ -144,7 +144,7 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   [Fact]
   public async Task ReturnsFilteredReceipts()
   {
-    string search = "_1";
+    string search = "E_1";
     DateOnly after = _today.AddDays(-5);
     DateOnly before = _today.AddDays(-1);
     decimal minTotal = 1.0m;
@@ -156,7 +156,7 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
     response.Receipts.Should()
       .OnlyContain(
         r =>
-          r.Store.Contains(search)
+          r.Store.Contains(search, StringComparison.OrdinalIgnoreCase)
           && r.PurchaseDate >= after
           && r.PurchaseDate <= before
           && r.Total >= minTotal
