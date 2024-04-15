@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
   private const int _totalReceipts = 51;
+  private readonly DateOnly _today = DateOnly.FromDateTime(DateTime.Today);
 
   public async Task InitializeAsync()
   {
@@ -21,10 +22,8 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
       return;
     }
 
-    DateOnly date = DateOnly.FromDateTime(DateTime.Today).AddDays(-_totalReceipts);
-
     DbReceiptHeader CreateReceiptHeader(int i)
-      => new(Guid.NewGuid().ToString("N"), $"store_{i}", date.AddDays(i % 5), 0);
+      => new(Guid.NewGuid().ToString("N"), $"store_{i}", _today.AddDays(-i % 5), (i % 10) + .5m);
 
     IEnumerable<DbReceiptHeader> receiptHeaders = Enumerable.Range(1, _totalReceipts).Select(CreateReceiptHeader);
     await dbContext.ReceiptHeaders.AddRangeAsync(receiptHeaders);
@@ -140,6 +139,21 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   {
     GetReceiptsResponse response = await GetReceipts($"?pageSize={GetReceiptsQuery.MaxPageSize + 1}");
     response.Receipts.Should().HaveCount(GetReceiptsQuery.MaxPageSize);
+  }
+
+  [Fact]
+  public async Task ReturnsFilteredReceipts()
+  {
+    string search = "_1";
+    DateOnly after = _today.AddDays(-5);
+    DateOnly before = _today.AddDays(-1);
+    decimal minTotal = 1.0m;
+    decimal maxTotal = 5.0m;
+    string parameters = $"?search={search}&after={after}&before={before}&minTotal={minTotal}&maxTotal={maxTotal}";
+
+    GetReceiptsResponse response = await GetReceipts(parameters);
+
+    response.Receipts.Should().NotBeEmpty();
   }
 
   private async Task<GetReceiptsResponse> GetReceipts(string parameters = "")

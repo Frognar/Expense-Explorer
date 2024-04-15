@@ -24,10 +24,15 @@ public static class ReceiptEndpoints
   private static async Task<IResult> GetReceiptsAsync(
     int? pageSize,
     int? pageNumber,
+    string? search,
+    DateOnly? after,
+    DateOnly? before,
+    decimal? minTotal,
+    decimal? maxTotal,
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    GetReceiptsQuery query = new(pageSize, pageNumber);
+    GetReceiptsQuery query = new(pageSize, pageNumber, search, after, before, minTotal, maxTotal);
     var result = await sender.SendAsync(query, cancellationToken);
     return result
       .MapRight(r => r.MapToResponse())

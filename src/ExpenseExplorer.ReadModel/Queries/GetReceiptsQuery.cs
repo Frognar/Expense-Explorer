@@ -5,14 +5,35 @@ using ExpenseExplorer.ReadModel.Models;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
-public record GetReceiptsQuery(int PageSize, int PageNumber)
+public record GetReceiptsQuery(
+  int PageSize,
+  int PageNumber,
+  string Search,
+  DateOnly After,
+  DateOnly Before,
+  decimal MinTotal,
+  decimal MaxTotal)
   : IQuery<Either<Failure, PageOf<ReceiptHeaders>>>
 {
   public const int DefaultPageSize = 10;
   public const int MaxPageSize = 50;
 
-  public GetReceiptsQuery(int? pageSize, int? pageNumber)
-    : this(pageSize ?? DefaultPageSize, pageNumber ?? 1)
+  public GetReceiptsQuery(
+    int? pageSize,
+    int? pageNumber,
+    string? search,
+    DateOnly? after,
+    DateOnly? before,
+    decimal? minTotal,
+    decimal? maxTotal)
+    : this(
+      pageSize ?? DefaultPageSize,
+      pageNumber ?? 1,
+      search ?? string.Empty,
+      after ?? DateOnly.MinValue,
+      before ?? DateOnly.MaxValue,
+      minTotal ?? decimal.MinValue,
+      maxTotal ?? decimal.MaxValue)
   {
   }
 
