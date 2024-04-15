@@ -153,7 +153,14 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
 
     GetReceiptsResponse response = await GetReceipts(parameters);
 
-    response.Receipts.Should().NotBeEmpty();
+    response.Receipts.Should()
+      .OnlyContain(
+        r =>
+          r.Store.Contains(search)
+          && r.PurchaseDate >= after
+          && r.PurchaseDate <= before
+          && r.Total >= minTotal
+          && r.Total <= maxTotal);
   }
 
   private async Task<GetReceiptsResponse> GetReceipts(string parameters = "")

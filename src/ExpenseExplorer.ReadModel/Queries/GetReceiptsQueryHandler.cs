@@ -22,6 +22,9 @@ public class GetReceiptsQueryHandler(ExpenseExplorerContext context)
     {
       ArgumentNullException.ThrowIfNull(query);
       List<ReceiptHeaders> receipts = await _context.ReceiptHeaders.AsNoTracking()
+        .Where(r => r.PurchaseDate >= query.After && r.PurchaseDate <= query.Before)
+        .Where(r => r.Total >= query.MinTotal && r.Total <= query.MaxTotal)
+        .Where(r => r.Store.Contains(query.Search))
         .OrderByMany(
           Order.AscendingBy<DbReceiptHeader>(r => r.PurchaseDate),
           Order.DescendingBy<DbReceiptHeader>(r => r.Id))
