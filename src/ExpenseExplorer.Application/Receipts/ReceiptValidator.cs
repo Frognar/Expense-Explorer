@@ -20,15 +20,17 @@ public static class ReceiptValidator
 
   private static Validated<Store> Validate(string storeName)
   {
-    return string.IsNullOrWhiteSpace(storeName)
-      ? Validation.Failed<Store>(ValidationFailure.SingleFailure("StoreName", "EMPTY_STORE_NAME"))
-      : Validation.Succeeded(Store.Create(storeName));
+    return Store.TryCreate(storeName)
+      .Match(
+        () => Validation.Failed<Store>(ValidationFailure.SingleFailure("StoreName", "EMPTY_STORE_NAME")),
+        Validation.Succeeded);
   }
 
   private static Validated<PurchaseDate> Validate(DateOnly purchaseDate, DateOnly today)
   {
-    return purchaseDate > today
-      ? Validation.Failed<PurchaseDate>(ValidationFailure.SingleFailure("PurchaseDate", "FUTURE_DATE"))
-      : Validation.Succeeded(PurchaseDate.Create(purchaseDate, today));
+    return PurchaseDate.TryCreate(purchaseDate, today)
+      .Match(
+        () => Validation.Failed<PurchaseDate>(ValidationFailure.SingleFailure("PurchaseDate", "FUTURE_DATE")),
+        Validation.Succeeded);
   }
 }
