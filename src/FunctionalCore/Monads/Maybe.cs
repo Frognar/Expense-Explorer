@@ -21,6 +21,12 @@ public class Maybe<T>
     return _maybe.Match(onNone, onSome);
   }
 
+  public Maybe<TResult> Map<TResult>(Func<T, TResult> map)
+  {
+    ArgumentNullException.ThrowIfNull(map);
+    return Match(Maybe<TResult>.None, v => Maybe<TResult>.Some(map(v)));
+  }
+
   internal static Maybe<T> Some(T value) => new(new SomeValue(value));
 
   internal static Maybe<T> None() => new(default(NoneValue));

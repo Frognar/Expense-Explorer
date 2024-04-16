@@ -29,4 +29,18 @@ public class MaybeTests
       .Should()
       .Be(value < 0 ? -1 : value);
   }
+
+  [Property]
+  public void MapsWhenSome(int value)
+  {
+    Maybe<int> maybe = value < 0
+      ? None.OfType<int>()
+      : Some.From(value);
+
+    var projected = maybe.Map(v => v * 2);
+
+    projected.Match(() => -1, v => v)
+      .Should()
+      .Be(value < 0 ? -1 : value * 2);
+  }
 }
