@@ -59,4 +59,18 @@ public class MaybeTests
       .Should()
       .Be(value < 0 ? -1 : value * 2);
   }
+
+  [Property]
+  public void FlatMapsWhenSome(int value)
+  {
+    var maybe = value < 0
+      ? None.OfType<int>()
+      : Some.From(value);
+
+    var projected = maybe.FlatMap(v => Some.From(v * 2));
+
+    projected.Match(() => -1, v => v)
+      .Should()
+      .Be(value < 0 ? -1 : value * 2);
+  }
 }

@@ -29,6 +29,12 @@ public class Maybe<T>
 
   public Maybe<TResult> Select<TResult>(Func<T, TResult> map) => Map(map);
 
+  public Maybe<TResult> FlatMap<TResult>(Func<T, Maybe<TResult>> map)
+  {
+    ArgumentNullException.ThrowIfNull(map);
+    return Match(Maybe<TResult>.None, map);
+  }
+
   internal static Maybe<T> Some(T value) => new(new SomeValue(value));
 
   internal static Maybe<T> None() => new(default(NoneValue));
