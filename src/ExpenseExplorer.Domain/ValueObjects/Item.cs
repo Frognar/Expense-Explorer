@@ -2,6 +2,7 @@ namespace ExpenseExplorer.Domain.ValueObjects;
 
 using System.Text.Json.Serialization;
 using ExpenseExplorer.Domain.Exceptions;
+using FunctionalCore.Monads;
 
 public record Item
 {
@@ -17,5 +18,12 @@ public record Item
   public static Item Create(string name)
   {
     return new Item(name);
+  }
+
+  public static Maybe<Item> TryCreate(string name)
+  {
+    return string.IsNullOrWhiteSpace(name)
+      ? None.OfType<Item>()
+      : Some.From(new Item(name));
   }
 }

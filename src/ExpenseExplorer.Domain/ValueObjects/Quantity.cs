@@ -2,6 +2,7 @@ namespace ExpenseExplorer.Domain.ValueObjects;
 
 using System.Text.Json.Serialization;
 using ExpenseExplorer.Domain.Exceptions;
+using FunctionalCore.Monads;
 
 public record Quantity
 {
@@ -17,5 +18,12 @@ public record Quantity
   public static Quantity Create(decimal value)
   {
     return new Quantity(value);
+  }
+
+  public static Maybe<Quantity> TryCreate(decimal value)
+  {
+    return value <= 0
+      ? None.OfType<Quantity>()
+      : Some.From(new Quantity(value));
   }
 }

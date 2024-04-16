@@ -2,6 +2,7 @@ namespace ExpenseExplorer.Domain.ValueObjects;
 
 using System.Text.Json.Serialization;
 using ExpenseExplorer.Domain.Exceptions;
+using FunctionalCore.Monads;
 
 public record Money
 {
@@ -19,5 +20,12 @@ public record Money
   public static Money Create(decimal value)
   {
     return new Money(value);
+  }
+
+  public static Maybe<Money> TryCreate(decimal value)
+  {
+    return value < 0
+      ? None.OfType<Money>()
+      : Some.From(new Money(value));
   }
 }
