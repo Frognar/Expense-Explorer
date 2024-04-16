@@ -2,16 +2,23 @@ namespace FunctionalCore.Monads;
 
 public class Maybe<T>
 {
-#pragma warning disable S4487
+  private readonly bool _hasValue;
   private readonly T _value;
-#pragma warning restore S4487
 
-  private Maybe(T value)
+  private Maybe(T value, bool hasValue)
   {
     _value = value;
+    _hasValue = hasValue;
   }
 
-  internal static Maybe<T> Some(T value) => new(value);
+  public TResult Match<TResult>(Func<TResult> onNone, Func<T, TResult> onSome)
+  {
+    ArgumentNullException.ThrowIfNull(onNone);
+    ArgumentNullException.ThrowIfNull(onSome);
+    return _hasValue ? onSome(_value) : onNone();
+  }
 
-  internal static Maybe<T> None() => new(default!);
+  internal static Maybe<T> Some(T value) => new(value, true);
+
+  internal static Maybe<T> None() => new(default!, false);
 }

@@ -17,4 +17,16 @@ public class MaybeTests
     Maybe<int> maybe = None.OfType<int>();
     maybe.Should().NotBeNull();
   }
+
+  [Property]
+  public void MatchesCorrectly(int value)
+  {
+    Maybe<int> maybe = value < 0
+      ? None.OfType<int>()
+      : Some.From(value);
+
+    maybe.Match(() => -1, v => v)
+      .Should()
+      .Be(value < 0 ? -1 : value);
+  }
 }
