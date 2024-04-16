@@ -22,41 +22,46 @@ public static class PurchaseValidator
 
   private static Validated<Item> ValidateItem(string item)
   {
-    return string.IsNullOrWhiteSpace(item)
-      ? Validation.Failed<Item>(ValidationFailure.SingleFailure("Item", "EMPTY_ITEM_NAME"))
-      : Validation.Succeeded(Item.Create(item));
+    return Item.TryCreate(item)
+      .Match(
+        () => Validation.Failed<Item>(ValidationFailure.SingleFailure("Item", "EMPTY_ITEM_NAME")),
+        Validation.Succeeded);
   }
 
   private static Validated<Category> ValidateCategory(string category)
   {
-    return string.IsNullOrWhiteSpace(category)
-      ? Validation.Failed<Category>(ValidationFailure.SingleFailure("Category", "EMPTY_CATEGORY"))
-      : Validation.Succeeded(Category.Create(category));
+    return Category.TryCreate(category)
+      .Match(
+        () => Validation.Failed<Category>(ValidationFailure.SingleFailure("Category", "EMPTY_CATEGORY")),
+        Validation.Succeeded);
   }
 
   private static Validated<Quantity> ValidateQuantity(decimal quantity)
   {
-    return quantity <= 0
-      ? Validation.Failed<Quantity>(ValidationFailure.SingleFailure("Quantity", "NON_POSITIVE_QUANTITY"))
-      : Validation.Succeeded(Quantity.Create(quantity));
+    return Quantity.TryCreate(quantity)
+      .Match(
+        () => Validation.Failed<Quantity>(ValidationFailure.SingleFailure("Quantity", "NON_POSITIVE_QUANTITY")),
+        Validation.Succeeded);
   }
 
   private static Validated<Money> ValidateUnitPrice(decimal unitPrice)
   {
-    return unitPrice < 0
-      ? Validation.Failed<Money>(ValidationFailure.SingleFailure("UnitPrice", "NEGATIVE_UNIT_PRICE"))
-      : Validation.Succeeded(Money.Create(unitPrice));
+    return Money.TryCreate(unitPrice)
+      .Match(
+        () => Validation.Failed<Money>(ValidationFailure.SingleFailure("UnitPrice", "NEGATIVE_UNIT_PRICE")),
+        Validation.Succeeded);
   }
 
   private static Validated<Money> ValidateTotalDiscount(decimal? totalDiscount)
   {
-    if (totalDiscount is < 0)
+    if (!totalDiscount.HasValue)
     {
-      return Validation.Failed<Money>(ValidationFailure.SingleFailure("TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT"));
+      return Validation.Succeeded(Money.Zero);
     }
 
-    return totalDiscount.HasValue
-      ? Validation.Succeeded(Money.Create(totalDiscount.Value))
-      : Validation.Succeeded(Money.Zero);
+    return Money.TryCreate(totalDiscount.Value)
+      .Match(
+        () => Validation.Failed<Money>(ValidationFailure.SingleFailure("TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT")),
+        Validation.Succeeded);
   }
 }
