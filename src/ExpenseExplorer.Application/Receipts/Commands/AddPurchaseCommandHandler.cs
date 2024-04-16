@@ -29,9 +29,21 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
     string receiptId,
     CancellationToken cancellationToken)
   {
+    return await Id.TryCreate(receiptId)
+      .Match(
+        () => Task.FromResult(
+          Left.From<Failure, Receipt>(ValidationFailure.SingleFailure("ReceiptId", "INVALID_RECEIPT_ID"))),
+        async id => await AddPurchaseAsync(eitherFailureOrPurchase, id, cancellationToken));
+  }
+
+  private async Task<Either<Failure, Receipt>> AddPurchaseAsync(
+    Either<Failure, Purchase> eitherFailureOrPurchase,
+    Id receiptId,
+    CancellationToken cancellationToken)
+  {
     return await eitherFailureOrPurchase.Match(
       failure => Task.FromResult(Left.From<Failure, Receipt>(failure)),
-      purchase => AddPurchaseAsync(purchase, Id.Create(receiptId), cancellationToken));
+      purchase => AddPurchaseAsync(purchase, receiptId, cancellationToken));
   }
 
   private async Task<Either<Failure, Receipt>> AddPurchaseAsync(
