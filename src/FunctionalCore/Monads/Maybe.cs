@@ -35,6 +35,13 @@ public class Maybe<T>
     return Match(Maybe<TResult>.None, map);
   }
 
+  public Maybe<TResult> SelectMany<TResult, T1>(Func<T, Maybe<T1>> selector, Func<T, T1, TResult> projector)
+  {
+    ArgumentNullException.ThrowIfNull(selector);
+    ArgumentNullException.ThrowIfNull(projector);
+    return FlatMap(v => selector(v).Map(i => projector(v, i)));
+  }
+
   internal static Maybe<T> Some(T value) => new(new SomeValue(value));
 
   internal static Maybe<T> None() => new(default(NoneValue));
