@@ -27,6 +27,8 @@ public class Maybe<T>
     return Match(Maybe<TResult>.None, v => Maybe<TResult>.Some(map(v)));
   }
 
+  public Maybe<TResult> Select<TResult>(Func<T, TResult> map) => Map(map);
+
   internal static Maybe<T> Some(T value) => new(new SomeValue(value));
 
   internal static Maybe<T> None() => new(default(NoneValue));

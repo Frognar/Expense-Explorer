@@ -7,21 +7,21 @@ public class MaybeTests
   [Property]
   public void CanCreateSome(int value)
   {
-    Maybe<int> maybe = Some.From(value);
+    var maybe = Some.From(value);
     maybe.Should().NotBeNull();
   }
 
   [Fact]
   public void CanCreateNone()
   {
-    Maybe<int> maybe = None.OfType<int>();
+    var maybe = None.OfType<int>();
     maybe.Should().NotBeNull();
   }
 
   [Property]
   public void MatchesCorrectly(int value)
   {
-    Maybe<int> maybe = value < 0
+    var maybe = value < 0
       ? None.OfType<int>()
       : Some.From(value);
 
@@ -33,11 +33,27 @@ public class MaybeTests
   [Property]
   public void MapsWhenSome(int value)
   {
-    Maybe<int> maybe = value < 0
+    var maybe = value < 0
       ? None.OfType<int>()
       : Some.From(value);
 
     var projected = maybe.Map(v => v * 2);
+
+    projected.Match(() => -1, v => v)
+      .Should()
+      .Be(value < 0 ? -1 : value * 2);
+  }
+
+  [Property]
+  public void MapsWithQuerySyntax(int value)
+  {
+    var maybe = value < 0
+      ? None.OfType<int>()
+      : Some.From(value);
+
+    var projected =
+      from v in maybe
+      select v * 2;
 
     projected.Match(() => -1, v => v)
       .Should()
