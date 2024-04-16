@@ -21,46 +21,46 @@ public sealed class Either<L, R>
     return _either.Match(onLeft, onRight);
   }
 
-  public Either<L1, R> MapLeft<L1>(Func<L, L1> selector)
+  public Either<L1, R> MapLeft<L1>(Func<L, L1> map)
   {
-    ArgumentNullException.ThrowIfNull(selector);
-    return Match(left => Either<L1, R>.Left(selector(left)), Either<L1, R>.Right);
+    ArgumentNullException.ThrowIfNull(map);
+    return Match(left => Either<L1, R>.Left(map(left)), Either<L1, R>.Right);
   }
 
-  public Either<L, R1> MapRight<R1>(Func<R, R1> selector)
+  public Either<L, R1> MapRight<R1>(Func<R, R1> map)
   {
-    ArgumentNullException.ThrowIfNull(selector);
-    return Match(Either<L, R1>.Left, right => Either<L, R1>.Right(selector(right)));
+    ArgumentNullException.ThrowIfNull(map);
+    return Match(Either<L, R1>.Left, right => Either<L, R1>.Right(map(right)));
   }
 
   public Either<L, R1> Select<R1>(Func<R, R1> selector) => MapRight(selector);
 
-  public Either<L1, R1> MapBoth<L1, R1>(Func<L, L1> leftSelector, Func<R, R1> rightSelector)
+  public Either<L1, R1> MapBoth<L1, R1>(Func<L, L1> lmap, Func<R, R1> rmap)
   {
-    ArgumentNullException.ThrowIfNull(leftSelector);
-    ArgumentNullException.ThrowIfNull(rightSelector);
+    ArgumentNullException.ThrowIfNull(lmap);
+    ArgumentNullException.ThrowIfNull(rmap);
     return Match(
-      left => Either<L1, R1>.Left(leftSelector(left)),
-      right => Either<L1, R1>.Right(rightSelector(right)));
+      left => Either<L1, R1>.Left(lmap(left)),
+      right => Either<L1, R1>.Right(rmap(right)));
   }
 
-  public Either<L1, R> FlatMapLeft<L1>(Func<L, Either<L1, R>> selector)
+  public Either<L1, R> FlatMapLeft<L1>(Func<L, Either<L1, R>> map)
   {
-    ArgumentNullException.ThrowIfNull(selector);
-    return Match(selector, Either<L1, R>.Right);
+    ArgumentNullException.ThrowIfNull(map);
+    return Match(map, Either<L1, R>.Right);
   }
 
-  public Either<L, R1> FlatMapRight<R1>(Func<R, Either<L, R1>> selector)
+  public Either<L, R1> FlatMapRight<R1>(Func<R, Either<L, R1>> map)
   {
-    ArgumentNullException.ThrowIfNull(selector);
-    return Match(Either<L, R1>.Left, selector);
+    ArgumentNullException.ThrowIfNull(map);
+    return Match(Either<L, R1>.Left, map);
   }
 
-  public Either<L1, R1> FlatMapBoth<L1, R1>(Func<L, Either<L1, R1>> leftSelector, Func<R, Either<L1, R1>> rightSelector)
+  public Either<L1, R1> FlatMapBoth<L1, R1>(Func<L, Either<L1, R1>> lmap, Func<R, Either<L1, R1>> rmap)
   {
-    ArgumentNullException.ThrowIfNull(leftSelector);
-    ArgumentNullException.ThrowIfNull(rightSelector);
-    return Match(leftSelector, rightSelector);
+    ArgumentNullException.ThrowIfNull(lmap);
+    ArgumentNullException.ThrowIfNull(rmap);
+    return Match(lmap, rmap);
   }
 
   public Either<L, R1> SelectMany<R1, T>(Func<R, Either<L, T>> selector, Func<R, T, R1> projector)
