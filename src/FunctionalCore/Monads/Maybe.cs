@@ -12,4 +12,6 @@ public class Maybe<T>
   }
 
   internal static Maybe<T> Some(T value) => new(value);
+
+  internal static Maybe<T> None() => new(default!);
 }
