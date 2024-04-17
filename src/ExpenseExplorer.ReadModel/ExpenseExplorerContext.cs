@@ -9,6 +9,8 @@ public sealed class ExpenseExplorerContext(string connectionString) : DbContext
 
   public DbSet<DbReceiptHeader> ReceiptHeaders { get; set; } = default!;
 
+  public DbSet<DbPurchase> Purchases { get; set; } = default!;
+
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
     optionsBuilder.UseNpgsql(_connectionString);
