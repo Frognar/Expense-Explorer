@@ -36,6 +36,7 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
       Task task = resolvedEvent.Event.EventType switch
       {
         FactTypes.ReceiptCreatedFactType => HandleReceiptCreationAsync(resolvedEvent, stoppingToken),
+        FactTypes.PurchaseAddedFactType => HandlePurchaseAdditionAsync(resolvedEvent, stoppingToken),
         _ => Task.FromResult(() => Console.WriteLine(resolvedEvent.Event.EventType)),
       };
 
@@ -62,6 +63,23 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
     string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
     OpenNewReceiptFact receiptCreated = JsonSerializer.Deserialize<OpenNewReceiptFact>(jsonFact)!;
     CreateReceiptCommand command = new(receiptCreated.Id, receiptCreated.Store, receiptCreated.PurchaseDate);
+    await _sender.SendAsync(command, cancellationToken);
+  }
+
+  private async Task HandlePurchaseAdditionAsync(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
+  {
+    string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
+    AddPurchaseFact purchaseAdded = JsonSerializer.Deserialize<AddPurchaseFact>(jsonFact)!;
+    AddPurchaseCommand command = new(
+      purchaseAdded.ReceiptId,
+      purchaseAdded.PurchaseId,
+      purchaseAdded.Item,
+      purchaseAdded.Category,
+      purchaseAdded.Quantity,
+      purchaseAdded.UnitPrice,
+      purchaseAdded.TotalDiscount,
+      purchaseAdded.Description);
+
     await _sender.SendAsync(command, cancellationToken);
   }
 }
