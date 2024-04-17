@@ -17,5 +17,5 @@ public sealed class DbReceiptHeader(string id, string store, DateOnly purchaseDa
 
   public DateOnly PurchaseDate { get; init; } = purchaseDate;
 
-  public decimal Total { get; init; } = total;
+  public decimal Total { get; set; } = total;
 }
