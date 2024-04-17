@@ -48,6 +48,7 @@ public static class FactSerializer
     => new(
       Id.Create(simplePurchaseAdded.ReceiptId),
       Purchase.Create(
+        Id.Create(simplePurchaseAdded.PurchaseId),
         Item.Create(simplePurchaseAdded.Item),
         Category.Create(simplePurchaseAdded.Category),
         Quantity.Create(simplePurchaseAdded.Quantity),
@@ -58,6 +59,7 @@ public static class FactSerializer
   private static SimplePurchaseAdded Map(PurchaseAdded purchaseAdded)
     => new(
       purchaseAdded.ReceiptId.Value,
+      purchaseAdded.Purchase.Id.Value,
       purchaseAdded.Purchase.Item.Name,
       purchaseAdded.Purchase.Category.Name,
       purchaseAdded.Purchase.Quantity.Value,
@@ -86,6 +88,7 @@ public static class FactSerializer
 
   private sealed record SimplePurchaseAdded(
     string ReceiptId,
+    string PurchaseId,
     string Item,
     string Category,
     decimal Quantity,

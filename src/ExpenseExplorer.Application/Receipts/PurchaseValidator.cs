@@ -10,8 +10,9 @@ public static class PurchaseValidator
   public static Validated<Purchase> Validate(AddPurchaseCommand command)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Func<Item, Category, Quantity, Money, Money, Description, Purchase> createPurchase = Purchase.Create;
+    Func<Id, Item, Category, Quantity, Money, Money, Description, Purchase> createPurchase = Purchase.Create;
     return createPurchase
+      .Apply(Validation.Succeeded(Id.Unique()))
       .Apply(ValidateItem(command.Item))
       .Apply(ValidateCategory(command.Category))
       .Apply(ValidateQuantity(command.Quantity))

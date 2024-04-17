@@ -21,7 +21,7 @@ public class PurchaseTests
     Money totalDiscount,
     Description description)
   {
-    Purchase purchase = Purchase.Create(item, category, quantity, unitPrice, totalDiscount, description);
+    Purchase purchase = Purchase.Create(Id.Unique(), item, category, quantity, unitPrice, totalDiscount, description);
     purchase.Item.Should().Be(item);
     purchase.Category.Should().Be(category);
     purchase.Quantity.Should().Be(quantity);

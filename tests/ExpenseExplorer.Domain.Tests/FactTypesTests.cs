@@ -24,6 +24,7 @@ public class FactTypesTests
     Fact fact = new PurchaseAdded(
       Id.Unique(),
       Purchase.Create(
+        Id.Unique(),
         Item.Create("i"),
         Category.Create("c"),
         Quantity.Create(1),

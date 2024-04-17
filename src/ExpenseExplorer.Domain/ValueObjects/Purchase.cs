@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
 public record Purchase(
+  Id Id,
   Item Item,
   Category Category,
   Quantity Quantity,
@@ -9,6 +10,7 @@ public record Purchase(
   Description Description)
 {
   public static Purchase Create(
+    Id id,
     Item item,
     Category category,
     Quantity quantity,
@@ -17,6 +19,7 @@ public record Purchase(
     Description description)
   {
     return new Purchase(
+      id,
       item,
       category,
       quantity,

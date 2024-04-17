@@ -13,7 +13,7 @@ public static class PurchaseGenerator
         from unitPrice in MoneyGenerator.MoneyGen().Generator
         from totalDiscount in MoneyGenerator.MoneyGen().Generator
         from description in DescriptionGenerator.DescriptionGen().Generator
-        select new Purchase(item, category, quantity, unitPrice, totalDiscount, description))
+        select new Purchase(Id.Unique(), item, category, quantity, unitPrice, totalDiscount, description))
       .ToArbitrary();
   }
 }

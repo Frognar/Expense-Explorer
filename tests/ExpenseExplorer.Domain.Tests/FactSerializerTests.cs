@@ -41,6 +41,7 @@ public class FactSerializerTests
     Fact fact = new PurchaseAdded(
       Id.Create("id"),
       Purchase.Create(
+        Id.Create("pId"),
         Item.Create("i"),
         Category.Create("c"),
         Quantity.Create(1),
@@ -52,7 +53,7 @@ public class FactSerializerTests
 
     data.Should()
       .BeEquivalentTo(
-        "{\"ReceiptId\":\"id\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
+        "{\"ReceiptId\":\"id\",\"PurchaseId\":\"pId\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
           .ToArray());
   }
 
@@ -60,7 +61,7 @@ public class FactSerializerTests
   public void DeserializePurchaseAdded()
   {
     byte[] data
-      = "{\"ReceiptId\":\"id\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
+      = "{\"ReceiptId\":\"id\",\"PurchaseId\":\"pId\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
         .ToArray();
 
     Fact fact = FactSerializer.Deserialize(FactTypes.PurchaseAddedFactType, data);
