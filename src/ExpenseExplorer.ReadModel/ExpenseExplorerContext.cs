@@ -15,4 +15,14 @@ public sealed class ExpenseExplorerContext(string connectionString) : DbContext
   {
     optionsBuilder.UseNpgsql(_connectionString);
   }
+
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    ArgumentNullException.ThrowIfNull(modelBuilder);
+    modelBuilder.Entity<DbReceipt>()
+      .HasMany(r => r.Purchases)
+      .WithOne()
+      .HasForeignKey(p => p.ReceiptId)
+      .IsRequired();
+  }
 }

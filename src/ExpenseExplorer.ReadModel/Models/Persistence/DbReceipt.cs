@@ -18,4 +18,6 @@ public sealed class DbReceipt(string id, string store, DateOnly purchaseDate, de
   public DateOnly PurchaseDate { get; init; } = purchaseDate;
 
   public decimal Total { get; set; } = total;
+
+  public ICollection<DbPurchase> Purchases { get; } = new List<DbPurchase>();
 }
