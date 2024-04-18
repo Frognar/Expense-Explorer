@@ -19,6 +19,7 @@ public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(fa
 
     DateOnly today = DateOnly.FromDateTime(DateTime.Today);
     dbContext.ReceiptHeaders.Add(new DbReceiptHeader("abc", "store", today, 0));
+    dbContext.ReceiptHeaders.Add(new DbReceiptHeader("bcd", "store", today, 0));
     await dbContext.SaveChangesAsync();
   }
 
@@ -27,10 +28,12 @@ public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(fa
     return Task.CompletedTask;
   }
 
-  [Fact]
-  public async Task CanGetReceipt()
+  [Theory]
+  [InlineData("abc")]
+  [InlineData("bcd")]
+  public async Task CanGetReceipt(string id)
   {
-    HttpResponseMessage response = await Get("abc");
+    HttpResponseMessage response = await Get(id);
     response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
