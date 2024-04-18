@@ -16,6 +16,7 @@ public static class ReceiptEndpoints
   {
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/receipts");
     group.MapGet("/", GetReceiptsAsync);
+    group.MapGet("/{receiptId}", GetReceiptAsync);
     group.MapPost("/", OpenNewReceiptAsync);
     group.MapPost("/{receiptId}", AddPurchaseAsync);
     return endpointRouteBuilder;
@@ -37,6 +38,16 @@ public static class ReceiptEndpoints
     return result
       .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
+  }
+
+#pragma warning disable S1172
+  private static Task<IResult> GetReceiptAsync(
+    string receiptId,
+    ISender sender,
+    CancellationToken cancellationToken = default)
+#pragma warning restore S1172
+  {
+    return Task.FromResult(Results.Ok());
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(
