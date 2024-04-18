@@ -47,11 +47,14 @@ public static class ReceiptEndpoints
     ExpenseExplorerContext context,
 #pragma warning disable S1172
     ISender sender,
-    CancellationToken cancellationToken = default)
 #pragma warning restore S1172
+    CancellationToken cancellationToken = default)
   {
-    return await context.ReceiptHeaders.AnyAsync(r => r.Id == receiptId, cancellationToken: cancellationToken)
-      ? Results.Ok(new GetReceiptResponse(receiptId, "store", DateOnly.FromDateTime(DateTime.Today).AddDays(-1), 5))
+    var receipt = await context.ReceiptHeaders
+      .FirstOrDefaultAsync(r => r.Id == receiptId, cancellationToken: cancellationToken);
+
+    return receipt is not null
+      ? Results.Ok(new GetReceiptResponse(receipt.Id, receipt.Store, receipt.PurchaseDate, receipt.Total))
       : Results.NotFound();
   }
 

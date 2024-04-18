@@ -10,6 +10,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
+  private static readonly DateOnly _today = DateOnly.FromDateTime(DateTime.Today);
+
+  private static readonly Dictionary<string, DbReceiptHeader> _receipts = new()
+  {
+    { "abc", new DbReceiptHeader("abc", "store", _today.AddDays(-1), 5) },
+    { "bcd", new DbReceiptHeader("bcd", "store 2", _today, 1) },
+  };
+
   public async Task InitializeAsync()
   {
     IServiceScope scope = ServiceScopeFactory.CreateScope();
@@ -19,9 +27,7 @@ public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(fa
       return;
     }
 
-    DateOnly today = DateOnly.FromDateTime(DateTime.Today);
-    dbContext.ReceiptHeaders.Add(new DbReceiptHeader("abc", "store", today.AddDays(-1), 5));
-    dbContext.ReceiptHeaders.Add(new DbReceiptHeader("bcd", "store 2", today, 1));
+    await dbContext.AddRangeAsync(_receipts.Values);
     await dbContext.SaveChangesAsync();
   }
 
@@ -46,16 +52,18 @@ public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(fa
     response.StatusCode.Should().Be(HttpStatusCode.NotFound);
   }
 
-  [Fact]
-  public async Task ReturnsReceipt()
+  [Theory]
+  [InlineData("abc")]
+  [InlineData("bcd")]
+  public async Task ReturnsReceipt(string id)
   {
-    HttpResponseMessage response = await Get("abc");
+    HttpResponseMessage response = await Get(id);
     GetReceiptResponse receipt = (await response.Content.ReadFromJsonAsync<GetReceiptResponse>())!;
     receipt.Should().NotBeNull();
-    receipt.Id.Should().Be("abc");
-    receipt.Store.Should().Be("store");
-    receipt.PurchaseDate.Should().Be(DateOnly.FromDateTime(DateTime.Today));
-    receipt.Total.Should().Be(5);
+    receipt.Id.Should().Be(_receipts[id].Id);
+    receipt.Store.Should().Be(_receipts[id].Store);
+    receipt.PurchaseDate.Should().Be(_receipts[id].PurchaseDate);
+    receipt.Total.Should().Be(_receipts[id].Total);
   }
 
   private async Task<HttpResponseMessage> Get(string id)
