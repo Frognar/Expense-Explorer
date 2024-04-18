@@ -40,14 +40,14 @@ public static class ReceiptEndpoints
       .Match(Handle, Results.Ok);
   }
 
-#pragma warning disable S1172
   private static Task<IResult> GetReceiptAsync(
     string receiptId,
+#pragma warning disable S1172
     ISender sender,
     CancellationToken cancellationToken = default)
 #pragma warning restore S1172
   {
-    return Task.FromResult(Results.Ok());
+    return Task.FromResult(receiptId == "abc" ? Results.Ok() : Results.NotFound());
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(

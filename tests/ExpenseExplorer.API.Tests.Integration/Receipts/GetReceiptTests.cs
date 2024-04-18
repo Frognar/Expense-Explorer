@@ -34,4 +34,12 @@ public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(fa
     HttpResponseMessage response = await Client.GetAsync(uri);
     response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
+
+  [Fact]
+  public async Task NotFoundForUnknownReceipt()
+  {
+    Uri uri = new("api/receipts/unknown", UriKind.Relative);
+    HttpResponseMessage response = await Client.GetAsync(uri);
+    response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+  }
 }
