@@ -12,17 +12,17 @@ public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(fa
 {
   private static readonly DateOnly _today = DateOnly.FromDateTime(DateTime.Today);
 
-  private static readonly Dictionary<string, DbReceiptHeader> _receipts = new()
+  private static readonly Dictionary<string, DbReceipt> _receipts = new()
   {
-    { "abc", new DbReceiptHeader("abc", "store", _today.AddDays(-1), 5) },
-    { "bcd", new DbReceiptHeader("bcd", "store 2", _today, 1) },
+    { "abc", new DbReceipt("abc", "store", _today.AddDays(-1), 5) },
+    { "bcd", new DbReceipt("bcd", "store 2", _today, 1) },
   };
 
   public async Task InitializeAsync()
   {
     IServiceScope scope = ServiceScopeFactory.CreateScope();
     ExpenseExplorerContext dbContext = scope.ServiceProvider.GetRequiredService<ExpenseExplorerContext>();
-    if (await dbContext.ReceiptHeaders.AnyAsync())
+    if (await dbContext.Receipts.AnyAsync())
     {
       return;
     }

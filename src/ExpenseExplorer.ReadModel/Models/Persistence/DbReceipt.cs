@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
   "Performance",
   "CA1812:Avoid uninstantiated internal classes",
   Justification = "Instantiated by Entity Framework")]
-public sealed class DbReceiptHeader(string id, string store, DateOnly purchaseDate, decimal total)
+public sealed class DbReceipt(string id, string store, DateOnly purchaseDate, decimal total)
 {
   [MaxLength(64)]
   public string Id { get; init; } = id;

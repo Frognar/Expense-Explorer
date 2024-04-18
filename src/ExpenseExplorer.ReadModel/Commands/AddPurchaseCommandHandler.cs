@@ -11,7 +11,7 @@ public sealed class AddPurchaseCommandHandler(ExpenseExplorerContext context)
   public async Task<Unit> HandleAsync(AddPurchaseCommand command, CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    DbReceiptHeader? receiptHeader = _context.ReceiptHeaders.FirstOrDefault(r => r.Id == command.ReceiptId);
+    DbReceipt? receiptHeader = _context.Receipts.FirstOrDefault(r => r.Id == command.ReceiptId);
     if (receiptHeader is null)
     {
       throw new InvalidOperationException($"Receipt with id {command.ReceiptId} not found.");

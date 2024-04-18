@@ -16,7 +16,7 @@ public sealed class CreateReceiptCommandHandler(ExpenseExplorerContext context)
   public async Task<Unit> HandleAsync(CreateReceiptCommand command, CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    _context.ReceiptHeaders.Add(new DbReceiptHeader(command.Id, command.Store, command.PurchaseDate, 0));
+    _context.Receipts.Add(new DbReceipt(command.Id, command.Store, command.PurchaseDate, 0));
     await _context.SaveChangesAsync(cancellationToken);
     Console.WriteLine(command);
     return Unit.Instance;

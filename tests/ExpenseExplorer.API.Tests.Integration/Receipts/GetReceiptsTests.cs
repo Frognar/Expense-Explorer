@@ -17,16 +17,16 @@ public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   {
     IServiceScope scope = ServiceScopeFactory.CreateScope();
     ExpenseExplorerContext dbContext = scope.ServiceProvider.GetRequiredService<ExpenseExplorerContext>();
-    if (await dbContext.ReceiptHeaders.AnyAsync())
+    if (await dbContext.Receipts.AnyAsync())
     {
       return;
     }
 
-    DbReceiptHeader CreateReceiptHeader(int i)
+    DbReceipt CreateReceiptHeader(int i)
       => new(Guid.NewGuid().ToString("N"), $"store_{i}", _today.AddDays(-i % 5), (i % 10) + .5m);
 
-    IEnumerable<DbReceiptHeader> receiptHeaders = Enumerable.Range(1, _totalReceipts).Select(CreateReceiptHeader);
-    await dbContext.ReceiptHeaders.AddRangeAsync(receiptHeaders);
+    IEnumerable<DbReceipt> receiptHeaders = Enumerable.Range(1, _totalReceipts).Select(CreateReceiptHeader);
+    await dbContext.Receipts.AddRangeAsync(receiptHeaders);
     await dbContext.SaveChangesAsync();
   }
 

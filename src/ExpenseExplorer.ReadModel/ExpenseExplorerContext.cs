@@ -7,7 +7,7 @@ public sealed class ExpenseExplorerContext(string connectionString) : DbContext
 {
   private readonly string _connectionString = connectionString;
 
-  public DbSet<DbReceiptHeader> ReceiptHeaders { get; set; } = default!;
+  public DbSet<DbReceipt> Receipts { get; set; } = default!;
 
   public DbSet<DbPurchase> Purchases { get; set; } = default!;
 

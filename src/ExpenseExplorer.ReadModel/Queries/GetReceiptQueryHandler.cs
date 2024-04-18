@@ -17,7 +17,7 @@ public class GetReceiptQueryHandler(ExpenseExplorerContext context)
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(query);
-    DbReceiptHeader? receipt = await _context.ReceiptHeaders
+    DbReceipt? receipt = await _context.Receipts
       .FirstOrDefaultAsync(r => r.Id == query.ReceiptId, cancellationToken: cancellationToken);
 
     return receipt is not null

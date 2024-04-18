@@ -22,19 +22,19 @@ public class GetReceiptsQueryHandler(ExpenseExplorerContext context)
     try
     {
       ArgumentNullException.ThrowIfNull(query);
-      List<ReceiptHeaders> receipts = await _context.ReceiptHeaders.AsNoTracking()
+      List<ReceiptHeaders> receipts = await _context.Receipts.AsNoTracking()
         .Filter(
           PurchaseDateBetween(query.After, query.Before),
           TotalBetween(query.MinTotal, query.MaxTotal),
           StoreContains(query.Search))
         .OrderByMany(
-          Order.AscendingBy<DbReceiptHeader>(r => r.PurchaseDate),
-          Order.DescendingBy<DbReceiptHeader>(r => r.Id))
+          Order.AscendingBy<DbReceipt>(r => r.PurchaseDate),
+          Order.DescendingBy<DbReceipt>(r => r.Id))
         .GetPage(query.PageNumber, query.PageSize)
         .Select(r => new ReceiptHeaders(r.Id, r.Store, r.PurchaseDate, r.Total))
         .ToListAsync(cancellationToken);
 
-      int totalCount = await _context.ReceiptHeaders.CountAsync(cancellationToken);
+      int totalCount = await _context.Receipts.CountAsync(cancellationToken);
       PageOf<ReceiptHeaders> response = Page.Of(receipts, totalCount, query.PageSize, query.PageNumber);
       return Right.From<Failure, PageOf<ReceiptHeaders>>(response);
     }
@@ -44,17 +44,17 @@ public class GetReceiptsQueryHandler(ExpenseExplorerContext context)
     }
   }
 
-  private static Expression<Func<DbReceiptHeader, bool>> PurchaseDateBetween(DateOnly min, DateOnly max)
+  private static Expression<Func<DbReceipt, bool>> PurchaseDateBetween(DateOnly min, DateOnly max)
   {
     return r => r.PurchaseDate >= min && r.PurchaseDate <= max;
   }
 
-  private static Expression<Func<DbReceiptHeader, bool>> TotalBetween(decimal min, decimal max)
+  private static Expression<Func<DbReceipt, bool>> TotalBetween(decimal min, decimal max)
   {
     return r => r.Total >= min && r.Total <= max;
   }
 
-  private static Expression<Func<DbReceiptHeader, bool>> StoreContains(string search)
+  private static Expression<Func<DbReceipt, bool>> StoreContains(string search)
   {
     if (string.IsNullOrWhiteSpace(search))
     {
