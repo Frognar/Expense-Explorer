@@ -30,16 +30,20 @@ public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(fa
   [Fact]
   public async Task CanGetReceipt()
   {
-    Uri uri = new("api/receipts/abc", UriKind.Relative);
-    HttpResponseMessage response = await Client.GetAsync(uri);
+    HttpResponseMessage response = await Get("abc");
     response.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [Fact]
   public async Task NotFoundForUnknownReceipt()
   {
-    Uri uri = new("api/receipts/unknown", UriKind.Relative);
-    HttpResponseMessage response = await Client.GetAsync(uri);
+    HttpResponseMessage response = await Get("unknown");
     response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+  }
+
+  private async Task<HttpResponseMessage> Get(string id)
+  {
+    Uri uri = new($"api/receipts/{id}", UriKind.Relative);
+    return await Client.GetAsync(uri);
   }
 }
