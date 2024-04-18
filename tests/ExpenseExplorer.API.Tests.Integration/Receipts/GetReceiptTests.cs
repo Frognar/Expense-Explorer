@@ -1,6 +1,8 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
 using System.Net;
+using System.Net.Http.Json;
+using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.ReadModel;
 using ExpenseExplorer.ReadModel.Models.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -18,8 +20,8 @@ public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(fa
     }
 
     DateOnly today = DateOnly.FromDateTime(DateTime.Today);
-    dbContext.ReceiptHeaders.Add(new DbReceiptHeader("abc", "store", today, 0));
-    dbContext.ReceiptHeaders.Add(new DbReceiptHeader("bcd", "store", today, 0));
+    dbContext.ReceiptHeaders.Add(new DbReceiptHeader("abc", "store", today.AddDays(-1), 5));
+    dbContext.ReceiptHeaders.Add(new DbReceiptHeader("bcd", "store 2", today, 1));
     await dbContext.SaveChangesAsync();
   }
 
@@ -42,6 +44,18 @@ public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(fa
   {
     HttpResponseMessage response = await Get("unknown");
     response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+  }
+
+  [Fact]
+  public async Task ReturnsReceipt()
+  {
+    HttpResponseMessage response = await Get("abc");
+    GetReceiptResponse receipt = (await response.Content.ReadFromJsonAsync<GetReceiptResponse>())!;
+    receipt.Should().NotBeNull();
+    receipt.Id.Should().Be("abc");
+    receipt.Store.Should().Be("store");
+    receipt.PurchaseDate.Should().Be(DateOnly.FromDateTime(DateTime.Today));
+    receipt.Total.Should().Be(5);
   }
 
   private async Task<HttpResponseMessage> Get(string id)

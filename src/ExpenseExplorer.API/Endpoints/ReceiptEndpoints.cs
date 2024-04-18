@@ -51,7 +51,7 @@ public static class ReceiptEndpoints
 #pragma warning restore S1172
   {
     return await context.ReceiptHeaders.AnyAsync(r => r.Id == receiptId, cancellationToken: cancellationToken)
-      ? Results.Ok()
+      ? Results.Ok(new GetReceiptResponse(receiptId, "store", DateOnly.FromDateTime(DateTime.Today).AddDays(-1), 5))
       : Results.NotFound();
   }
 
