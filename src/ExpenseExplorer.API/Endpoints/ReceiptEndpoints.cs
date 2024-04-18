@@ -6,11 +6,9 @@ using CommandHub;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
 using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.ReadModel;
 using ExpenseExplorer.ReadModel.Queries;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
-using Microsoft.EntityFrameworkCore;
 
 public static class ReceiptEndpoints
 {
@@ -44,18 +42,11 @@ public static class ReceiptEndpoints
 
   private static async Task<IResult> GetReceiptAsync(
     string receiptId,
-    ExpenseExplorerContext context,
-#pragma warning disable S1172
     ISender sender,
-#pragma warning restore S1172
     CancellationToken cancellationToken = default)
   {
-    var receipt = await context.ReceiptHeaders
-      .FirstOrDefaultAsync(r => r.Id == receiptId, cancellationToken: cancellationToken);
-
-    return receipt is not null
-      ? Results.Ok(new GetReceiptResponse(receipt.Id, receipt.Store, receipt.PurchaseDate, receipt.Total))
-      : Results.NotFound();
+    var result = await sender.SendAsync(new GetReceiptQuery(receiptId), cancellationToken);
+    return result.Match(Handle, r => Results.Ok(new GetReceiptResponse(r.Id, r.Store, r.PurchaseDate, r.Total)));
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(
