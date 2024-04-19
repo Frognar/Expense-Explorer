@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.ReadModel.Queries;
 
+using System.Linq.Expressions;
 using CommandHub.Queries;
 using ExpenseExplorer.ReadModel.Models;
 using ExpenseExplorer.ReadModel.Models.Persistence;
@@ -10,6 +11,16 @@ using Microsoft.EntityFrameworkCore;
 public class GetReceiptQueryHandler(ExpenseExplorerContext context)
   : IQueryHandler<GetReceiptQuery, Either<Failure, Receipt>>
 {
+  private static readonly Expression<Func<DbReceipt, Receipt>> _receiptSelector = r =>
+    new Receipt(
+      r.Id,
+      r.Store,
+      r.PurchaseDate,
+      r.Total,
+      r.Purchases.Select(
+        p =>
+          new Purchase(p.PurchaseId, p.Item, p.Category, p.Quantity, p.UnitPrice, p.TotalDiscount, p.Description)));
+
   private readonly ExpenseExplorerContext _context = context;
 
   public async Task<Either<Failure, Receipt>> HandleAsync(
@@ -17,26 +28,13 @@ public class GetReceiptQueryHandler(ExpenseExplorerContext context)
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(query);
-    DbReceipt? receipt = await _context.Receipts
-      .Include(r => r.Purchases)
-      .FirstOrDefaultAsync(r => r.Id == query.ReceiptId, cancellationToken: cancellationToken);
+    Receipt? receipt = await _context.Receipts
+      .Where(r => r.Id == query.ReceiptId)
+      .Select(_receiptSelector)
+      .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
     return receipt is not null
-      ? Right.From<Failure, Receipt>(
-        new Receipt(
-          receipt.Id,
-          receipt.Store,
-          receipt.PurchaseDate,
-          receipt.Total,
-          receipt.Purchases.Select(
-            p => new Purchase(
-              p.PurchaseId,
-              p.Item,
-              p.Category,
-              p.Quantity,
-              p.UnitPrice,
-              p.TotalDiscount,
-              p.Description))))
+      ? Right.From<Failure, Receipt>(receipt)
       : Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found.", query.ReceiptId));
   }
 }
