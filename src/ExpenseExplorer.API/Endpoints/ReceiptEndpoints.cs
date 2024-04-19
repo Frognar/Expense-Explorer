@@ -45,8 +45,27 @@ public static class ReceiptEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    var result = await sender.SendAsync(new GetReceiptQuery(receiptId), cancellationToken);
-    return result.Match(Handle, r => Results.Ok(new GetReceiptResponse(r.Id, r.Store, r.PurchaseDate, r.Total)));
+    Either<Failure, ReadModel.Models.Receipt> result = await sender.SendAsync(
+      new GetReceiptQuery(receiptId),
+      cancellationToken);
+
+    return result.Match(
+      Handle,
+      r => Results.Ok(
+        new GetReceiptResponse(
+          r.Id,
+          r.Store,
+          r.PurchaseDate,
+          r.Total,
+          r.Purchases.Select(
+            p => new GetReceiptPurchaseResponse(
+              p.Id,
+              p.Item,
+              p.Category,
+              p.Quantity,
+              p.UnitPrice,
+              p.TotalDiscount,
+              p.Description)))));
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(

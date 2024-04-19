@@ -2,8 +2,8 @@ namespace ExpenseExplorer.API.Mappers;
 
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.Application.Receipts.Commands;
+using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
-using ExpenseExplorer.ReadModel.Models;
 
 public static class ReceiptMapper
 {
@@ -26,7 +26,7 @@ public static class ReceiptMapper
       request.Description);
   }
 
-  public static GetReceiptsResponse MapToResponse(this PageOf<ReceiptHeaders> page)
+  public static GetReceiptsResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.ReceiptHeaders> page)
   {
     ArgumentNullException.ThrowIfNull(page);
     return new GetReceiptsResponse(
@@ -37,7 +37,7 @@ public static class ReceiptMapper
       page.PageCount);
   }
 
-  public static ReceiptResponse MapToResponse(this Domain.Receipts.Receipt receipt)
+  public static ReceiptResponse MapToResponse(this Receipt receipt)
   {
     ArgumentNullException.ThrowIfNull(receipt);
     return new ReceiptResponse(

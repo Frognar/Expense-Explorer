@@ -18,10 +18,25 @@ public class GetReceiptQueryHandler(ExpenseExplorerContext context)
   {
     ArgumentNullException.ThrowIfNull(query);
     DbReceipt? receipt = await _context.Receipts
+      .Include(r => r.Purchases)
       .FirstOrDefaultAsync(r => r.Id == query.ReceiptId, cancellationToken: cancellationToken);
 
     return receipt is not null
-      ? Right.From<Failure, Receipt>(new Receipt(receipt.Id, receipt.Store, receipt.PurchaseDate, receipt.Total))
+      ? Right.From<Failure, Receipt>(
+        new Receipt(
+          receipt.Id,
+          receipt.Store,
+          receipt.PurchaseDate,
+          receipt.Total,
+          receipt.Purchases.Select(
+            p => new Purchase(
+              p.PurchaseId,
+              p.Item,
+              p.Category,
+              p.Quantity,
+              p.UnitPrice,
+              p.TotalDiscount,
+              p.Description))))
       : Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found.", query.ReceiptId));
   }
 }
