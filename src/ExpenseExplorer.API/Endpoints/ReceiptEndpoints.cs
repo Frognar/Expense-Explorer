@@ -49,23 +49,7 @@ public static class ReceiptEndpoints
       new GetReceiptQuery(receiptId),
       cancellationToken);
 
-    return result.Match(
-      Handle,
-      r => Results.Ok(
-        new GetReceiptResponse(
-          r.Id,
-          r.Store,
-          r.PurchaseDate,
-          r.Total,
-          r.Purchases.Select(
-            p => new GetReceiptPurchaseResponse(
-              p.Id,
-              p.Item,
-              p.Category,
-              p.Quantity,
-              p.UnitPrice,
-              p.TotalDiscount,
-              p.Description)))));
+    return result.Match(Handle, r => Results.Ok(r.MapToResponse()));
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(
