@@ -5,10 +5,11 @@ using System.Net;
 using CommandHub;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
-using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.ReadModel.Models;
 using ExpenseExplorer.ReadModel.Queries;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
+using Receipt = ExpenseExplorer.Domain.Receipts.Receipt;
 
 public static class ReceiptEndpoints
 {
@@ -34,7 +35,7 @@ public static class ReceiptEndpoints
     CancellationToken cancellationToken = default)
   {
     GetReceiptsQuery query = new(pageSize, pageNumber, search, after, before, minTotal, maxTotal);
-    var result = await sender.SendAsync(query, cancellationToken);
+    Either<Failure, PageOf<ReceiptHeaders>> result = await sender.SendAsync(query, cancellationToken);
     return result
       .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
@@ -45,11 +46,11 @@ public static class ReceiptEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    Either<Failure, ReadModel.Models.Receipt> result = await sender.SendAsync(
-      new GetReceiptQuery(receiptId),
-      cancellationToken);
-
-    return result.Match(Handle, r => Results.Ok(r.MapToResponse()));
+    GetReceiptQuery query = new(receiptId);
+    Either<Failure, ReadModel.Models.Receipt> result = await sender.SendAsync(query, cancellationToken);
+    return result
+      .MapRight(r => r.MapToResponse())
+      .Match(Handle, Results.Ok);
   }
 
   private static async Task<IResult> OpenNewReceiptAsync(
