@@ -1,7 +1,7 @@
 namespace ExpenseExplorer.API.Contract;
 
 public record PurchaseResponse(
-  int Index,
+  string Id,
   string Item,
   string Category,
   decimal Quantity,

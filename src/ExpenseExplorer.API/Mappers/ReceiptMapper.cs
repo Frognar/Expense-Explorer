@@ -37,11 +37,11 @@ public static class ReceiptMapper
       receipt.Version.Value);
   }
 
-  private static PurchaseResponse MapToResponse(this Purchase purchase, int index)
+  private static PurchaseResponse MapToResponse(this Purchase purchase)
   {
     ArgumentNullException.ThrowIfNull(purchase);
     return new PurchaseResponse(
-      index + 1,
+      purchase.Id.Value,
       purchase.Item.Name,
       purchase.Category.Name,
       purchase.Quantity.Value,
