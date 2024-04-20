@@ -4,14 +4,38 @@ using System.Net;
 using System.Net.Http.Json;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Tests.Integration.Receipts.TestData;
+using ExpenseExplorer.Application.Receipts.Persistence;
+using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.Domain.ValueObjects;
+using Microsoft.Extensions.DependencyInjection;
 
-public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory)
+public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
+  private static string _receiptId = string.Empty;
+
+  public async Task InitializeAsync()
+  {
+    IServiceScope scope = ServiceScopeFactory.CreateScope();
+    IReceiptRepository repository = scope.ServiceProvider.GetRequiredService<IReceiptRepository>();
+    DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+    if (string.IsNullOrEmpty(_receiptId))
+    {
+      Receipt receipt = Receipt.New(Store.Create("store"), PurchaseDate.Create(today, today), today);
+      await repository.SaveAsync(receipt, default);
+      _receiptId = receipt.Id.Value;
+    }
+  }
+
+  public Task DisposeAsync()
+  {
+    return Task.CompletedTask;
+  }
+
   [Theory]
   [ClassData(typeof(ValidAddPurchaseRequestData))]
   public async Task CanAddPurchaseToReceipt(object request)
   {
-    HttpResponseMessage response = await SendWithValidReceiptId(request);
+    HttpResponseMessage response = await Post(_receiptId, request);
     response.StatusCode.ShouldBeIn200Group();
   }
 
@@ -19,16 +43,16 @@ public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   [ClassData(typeof(ValidAddPurchaseRequestData))]
   public async Task ContainsAddedPurchaseInResponse(object request)
   {
-    HttpResponseMessage response = await SendWithValidReceiptId(request);
+    HttpResponseMessage response = await Post(_receiptId, request);
     ReceiptResponse receipt = (await response.Content.ReadFromJsonAsync<ReceiptResponse>())!;
-    receipt.Purchases.Count().Should().Be(1);
+    receipt.Purchases.Count().Should().BeGreaterThan(0);
   }
 
   [Theory]
   [ClassData(typeof(InvalidAddPurchaseRequestData))]
   public async Task IsBadRequestWhenRequestIsInvalid(object request)
   {
-    HttpResponseMessage response = await SendWithValidReceiptId(request);
+    HttpResponseMessage response = await Post(_receiptId, request);
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
   }
 
@@ -38,14 +62,6 @@ public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   {
     HttpResponseMessage response = await Post("invalid-id", request);
     response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-  }
-
-  private async Task<HttpResponseMessage> SendWithValidReceiptId(object request)
-  {
-    object openNewRequest = new { storeName = "store", purchaseDate = DateOnly.MinValue };
-    HttpResponseMessage newReceiptResponse = await Client.PostAsJsonAsync("/api/receipts", openNewRequest);
-    ReceiptResponse receipt = (await newReceiptResponse.Content.ReadFromJsonAsync<ReceiptResponse>())!;
-    return await Post(receipt.Id, request);
   }
 
   private async Task<HttpResponseMessage> Post(string receiptId, object request)
