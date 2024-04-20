@@ -44,7 +44,7 @@ public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   public async Task ContainsAddedPurchaseInResponse(object request)
   {
     HttpResponseMessage response = await Post(_receiptId, request);
-    ReceiptResponse receipt = (await response.Content.ReadFromJsonAsync<ReceiptResponse>())!;
+    AddPurchaseResponse receipt = (await response.Content.ReadFromJsonAsync<AddPurchaseResponse>())!;
     receipt.Purchases.Count().Should().BeGreaterThan(0);
   }
 

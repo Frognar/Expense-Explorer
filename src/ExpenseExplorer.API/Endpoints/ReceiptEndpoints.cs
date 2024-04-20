@@ -63,7 +63,7 @@ public static class ReceiptEndpoints
     DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
     Either<Failure, Receipt> result = await sender.SendAsync(request.MapToCommand(today), cancellationToken);
     return result
-      .MapRight(r => r.MapToResponse())
+      .MapRight(r => r.MapTo<OpenNewReceiptResponse>())
       .Match(Handle, Results.Ok);
   }
 
@@ -81,7 +81,7 @@ public static class ReceiptEndpoints
   {
     Either<Failure, Receipt> result = await sender.SendAsync(request.MapToCommand(receiptId), cancellationToken);
     return result
-      .MapRight(r => r.MapToResponse())
+      .MapRight(r => r.MapTo<AddPurchaseResponse>())
       .Match(Handle, Results.Ok);
   }
 

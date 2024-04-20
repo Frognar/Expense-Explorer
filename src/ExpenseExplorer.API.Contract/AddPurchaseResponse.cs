@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.API.Contract;
 
-public record ReceiptResponse(
+public record AddPurchaseResponse(
   string Id,
   string StoreName,
   DateOnly PurchaseDate,

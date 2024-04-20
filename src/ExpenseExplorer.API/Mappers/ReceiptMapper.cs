@@ -26,14 +26,23 @@ public static class ReceiptMapper
       request.Description);
   }
 
-  public static ReceiptResponse MapToResponse(this Receipt receipt)
+  public static TResult MapTo<TResult>(this Receipt receipt)
   {
     ArgumentNullException.ThrowIfNull(receipt);
-    return new ReceiptResponse(
+    if (typeof(TResult) == typeof(AddPurchaseResponse))
+    {
+      return (TResult)(object)new AddPurchaseResponse(
+        receipt.Id.Value,
+        receipt.Store.Name,
+        receipt.PurchaseDate.Date,
+        receipt.Purchases.Select(MapToResponse),
+        receipt.Version.Value);
+    }
+
+    return (TResult)(object)new OpenNewReceiptResponse(
       receipt.Id.Value,
       receipt.Store.Name,
       receipt.PurchaseDate.Date,
-      receipt.Purchases.Select(MapToResponse),
       receipt.Version.Value);
   }
 
