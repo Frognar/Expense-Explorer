@@ -19,6 +19,7 @@ public static class ReceiptEndpoints
     group.MapGet("/", GetReceiptsAsync);
     group.MapGet("/{receiptId}", GetReceiptAsync);
     group.MapPost("/", OpenNewReceiptAsync);
+    group.MapPatch("/{receiptId}", UpdateReceiptAsync);
     group.MapPost("/{receiptId}/purchases", AddPurchaseAsync);
     return endpointRouteBuilder;
   }
@@ -64,6 +65,12 @@ public static class ReceiptEndpoints
     return result
       .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
+  }
+
+  private static Task<IResult> UpdateReceiptAsync(
+    string receiptId)
+  {
+    return Task.FromResult(Results.Ok(receiptId));
   }
 
   private static async Task<IResult> AddPurchaseAsync(
