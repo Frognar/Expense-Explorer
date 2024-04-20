@@ -44,6 +44,14 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
     response.Should().NotBeNull();
   }
 
+  [Fact]
+  public async Task CanUpdateReceiptWithNewStoreName()
+  {
+    HttpResponseMessage message = await Patch(_receiptId, new { storeName = "new store" });
+    UpdateReceiptResponse response = (await message.Content.ReadFromJsonAsync<UpdateReceiptResponse>())!;
+    response.StoreName.Should().Be("new store");
+  }
+
   private async Task<HttpResponseMessage> Patch(string receiptId, object request)
   {
     Uri uri = new($"/api/receipts/{receiptId}");

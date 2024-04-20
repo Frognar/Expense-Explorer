@@ -68,9 +68,10 @@ public static class ReceiptEndpoints
   }
 
   private static Task<IResult> UpdateReceiptAsync(
-    string receiptId)
+    string receiptId,
+    UpdateReceiptRequest request)
   {
-    return Task.FromResult(Results.Ok(new UpdateReceiptResponse(receiptId)));
+    return Task.FromResult(Results.Ok(new UpdateReceiptResponse(receiptId, request.StoreName ?? string.Empty)));
   }
 
   private static async Task<IResult> AddPurchaseAsync(
