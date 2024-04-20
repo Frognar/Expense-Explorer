@@ -3,6 +3,7 @@ namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 using System.Net;
 using System.Net.Http.Json;
 using ExpenseExplorer.API.Contract;
+using ExpenseExplorer.API.Contract.ReadModel;
 using ExpenseExplorer.ReadModel;
 using ExpenseExplorer.ReadModel.Models.Persistence;
 using Microsoft.EntityFrameworkCore;

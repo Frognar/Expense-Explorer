@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.API.Contract;
+namespace ExpenseExplorer.API.Contract.ReadModel;
 
 public record GetReceiptResponse(
   string Id,
