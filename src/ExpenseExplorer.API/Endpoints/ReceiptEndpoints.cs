@@ -70,7 +70,7 @@ public static class ReceiptEndpoints
   private static Task<IResult> UpdateReceiptAsync(
     string receiptId)
   {
-    return Task.FromResult(Results.Ok(receiptId));
+    return Task.FromResult(Results.Ok(new UpdateReceiptResponse(receiptId)));
   }
 
   private static async Task<IResult> AddPurchaseAsync(

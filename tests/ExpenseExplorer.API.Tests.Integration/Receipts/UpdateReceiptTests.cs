@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
 using System.Net.Http.Json;
+using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
@@ -34,5 +35,14 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
     Uri uri = new($"/api/receipts/{_receiptId}");
     HttpResponseMessage response = await Client.PatchAsJsonAsync(uri, new { });
     response.StatusCode.ShouldBeIn200Group();
+  }
+
+  [Fact]
+  public async Task ContainsUpdatedReceiptInResponse()
+  {
+    Uri uri = new($"/api/receipts/{_receiptId}");
+    HttpResponseMessage response = await Client.PatchAsJsonAsync(uri, new { });
+    UpdateReceiptResponse addPurchase = (await response.Content.ReadFromJsonAsync<UpdateReceiptResponse>())!;
+    addPurchase.Should().NotBeNull();
   }
 }
