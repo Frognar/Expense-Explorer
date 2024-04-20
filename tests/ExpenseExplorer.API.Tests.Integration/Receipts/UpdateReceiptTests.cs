@@ -32,17 +32,21 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
   [Fact]
   public async Task CanUpdateReceipt()
   {
-    Uri uri = new($"/api/receipts/{_receiptId}");
-    HttpResponseMessage response = await Client.PatchAsJsonAsync(uri, new { });
-    response.StatusCode.ShouldBeIn200Group();
+    HttpResponseMessage message = await Patch(_receiptId, new { });
+    message.StatusCode.ShouldBeIn200Group();
   }
 
   [Fact]
   public async Task ContainsUpdatedReceiptInResponse()
   {
-    Uri uri = new($"/api/receipts/{_receiptId}");
-    HttpResponseMessage response = await Client.PatchAsJsonAsync(uri, new { });
-    UpdateReceiptResponse addPurchase = (await response.Content.ReadFromJsonAsync<UpdateReceiptResponse>())!;
-    addPurchase.Should().NotBeNull();
+    HttpResponseMessage message = await Patch(_receiptId, new { });
+    UpdateReceiptResponse response = (await message.Content.ReadFromJsonAsync<UpdateReceiptResponse>())!;
+    response.Should().NotBeNull();
+  }
+
+  private async Task<HttpResponseMessage> Patch(string receiptId, object request)
+  {
+    Uri uri = new($"/api/receipts/{receiptId}");
+    return await Client.PatchAsJsonAsync(uri, request);
   }
 }
