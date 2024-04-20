@@ -19,7 +19,7 @@ public static class ReceiptEndpoints
     group.MapGet("/", GetReceiptsAsync);
     group.MapGet("/{receiptId}", GetReceiptAsync);
     group.MapPost("/", OpenNewReceiptAsync);
-    group.MapPost("/{receiptId}", AddPurchaseAsync);
+    group.MapPost("/{receiptId}/purchases", AddPurchaseAsync);
     return endpointRouteBuilder;
   }
 

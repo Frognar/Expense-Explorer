@@ -1,6 +1,5 @@
 namespace ExpenseExplorer.API.Mappers;
 
-using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Contract.ReadModel;
 
 public static class ReadModelReceiptMapper

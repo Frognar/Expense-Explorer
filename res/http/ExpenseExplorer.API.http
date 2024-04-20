@@ -19,7 +19,7 @@ Content-Type: application/json
 
 ###
 
-POST {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}
+POST {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}/purchases
 Content-Type: application/json
 
 {

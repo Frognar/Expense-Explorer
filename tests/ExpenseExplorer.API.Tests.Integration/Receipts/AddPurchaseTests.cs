@@ -36,7 +36,7 @@ public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   [ClassData(typeof(ValidAddPurchaseRequestData))]
   public async Task IsNotFoundWhenReceiptIdIsInvalid(object request)
   {
-    HttpResponseMessage response = await Client.PostAsJsonAsync("/api/receipts/invalid-id", request);
+    HttpResponseMessage response = await Post("invalid-id", request);
     response.StatusCode.Should().Be(HttpStatusCode.NotFound);
   }
 
@@ -45,6 +45,11 @@ public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
     object openNewRequest = new { storeName = "store", purchaseDate = DateOnly.MinValue };
     HttpResponseMessage newReceiptResponse = await Client.PostAsJsonAsync("/api/receipts", openNewRequest);
     ReceiptResponse receipt = (await newReceiptResponse.Content.ReadFromJsonAsync<ReceiptResponse>())!;
-    return await Client.PostAsJsonAsync($"/api/receipts/{receipt.Id}", request);
+    return await Post(receipt.Id, request);
+  }
+
+  private async Task<HttpResponseMessage> Post(string receiptId, object request)
+  {
+    return await Client.PostAsJsonAsync($"/api/receipts/{receiptId}/purchases", request);
   }
 }
