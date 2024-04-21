@@ -71,7 +71,9 @@ public static class ReceiptEndpoints
     string receiptId,
     UpdateReceiptRequest request)
   {
-    return Task.FromResult(Results.Ok(new UpdateReceiptResponse(receiptId, request.StoreName ?? string.Empty, 1)));
+    return Task.FromResult(
+      Results.Ok(
+        new UpdateReceiptResponse(receiptId, request.StoreName ?? string.Empty, new DateOnly(2024, 4, 21), 1)));
   }
 
   private static async Task<IResult> AddPurchaseAsync(

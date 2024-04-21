@@ -10,15 +10,15 @@ using Microsoft.Extensions.DependencyInjection;
 public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
   private static string _receiptId = string.Empty;
+  private readonly DateOnly _today = DateOnly.FromDateTime(DateTime.Today);
 
   public async Task InitializeAsync()
   {
     IServiceScope scope = ServiceScopeFactory.CreateScope();
     IReceiptRepository repository = scope.ServiceProvider.GetRequiredService<IReceiptRepository>();
-    DateOnly today = DateOnly.FromDateTime(DateTime.Today);
     if (string.IsNullOrEmpty(_receiptId))
     {
-      Receipt receipt = Receipt.New(Store.Create("store"), PurchaseDate.Create(today, today), today);
+      Receipt receipt = Receipt.New(Store.Create("store"), PurchaseDate.Create(_today, _today), _today);
       await repository.SaveAsync(receipt, default);
       _receiptId = receipt.Id.Value;
     }
@@ -49,7 +49,9 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
   {
     HttpResponseMessage message = await Patch(_receiptId, new { storeName = "new store" });
     UpdateReceiptResponse response = (await message.Content.ReadFromJsonAsync<UpdateReceiptResponse>())!;
+    response.Id.Should().Be(_receiptId);
     response.StoreName.Should().Be("new store");
+    response.PurchaseDate.Should().Be(_today);
     response.Version.Should().Be(1);
   }
 
