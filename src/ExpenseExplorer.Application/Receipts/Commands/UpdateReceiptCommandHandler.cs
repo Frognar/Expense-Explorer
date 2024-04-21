@@ -17,17 +17,28 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Either<Failure, Receipt> eitherFailureOrReceipt = await Id.TryCreate(command.ReceiptId)
+    Either<Failure, Receipt> eitherFailureOrReceipt = await GetReceiptAsync(command.ReceiptId, cancellationToken);
+    eitherFailureOrReceipt = eitherFailureOrReceipt.MapRight(CorrectStoreIfNotEmpty(command.StoreName));
+    eitherFailureOrReceipt = await SaveAsync(eitherFailureOrReceipt, cancellationToken);
+    return eitherFailureOrReceipt;
+  }
+
+  private static Func<Receipt, Receipt> CorrectStoreIfNotEmpty(string? storeName)
+  {
+    return receipt => CorrectStoreIfNotEmpty(receipt, storeName ?? string.Empty);
+  }
+
+  private static Receipt CorrectStoreIfNotEmpty(Receipt receipt, string storeName)
+  {
+    return Store.TryCreate(storeName).Match(() => receipt, receipt.CorrectStore);
+  }
+
+  private async Task<Either<Failure, Receipt>> GetReceiptAsync(string receiptId, CancellationToken cancellationToken)
+  {
+    return await Id.TryCreate(receiptId)
       .Match(
         () => Task.FromResult(Left.From<Failure, Receipt>(CommonFailures.InvalidReceiptId)),
-        async receiptId => await Store.TryCreate(command.StoreName ?? string.Empty)
-          .Match(
-            async () => await _receiptRepository.GetAsync(receiptId, cancellationToken),
-            async store
-              => (await _receiptRepository.GetAsync(receiptId, cancellationToken))
-              .MapRight(r => r.CorrectStore(store))));
-
-    return await SaveAsync(eitherFailureOrReceipt, cancellationToken);
+        id => _receiptRepository.GetAsync(id, cancellationToken));
   }
 
   private async Task<Either<Failure, Receipt>> SaveAsync(
@@ -41,7 +52,7 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
 
   private async Task<Either<Failure, Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
-    var eitherFailureOrVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
+    Either<Failure, Version> eitherFailureOrVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
     return eitherFailureOrVersion.MapRight(v => receipt.WithVersion(v).ClearChanges());
   }
 }
