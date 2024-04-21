@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
+using System.Diagnostics;
 using System.Net.Http.Json;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.Application.Receipts.Persistence;
@@ -39,20 +40,44 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
   [Fact]
   public async Task ContainsUpdatedReceiptInResponse()
   {
-    HttpResponseMessage message = await Patch(_receiptId, new { });
-    UpdateReceiptResponse response = (await message.Content.ReadFromJsonAsync<UpdateReceiptResponse>())!;
+    UpdateReceiptResponse response = await PatchReceipt(_receiptId, new { });
     response.Should().NotBeNull();
   }
 
   [Fact]
   public async Task CanUpdateReceiptWithNewStoreName()
   {
-    HttpResponseMessage message = await Patch(_receiptId, new { storeName = "new store" });
-    UpdateReceiptResponse response = (await message.Content.ReadFromJsonAsync<UpdateReceiptResponse>())!;
+    UpdateReceiptResponse response = await PatchReceipt(_receiptId, new { storeName = "new store" });
     response.Id.Should().Be(_receiptId);
     response.StoreName.Should().Be("new store");
     response.PurchaseDate.Should().Be(_today);
     response.Version.Should().Be(1);
+  }
+
+  [Fact]
+  public async Task DontUpdateReceiptWhenNoChanges()
+  {
+    Receipt receipt = await GetReceiptFromDb();
+
+    UpdateReceiptResponse response = await PatchReceipt(_receiptId, new { });
+
+    response.StoreName.Should().Be(receipt.Store.Name);
+    response.PurchaseDate.Should().Be(receipt.PurchaseDate.Date);
+    response.Version.Should().Be(receipt.Version.Value);
+  }
+
+  private async Task<Receipt> GetReceiptFromDb()
+  {
+    IServiceScope scope = ServiceScopeFactory.CreateScope();
+    IReceiptRepository repository = scope.ServiceProvider.GetRequiredService<IReceiptRepository>();
+    return (await repository.GetAsync(Id.Create(_receiptId), default))
+      .Match(_ => throw new UnreachableException(), r => r);
+  }
+
+  private async Task<UpdateReceiptResponse> PatchReceipt(string receiptId, object request)
+  {
+    HttpResponseMessage message = await Patch(receiptId, request);
+    return (await message.Content.ReadFromJsonAsync<UpdateReceiptResponse>())!;
   }
 
   private async Task<HttpResponseMessage> Patch(string receiptId, object request)
