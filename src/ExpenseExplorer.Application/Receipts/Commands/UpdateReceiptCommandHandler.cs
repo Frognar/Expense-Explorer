@@ -19,8 +19,7 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
     ArgumentNullException.ThrowIfNull(command);
     Either<Failure, Receipt> eitherFailureOrReceipt = await Id.TryCreate(command.ReceiptId)
       .Match(
-        () => Task.FromResult(
-          Left.From<Failure, Receipt>(ValidationFailure.SingleFailure("ReceiptId", "INVALID_RECEIPT_ID"))),
+        () => Task.FromResult(Left.From<Failure, Receipt>(CommonFailures.InvalidReceiptId)),
         async receiptId => await Store.TryCreate(command.StoreName ?? string.Empty)
           .Match(
             async () => await _receiptRepository.GetAsync(receiptId, cancellationToken),
