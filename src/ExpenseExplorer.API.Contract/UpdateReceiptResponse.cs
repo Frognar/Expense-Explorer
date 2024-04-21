@@ -1,3 +1,3 @@
 namespace ExpenseExplorer.API.Contract;
 
-public record UpdateReceiptResponse(string Id, string StoreName);
+public record UpdateReceiptResponse(string Id, string StoreName, ulong Version);

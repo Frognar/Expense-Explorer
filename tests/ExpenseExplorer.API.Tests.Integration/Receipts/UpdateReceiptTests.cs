@@ -50,6 +50,7 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
     HttpResponseMessage message = await Patch(_receiptId, new { storeName = "new store" });
     UpdateReceiptResponse response = (await message.Content.ReadFromJsonAsync<UpdateReceiptResponse>())!;
     response.StoreName.Should().Be("new store");
+    response.Version.Should().Be(1);
   }
 
   private async Task<HttpResponseMessage> Patch(string receiptId, object request)
