@@ -5,6 +5,7 @@ using System.Net;
 using CommandHub;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
+using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.ReadModel.Models;
 using ExpenseExplorer.ReadModel.Queries;
 using FunctionalCore.Failures;
@@ -67,13 +68,17 @@ public static class ReceiptEndpoints
       .Match(Handle, Results.Ok);
   }
 
-  private static Task<IResult> UpdateReceiptAsync(
+  private static async Task<IResult> UpdateReceiptAsync(
     string receiptId,
-    UpdateReceiptRequest request)
+    UpdateReceiptRequest request,
+    ISender sender,
+    CancellationToken cancellationToken)
   {
-    return Task.FromResult(
-      Results.Ok(
-        new UpdateReceiptResponse(receiptId, request.StoreName ?? string.Empty, new DateOnly(2024, 4, 21), 1)));
+    UpdateReceiptCommand command = new(receiptId, request.StoreName);
+    Either<Failure, Receipt> result = await sender.SendAsync(command, cancellationToken);
+    return result
+      .MapRight(r => new UpdateReceiptResponse(r.Id.Value, r.Store.Name, r.PurchaseDate.Date, r.Version.Value))
+      .Match(Handle, Results.Ok);
   }
 
   private static async Task<IResult> AddPurchaseAsync(
