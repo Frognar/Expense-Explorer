@@ -23,9 +23,9 @@ public class ReceiptTests
     Receipt receipt = Receipt.New(store, purchaseDate, TodayDateOnly);
     receipt.UnsavedChanges.Count().Should().Be(1);
     ReceiptCreated receiptCreated = receipt.UnsavedChanges.OfType<ReceiptCreated>().Single();
-    receiptCreated.Id.Should().Be(receipt.Id);
-    receiptCreated.Store.Should().Be(receipt.Store);
-    receiptCreated.PurchaseDate.Should().Be(receipt.PurchaseDate);
+    receiptCreated.Id.Should().Be(receipt.Id.Value);
+    receiptCreated.Store.Should().Be(receipt.Store.Name);
+    receiptCreated.PurchaseDate.Should().Be(receipt.PurchaseDate.Date);
   }
 
   [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(StoreGenerator)])]
@@ -43,8 +43,8 @@ public class ReceiptTests
   {
     receipt = receipt.CorrectStore(newStore);
     StoreCorrected storeCorrected = receipt.UnsavedChanges.OfType<StoreCorrected>().Single();
-    storeCorrected.ReceiptId.Should().Be(receipt.Id);
-    storeCorrected.Store.Should().Be(receipt.Store);
+    storeCorrected.ReceiptId.Should().Be(receipt.Id.Value);
+    storeCorrected.Store.Should().Be(receipt.Store.Name);
   }
 
   [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(StoreGenerator)])]
@@ -73,8 +73,15 @@ public class ReceiptTests
   {
     receipt = receipt.AddPurchase(purchase);
     PurchaseAdded purchaseAdded = receipt.UnsavedChanges.OfType<PurchaseAdded>().Single();
-    purchaseAdded.ReceiptId.Should().Be(receipt.Id);
-    purchaseAdded.Purchase.Should().Be(receipt.Purchases.Last());
+    purchaseAdded.ReceiptId.Should().Be(receipt.Id.Value);
+    Purchase last = receipt.Purchases.Last();
+    purchaseAdded.PurchaseId.Should().Be(last.Id.Value);
+    purchaseAdded.Item.Should().Be(last.Item.Name);
+    purchaseAdded.Category.Should().Be(last.Category.Name);
+    purchaseAdded.Quantity.Should().Be(last.Quantity.Value);
+    purchaseAdded.UnitPrice.Should().Be(last.UnitPrice.Value);
+    purchaseAdded.TotalDiscount.Should().Be(last.TotalDiscount.Value);
+    purchaseAdded.Description.Should().Be(last.Description.Value);
   }
 
   [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(PurchaseDateGenerator)])]
@@ -92,8 +99,8 @@ public class ReceiptTests
   {
     receipt = receipt.ChangePurchaseDate(newPurchaseDate, newPurchaseDate.Date);
     PurchaseDateChanged purchaseDateChanged = receipt.UnsavedChanges.OfType<PurchaseDateChanged>().Single();
-    purchaseDateChanged.ReceiptId.Should().Be(receipt.Id);
-    purchaseDateChanged.PurchaseDate.Should().Be(newPurchaseDate);
+    purchaseDateChanged.ReceiptId.Should().Be(receipt.Id.Value);
+    purchaseDateChanged.PurchaseDate.Should().Be(newPurchaseDate.Date);
   }
 
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator), typeof(PurchaseGenerator)])]
@@ -102,9 +109,9 @@ public class ReceiptTests
     Id receiptId = Id.Unique();
     List<Fact> facts =
     [
-      new ReceiptCreated(receiptId, store, purchaseDate, TodayDateOnly),
-      new PurchaseAdded(receiptId, purchase),
-      new StoreCorrected(receiptId, newStore)
+      ReceiptCreated.Create(receiptId, store, purchaseDate, TodayDateOnly),
+      PurchaseAdded.Create(receiptId, purchase),
+      StoreCorrected.Create(receiptId, newStore)
     ];
 
     Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
@@ -125,9 +132,9 @@ public class ReceiptTests
     Id receiptId = Id.Unique();
     List<Fact> facts =
     [
-      new ReceiptCreated(receiptId, store, purchaseDate, TodayDateOnly),
-      new PurchaseAdded(receiptId, purchase),
-      new StoreCorrected(receiptId, newStore)
+      ReceiptCreated.Create(receiptId, store, purchaseDate, TodayDateOnly),
+      PurchaseAdded.Create(receiptId, purchase),
+      StoreCorrected.Create(receiptId, newStore)
     ];
 
     Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));

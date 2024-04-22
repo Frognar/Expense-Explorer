@@ -62,7 +62,7 @@ public class AddPurchaseCommandHandlerTests
   {
     public FakeReceiptRepository()
     {
-      ReceiptCreated createFact = new(
+      ReceiptCreated createFact = ReceiptCreated.Create(
         Id.Create("receiptId"),
         Store.Create("store"),
         PurchaseDate.Create(TodayDateOnly, TodayDateOnly),

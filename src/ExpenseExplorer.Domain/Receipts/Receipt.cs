@@ -44,7 +44,7 @@ public class Receipt
   public static Receipt New(Store store, PurchaseDate purchaseDate, DateOnly createdDate)
   {
     Id id = Id.Unique();
-    Fact receiptCreated = new ReceiptCreated(id, store, purchaseDate, createdDate);
+    Fact receiptCreated = ReceiptCreated.Create(id, store, purchaseDate, createdDate);
     return new Receipt(id, store, purchaseDate, [], [receiptCreated], Version.New());
   }
 
@@ -61,21 +61,21 @@ public class Receipt
 
   public Receipt CorrectStore(Store store)
   {
-    Fact storeCorrected = new StoreCorrected(Id, store);
+    Fact storeCorrected = StoreCorrected.Create(Id, store);
     List<Fact> allChanges = _unsavedChanges.Append(storeCorrected).ToList();
     return new Receipt(Id, store, PurchaseDate, Purchases, allChanges, Version);
   }
 
   public Receipt ChangePurchaseDate(PurchaseDate purchaseDate, DateOnly requestedDate)
   {
-    Fact purchaseDateChanged = new PurchaseDateChanged(Id, purchaseDate, requestedDate);
+    Fact purchaseDateChanged = PurchaseDateChanged.Create(Id, purchaseDate, requestedDate);
     List<Fact> allChanges = _unsavedChanges.Append(purchaseDateChanged).ToList();
     return new Receipt(Id, Store, purchaseDate, Purchases, allChanges, Version);
   }
 
   public Receipt AddPurchase(Purchase purchase)
   {
-    Fact purchaseAdded = new PurchaseAdded(Id, purchase);
+    Fact purchaseAdded = PurchaseAdded.Create(Id, purchase);
     List<Fact> allChanges = _unsavedChanges.Append(purchaseAdded).ToList();
     List<Purchase> allPurchases = Purchases.Append(purchase).ToList();
     return new Receipt(Id, Store, PurchaseDate, allPurchases, allChanges, Version);
@@ -99,21 +99,34 @@ public class Receipt
 
   private Receipt Apply(ReceiptCreated fact)
   {
-    return new Receipt(fact.Id, fact.Store, fact.PurchaseDate, Purchases, _unsavedChanges.ToList(), Version);
+    Id receiptId = Id.Create(fact.Id);
+    Store store = Store.Create(fact.Store);
+    PurchaseDate purchaseDate = PurchaseDate.Create(fact.PurchaseDate, fact.CreatedDate);
+    return new Receipt(receiptId, store, purchaseDate, Purchases, _unsavedChanges.ToList(), Version);
   }
 
   private Receipt Apply(StoreCorrected fact)
   {
-    return new Receipt(Id, fact.Store, PurchaseDate, Purchases, _unsavedChanges.ToList(), Version);
+    Store store = Store.Create(fact.Store);
+    return new Receipt(Id, store, PurchaseDate, Purchases, _unsavedChanges.ToList(), Version);
   }
 
   private Receipt Apply(PurchaseAdded fact)
   {
+    Purchase purchase = Purchase.Create(
+      Id.Create(fact.PurchaseId),
+      Item.Create(fact.Item),
+      Category.Create(fact.Category),
+      Quantity.Create(fact.Quantity),
+      Money.Create(fact.UnitPrice),
+      Money.Create(fact.TotalDiscount),
+      Description.Create(fact.Description));
+
     return new Receipt(
       Id,
       Store,
       PurchaseDate,
-      Purchases.Append(fact.Purchase).ToList(),
+      Purchases.Append(purchase).ToList(),
       _unsavedChanges.ToList(),
       Version);
   }

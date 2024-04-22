@@ -9,7 +9,7 @@ public class FactTypesTests
   [Fact]
   public void GetTypeForReceiptCreated()
   {
-    Fact fact = new ReceiptCreated(
+    Fact fact = ReceiptCreated.Create(
       Id.Unique(),
       Store.Create("store"),
       PurchaseDate.Create(new DateOnly(2000, 1, 1), TodayDateOnly),
@@ -21,7 +21,7 @@ public class FactTypesTests
   [Fact]
   public void GetTypeForPurchaseAdded()
   {
-    Fact fact = new PurchaseAdded(
+    Fact fact = PurchaseAdded.Create(
       Id.Unique(),
       Purchase.Create(
         Id.Unique(),
@@ -38,7 +38,7 @@ public class FactTypesTests
   [Fact]
   public void GetTypeForStoreCorrected()
   {
-    Fact fact = new StoreCorrected(Id.Unique(), Store.Create("store"));
+    Fact fact = StoreCorrected.Create(Id.Unique(), Store.Create("store"));
     AssertFactType(fact, FactTypes.StoreCorrectedFactType);
   }
 
@@ -46,7 +46,7 @@ public class FactTypesTests
   public void GetTypeForPurchaseDateChanged()
   {
     DateOnly today = new DateOnly(2021, 1, 1);
-    Fact fact = new PurchaseDateChanged(Id.Unique(), PurchaseDate.Create(today.AddDays(-1), today), today);
+    Fact fact = PurchaseDateChanged.Create(Id.Unique(), PurchaseDate.Create(today.AddDays(-1), today), today);
     AssertFactType(fact, FactTypes.PurchaseDateChangedFactType);
   }
 

@@ -9,7 +9,7 @@ public class FactSerializerTests
   [Fact]
   public void SerializeReceiptCreated()
   {
-    Fact fact = new ReceiptCreated(
+    Fact fact = ReceiptCreated.Create(
       Id.Create("id"),
       Store.Create("store"),
       PurchaseDate.Create(new DateOnly(2000, 1, 1), TodayDateOnly),
@@ -38,7 +38,7 @@ public class FactSerializerTests
   [Fact]
   public void SerializePurchaseAdded()
   {
-    Fact fact = new PurchaseAdded(
+    Fact fact = PurchaseAdded.Create(
       Id.Create("id"),
       Purchase.Create(
         Id.Create("pId"),
@@ -72,7 +72,7 @@ public class FactSerializerTests
   [Fact]
   public void SerializeStoreCorrected()
   {
-    Fact fact = new StoreCorrected(Id.Create("id"), Store.Create("store"));
+    Fact fact = StoreCorrected.Create(Id.Create("id"), Store.Create("store"));
 
     byte[] data = FactSerializer.Serialize(fact);
 
@@ -94,7 +94,7 @@ public class FactSerializerTests
   {
     DateOnly today = new DateOnly(2001, 1, 1);
     DateOnly newDate = today.AddYears(-1);
-    Fact fact = new PurchaseDateChanged(Id.Create("id"), PurchaseDate.Create(newDate, today), today);
+    Fact fact = PurchaseDateChanged.Create(Id.Create("id"), PurchaseDate.Create(newDate, today), today);
 
     byte[] data = FactSerializer.Serialize(fact);
 
