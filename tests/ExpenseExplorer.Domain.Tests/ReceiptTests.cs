@@ -77,6 +77,16 @@ public class ReceiptTests
     purchaseAdded.Purchase.Should().Be(receipt.Purchases.Last());
   }
 
+  [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(PurchaseDateGenerator)])]
+  public void CanChangePurchaseDate(Receipt receipt, PurchaseDate newPurchaseDate)
+  {
+    receipt
+      .ChangePurchaseDate(newPurchaseDate)
+      .PurchaseDate
+      .Should()
+      .Be(newPurchaseDate);
+  }
+
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator), typeof(PurchaseGenerator)])]
   public void CanBeRecreatedFromFacts(Store store, PurchaseDate purchaseDate, Purchase purchase, Store newStore)
   {

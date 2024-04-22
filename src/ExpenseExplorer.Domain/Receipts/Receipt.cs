@@ -66,6 +66,11 @@ public class Receipt
     return new Receipt(Id, store, PurchaseDate, Purchases, allChanges, Version);
   }
 
+  public Receipt ChangePurchaseDate(PurchaseDate purchaseDate)
+  {
+    return new Receipt(Id, Store, purchaseDate, Purchases, _unsavedChanges, Version);
+  }
+
   public Receipt AddPurchase(Purchase purchase)
   {
     Fact purchaseAdded = new PurchaseAdded(Id, purchase);
