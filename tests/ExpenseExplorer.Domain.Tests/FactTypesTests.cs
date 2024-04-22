@@ -45,7 +45,8 @@ public class FactTypesTests
   [Fact]
   public void GetTypeForPurchaseDateChanged()
   {
-    Fact fact = new PurchaseDateChanged(Id.Unique(), PurchaseDate.Create(DateOnly.MinValue, DateOnly.MinValue));
+    DateOnly today = new DateOnly(2021, 1, 1);
+    Fact fact = new PurchaseDateChanged(Id.Unique(), PurchaseDate.Create(today.AddDays(-1), today), today);
     AssertFactType(fact, FactTypes.PurchaseDateChangedFactType);
   }
 

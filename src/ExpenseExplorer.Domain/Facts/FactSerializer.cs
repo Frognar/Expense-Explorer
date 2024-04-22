@@ -15,6 +15,7 @@ public static class FactSerializer
       Receipts.Facts.ReceiptCreated receiptCreated => Serialize(Map(receiptCreated)),
       Receipts.Facts.PurchaseAdded purchaseAdded => Serialize(Map(purchaseAdded)),
       Receipts.Facts.StoreCorrected storeCorrected => Serialize(Map(storeCorrected)),
+      Receipts.Facts.PurchaseDateChanged purchaseDateChanged => Serialize(Map(purchaseDateChanged)),
       _ => throw new UnreachableException(),
     };
   }
@@ -26,6 +27,7 @@ public static class FactSerializer
       FactTypes.ReceiptCreatedFactType => Map(Deserialize<SimpleReceiptCreated>(data)),
       FactTypes.PurchaseAddedFactType => Map(Deserialize<SimplePurchaseAdded>(data)),
       FactTypes.StoreCorrectedFactType => Map(Deserialize<SimpleStoreCorrected>(data)),
+      FactTypes.PurchaseDateChangedFactType => Map(Deserialize<SimplePurchaseDateChanged>(data)),
       _ => throw new UnreachableException(),
     };
   }
@@ -73,6 +75,15 @@ public static class FactSerializer
   private static SimpleStoreCorrected Map(StoreCorrected storeCorrected)
     => new(storeCorrected.ReceiptId.Value, storeCorrected.Store.Name);
 
+  private static PurchaseDateChanged Map(SimplePurchaseDateChanged simplePurchaseDateChanged)
+    => new(
+      Id.Create(simplePurchaseDateChanged.ReceiptId),
+      PurchaseDate.Create(simplePurchaseDateChanged.PurchaseDate, simplePurchaseDateChanged.RequestedAt),
+      simplePurchaseDateChanged.RequestedAt);
+
+  private static SimplePurchaseDateChanged Map(PurchaseDateChanged purchaseDateChanged)
+    => new(purchaseDateChanged.ReceiptId.Value, purchaseDateChanged.PurchaseDate.Date, purchaseDateChanged.RequestedAt);
+
   private static byte[] Serialize<T>(T fact)
   {
     string json = JsonSerializer.Serialize(fact);
@@ -97,4 +108,6 @@ public static class FactSerializer
     string Description);
 
   private sealed record SimpleStoreCorrected(string ReceiptId, string Store);
+
+  private sealed record SimplePurchaseDateChanged(string ReceiptId, DateOnly PurchaseDate, DateOnly RequestedAt);
 }
