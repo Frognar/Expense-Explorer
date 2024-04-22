@@ -104,20 +104,26 @@ public class ReceiptTests
   }
 
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator), typeof(PurchaseGenerator)])]
-  public void CanBeRecreatedFromFacts(Store store, PurchaseDate purchaseDate, Purchase purchase, Store newStore)
+  public void CanBeRecreatedFromFacts(
+    Store store,
+    PurchaseDate purchaseDate,
+    Purchase purchase,
+    Store newStore,
+    PurchaseDate newPurchaseDate)
   {
     Id receiptId = Id.Unique();
     List<Fact> facts =
     [
       ReceiptCreated.Create(receiptId, store, purchaseDate, TodayDateOnly),
       PurchaseAdded.Create(receiptId, purchase),
-      StoreCorrected.Create(receiptId, newStore)
+      StoreCorrected.Create(receiptId, newStore),
+      PurchaseDateChanged.Create(receiptId, newPurchaseDate, TodayDateOnly)
     ];
 
     Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
     receipt.Id.Should().Be(receiptId);
     receipt.Store.Should().Be(newStore);
-    receipt.PurchaseDate.Should().Be(purchaseDate);
+    receipt.PurchaseDate.Should().Be(newPurchaseDate);
     receipt.Purchases.Should().Contain(purchase);
     receipt.Version.Should().Be(Version.Create((ulong)(facts.Count - 1)));
   }

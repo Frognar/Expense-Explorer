@@ -93,6 +93,7 @@ public class Receipt
       ReceiptCreated receiptCreated => Apply(receiptCreated),
       StoreCorrected storeCorrected => Apply(storeCorrected),
       PurchaseAdded purchaseAdded => Apply(purchaseAdded),
+      PurchaseDateChanged purchaseDateChanged => Apply(purchaseDateChanged),
       _ => this,
     };
   }
@@ -129,5 +130,11 @@ public class Receipt
       Purchases.Append(purchase).ToList(),
       _unsavedChanges.ToList(),
       Version);
+  }
+
+  private Receipt Apply(PurchaseDateChanged fact)
+  {
+    PurchaseDate purchaseDate = PurchaseDate.Create(fact.PurchaseDate, fact.RequestedDate);
+    return new Receipt(Id, Store, purchaseDate, Purchases, _unsavedChanges.ToList(), Version);
   }
 }
