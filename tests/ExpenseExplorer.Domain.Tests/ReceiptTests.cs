@@ -81,10 +81,19 @@ public class ReceiptTests
   public void CanChangePurchaseDate(Receipt receipt, PurchaseDate newPurchaseDate)
   {
     receipt
-      .ChangePurchaseDate(newPurchaseDate)
+      .ChangePurchaseDate(newPurchaseDate, newPurchaseDate.Date)
       .PurchaseDate
       .Should()
       .Be(newPurchaseDate);
+  }
+
+  [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(PurchaseDateGenerator)])]
+  public void ProducesPurchaseDateChangedFactWhenPurchaseDateChanged(Receipt receipt, PurchaseDate newPurchaseDate)
+  {
+    receipt = receipt.ChangePurchaseDate(newPurchaseDate, newPurchaseDate.Date);
+    PurchaseDateChanged purchaseDateChanged = receipt.UnsavedChanges.OfType<PurchaseDateChanged>().Single();
+    purchaseDateChanged.ReceiptId.Should().Be(receipt.Id);
+    purchaseDateChanged.PurchaseDate.Should().Be(newPurchaseDate);
   }
 
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator), typeof(PurchaseGenerator)])]

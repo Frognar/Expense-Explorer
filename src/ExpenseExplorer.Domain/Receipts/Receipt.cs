@@ -66,9 +66,11 @@ public class Receipt
     return new Receipt(Id, store, PurchaseDate, Purchases, allChanges, Version);
   }
 
-  public Receipt ChangePurchaseDate(PurchaseDate purchaseDate)
+  public Receipt ChangePurchaseDate(PurchaseDate purchaseDate, DateOnly requestedDate)
   {
-    return new Receipt(Id, Store, purchaseDate, Purchases, _unsavedChanges, Version);
+    Fact purchaseDateChanged = new PurchaseDateChanged(Id, purchaseDate, requestedDate);
+    List<Fact> allChanges = _unsavedChanges.Append(purchaseDateChanged).ToList();
+    return new Receipt(Id, Store, purchaseDate, Purchases, allChanges, Version);
   }
 
   public Receipt AddPurchase(Purchase purchase)
