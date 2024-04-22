@@ -78,11 +78,14 @@ public static class FactSerializer
   private static PurchaseDateChanged Map(SimplePurchaseDateChanged simplePurchaseDateChanged)
     => new(
       Id.Create(simplePurchaseDateChanged.ReceiptId),
-      PurchaseDate.Create(simplePurchaseDateChanged.PurchaseDate, simplePurchaseDateChanged.RequestedAt),
-      simplePurchaseDateChanged.RequestedAt);
+      PurchaseDate.Create(simplePurchaseDateChanged.PurchaseDate, simplePurchaseDateChanged.RequestedDate),
+      simplePurchaseDateChanged.RequestedDate);
 
   private static SimplePurchaseDateChanged Map(PurchaseDateChanged purchaseDateChanged)
-    => new(purchaseDateChanged.ReceiptId.Value, purchaseDateChanged.PurchaseDate.Date, purchaseDateChanged.RequestedAt);
+    => new(
+      purchaseDateChanged.ReceiptId.Value,
+      purchaseDateChanged.PurchaseDate.Date,
+      purchaseDateChanged.RequestedDate);
 
   private static byte[] Serialize<T>(T fact)
   {
@@ -109,5 +112,5 @@ public static class FactSerializer
 
   private sealed record SimpleStoreCorrected(string ReceiptId, string Store);
 
-  private sealed record SimplePurchaseDateChanged(string ReceiptId, DateOnly PurchaseDate, DateOnly RequestedAt);
+  private sealed record SimplePurchaseDateChanged(string ReceiptId, DateOnly PurchaseDate, DateOnly RequestedDate);
 }

@@ -92,21 +92,21 @@ public class FactSerializerTests
   [Fact]
   public void SerializePurchaseDateChanged()
   {
-    DateOnly requestedAt = new DateOnly(2001, 1, 1);
-    DateOnly newDate = requestedAt.AddYears(-1);
-    Fact fact = new PurchaseDateChanged(Id.Create("id"), PurchaseDate.Create(newDate, requestedAt), requestedAt);
+    DateOnly today = new DateOnly(2001, 1, 1);
+    DateOnly newDate = today.AddYears(-1);
+    Fact fact = new PurchaseDateChanged(Id.Create("id"), PurchaseDate.Create(newDate, today), today);
 
     byte[] data = FactSerializer.Serialize(fact);
 
     data.Should()
       .BeEquivalentTo(
-        "{\"ReceiptId\":\"id\",\"PurchaseDate\":\"2000-01-01\",\"RequestedAt\":\"2001-01-01\"}"u8.ToArray());
+        "{\"ReceiptId\":\"id\",\"PurchaseDate\":\"2000-01-01\",\"RequestedDate\":\"2001-01-01\"}"u8.ToArray());
   }
 
   [Fact]
   public void DeserializePurchaseDateChanged()
   {
-    byte[] data = "{\"ReceiptId\":\"id\",\"PurchaseDate\":\"2000-01-01\",\"RequestedAt\":\"2001-01-01\"}"u8.ToArray();
+    byte[] data = "{\"ReceiptId\":\"id\",\"PurchaseDate\":\"2000-01-01\",\"RequestedDate\":\"2001-01-01\"}"u8.ToArray();
 
     Fact fact = FactSerializer.Deserialize(FactTypes.PurchaseDateChangedFactType, data);
 
