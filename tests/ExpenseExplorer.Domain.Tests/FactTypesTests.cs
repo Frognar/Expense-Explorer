@@ -42,6 +42,13 @@ public class FactTypesTests
     AssertFactType(fact, FactTypes.StoreCorrectedFactType);
   }
 
+  [Fact]
+  public void GetTypeForPurchaseDateChanged()
+  {
+    Fact fact = new PurchaseDateChanged(Id.Unique(), PurchaseDate.Create(DateOnly.MinValue, DateOnly.MinValue));
+    AssertFactType(fact, FactTypes.PurchaseDateChangedFactType);
+  }
+
   private static void AssertFactType(Fact fact, string expectedType)
   {
     string type = FactTypes.GetFactType(fact);
