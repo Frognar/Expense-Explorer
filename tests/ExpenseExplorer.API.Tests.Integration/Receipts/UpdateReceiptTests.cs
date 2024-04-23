@@ -50,6 +50,26 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
   }
 
   [Fact]
+  public async Task CanUpdateReceiptWithNewPurchaseDate()
+  {
+    UpdateReceiptResponse response = await PatchReceipt(_receiptId, new { purchaseDate = "2022-01-01" });
+    response.PurchaseDate.Should().Be(new DateOnly(2022, 1, 1));
+    response.Version.Should().Be(1);
+  }
+
+  [Fact]
+  public async Task CanUpdateBothStoreNameAndPurchaseDate()
+  {
+    UpdateReceiptResponse response = await PatchReceipt(
+      _receiptId,
+      new { storeName = "new store", purchaseDate = "2022-01-01" });
+
+    response.StoreName.Should().Be("new store");
+    response.PurchaseDate.Should().Be(new DateOnly(2022, 1, 1));
+    response.Version.Should().Be(2);
+  }
+
+  [Fact]
   public async Task DontUpdateReceiptWhenNoChanges()
   {
     UpdateReceiptResponse response = await PatchReceipt(_receiptId, new { });

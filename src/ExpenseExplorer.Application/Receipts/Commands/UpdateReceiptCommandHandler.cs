@@ -18,7 +18,10 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
   {
     ArgumentNullException.ThrowIfNull(command);
     Either<Failure, Receipt> eitherFailureOrReceipt = await GetReceiptAsync(command.ReceiptId, cancellationToken);
-    eitherFailureOrReceipt = eitherFailureOrReceipt.MapRight(CorrectStoreIfNotEmpty(command.StoreName));
+    eitherFailureOrReceipt = eitherFailureOrReceipt
+      .MapRight(CorrectStoreIfNotEmpty(command.StoreName))
+      .MapRight(ChangePurchaseDateIfNotEmpty(command.PurchaseDate, command.Today));
+
     eitherFailureOrReceipt = await SaveAsync(eitherFailureOrReceipt, cancellationToken);
     return eitherFailureOrReceipt;
   }
@@ -31,6 +34,16 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
   private static Receipt CorrectStoreIfNotEmpty(Receipt receipt, string storeName)
   {
     return Store.TryCreate(storeName).Match(() => receipt, receipt.CorrectStore);
+  }
+
+  private static Func<Receipt, Receipt> ChangePurchaseDateIfNotEmpty(DateOnly? purchaseDate, DateOnly today)
+  {
+    return receipt => ChangePurchaseDateIfNotEmpty(receipt, purchaseDate, today);
+  }
+
+  private static Receipt ChangePurchaseDateIfNotEmpty(Receipt receipt, DateOnly? purchaseDate, DateOnly today)
+  {
+    return PurchaseDate.TryCreate(purchaseDate, today).Match(() => receipt, d => receipt.ChangePurchaseDate(d, today));
   }
 
   private async Task<Either<Failure, Receipt>> GetReceiptAsync(string receiptId, CancellationToken cancellationToken)

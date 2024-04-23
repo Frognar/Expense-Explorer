@@ -5,4 +5,5 @@ using ExpenseExplorer.Domain.Receipts;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
-public record UpdateReceiptCommand(string ReceiptId, string? StoreName) : ICommand<Either<Failure, Receipt>>;
+public record UpdateReceiptCommand(string ReceiptId, string? StoreName, DateOnly? PurchaseDate, DateOnly Today)
+  : ICommand<Either<Failure, Receipt>>;

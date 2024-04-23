@@ -71,10 +71,12 @@ public static class ReceiptEndpoints
   private static async Task<IResult> UpdateReceiptAsync(
     string receiptId,
     UpdateReceiptRequest request,
+    TimeProvider timeProvider,
     ISender sender,
     CancellationToken cancellationToken)
   {
-    UpdateReceiptCommand command = new(receiptId, request.StoreName);
+    DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
+    UpdateReceiptCommand command = new(receiptId, request.StoreName, request.PurchaseDate, today);
     Either<Failure, Receipt> result = await sender.SendAsync(command, cancellationToken);
     return result
       .MapRight(r => new UpdateReceiptResponse(r.Id.Value, r.Store.Name, r.PurchaseDate.Date, r.Version.Value))

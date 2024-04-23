@@ -27,10 +27,10 @@ public record PurchaseDate
     return new PurchaseDate(date, today);
   }
 
-  public static Maybe<PurchaseDate> TryCreate(DateOnly date, DateOnly today)
+  public static Maybe<PurchaseDate> TryCreate(DateOnly? date, DateOnly today)
   {
-    return date > today
+    return !date.HasValue || date > today
       ? None.OfType<PurchaseDate>()
-      : Some.From(new PurchaseDate(date, today));
+      : Some.From(new PurchaseDate(date.Value, today));
   }
 }
