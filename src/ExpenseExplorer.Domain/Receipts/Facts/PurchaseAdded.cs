@@ -2,33 +2,17 @@ namespace ExpenseExplorer.Domain.Receipts.Facts;
 
 using ExpenseExplorer.Domain.ValueObjects;
 
-public class PurchaseAdded(
-  string receiptId,
-  string purchaseId,
-  string item,
-  string category,
-  decimal quantity,
-  decimal unitPrice,
-  decimal totalDiscount,
-  string description)
+public record PurchaseAdded(
+  string ReceiptId,
+  string PurchaseId,
+  string Item,
+  string Category,
+  decimal Quantity,
+  decimal UnitPrice,
+  decimal TotalDiscount,
+  string Description)
   : Fact
 {
-  public string ReceiptId { get; } = receiptId;
-
-  public string PurchaseId { get; } = purchaseId;
-
-  public string Item { get; } = item;
-
-  public string Category { get; } = category;
-
-  public decimal Quantity { get; } = quantity;
-
-  public decimal UnitPrice { get; } = unitPrice;
-
-  public decimal TotalDiscount { get; } = totalDiscount;
-
-  public string Description { get; } = description;
-
   public static PurchaseAdded Create(Id receiptId, Purchase purchase)
   {
     ArgumentNullException.ThrowIfNull(receiptId);
