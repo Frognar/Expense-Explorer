@@ -2,18 +2,14 @@ namespace ExpenseExplorer.Domain.Tests;
 
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
-using ExpenseExplorer.Domain.ValueObjects;
 
 public class FactSerializerTests
 {
   [Fact]
   public void SerializeReceiptCreated()
   {
-    Fact fact = ReceiptCreated.Create(
-      Id.Create("id"),
-      Store.Create("store"),
-      PurchaseDate.Create(new DateOnly(2000, 1, 1), TodayDateOnly),
-      TodayDateOnly);
+    DateOnly today = new(2000, 1, 1);
+    Fact fact = new ReceiptCreated("id", "store", today, today);
 
     byte[] data = FactSerializer.Serialize(fact);
 
@@ -38,16 +34,7 @@ public class FactSerializerTests
   [Fact]
   public void SerializePurchaseAdded()
   {
-    Fact fact = PurchaseAdded.Create(
-      Id.Create("id"),
-      Purchase.Create(
-        Id.Create("pId"),
-        Item.Create("i"),
-        Category.Create("c"),
-        Quantity.Create(1),
-        Money.Create(1),
-        Money.Zero,
-        Description.Create(null)));
+    Fact fact = new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, string.Empty);
 
     byte[] data = FactSerializer.Serialize(fact);
 
@@ -72,7 +59,7 @@ public class FactSerializerTests
   [Fact]
   public void SerializeStoreCorrected()
   {
-    Fact fact = StoreCorrected.Create(Id.Create("id"), Store.Create("store"));
+    Fact fact = new StoreCorrected("id", "store");
 
     byte[] data = FactSerializer.Serialize(fact);
 
@@ -94,7 +81,7 @@ public class FactSerializerTests
   {
     DateOnly today = new DateOnly(2001, 1, 1);
     DateOnly newDate = today.AddYears(-1);
-    Fact fact = PurchaseDateChanged.Create(Id.Create("id"), PurchaseDate.Create(newDate, today), today);
+    Fact fact = new PurchaseDateChanged("id", newDate, today);
 
     byte[] data = FactSerializer.Serialize(fact);
 

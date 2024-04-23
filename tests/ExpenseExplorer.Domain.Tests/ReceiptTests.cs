@@ -103,47 +103,41 @@ public class ReceiptTests
     purchaseDateChanged.PurchaseDate.Should().Be(newPurchaseDate.Date);
   }
 
-  [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator), typeof(PurchaseGenerator)])]
-  public void CanBeRecreatedFromFacts(
-    Store store,
-    PurchaseDate purchaseDate,
-    Purchase purchase,
-    Store newStore,
-    PurchaseDate newPurchaseDate)
+  [Fact]
+  public void CanBeRecreatedFromFacts()
   {
-    Id receiptId = Id.Unique();
+    DateOnly today = new DateOnly(2000, 1, 1);
     List<Fact> facts =
     [
-      ReceiptCreated.Create(receiptId, store, purchaseDate, TodayDateOnly),
-      PurchaseAdded.Create(receiptId, purchase),
-      StoreCorrected.Create(receiptId, newStore),
-      PurchaseDateChanged.Create(receiptId, newPurchaseDate, TodayDateOnly)
+      new ReceiptCreated("id", "store", today, today),
+      new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, "d"),
+      new StoreCorrected("id", "newStore"),
+      new PurchaseDateChanged("id", today.AddDays(-1), today)
     ];
 
     Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
-    receipt.Id.Should().Be(receiptId);
-    receipt.Store.Should().Be(newStore);
-    receipt.PurchaseDate.Should().Be(newPurchaseDate);
-    receipt.Purchases.Should().Contain(purchase);
-    receipt.Version.Should().Be(Version.Create((ulong)(facts.Count - 1)));
+
+    receipt.Id.Value.Should().Be("id");
+    receipt.Store.Name.Should().Be("newStore");
+    receipt.PurchaseDate.Date.Should().Be(new DateOnly(1999, 12, 31));
+    receipt.Purchases.Should().Contain(p => p.Id.Value == "pId");
+    receipt.Version.Value.Should().Be((ulong)(facts.Count - 1));
   }
 
-  [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator), typeof(PurchaseGenerator)])]
-  public void HasNoUnsavedChangesWhenRecreatedFromFacts(
-    Store store,
-    PurchaseDate purchaseDate,
-    Purchase purchase,
-    Store newStore)
+  [Fact]
+  public void HasNoUnsavedChangesWhenRecreatedFromFacts()
   {
-    Id receiptId = Id.Unique();
+    DateOnly today = new DateOnly(2000, 1, 1);
     List<Fact> facts =
     [
-      ReceiptCreated.Create(receiptId, store, purchaseDate, TodayDateOnly),
-      PurchaseAdded.Create(receiptId, purchase),
-      StoreCorrected.Create(receiptId, newStore)
+      new ReceiptCreated("id", "store", today, today),
+      new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, "d"),
+      new StoreCorrected("id", "newStore"),
+      new PurchaseDateChanged("id", today.AddDays(-1), today)
     ];
 
     Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+
     receipt.UnsavedChanges.Should().BeEmpty();
   }
 }

@@ -62,12 +62,8 @@ public class AddPurchaseCommandHandlerTests
   {
     public FakeReceiptRepository()
     {
-      ReceiptCreated createFact = ReceiptCreated.Create(
-        Id.Create("receiptId"),
-        Store.Create("store"),
-        PurchaseDate.Create(TodayDateOnly, TodayDateOnly),
-        TodayDateOnly);
-
+      DateOnly today = new DateOnly(2000, 1, 1);
+      ReceiptCreated createFact = new("receiptId", "store", today, today);
       Add(Receipt.Recreate([createFact], default));
     }
 

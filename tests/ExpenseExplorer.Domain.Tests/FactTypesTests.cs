@@ -2,43 +2,28 @@ namespace ExpenseExplorer.Domain.Tests;
 
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
-using ExpenseExplorer.Domain.ValueObjects;
 
 public class FactTypesTests
 {
   [Fact]
   public void GetTypeForReceiptCreated()
   {
-    Fact fact = ReceiptCreated.Create(
-      Id.Unique(),
-      Store.Create("store"),
-      PurchaseDate.Create(new DateOnly(2000, 1, 1), TodayDateOnly),
-      TodayDateOnly);
-
+    DateOnly today = new(2000, 1, 1);
+    Fact fact = new ReceiptCreated("id", "store", today, today);
     AssertFactType(fact, FactTypes.ReceiptCreatedFactType);
   }
 
   [Fact]
   public void GetTypeForPurchaseAdded()
   {
-    Fact fact = PurchaseAdded.Create(
-      Id.Unique(),
-      Purchase.Create(
-        Id.Unique(),
-        Item.Create("i"),
-        Category.Create("c"),
-        Quantity.Create(1),
-        Money.Create(1),
-        Money.Zero,
-        Description.Create(null)));
-
+    Fact fact = new PurchaseAdded("id", "pid", "i", "c", 1, 1, 0, string.Empty);
     AssertFactType(fact, FactTypes.PurchaseAddedFactType);
   }
 
   [Fact]
   public void GetTypeForStoreCorrected()
   {
-    Fact fact = StoreCorrected.Create(Id.Unique(), Store.Create("store"));
+    Fact fact = new StoreCorrected("id", "store");
     AssertFactType(fact, FactTypes.StoreCorrectedFactType);
   }
 
@@ -46,7 +31,7 @@ public class FactTypesTests
   public void GetTypeForPurchaseDateChanged()
   {
     DateOnly today = new DateOnly(2021, 1, 1);
-    Fact fact = PurchaseDateChanged.Create(Id.Unique(), PurchaseDate.Create(today.AddDays(-1), today), today);
+    Fact fact = new PurchaseDateChanged("id", today.AddDays(-1), today);
     AssertFactType(fact, FactTypes.PurchaseDateChangedFactType);
   }
 
