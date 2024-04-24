@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
+using System.Net;
 using System.Net.Http.Json;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.Application.Receipts.Persistence;
@@ -31,20 +32,13 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
   public async Task CanUpdateReceipt()
   {
     HttpResponseMessage message = await Patch(_receiptId, new { });
-    message.StatusCode.ShouldBeIn200Group();
-  }
-
-  [Fact]
-  public async Task ContainsUpdatedReceiptInResponse()
-  {
-    UpdateReceiptResponse response = await PatchReceipt(_receiptId, new { });
-    response.Should().NotBeNull();
+    message.StatusCode.Should().Be(HttpStatusCode.OK);
   }
 
   [Fact]
   public async Task CanUpdateReceiptWithNewStoreName()
   {
-    UpdateReceiptResponse response = await PatchReceipt(_receiptId, new { storeName = "new store" });
+    UpdateReceiptResponse response = await PatchReceipt(storeName: "new store");
     response.StoreName.Should().Be("new store");
     response.Version.Should().Be(1);
   }
@@ -52,7 +46,7 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
   [Fact]
   public async Task CanUpdateReceiptWithNewPurchaseDate()
   {
-    UpdateReceiptResponse response = await PatchReceipt(_receiptId, new { purchaseDate = "2022-01-01" });
+    UpdateReceiptResponse response = await PatchReceipt(purchaseDate: "2022-01-01");
     response.PurchaseDate.Should().Be(new DateOnly(2022, 1, 1));
     response.Version.Should().Be(1);
   }
@@ -60,10 +54,7 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
   [Fact]
   public async Task CanUpdateBothStoreNameAndPurchaseDate()
   {
-    UpdateReceiptResponse response = await PatchReceipt(
-      _receiptId,
-      new { storeName = "new store", purchaseDate = "2022-01-01" });
-
+    UpdateReceiptResponse response = await PatchReceipt("new store", "2022-01-01");
     response.StoreName.Should().Be("new store");
     response.PurchaseDate.Should().Be(new DateOnly(2022, 1, 1));
     response.Version.Should().Be(2);
@@ -72,16 +63,15 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
   [Fact]
   public async Task DontUpdateReceiptWhenNoChanges()
   {
-    UpdateReceiptResponse response = await PatchReceipt(_receiptId, new { });
-
+    UpdateReceiptResponse response = await PatchReceipt();
     response.StoreName.Should().Be(_storeName);
     response.PurchaseDate.Should().Be(_today);
     response.Version.Should().Be(0);
   }
 
-  private async Task<UpdateReceiptResponse> PatchReceipt(string receiptId, object request)
+  private async Task<UpdateReceiptResponse> PatchReceipt(string? storeName = null, string? purchaseDate = null)
   {
-    HttpResponseMessage message = await Patch(receiptId, request);
+    HttpResponseMessage message = await Patch(_receiptId, new { storeName, purchaseDate });
     return (await message.Content.ReadFromJsonAsync<UpdateReceiptResponse>())!;
   }
 
