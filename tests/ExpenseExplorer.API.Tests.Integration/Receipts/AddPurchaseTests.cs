@@ -33,7 +33,8 @@ public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   public async Task CanAddPurchaseToReceipt(object request)
   {
     HttpResponseMessage response = await Post(_receiptId, request);
-    response.StatusCode.ShouldBeIn200Group();
+    response.StatusCode.Should().Be(HttpStatusCode.Created);
+    response.Headers.Location.Should().NotBeNull();
   }
 
   [Theory]
