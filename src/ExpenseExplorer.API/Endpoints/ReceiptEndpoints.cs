@@ -14,11 +14,13 @@ using Receipt = ExpenseExplorer.Domain.Receipts.Receipt;
 
 public static class ReceiptEndpoints
 {
+  private const string _getReceiptRoute = "GetReceipt";
+
   public static IEndpointRouteBuilder MapReceiptEndpoints(this IEndpointRouteBuilder endpointRouteBuilder)
   {
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/receipts");
     group.MapGet("/", GetReceiptsAsync);
-    group.MapGet("/{receiptId}", GetReceiptAsync);
+    group.MapGet("/{receiptId}", GetReceiptAsync).WithName(_getReceiptRoute);
     group.MapPost("/", OpenNewReceiptAsync);
     group.MapPatch("/{receiptId}", UpdateReceiptAsync);
     group.MapPost("/{receiptId}/purchases", AddPurchaseAsync);
@@ -65,7 +67,7 @@ public static class ReceiptEndpoints
     Either<Failure, Receipt> result = await sender.SendAsync(request.MapToCommand(today), cancellationToken);
     return result
       .MapRight(r => r.MapTo<OpenNewReceiptResponse>())
-      .Match(Handle, Results.Ok);
+      .Match(Handle, response => Results.CreatedAtRoute(_getReceiptRoute, new { receiptId = response.Id }, response));
   }
 
   private static async Task<IResult> UpdateReceiptAsync(

@@ -10,15 +10,21 @@ public class OpenNewReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTes
   [ClassData(typeof(ValidOpenNewRequestData))]
   public async Task CanCreateReceipt(object request)
   {
-    var response = await Client.PostAsJsonAsync("api/receipts", request);
-    response.StatusCode.ShouldBeIn200Group();
+    HttpResponseMessage response = await Post(request);
+    response.StatusCode.Should().Be(HttpStatusCode.Created);
+    response.Headers.Location.Should().NotBeNull();
   }
 
   [Theory]
   [ClassData(typeof(InvalidOpenNewRequestData))]
   public async Task IsBadRequestWhenInvalidRequest(object request)
   {
-    var response = await Client.PostAsJsonAsync("api/receipts", request);
+    HttpResponseMessage response = await Post(request);
     response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+  }
+
+  private async Task<HttpResponseMessage> Post(object request)
+  {
+    return await Client.PostAsJsonAsync("api/receipts", request);
   }
 }
