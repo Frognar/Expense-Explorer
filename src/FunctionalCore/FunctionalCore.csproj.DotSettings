@@ -1,8 +1,10 @@
-﻿<wpf:ResourceDictionary xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib"
+﻿<wpf:ResourceDictionary xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                        xmlns:s="clr-namespace:System;assembly=mscorlib"
                         xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml"
-                        xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                        xml:space="preserve">
+                        xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xml:space="preserve">
 	<s:Boolean
             x:Key="/Default/CodeInspection/NamespaceProvider/NamespaceFoldersToSkip/=monads_005Ceither/@EntryIndexedValue">True</s:Boolean>
     <s:Boolean
-            x:Key="/Default/CodeInspection/NamespaceProvider/NamespaceFoldersToSkip/=monads_005Cmaybe/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
+            x:Key="/Default/CodeInspection/NamespaceProvider/NamespaceFoldersToSkip/=monads_005Cmaybe/@EntryIndexedValue">True</s:Boolean>
+    <s:Boolean
+            x:Key="/Default/CodeInspection/NamespaceProvider/NamespaceFoldersToSkip/=monads_005Cresult/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
