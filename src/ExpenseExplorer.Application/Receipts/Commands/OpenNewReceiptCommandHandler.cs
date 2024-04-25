@@ -17,7 +17,7 @@ public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    var eitherFailureOrReceipt = ReceiptValidator.Validate(command).ToEither();
+    var eitherFailureOrReceipt = OpenNewReceiptValidator.Validate(command).ToEither();
     eitherFailureOrReceipt = await SaveAsync(eitherFailureOrReceipt, cancellationToken);
     return eitherFailureOrReceipt;
   }

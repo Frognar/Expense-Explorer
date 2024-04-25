@@ -1,12 +1,11 @@
-namespace ExpenseExplorer.Application.Receipts;
+namespace ExpenseExplorer.Application.Receipts.Commands;
 
-using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Failures;
 using FunctionalCore.Validations;
 
-public static class ReceiptValidator
+public static class OpenNewReceiptValidator
 {
   public static Validated<Receipt> Validate(OpenNewReceiptCommand command)
   {
