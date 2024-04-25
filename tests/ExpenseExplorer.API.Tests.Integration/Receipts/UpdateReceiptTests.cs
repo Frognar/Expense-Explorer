@@ -36,6 +36,21 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
   }
 
   [Fact]
+  public async Task IsBadRequestWhenInvalidRequest()
+  {
+    DateOnly inFuture = DateOnly.FromDateTime(DateTime.Today.AddDays(1));
+    HttpResponseMessage message = await Patch(_receiptId, new { purchaseDate = inFuture });
+    message.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+  }
+
+  [Fact]
+  public async Task IsNotFoundWhenReceiptIdIsInvalid()
+  {
+    HttpResponseMessage message = await Patch("invalid-id", new { });
+    message.StatusCode.Should().Be(HttpStatusCode.NotFound);
+  }
+
+  [Fact]
   public async Task CanUpdateReceiptWithNewStoreName()
   {
     UpdateReceiptResponse response = await PatchReceipt(storeName: "new store");
