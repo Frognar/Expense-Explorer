@@ -18,7 +18,7 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    var eitherFailureOrPurchase = PurchaseValidator.Validate(command).ToEither();
+    var eitherFailureOrPurchase = AddPurchaseValidator.Validate(command).ToEither();
     var eitherFailureOrReceipt = await AddPurchaseAsync(eitherFailureOrPurchase, command.ReceiptId, cancellationToken);
     eitherFailureOrReceipt = await SaveAsync(eitherFailureOrReceipt, cancellationToken);
     return eitherFailureOrReceipt;
