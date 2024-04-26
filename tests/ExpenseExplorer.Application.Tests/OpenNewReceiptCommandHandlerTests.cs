@@ -42,7 +42,7 @@ public class OpenNewReceiptCommandHandlerTests
     _receiptRepository.Should().Contain(r => r.Id == receipt.Id);
   }
 
-  private async Task<Either<Failure, Receipt>> Handle(OpenNewReceiptCommand command)
+  private async Task<Result<Receipt>> Handle(OpenNewReceiptCommand command)
   {
     OpenNewReceiptCommandHandler handler = new(_receiptRepository);
     return await handler.HandleAsync(command);

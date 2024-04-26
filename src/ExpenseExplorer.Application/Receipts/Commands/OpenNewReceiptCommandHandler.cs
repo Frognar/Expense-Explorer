@@ -3,37 +3,36 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 using CommandHub.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
-using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
 public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
-  : ICommandHandler<OpenNewReceiptCommand, Either<Failure, Receipt>>
+  : ICommandHandler<OpenNewReceiptCommand, Result<Receipt>>
 {
   private readonly IReceiptRepository _receiptRepository = receiptRepository;
 
-  public async Task<Either<Failure, Receipt>> HandleAsync(
+  public async Task<Result<Receipt>> HandleAsync(
     OpenNewReceiptCommand command,
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    var eitherFailureOrReceipt = OpenNewReceiptValidator.Validate(command).ToEither();
-    eitherFailureOrReceipt = await SaveAsync(eitherFailureOrReceipt, cancellationToken);
-    return eitherFailureOrReceipt;
+    Result<Receipt> resultOfReceipt = OpenNewReceiptValidator.Validate(command).ToResult();
+    resultOfReceipt = await SaveAsync(resultOfReceipt, cancellationToken);
+    return resultOfReceipt;
   }
 
-  private async Task<Either<Failure, Receipt>> SaveAsync(
-    Either<Failure, Receipt> eitherFailureOrReceipt,
+  private async Task<Result<Receipt>> SaveAsync(
+    Result<Receipt> resultOfReceipt,
     CancellationToken cancellationToken)
   {
-    return await eitherFailureOrReceipt.Match(
-      failure => Task.FromResult(Left.From<Failure, Receipt>(failure)),
+    return await resultOfReceipt.Match(
+      failure => Task.FromResult(Fail.OfType<Receipt>(failure)),
       receipt => SaveAsync(receipt, cancellationToken));
   }
 
-  private async Task<Either<Failure, Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
+  private async Task<Result<Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
     var eitherFailureOrVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
-    return eitherFailureOrVersion.MapRight(v => receipt.WithVersion(v).ClearChanges());
+    return eitherFailureOrVersion.MapRight(v => receipt.WithVersion(v).ClearChanges()).ToResult();
   }
 }

@@ -64,9 +64,9 @@ public static class ReceiptEndpoints
     CancellationToken cancellationToken = default)
   {
     DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
-    Either<Failure, Receipt> result = await sender.SendAsync(request.MapToCommand(today), cancellationToken);
+    Result<Receipt> result = await sender.SendAsync(request.MapToCommand(today), cancellationToken);
     return result
-      .MapRight(r => r.MapTo<OpenNewReceiptResponse>())
+      .Map(r => r.MapTo<OpenNewReceiptResponse>())
       .Match(Handle, response => Results.CreatedAtRoute(_getReceiptRoute, new { receiptId = response.Id }, response));
   }
 
