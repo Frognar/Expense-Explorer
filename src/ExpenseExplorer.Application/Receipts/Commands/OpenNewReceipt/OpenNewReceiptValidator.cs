@@ -5,7 +5,7 @@ using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Failures;
 using FunctionalCore.Validations;
 
-public static class OpenNewReceiptValidator
+internal static class OpenNewReceiptValidator
 {
   public static Validated<Receipt> Validate(OpenNewReceiptCommand command)
   {

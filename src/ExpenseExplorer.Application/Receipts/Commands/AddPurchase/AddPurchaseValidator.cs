@@ -4,7 +4,7 @@ using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Failures;
 using FunctionalCore.Validations;
 
-public static class AddPurchaseValidator
+internal static class AddPurchaseValidator
 {
   public static Validated<Purchase> Validate(AddPurchaseCommand command)
   {

@@ -18,7 +18,7 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Result<UpdateReceiptPatchModel> resultOfPatchModel = UpdateReceiptValidator.Validate(command).ToResult();
+    Result<ReceiptPatchModel> resultOfPatchModel = UpdateReceiptValidator.Validate(command).ToResult();
     Result<Receipt> resultOfReceipt = await UpdateReceiptAsync(
       resultOfPatchModel,
       command.ReceiptId,
@@ -28,7 +28,7 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
   }
 
   private async Task<Result<Receipt>> UpdateReceiptAsync(
-    Result<UpdateReceiptPatchModel> resultOfPatchModel,
+    Result<ReceiptPatchModel> resultOfPatchModel,
     string receiptId,
     CancellationToken cancellationToken)
   {
@@ -39,7 +39,7 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
   }
 
   private async Task<Result<Receipt>> UpdateReceiptAsync(
-    Result<UpdateReceiptPatchModel> resultOfPatchModel,
+    Result<ReceiptPatchModel> resultOfPatchModel,
     Id receiptId,
     CancellationToken cancellationToken)
   {
@@ -49,7 +49,7 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
   }
 
   private async Task<Result<Receipt>> UpdateReceiptAsync(
-    UpdateReceiptPatchModel patchModel,
+    ReceiptPatchModel patchModel,
     Id receiptId,
     CancellationToken cancellationToken)
   {

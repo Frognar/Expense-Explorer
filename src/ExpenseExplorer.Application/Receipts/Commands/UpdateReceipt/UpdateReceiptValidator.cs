@@ -5,13 +5,13 @@ using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
-public static class UpdateReceiptValidator
+internal static class UpdateReceiptValidator
 {
-  internal static Validated<UpdateReceiptPatchModel> Validate(UpdateReceiptCommand command)
+  public static Validated<ReceiptPatchModel> Validate(UpdateReceiptCommand command)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Func<Maybe<Store>, Maybe<PurchaseDate>, DateOnly, UpdateReceiptPatchModel> createPatchModel
-      = UpdateReceiptPatchModel.Create;
+    Func<Maybe<Store>, Maybe<PurchaseDate>, DateOnly, ReceiptPatchModel> createPatchModel
+      = ReceiptPatchModel.Create;
 
     return createPatchModel
       .Apply(Validate(command.StoreName))
