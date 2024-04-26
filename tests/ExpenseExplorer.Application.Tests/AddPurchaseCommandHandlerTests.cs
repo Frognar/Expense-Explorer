@@ -67,20 +67,20 @@ public class AddPurchaseCommandHandlerTests
       Add(Receipt.Recreate([createFact], default));
     }
 
-    public Task<Either<Failure, Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
+    public Task<Result<Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
     {
       cancellationToken.ThrowIfCancellationRequested();
       this[0] = receipt.WithVersion(Version.Create(receipt.Version.Value + 1));
-      return Task.FromResult(Right.From<Failure, Version>(Version.Create(receipt.Version.Value + 1)));
+      return Task.FromResult(Success.From(Version.Create(receipt.Version.Value + 1)));
     }
 
-    public Task<Either<Failure, Receipt>> GetAsync(Id id, CancellationToken cancellationToken)
+    public Task<Result<Receipt>> GetAsync(Id id, CancellationToken cancellationToken)
     {
       cancellationToken.ThrowIfCancellationRequested();
       Receipt? receipt = this.SingleOrDefault(r => r.Id == id);
       return receipt is null
-        ? Task.FromResult(Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id.Value)))
-        : Task.FromResult(Right.From<Failure, Receipt>(receipt));
+        ? Task.FromResult(Fail.OfType<Receipt>(new NotFoundFailure("Receipt not found", id.Value)))
+        : Task.FromResult(Success.From(receipt));
     }
   }
 }

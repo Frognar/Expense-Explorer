@@ -23,22 +23,22 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
   }
 
   private async Task<Result<Receipt>> AddPurchaseAsync(
-    Result<Purchase> eitherFailureOrPurchase,
+    Result<Purchase> resultOfPurchase,
     string receiptId,
     CancellationToken cancellationToken)
   {
     return await Id.TryCreate(receiptId)
       .Match(
         () => Task.FromResult(Fail.OfType<Receipt>(CommonFailures.InvalidReceiptId)),
-        async id => await AddPurchaseAsync(eitherFailureOrPurchase, id, cancellationToken));
+        async id => await AddPurchaseAsync(resultOfPurchase, id, cancellationToken));
   }
 
   private async Task<Result<Receipt>> AddPurchaseAsync(
-    Result<Purchase> eitherFailureOrPurchase,
+    Result<Purchase> resultOfPurchase,
     Id receiptId,
     CancellationToken cancellationToken)
   {
-    return await eitherFailureOrPurchase.Match(
+    return await resultOfPurchase.Match(
       failure => Task.FromResult(Fail.OfType<Receipt>(failure)),
       purchase => AddPurchaseAsync(purchase, receiptId, cancellationToken));
   }
@@ -48,8 +48,8 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
     Id receiptId,
     CancellationToken cancellationToken)
   {
-    var eitherFailureOrReceipt = await _receiptRepository.GetAsync(receiptId, cancellationToken);
-    return eitherFailureOrReceipt.MapRight(r => r.AddPurchase(purchase)).ToResult();
+    Result<Receipt> resultOfReceipt = await _receiptRepository.GetAsync(receiptId, cancellationToken);
+    return resultOfReceipt.Map(r => r.AddPurchase(purchase));
   }
 
   private async Task<Result<Receipt>> SaveAsync(
@@ -63,8 +63,7 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
 
   private async Task<Result<Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
-    var eitherFailureOrVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
-    var eitherFailureOrReceipt = eitherFailureOrVersion.MapRight(v => receipt.WithVersion(v).ClearChanges());
-    return eitherFailureOrReceipt.ToResult();
+    Result<Version> resultOfVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
+    return resultOfVersion.Map(v => receipt.WithVersion(v).ClearChanges());
   }
 }

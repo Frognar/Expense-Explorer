@@ -17,7 +17,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     _eventStore.Dispose();
   }
 
-  public async Task<Either<Failure, Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
+  public async Task<Result<Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
     try
     {
@@ -28,26 +28,26 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
         receipt.UnsavedChanges,
         cancellationToken);
 
-      return Right.From<Failure, Version>(version);
+      return Success.From(version);
     }
     catch (FactSaveException ex)
     {
-      return Left.From<Failure, Version>(new FatalFailure(ex));
+      return Fail.OfType<Version>(new FatalFailure(ex));
     }
   }
 
-  public async Task<Either<Failure, Receipt>> GetAsync(Id id, CancellationToken cancellationToken)
+  public async Task<Result<Receipt>> GetAsync(Id id, CancellationToken cancellationToken)
   {
     try
     {
       (List<Fact> facts, Version version) = await _eventStore.GetEventsAsync(id, cancellationToken);
       return facts.Count == 0
-        ? Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found", id.Value))
-        : Right.From<Failure, Receipt>(Receipt.Recreate(facts, version));
+        ? Fail.OfType<Receipt>(new NotFoundFailure("Receipt not found", id.Value))
+        : Success.From(Receipt.Recreate(facts, version));
     }
     catch (FactReadException ex)
     {
-      return Left.From<Failure, Receipt>(new FatalFailure(ex));
+      return Fail.OfType<Receipt>(new FatalFailure(ex));
     }
   }
 }

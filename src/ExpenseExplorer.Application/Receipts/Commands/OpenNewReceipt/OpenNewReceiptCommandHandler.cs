@@ -3,6 +3,7 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 using CommandHub.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
@@ -32,7 +33,7 @@ public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
 
   private async Task<Result<Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
-    var eitherFailureOrVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
-    return eitherFailureOrVersion.MapRight(v => receipt.WithVersion(v).ClearChanges()).ToResult();
+    Result<Version> resultOfVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
+    return resultOfVersion.Map(v => receipt.WithVersion(v).ClearChanges());
   }
 }

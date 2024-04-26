@@ -4,7 +4,6 @@ using CommandHub.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
@@ -53,7 +52,7 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
     Id receiptId,
     CancellationToken cancellationToken)
   {
-    Result<Receipt> resultOfReceipt = (await _receiptRepository.GetAsync(receiptId, cancellationToken)).ToResult();
+    Result<Receipt> resultOfReceipt = await _receiptRepository.GetAsync(receiptId, cancellationToken);
     return resultOfReceipt
       .Map(r => patchModel.Store.Match(() => r, r.CorrectStore))
       .Map(r => patchModel.PurchaseDate.Match(() => r, date => r.ChangePurchaseDate(date, patchModel.Today)));
@@ -70,7 +69,7 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
 
   private async Task<Result<Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
-    Either<Failure, Version> eitherFailureOrVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
-    return eitherFailureOrVersion.MapRight(v => receipt.WithVersion(v).ClearChanges()).ToResult();
+    Result<Version> resultOfVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
+    return resultOfVersion.Map(v => receipt.WithVersion(v).ClearChanges());
   }
 }
