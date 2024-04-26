@@ -9,71 +9,68 @@ using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
 public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
-  : ICommandHandler<UpdateReceiptCommand, Either<Failure, Receipt>>
+  : ICommandHandler<UpdateReceiptCommand, Result<Receipt>>
 {
   private readonly IReceiptRepository _receiptRepository = receiptRepository;
 
-  public async Task<Either<Failure, Receipt>> HandleAsync(
+  public async Task<Result<Receipt>> HandleAsync(
     UpdateReceiptCommand command,
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Either<Failure, UpdateReceiptPatchModel> eitherFailureOrPatchModel
-      = UpdateReceiptValidator.Validate(command).ToEither();
-
-    Either<Failure, Receipt> eitherFailureOrReceipt = await UpdateReceiptAsync(
-      eitherFailureOrPatchModel,
+    Result<UpdateReceiptPatchModel> resultOfPatchModel = UpdateReceiptValidator.Validate(command).ToResult();
+    Result<Receipt> resultOfReceipt = await UpdateReceiptAsync(
+      resultOfPatchModel,
       command.ReceiptId,
       cancellationToken);
 
-    eitherFailureOrReceipt = await SaveAsync(eitherFailureOrReceipt, cancellationToken);
-    return eitherFailureOrReceipt;
+    return await SaveAsync(resultOfReceipt, cancellationToken);
   }
 
-  private async Task<Either<Failure, Receipt>> UpdateReceiptAsync(
-    Either<Failure, UpdateReceiptPatchModel> eitherFailureOrPatchModel,
+  private async Task<Result<Receipt>> UpdateReceiptAsync(
+    Result<UpdateReceiptPatchModel> resultOfPatchModel,
     string receiptId,
     CancellationToken cancellationToken)
   {
     return await Id.TryCreate(receiptId)
       .Match(
-        () => Task.FromResult(Left.From<Failure, Receipt>(CommonFailures.InvalidReceiptId)),
-        async id => await UpdateReceiptAsync(eitherFailureOrPatchModel, id, cancellationToken));
+        () => Task.FromResult(Fail.OfType<Receipt>(CommonFailures.InvalidReceiptId)),
+        async id => await UpdateReceiptAsync(resultOfPatchModel, id, cancellationToken));
   }
 
-  private async Task<Either<Failure, Receipt>> UpdateReceiptAsync(
-    Either<Failure, UpdateReceiptPatchModel> eitherFailureOrPatchModel,
+  private async Task<Result<Receipt>> UpdateReceiptAsync(
+    Result<UpdateReceiptPatchModel> resultOfPatchModel,
     Id receiptId,
     CancellationToken cancellationToken)
   {
-    return await eitherFailureOrPatchModel.Match(
-      failure => Task.FromResult(Left.From<Failure, Receipt>(failure)),
+    return await resultOfPatchModel.Match(
+      failure => Task.FromResult(Fail.OfType<Receipt>(failure)),
       patchModel => UpdateReceiptAsync(patchModel, receiptId, cancellationToken));
   }
 
-  private async Task<Either<Failure, Receipt>> UpdateReceiptAsync(
+  private async Task<Result<Receipt>> UpdateReceiptAsync(
     UpdateReceiptPatchModel patchModel,
     Id receiptId,
     CancellationToken cancellationToken)
   {
-    Either<Failure, Receipt> eitherFailureOrReceipt = await _receiptRepository.GetAsync(receiptId, cancellationToken);
-    return eitherFailureOrReceipt
-      .MapRight(r => patchModel.Store.Match(() => r, r.CorrectStore))
-      .MapRight(r => patchModel.PurchaseDate.Match(() => r, date => r.ChangePurchaseDate(date, patchModel.Today)));
+    Result<Receipt> resultOfReceipt = (await _receiptRepository.GetAsync(receiptId, cancellationToken)).ToResult();
+    return resultOfReceipt
+      .Map(r => patchModel.Store.Match(() => r, r.CorrectStore))
+      .Map(r => patchModel.PurchaseDate.Match(() => r, date => r.ChangePurchaseDate(date, patchModel.Today)));
   }
 
-  private async Task<Either<Failure, Receipt>> SaveAsync(
-    Either<Failure, Receipt> eitherFailureOrReceipt,
+  private async Task<Result<Receipt>> SaveAsync(
+    Result<Receipt> resultOfReceipt,
     CancellationToken cancellationToken)
   {
-    return await eitherFailureOrReceipt.Match(
-      failure => Task.FromResult(Left.From<Failure, Receipt>(failure)),
+    return await resultOfReceipt.Match(
+      failure => Task.FromResult(Fail.OfType<Receipt>(failure)),
       receipt => SaveAsync(receipt, cancellationToken));
   }
 
-  private async Task<Either<Failure, Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
+  private async Task<Result<Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
     Either<Failure, Version> eitherFailureOrVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
-    return eitherFailureOrVersion.MapRight(v => receipt.WithVersion(v).ClearChanges());
+    return eitherFailureOrVersion.MapRight(v => receipt.WithVersion(v).ClearChanges()).ToResult();
   }
 }

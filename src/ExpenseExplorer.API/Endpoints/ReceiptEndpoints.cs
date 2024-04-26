@@ -79,9 +79,9 @@ public static class ReceiptEndpoints
   {
     DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
     UpdateReceiptCommand command = new(receiptId, request.StoreName, request.PurchaseDate, today);
-    Either<Failure, Receipt> result = await sender.SendAsync(command, cancellationToken);
+    Result<Receipt> result = await sender.SendAsync(command, cancellationToken);
     return result
-      .MapRight(r => new UpdateReceiptResponse(r.Id.Value, r.Store.Name, r.PurchaseDate.Date, r.Version.Value))
+      .Map(r => new UpdateReceiptResponse(r.Id.Value, r.Store.Name, r.PurchaseDate.Date, r.Version.Value))
       .Match(Handle, Results.Ok);
   }
 
