@@ -3,7 +3,6 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 using CommandHub.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
@@ -17,23 +16,10 @@ public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Result<Receipt> resultOfReceipt = OpenNewReceiptValidator.Validate(command).ToResult();
-    resultOfReceipt = await SaveAsync(resultOfReceipt, cancellationToken);
-    return resultOfReceipt;
-  }
-
-  private async Task<Result<Receipt>> SaveAsync(
-    Result<Receipt> resultOfReceipt,
-    CancellationToken cancellationToken)
-  {
-    return await resultOfReceipt.Match(
-      failure => Task.FromResult(Fail.OfType<Receipt>(failure)),
-      receipt => SaveAsync(receipt, cancellationToken));
-  }
-
-  private async Task<Result<Receipt>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
-  {
-    Result<Version> resultOfVersion = await _receiptRepository.SaveAsync(receipt, cancellationToken);
-    return resultOfVersion.Map(v => receipt.WithVersion(v).ClearChanges());
+    return
+      await (
+        from receipt in OpenNewReceiptValidator.Validate(command).ToResult()
+        from version in _receiptRepository.SaveAsync(receipt, cancellationToken)
+        select receipt.WithVersion(version).ClearChanges());
   }
 }
