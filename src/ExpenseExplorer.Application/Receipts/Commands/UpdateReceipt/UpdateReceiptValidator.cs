@@ -7,7 +7,7 @@ using FunctionalCore.Validations;
 
 internal static class UpdateReceiptValidator
 {
-  public static Validated<ReceiptPatchModel> Validate(UpdateReceiptCommand command)
+  public static Result<ReceiptPatchModel> Validate(UpdateReceiptCommand command)
   {
     ArgumentNullException.ThrowIfNull(command);
     Func<Maybe<Store>, Maybe<PurchaseDate>, DateOnly, ReceiptPatchModel> createPatchModel
@@ -16,7 +16,8 @@ internal static class UpdateReceiptValidator
     return createPatchModel
       .Apply(Validate(command.StoreName))
       .Apply(Validate(command.PurchaseDate, command.Today))
-      .Apply(Validation.Succeeded(command.Today));
+      .Apply(Validation.Succeeded(command.Today))
+      .ToResult();
   }
 
   private static Validated<Maybe<Store>> Validate(string? storeName)

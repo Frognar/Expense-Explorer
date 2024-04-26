@@ -2,11 +2,12 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Failures;
+using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
 internal static class AddPurchaseValidator
 {
-  public static Validated<Purchase> Validate(AddPurchaseCommand command)
+  public static Result<Purchase> Validate(AddPurchaseCommand command)
   {
     ArgumentNullException.ThrowIfNull(command);
     Func<Id, Item, Category, Quantity, Money, Money, Description, Purchase> createPurchase = Purchase.Create;
@@ -17,7 +18,8 @@ internal static class AddPurchaseValidator
       .Apply(ValidateQuantity(command.Quantity))
       .Apply(ValidateUnitPrice(command.UnitPrice))
       .Apply(ValidateTotalDiscount(command.TotalDiscount))
-      .Apply(Validation.Succeeded(Description.Create(command.Description)));
+      .Apply(Validation.Succeeded(Description.Create(command.Description)))
+      .ToResult();
   }
 
   private static Validated<Item> ValidateItem(string item)

@@ -5,7 +5,6 @@ using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Monads;
-using FunctionalCore.Validations;
 
 public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<UpdateReceiptCommand, Result<Receipt>>
@@ -17,7 +16,7 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Result<ReceiptPatchModel> resultOfPatchModel = UpdateReceiptValidator.Validate(command).ToResult();
+    Result<ReceiptPatchModel> resultOfPatchModel = UpdateReceiptValidator.Validate(command);
     Result<Receipt> resultOfReceipt = await UpdateReceiptAsync(
       resultOfPatchModel,
       command.ReceiptId,

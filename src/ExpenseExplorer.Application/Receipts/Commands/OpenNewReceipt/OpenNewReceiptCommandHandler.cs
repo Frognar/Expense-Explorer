@@ -4,7 +4,6 @@ using CommandHub.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using FunctionalCore.Monads;
-using FunctionalCore.Validations;
 
 public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<OpenNewReceiptCommand, Result<Receipt>>
@@ -18,7 +17,7 @@ public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
     ArgumentNullException.ThrowIfNull(command);
     return
       await (
-        from receipt in OpenNewReceiptValidator.Validate(command).ToResult()
+        from receipt in OpenNewReceiptValidator.Validate(command)
         from version in _receiptRepository.SaveAsync(receipt, cancellationToken)
         select receipt.WithVersion(version).ClearChanges());
   }
