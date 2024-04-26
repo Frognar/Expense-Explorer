@@ -13,6 +13,12 @@ public static class ReceiptMapper
     return new OpenNewReceiptCommand(request.StoreName, request.PurchaseDate, today);
   }
 
+  public static UpdateReceiptCommand MapToCommand(this UpdateReceiptRequest request, string receiptId, DateOnly today)
+  {
+    ArgumentNullException.ThrowIfNull(request);
+    return new UpdateReceiptCommand(receiptId, request.StoreName, request.PurchaseDate, today);
+  }
+
   public static AddPurchaseCommand MapToCommand(this AddPurchaseRequest request, string receiptId)
   {
     ArgumentNullException.ThrowIfNull(request);
@@ -36,6 +42,15 @@ public static class ReceiptMapper
         receipt.Store.Name,
         receipt.PurchaseDate.Date,
         receipt.Purchases.Select(MapToResponse),
+        receipt.Version.Value);
+    }
+
+    if (typeof(TResult) == typeof(UpdateReceiptResponse))
+    {
+      return (TResult)(object)new UpdateReceiptResponse(
+        receipt.Id.Value,
+        receipt.Store.Name,
+        receipt.PurchaseDate.Date,
         receipt.Version.Value);
     }
 

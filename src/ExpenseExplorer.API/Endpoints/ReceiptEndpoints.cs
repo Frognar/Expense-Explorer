@@ -5,7 +5,6 @@ using System.Net;
 using CommandHub;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
-using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.ReadModel.Models;
 using ExpenseExplorer.ReadModel.Queries;
 using FunctionalCore.Failures;
@@ -78,10 +77,9 @@ public static class ReceiptEndpoints
     CancellationToken cancellationToken)
   {
     DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
-    UpdateReceiptCommand command = new(receiptId, request.StoreName, request.PurchaseDate, today);
-    Result<Receipt> result = await sender.SendAsync(command, cancellationToken);
+    Result<Receipt> result = await sender.SendAsync(request.MapToCommand(receiptId, today), cancellationToken);
     return result
-      .Map(r => new UpdateReceiptResponse(r.Id.Value, r.Store.Name, r.PurchaseDate.Date, r.Version.Value))
+      .Map(r => r.MapTo<UpdateReceiptResponse>())
       .Match(Handle, Results.Ok);
   }
 
