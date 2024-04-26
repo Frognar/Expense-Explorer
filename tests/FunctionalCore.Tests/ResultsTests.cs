@@ -47,6 +47,20 @@ public class ResultsTests
   }
 
   [Property]
+  public async Task MapsAsyncWhenSuccess(int value)
+  {
+    var result = value < 0
+      ? Fail.OfType<int>(new TestFailure("Negative"))
+      : Success.From(value);
+
+    var projected = await result.MapAsync(v => Task.FromResult(v.ToString(CultureInfo.InvariantCulture)));
+
+    projected.Match(failure => failure.Message, r => r)
+      .Should()
+      .Be(value < 0 ? "Negative" : value.ToString(CultureInfo.InvariantCulture));
+  }
+
+  [Property]
   public void MapsWithQuerySyntax(int value)
   {
     var result = value < 0
@@ -78,6 +92,21 @@ public class ResultsTests
   }
 
   [Property]
+  public async Task FlatMapsAsyncWhenSuccess(int value)
+  {
+    var result = value < 0
+      ? Fail.OfType<int>(new TestFailure("Negative"))
+      : Success.From(value);
+
+    var projected = await result
+      .FlatMapAsync(v => Task.FromResult(Success.From(v.ToString(CultureInfo.InvariantCulture))));
+
+    projected.Match(failure => failure.Message, r => r)
+      .Should()
+      .Be(value < 0 ? "Negative" : value.ToString(CultureInfo.InvariantCulture));
+  }
+
+  [Property]
   public void FlatMapsWithQuerySyntax(int value)
   {
     var result = value < 0
@@ -88,6 +117,23 @@ public class ResultsTests
       from r in result
       from r1 in result
       select r + r1;
+
+    projected.Match(failure => failure.Message, r => r.ToString(CultureInfo.InvariantCulture))
+      .Should()
+      .Be(value < 0 ? "Negative" : (value * 2).ToString(CultureInfo.InvariantCulture));
+  }
+
+  [Property]
+  public async Task FlatMapsAsyncWithQuerySyntax(int value)
+  {
+    var result = value < 0
+      ? Fail.OfType<int>(new TestFailure("Negative"))
+      : Success.From(value);
+
+    var projected = await (
+      from r in result
+      from r1 in Task.FromResult(result)
+      select r + r1);
 
     projected.Match(failure => failure.Message, r => r.ToString(CultureInfo.InvariantCulture))
       .Should()
