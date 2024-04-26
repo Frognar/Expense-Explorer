@@ -15,6 +15,12 @@ public static class Validation
     return validated.Match(Left.From<Failure, S>, Right.From<Failure, S>);
   }
 
+  public static Result<S> ToResult<S>(this Validated<S> validated)
+  {
+    ArgumentNullException.ThrowIfNull(validated);
+    return validated.Match(Fail.OfType<S>, Success.From);
+  }
+
   public static Validated<S> Apply<T, S>(this Func<T, S> map, Validated<T> source)
   {
     return Apply(Succeeded(map), source);

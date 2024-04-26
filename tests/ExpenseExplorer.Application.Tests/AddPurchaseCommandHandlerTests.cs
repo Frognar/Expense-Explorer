@@ -52,7 +52,7 @@ public class AddPurchaseCommandHandlerTests
     return result.Match(_ => throw new UnreachableException(), r => r);
   }
 
-  private async Task<Either<Failure, Receipt>> Handle(AddPurchaseCommand command)
+  private async Task<Result<Receipt>> Handle(AddPurchaseCommand command)
   {
     AddPurchaseCommandHandler handler = new(_receiptRepository);
     return await handler.HandleAsync(command);

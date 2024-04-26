@@ -91,9 +91,9 @@ public static class ReceiptEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    Either<Failure, Receipt> result = await sender.SendAsync(request.MapToCommand(receiptId), cancellationToken);
+    Result<Receipt> result = await sender.SendAsync(request.MapToCommand(receiptId), cancellationToken);
     return result
-      .MapRight(r => r.MapTo<AddPurchaseResponse>())
+      .Map(r => r.MapTo<AddPurchaseResponse>())
       .Match(Handle, response => Results.CreatedAtRoute(_getReceiptRoute, new { receiptId = response.Id }, response));
   }
 
