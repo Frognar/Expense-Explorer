@@ -16,16 +16,12 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Result<Receipt> resultOfReceipt = await (
-      from purchase in AddPurchaseValidator.Validate(command)
-      from receipt in Id.TryCreate(command.ReceiptId)
-        .ToResult(() => CommonFailures.InvalidReceiptId)
-        .FlatMapAsync(async id => await _receiptRepository.GetAsync(id, cancellationToken))
-      select receipt.AddPurchase(purchase));
-
     return await (
-      from receipt in resultOfReceipt
-      from version in _receiptRepository.SaveAsync(receipt, cancellationToken)
-      select receipt.WithVersion(version).ClearChanges());
+      from purchase in AddPurchaseValidator.Validate(command)
+      from id in Id.TryCreate(command.ReceiptId).ToResult(() => CommonFailures.InvalidReceiptId)
+      from receipt in _receiptRepository.GetAsync(id, cancellationToken)
+      from receiptWithPurchase in Success.From(receipt.AddPurchase(purchase))
+      from version in _receiptRepository.SaveAsync(receiptWithPurchase, cancellationToken)
+      select receiptWithPurchase.WithVersion(version).ClearChanges());
   }
 }

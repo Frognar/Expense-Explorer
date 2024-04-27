@@ -131,13 +131,16 @@ public class ResultsTests
       : Success.From(value);
 
     var projected = await (
-      from r in result
+      from r0 in result
       from r1 in Task.FromResult(result)
-      select r + r1);
+      from r2 in result
+      from r3 in Task.FromResult(result)
+      from r4 in result
+      select r0 + r1 + r2 + r3 + r4);
 
     projected.Match(failure => failure.Message, r => r.ToString(CultureInfo.InvariantCulture))
       .Should()
-      .Be(value < 0 ? "Negative" : (value * 2).ToString(CultureInfo.InvariantCulture));
+      .Be(value < 0 ? "Negative" : (value * 5).ToString(CultureInfo.InvariantCulture));
   }
 
   private sealed record TestFailure(string Message) : Failure(Message);
