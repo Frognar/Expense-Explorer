@@ -1,9 +1,17 @@
 namespace FunctionalCore.Monads;
 
 using System.Diagnostics.CodeAnalysis;
+using FunctionalCore.Failures;
 
 public static class MaybeExtensions
 {
+  public static Result<T> ToResult<T>(this Maybe<T> source, Func<Failure> onNoneFailureFactory)
+  {
+    ArgumentNullException.ThrowIfNull(source);
+    ArgumentNullException.ThrowIfNull(onNoneFailureFactory);
+    return source.Match(() => Fail.OfType<T>(onNoneFailureFactory()), Success.From);
+  }
+
   public static async Task<Maybe<TResult>> MapAsync<T, TResult>(this Maybe<T> source, Func<T, Task<TResult>> map)
   {
     ArgumentNullException.ThrowIfNull(source);

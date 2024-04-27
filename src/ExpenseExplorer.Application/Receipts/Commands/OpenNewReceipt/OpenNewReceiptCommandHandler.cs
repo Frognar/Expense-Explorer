@@ -15,10 +15,9 @@ public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    return
-      await (
-        from receipt in OpenNewReceiptValidator.Validate(command)
-        from version in _receiptRepository.SaveAsync(receipt, cancellationToken)
-        select receipt.WithVersion(version).ClearChanges());
+    return await (
+      from receipt in OpenNewReceiptValidator.Validate(command)
+      from version in _receiptRepository.SaveAsync(receipt, cancellationToken)
+      select receipt.WithVersion(version).ClearChanges());
   }
 }
