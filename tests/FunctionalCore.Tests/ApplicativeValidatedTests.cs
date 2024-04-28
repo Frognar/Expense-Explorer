@@ -204,6 +204,38 @@ public class ApplicativeValidatedTests
       .Be(GetExpectedString(v1, v2, v3, v4, v5, v6, v7, v8, v9, v0));
   }
 
+  [Property]
+  public void ApplyStartingWithFailure(int v1, int v2, int v3, int v4, int v5, int v6, int v7, int v8, int v9, int v0)
+  {
+    ValidationError error = ValidationError.Create("test", "failure");
+    Validated<Func<int, int, int, int, int, int, int, int, int, int, string>> failure =
+      Validation.Failed<Func<int, int, int, int, int, int, int, int, int, int, string>>(Failure.Validation(error));
+
+    Validated<string> validatedResult =
+      failure
+        .Apply(Validate(v1))
+        .Apply(Validate(v2))
+        .Apply(Validate(v3))
+        .Apply(Validate(v4))
+        .Apply(Validate(v5))
+        .Apply(Validate(v6))
+        .Apply(Validate(v7))
+        .Apply(Validate(v8))
+        .Apply(Validate(v9))
+        .Apply(Validate(v0));
+
+    validatedResult
+      .Match(AggregateErrors, v => v.ToString())
+      .Should()
+      .Be(GetExpectedErrorString(error, v1, v2, v3, v4, v5, v6, v7, v8, v9, v0));
+  }
+
+  private static string GetExpectedErrorString(ValidationError error, int value, params int[] values)
+  {
+    ValidationFailure errors = Failure.Validation(error).Concat(CreateErrors(CountInvalid(value, values)));
+    return AggregateErrors(errors);
+  }
+
   private static string GetExpectedString(int value, params int[] values)
   {
     ValidationFailure errors = CreateErrors(CountInvalid(value, values));
