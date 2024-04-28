@@ -9,37 +9,16 @@ public class FailureTests
   {
     Exception ex = new TestException("TEST");
 
-    FatalFailure failure = new FatalFailure(ex);
+    FatalFailure failure = Failure.Fatal(ex);
 
-    failure.Exception.Should().Be(ex);
-    failure.Message.Should().Be(ex.Message);
-  }
-
-  [Fact]
-  public void CanRecreateFatalFailure()
-  {
-    Exception ex = new TestException("TEST");
-
-    FatalFailure failure = new FatalFailure(new FatalFailure(ex));
-
-    failure.Exception.Should().Be(ex);
-    failure.Message.Should().Be(ex.Message);
+    AssertFatal(failure, ex);
   }
 
   [Fact]
   public void CanCreateNotFoundFailure()
   {
-    NotFoundFailure failure = new NotFoundFailure("Not found", "ID");
-    failure.Id.Should().Be("ID");
-    failure.Message.Should().Be("Not found");
-  }
-
-  [Fact]
-  public void CanRecreateNotFoundFailure()
-  {
-    NotFoundFailure failure = new NotFoundFailure(new NotFoundFailure("Not found", "ID"));
-    failure.Message.Should().Be("Not found");
-    failure.Id.Should().Be("ID");
+    NotFoundFailure failure = Failure.NotFound("Not found", "ID");
+    AssertNotFound(failure, "Not found", "ID");
   }
 
   [Fact]
@@ -47,23 +26,9 @@ public class FailureTests
   {
     ValidationError error = new("ID", "Invalid");
 
-    ValidationFailure failure = new ValidationFailure([error]);
+    ValidationFailure failure = Failure.Validation([error]);
 
-    failure.Errors.Should().Contain(error);
-    failure.Errors.Count().Should().Be(1);
-    failure.Message.Should().Be("One or more validation errors occurred.");
-  }
-
-  [Fact]
-  public void CanRecreateValidationFailure()
-  {
-    ValidationError error = new("ID", "Invalid");
-
-    ValidationFailure failure = new ValidationFailure(new ValidationFailure([error]));
-
-    failure.Errors.Should().Contain(error);
-    failure.Errors.Count().Should().Be(1);
-    failure.Message.Should().Be("One or more validation errors occurred.");
+    AssertValidationFailure(failure, error);
   }
 
   [Fact]
@@ -71,19 +36,44 @@ public class FailureTests
   {
     ValidationError error = new("ID", "Invalid");
 
-    ValidationFailure failure = ValidationFailure.SingleFailure(error);
+    ValidationFailure failure = Failure.Validation(error);
 
-    failure.Errors.Should().Contain(error);
-    failure.Errors.Count().Should().Be(1);
-    failure.Message.Should().Be("One or more validation errors occurred.");
+    AssertValidationFailure(failure, error);
   }
 
   [Fact]
   public void CanCreateValidationFailureWithSinglePropertyError()
   {
-    ValidationFailure failure = ValidationFailure.SingleFailure("ID", "Invalid");
-    failure.Errors.Should().Contain(new ValidationError("ID", "Invalid"));
-    failure.Errors.Count().Should().Be(1);
+    ValidationFailure failure = Failure.Validation("ID", "Invalid");
+    AssertValidationFailure(failure, new ValidationError("ID", "Invalid"));
+  }
+
+  [Fact]
+  public void CanRecreateFailure()
+  {
+    Exception ex = new TestException("TEST");
+
+    FatalFailure failure = Failure.Fatal(ex) with { Message = "Override" };
+
+    failure.Message.Should().Be("Override");
+  }
+
+  private static void AssertFatal(FatalFailure failure, Exception ex)
+  {
+    failure.Exception.Should().Be(ex);
+    failure.Message.Should().Be(ex.Message);
+  }
+
+  private static void AssertNotFound(NotFoundFailure failure, string message, string id)
+  {
+    failure.Id.Should().Be(id);
+    failure.Message.Should().Be(message);
+  }
+
+  private static void AssertValidationFailure(ValidationFailure failure, ValidationError containedError)
+  {
+    failure.Errors.Should().Contain(containedError);
+    failure.Errors.Should().HaveCount(1);
     failure.Message.Should().Be("One or more validation errors occurred.");
   }
 }
