@@ -1,10 +1,7 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-using System.Text.Json.Serialization;
-
 public record Description
 {
-  [JsonConstructor]
   private Description(string? value)
   {
     Value = value?.Trim() ?? string.Empty;

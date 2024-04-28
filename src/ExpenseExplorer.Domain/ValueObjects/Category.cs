@@ -1,12 +1,10 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-using System.Text.Json.Serialization;
 using ExpenseExplorer.Domain.Exceptions;
 using FunctionalCore.Monads;
 
 public record Category
 {
-  [JsonConstructor]
   private Category(string name)
   {
     EmptyCategoryNameException.ThrowIfEmpty(name);

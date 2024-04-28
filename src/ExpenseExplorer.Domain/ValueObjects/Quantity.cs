@@ -1,12 +1,10 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-using System.Text.Json.Serialization;
 using ExpenseExplorer.Domain.Exceptions;
 using FunctionalCore.Monads;
 
 public record Quantity
 {
-  [JsonConstructor]
   private Quantity(decimal value)
   {
     NonPositiveQuantityException.ThrowIfNotPositive(value);
