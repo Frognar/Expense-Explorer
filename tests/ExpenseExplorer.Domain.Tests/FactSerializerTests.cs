@@ -1,10 +1,31 @@
 namespace ExpenseExplorer.Domain.Tests;
 
+using System.Diagnostics;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 
 public class FactSerializerTests
 {
+  [Fact]
+  public void ThrowsWhenSerializingUnknownFact()
+  {
+    Fact fact = new UnknownFact();
+
+    Action act = () => FactSerializer.Serialize(fact);
+
+    act.Should().Throw<UnreachableException>();
+  }
+
+  [Fact]
+  public void ThrowsWhenDeserializingUnknownFact()
+  {
+    byte[] data = "{}"u8.ToArray();
+
+    Action act = () => FactSerializer.Deserialize("UNKNOWN", data);
+
+    act.Should().Throw<UnreachableException>();
+  }
+
   [Fact]
   public void SerializeReceiptCreated()
   {
@@ -99,4 +120,6 @@ public class FactSerializerTests
 
     fact.Should().BeOfType<PurchaseDateChanged>();
   }
+
+  private sealed record UnknownFact : Fact;
 }

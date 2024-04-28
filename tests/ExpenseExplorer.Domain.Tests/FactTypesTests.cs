@@ -1,10 +1,19 @@
 namespace ExpenseExplorer.Domain.Tests;
 
+using System.Diagnostics;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 
 public class FactTypesTests
 {
+  [Fact]
+  public void ThrowsWhenGettingTypeForUnknownFact()
+  {
+    Fact fact = new UnknownFact();
+    Action act = () => FactTypes.GetFactType(fact);
+    act.Should().Throw<UnreachableException>();
+  }
+
   [Fact]
   public void GetTypeForReceiptCreated()
   {
@@ -40,4 +49,6 @@ public class FactTypesTests
     string type = FactTypes.GetFactType(fact);
     type.Should().Be(expectedType);
   }
+
+  private sealed record UnknownFact : Fact;
 }
