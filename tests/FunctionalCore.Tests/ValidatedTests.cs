@@ -17,7 +17,7 @@ public class ValidatedTests
   [Property(Arbitrary = [typeof(ValidationErrorGenerator)])]
   public void IsInvalidWithErrors(ValidationError error)
   {
-    Validated<string> validated = Validation.Failed<string>(ValidationFailure.SingleFailure(error));
+    Validated<string> validated = Validation.Failed<string>(Failure.Validation(error));
     validated.IsValid.Should().BeFalse();
   }
 
@@ -96,7 +96,7 @@ public class ValidatedTests
 
   private static Validated<int> Validate(int value)
     => value < 0
-      ? Validation.Failed<int>(ValidationFailure.SingleFailure("value", "NEGATIVE_VALUE"))
+      ? Validation.Failed<int>(Failure.Validation("value", "NEGATIVE_VALUE"))
       : Validation.Succeeded(value);
 
   private static string ToInvariantString(int value) => value.ToString(CultureInfo.InvariantCulture);

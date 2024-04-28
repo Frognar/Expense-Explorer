@@ -4,6 +4,5 @@ using FunctionalCore.Failures;
 
 public static class CommonFailures
 {
-  public static readonly ValidationFailure InvalidReceiptId
-    = ValidationFailure.SingleFailure("ReceiptId", "INVALID_RECEIPT_ID");
+  public static readonly ValidationFailure InvalidReceiptId = Failure.Validation("ReceiptId", "INVALID_RECEIPT_ID");
 }

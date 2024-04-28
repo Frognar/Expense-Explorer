@@ -29,7 +29,7 @@ internal static class UpdateReceiptValidator
 
     return Store.TryCreate(storeName)
       .Match(
-        () => Validation.Failed<Maybe<Store>>(ValidationFailure.SingleFailure("StoreName", "EMPTY_STORE_NAME")),
+        () => Validation.Failed<Maybe<Store>>(Failure.Validation("StoreName", "EMPTY_STORE_NAME")),
         store => Validation.Succeeded(Some.From(store)));
   }
 
@@ -42,7 +42,7 @@ internal static class UpdateReceiptValidator
 
     return PurchaseDate.TryCreate(date.Value, today)
       .Match(
-        () => Validation.Failed<Maybe<PurchaseDate>>(ValidationFailure.SingleFailure("PurchaseDate", "FUTURE_DATE")),
+        () => Validation.Failed<Maybe<PurchaseDate>>(Failure.Validation("PurchaseDate", "FUTURE_DATE")),
         purchaseDate => Validation.Succeeded(Some.From(purchaseDate)));
   }
 }

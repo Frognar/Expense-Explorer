@@ -23,7 +23,7 @@ internal static class OpenNewReceiptValidator
   {
     return Store.TryCreate(storeName)
       .Match(
-        () => Validation.Failed<Store>(ValidationFailure.SingleFailure("StoreName", "EMPTY_STORE_NAME")),
+        () => Validation.Failed<Store>(Failure.Validation("StoreName", "EMPTY_STORE_NAME")),
         Validation.Succeeded);
   }
 
@@ -31,7 +31,7 @@ internal static class OpenNewReceiptValidator
   {
     return PurchaseDate.TryCreate(purchaseDate, today)
       .Match(
-        () => Validation.Failed<PurchaseDate>(ValidationFailure.SingleFailure("PurchaseDate", "FUTURE_DATE")),
+        () => Validation.Failed<PurchaseDate>(Failure.Validation("PurchaseDate", "FUTURE_DATE")),
         Validation.Succeeded);
   }
 }

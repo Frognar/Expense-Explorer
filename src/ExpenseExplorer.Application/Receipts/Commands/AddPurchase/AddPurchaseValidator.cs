@@ -26,7 +26,7 @@ internal static class AddPurchaseValidator
   {
     return Item.TryCreate(item)
       .Match(
-        () => Validation.Failed<Item>(ValidationFailure.SingleFailure("Item", "EMPTY_ITEM_NAME")),
+        () => Validation.Failed<Item>(Failure.Validation("Item", "EMPTY_ITEM_NAME")),
         Validation.Succeeded);
   }
 
@@ -34,7 +34,7 @@ internal static class AddPurchaseValidator
   {
     return Category.TryCreate(category)
       .Match(
-        () => Validation.Failed<Category>(ValidationFailure.SingleFailure("Category", "EMPTY_CATEGORY")),
+        () => Validation.Failed<Category>(Failure.Validation("Category", "EMPTY_CATEGORY")),
         Validation.Succeeded);
   }
 
@@ -42,7 +42,7 @@ internal static class AddPurchaseValidator
   {
     return Quantity.TryCreate(quantity)
       .Match(
-        () => Validation.Failed<Quantity>(ValidationFailure.SingleFailure("Quantity", "NON_POSITIVE_QUANTITY")),
+        () => Validation.Failed<Quantity>(Failure.Validation("Quantity", "NON_POSITIVE_QUANTITY")),
         Validation.Succeeded);
   }
 
@@ -50,7 +50,7 @@ internal static class AddPurchaseValidator
   {
     return Money.TryCreate(unitPrice)
       .Match(
-        () => Validation.Failed<Money>(ValidationFailure.SingleFailure("UnitPrice", "NEGATIVE_UNIT_PRICE")),
+        () => Validation.Failed<Money>(Failure.Validation("UnitPrice", "NEGATIVE_UNIT_PRICE")),
         Validation.Succeeded);
   }
 
@@ -63,7 +63,7 @@ internal static class AddPurchaseValidator
 
     return Money.TryCreate(totalDiscount.Value)
       .Match(
-        () => Validation.Failed<Money>(ValidationFailure.SingleFailure("TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT")),
+        () => Validation.Failed<Money>(Failure.Validation("TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT")),
         Validation.Succeeded);
   }
 }

@@ -217,7 +217,7 @@ public class ApplicativeValidatedTests
 
   private static ValidationFailure CreateErrors(int count)
   {
-    return new ValidationFailure(Enumerable.Repeat(ValidationError.Create("value", "NEGATIVE_VALUE"), count));
+    return Failure.Validation(Enumerable.Repeat(ValidationError.Create("value", "NEGATIVE_VALUE"), count));
   }
 
   private static int Sum(int value, params int[] values)
@@ -230,7 +230,7 @@ public class ApplicativeValidatedTests
 
   private static Validated<int> Validate(int value)
     => value < 0
-      ? Validation.Failed<int>(ValidationFailure.SingleFailure("value", "NEGATIVE_VALUE"))
+      ? Validation.Failed<int>(Failure.Validation("value", "NEGATIVE_VALUE"))
       : Validation.Succeeded(value);
 
   private static string ToInvariantString(int value) => value.ToString(CultureInfo.InvariantCulture);
