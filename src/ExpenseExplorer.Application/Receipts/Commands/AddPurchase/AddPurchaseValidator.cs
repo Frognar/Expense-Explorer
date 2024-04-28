@@ -1,7 +1,6 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
@@ -26,7 +25,7 @@ internal static class AddPurchaseValidator
   {
     return Item.TryCreate(item)
       .Match(
-        () => Validation.Failed<Item>(Failure.Validation("Item", "EMPTY_ITEM_NAME")),
+        () => Validation.Failed<Item>(CommonFailures.EmptyItemName),
         Validation.Succeeded);
   }
 
@@ -34,7 +33,7 @@ internal static class AddPurchaseValidator
   {
     return Category.TryCreate(category)
       .Match(
-        () => Validation.Failed<Category>(Failure.Validation("Category", "EMPTY_CATEGORY")),
+        () => Validation.Failed<Category>(CommonFailures.EmptyCategory),
         Validation.Succeeded);
   }
 
@@ -42,7 +41,7 @@ internal static class AddPurchaseValidator
   {
     return Quantity.TryCreate(quantity)
       .Match(
-        () => Validation.Failed<Quantity>(Failure.Validation("Quantity", "NON_POSITIVE_QUANTITY")),
+        () => Validation.Failed<Quantity>(CommonFailures.NonPositiveQuantity),
         Validation.Succeeded);
   }
 
@@ -50,7 +49,7 @@ internal static class AddPurchaseValidator
   {
     return Money.TryCreate(unitPrice)
       .Match(
-        () => Validation.Failed<Money>(Failure.Validation("UnitPrice", "NEGATIVE_UNIT_PRICE")),
+        () => Validation.Failed<Money>(CommonFailures.NegativeUnitPrice),
         Validation.Succeeded);
   }
 
@@ -63,7 +62,7 @@ internal static class AddPurchaseValidator
 
     return Money.TryCreate(totalDiscount.Value)
       .Match(
-        () => Validation.Failed<Money>(Failure.Validation("TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT")),
+        () => Validation.Failed<Money>(CommonFailures.NegativeTotalDiscount),
         Validation.Succeeded);
   }
 }

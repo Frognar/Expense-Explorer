@@ -1,7 +1,6 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
@@ -29,7 +28,7 @@ internal static class UpdateReceiptValidator
 
     return Store.TryCreate(storeName)
       .Match(
-        () => Validation.Failed<Maybe<Store>>(Failure.Validation("StoreName", "EMPTY_STORE_NAME")),
+        () => Validation.Failed<Maybe<Store>>(CommonFailures.EmptyStoreName),
         store => Validation.Succeeded(Some.From(store)));
   }
 
@@ -42,7 +41,7 @@ internal static class UpdateReceiptValidator
 
     return PurchaseDate.TryCreate(date.Value, today)
       .Match(
-        () => Validation.Failed<Maybe<PurchaseDate>>(Failure.Validation("PurchaseDate", "FUTURE_DATE")),
+        () => Validation.Failed<Maybe<PurchaseDate>>(CommonFailures.FutureDate),
         purchaseDate => Validation.Succeeded(Some.From(purchaseDate)));
   }
 }

@@ -2,7 +2,6 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
@@ -23,7 +22,7 @@ internal static class OpenNewReceiptValidator
   {
     return Store.TryCreate(storeName)
       .Match(
-        () => Validation.Failed<Store>(Failure.Validation("StoreName", "EMPTY_STORE_NAME")),
+        () => Validation.Failed<Store>(CommonFailures.EmptyStoreName),
         Validation.Succeeded);
   }
 
@@ -31,7 +30,7 @@ internal static class OpenNewReceiptValidator
   {
     return PurchaseDate.TryCreate(purchaseDate, today)
       .Match(
-        () => Validation.Failed<PurchaseDate>(Failure.Validation("PurchaseDate", "FUTURE_DATE")),
+        () => Validation.Failed<PurchaseDate>(CommonFailures.FutureDate),
         Validation.Succeeded);
   }
 }
