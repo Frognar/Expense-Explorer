@@ -75,6 +75,18 @@ public class ValidatedTests
       .Be(GetExpectedString(value));
   }
 
+  [Property]
+  public void ChangeToResult(int value)
+  {
+    Validated<int> validated = Validate(value);
+
+    Result<int> result = validated.ToResult();
+
+    result.Match(AggregateErrors, v => v.ToString(CultureInfo.InvariantCulture))
+      .Should()
+      .Be(GetExpectedString(value));
+  }
+
   private static string GetExpectedString(int value) => value < 0 ? "value: NEGATIVE_VALUE" : ToInvariantString(value);
 
   private static string AggregateErrors(Failure errors) => AggregateErrors((ValidationFailure)errors);

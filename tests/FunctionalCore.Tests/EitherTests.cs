@@ -1,6 +1,7 @@
 ﻿namespace FunctionalCore.Tests;
 
 using System.Globalization;
+using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
 public class EitherTests
@@ -152,4 +153,20 @@ public class EitherTests
       .Should()
       .Be(value < 0 ? value : "NegativeNegative".Length);
   }
+
+  [Property]
+  public void ChangeToResult(int value)
+  {
+    var either = value < 0
+      ? Left.From<Failure, int>(new TestFailure("Negative"))
+      : Right.From<Failure, int>(value);
+
+    var result = either.ToResult();
+
+    result.Match(f => f.Message.Length, s => s)
+      .Should()
+      .Be(value < 0 ? "Negative".Length : value);
+  }
+
+  private sealed record TestFailure(string Message) : Failure(Message);
 }

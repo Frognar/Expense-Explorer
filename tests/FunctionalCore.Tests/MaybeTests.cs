@@ -1,5 +1,6 @@
 namespace FunctionalCore.Tests;
 
+using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
 public class MaybeTests
@@ -135,4 +136,20 @@ public class MaybeTests
       .Should()
       .Be(value < 0 ? -1 : value * 2);
   }
+
+  [Property]
+  public void ChangeToResult(int value)
+  {
+    var maybe = value < 0
+      ? None.OfType<int>()
+      : Some.From(value);
+
+    var result = maybe.ToResult(() => new TestFailure("Negative"));
+
+    result.Match(f => f.Message.Length, s => s)
+      .Should()
+      .Be(value < 0 ? "Negative".Length : value);
+  }
+
+  private sealed record TestFailure(string Message) : Failure(Message);
 }

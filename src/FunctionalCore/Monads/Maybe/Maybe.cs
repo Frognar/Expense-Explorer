@@ -48,6 +48,8 @@ public class Maybe<T>
 
   private readonly record struct SomeValue(T Value) : IMaybe
   {
+    private T Value { get; } = Value;
+
     public TResult Match<TResult>(Func<TResult> onNone, Func<T, TResult> onSome) => onSome(Value);
   }
 
