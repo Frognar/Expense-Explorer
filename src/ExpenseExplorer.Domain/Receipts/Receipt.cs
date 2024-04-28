@@ -94,7 +94,7 @@ public class Receipt
       StoreCorrected storeCorrected => Apply(storeCorrected),
       PurchaseAdded purchaseAdded => Apply(purchaseAdded),
       PurchaseDateChanged purchaseDateChanged => Apply(purchaseDateChanged),
-      _ => this,
+      _ => throw new ArgumentException($"Unknown fact type: {fact.GetType()}", nameof(fact)),
     };
   }
 

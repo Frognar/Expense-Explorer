@@ -140,4 +140,16 @@ public class ReceiptTests
 
     receipt.UnsavedChanges.Should().BeEmpty();
   }
+
+  [Fact]
+  public void ThrowsWhenRecreatedWithUnsupportedFact()
+  {
+    Fact unknown = new UnknownFact();
+
+    Action act = () => Receipt.Recreate([unknown], Version.New());
+
+    act.Should().Throw<ArgumentException>();
+  }
+
+  private sealed record UnknownFact : Fact;
 }
