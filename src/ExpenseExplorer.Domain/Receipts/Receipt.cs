@@ -103,6 +103,7 @@ public class Receipt
       StoreCorrected storeCorrected => Apply(storeCorrected),
       PurchaseAdded purchaseAdded => Apply(purchaseAdded),
       PurchaseDateChanged purchaseDateChanged => Apply(purchaseDateChanged),
+      PurchaseDetailsChanged purchaseDetailsChanged => Apply(purchaseDetailsChanged),
       _ => throw new ArgumentException($"Unknown fact type: {fact.GetType()}", nameof(fact)),
     };
   }
@@ -137,6 +138,26 @@ public class Receipt
       Store,
       PurchaseDate,
       Purchases.Append(purchase).ToList(),
+      _unsavedChanges.ToList(),
+      Version);
+  }
+
+  private Receipt Apply(PurchaseDetailsChanged fact)
+  {
+    Purchase purchase = Purchase.Create(
+      Id.Create(fact.PurchaseId),
+      Item.Create(fact.Item),
+      Category.Create(fact.Category),
+      Quantity.Create(fact.Quantity),
+      Money.Create(fact.UnitPrice),
+      Money.Create(fact.TotalDiscount),
+      Description.Create(fact.Description));
+
+    return new Receipt(
+      Id,
+      Store,
+      PurchaseDate,
+      Purchases.Select(p => p.Id == purchase.Id ? purchase : p).ToList(),
       _unsavedChanges.ToList(),
       Version);
   }

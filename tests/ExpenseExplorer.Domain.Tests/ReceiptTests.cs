@@ -162,7 +162,8 @@ public class ReceiptTests
       new ReceiptCreated("id", "store", today, today),
       new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, "d"),
       new StoreCorrected("id", "newStore"),
-      new PurchaseDateChanged("id", today.AddDays(-1), today)
+      new PurchaseDateChanged("id", today.AddDays(-1), today),
+      new PurchaseDetailsChanged("id", "pId", "it", "ca", 2, 2, 1, "de")
     ];
 
     Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
@@ -170,8 +171,15 @@ public class ReceiptTests
     receipt.Id.Value.Should().Be("id");
     receipt.Store.Name.Should().Be("newStore");
     receipt.PurchaseDate.Date.Should().Be(new DateOnly(1999, 12, 31));
-    receipt.Purchases.Should().Contain(p => p.Id.Value == "pId");
     receipt.Version.Value.Should().Be((ulong)(facts.Count - 1));
+    Purchase purchase = receipt.Purchases.Single();
+    purchase.Id.Value.Should().Be("pId");
+    purchase.Item.Name.Should().Be("it");
+    purchase.Category.Name.Should().Be("ca");
+    purchase.Quantity.Value.Should().Be(2);
+    purchase.UnitPrice.Value.Should().Be(2);
+    purchase.TotalDiscount.Value.Should().Be(1);
+    purchase.Description.Value.Should().Be("de");
   }
 
   [Fact]
@@ -183,7 +191,8 @@ public class ReceiptTests
       new ReceiptCreated("id", "store", today, today),
       new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, "d"),
       new StoreCorrected("id", "newStore"),
-      new PurchaseDateChanged("id", today.AddDays(-1), today)
+      new PurchaseDateChanged("id", today.AddDays(-1), today),
+      new PurchaseDetailsChanged("id", "pId", "it", "ca", 2, 2, 1, "de")
     ];
 
     Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
