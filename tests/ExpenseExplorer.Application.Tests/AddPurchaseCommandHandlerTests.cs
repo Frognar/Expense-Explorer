@@ -46,6 +46,14 @@ public class AddPurchaseCommandHandlerTests
     _receiptRepository.Should().Contain(r => r.Id == receipt.Id && r.Purchases.Count > 0);
   }
 
+  [Property(Arbitrary = [typeof(InvalidAddPurchaseCommandGenerator)])]
+  public async Task ReturnsFailureWhenRequestIsInvalid(AddPurchaseCommand command)
+  {
+    var result = await Handle(command);
+    var failure = result.Match(e => e, _ => throw new UnreachableException());
+    failure.Should().NotBeNull();
+  }
+
   private async Task<Receipt> HandleValid(AddPurchaseCommand command)
   {
     var result = await Handle(command);
