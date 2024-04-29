@@ -23,13 +23,6 @@ public class FactTypesTests
   }
 
   [Fact]
-  public void GetTypeForPurchaseAdded()
-  {
-    Fact fact = new PurchaseAdded("id", "pid", "i", "c", 1, 1, 0, string.Empty);
-    AssertFactType(fact, FactTypes.PurchaseAddedFactType);
-  }
-
-  [Fact]
   public void GetTypeForStoreCorrected()
   {
     Fact fact = new StoreCorrected("id", "store");
@@ -42,6 +35,20 @@ public class FactTypesTests
     DateOnly today = new DateOnly(2021, 1, 1);
     Fact fact = new PurchaseDateChanged("id", today.AddDays(-1), today);
     AssertFactType(fact, FactTypes.PurchaseDateChangedFactType);
+  }
+
+  [Fact]
+  public void GetTypeForPurchaseAdded()
+  {
+    Fact fact = new PurchaseAdded("id", "pid", "i", "c", 1, 1, 0, string.Empty);
+    AssertFactType(fact, FactTypes.PurchaseAddedFactType);
+  }
+
+  [Fact]
+  public void GetTypeForPurchaseDetailsChanged()
+  {
+    Fact fact = new PurchaseDetailsChanged("id", "pid", "i", "c", 1, 1, 0, string.Empty);
+    AssertFactType(fact, FactTypes.PurchaseDetailsChangedFactType);
   }
 
   private static void AssertFactType(Fact fact, string expectedType)

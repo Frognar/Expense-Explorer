@@ -53,31 +53,6 @@ public class FactSerializerTests
   }
 
   [Fact]
-  public void SerializePurchaseAdded()
-  {
-    Fact fact = new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, string.Empty);
-
-    byte[] data = FactSerializer.Serialize(fact);
-
-    data.Should()
-      .BeEquivalentTo(
-        "{\"ReceiptId\":\"id\",\"PurchaseId\":\"pId\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
-          .ToArray());
-  }
-
-  [Fact]
-  public void DeserializePurchaseAdded()
-  {
-    byte[] data
-      = "{\"ReceiptId\":\"id\",\"PurchaseId\":\"pId\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
-        .ToArray();
-
-    Fact fact = FactSerializer.Deserialize(FactTypes.PurchaseAddedFactType, data);
-
-    fact.Should().BeOfType<PurchaseAdded>();
-  }
-
-  [Fact]
   public void SerializeStoreCorrected()
   {
     Fact fact = new StoreCorrected("id", "store");
@@ -119,6 +94,56 @@ public class FactSerializerTests
     Fact fact = FactSerializer.Deserialize(FactTypes.PurchaseDateChangedFactType, data);
 
     fact.Should().BeOfType<PurchaseDateChanged>();
+  }
+
+  [Fact]
+  public void SerializePurchaseAdded()
+  {
+    Fact fact = new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, string.Empty);
+
+    byte[] data = FactSerializer.Serialize(fact);
+
+    data.Should()
+      .BeEquivalentTo(
+        "{\"ReceiptId\":\"id\",\"PurchaseId\":\"pId\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
+          .ToArray());
+  }
+
+  [Fact]
+  public void DeserializePurchaseAdded()
+  {
+    byte[] data
+      = "{\"ReceiptId\":\"id\",\"PurchaseId\":\"pId\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
+        .ToArray();
+
+    Fact fact = FactSerializer.Deserialize(FactTypes.PurchaseAddedFactType, data);
+
+    fact.Should().BeOfType<PurchaseAdded>();
+  }
+
+  [Fact]
+  public void SerializePurchaseDetailsChanged()
+  {
+    Fact fact = new PurchaseDetailsChanged("id", "pId", "i", "c", 1, 1, 0, string.Empty);
+
+    byte[] data = FactSerializer.Serialize(fact);
+
+    data.Should()
+      .BeEquivalentTo(
+        "{\"ReceiptId\":\"id\",\"PurchaseId\":\"pId\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
+          .ToArray());
+  }
+
+  [Fact]
+  public void DeserializePurchaseDetailsChanged()
+  {
+    byte[] data
+      = "{\"ReceiptId\":\"id\",\"PurchaseId\":\"pId\",\"Item\":\"i\",\"Category\":\"c\",\"Quantity\":1,\"UnitPrice\":1,\"TotalDiscount\":0,\"Description\":\"\"}"u8
+        .ToArray();
+
+    Fact fact = FactSerializer.Deserialize(FactTypes.PurchaseDetailsChangedFactType, data);
+
+    fact.Should().BeOfType<PurchaseDetailsChanged>();
   }
 
   private sealed record UnknownFact : Fact;
