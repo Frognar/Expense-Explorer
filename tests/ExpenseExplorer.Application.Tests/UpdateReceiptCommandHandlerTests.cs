@@ -25,10 +25,22 @@ public class UpdateReceiptCommandHandlerTests
   {
     DateOnly? data = ticks.HasValue ? DateOnly.FromDateTime(new DateTime(ticks.Value, DateTimeKind.Utc)) : null;
     UpdateReceiptCommand command = new("receiptId", storeName, data, data ?? DateOnly.MaxValue);
-    Receipt s = await HandleValid(command);
-    s.Store.Name.Should().Be(storeName ?? _originalStoreName);
-    s.PurchaseDate.Date.Should().Be(data ?? _originalPurchaseDate);
-    s.Version.Value.Should().Be(1UL + (storeName is null ? 0UL : 1UL) + (ticks is null ? 0UL : 1UL));
+    Receipt receipt = await HandleValid(command);
+    receipt.Store.Name.Should().Be(storeName ?? _originalStoreName);
+    receipt.PurchaseDate.Date.Should().Be(data ?? _originalPurchaseDate);
+    receipt.Version.Value.Should().Be(1UL + (storeName is null ? 0UL : 1UL) + (ticks is null ? 0UL : 1UL));
+  }
+
+  [Fact]
+  public async Task SavesReceiptWhenValidCommand()
+  {
+    DateOnly today = new(2024, 1, 1);
+    UpdateReceiptCommand command = new("receiptId", "new store", today, today);
+
+    Receipt receipt = await HandleValid(command);
+
+    _receiptRepository.Should()
+      .Contain(r => r.Id == receipt.Id && r.PurchaseDate.Date == today && r.Store.Name == "new store");
   }
 
   [Property(Arbitrary = [typeof(ValidUpdateReceiptCommandGenerator)])]
