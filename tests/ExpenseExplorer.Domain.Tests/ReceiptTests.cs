@@ -127,6 +127,32 @@ public class ReceiptTests
     purchaseFromReceipt.Description.Should().Be(purchase.Description);
   }
 
+  [Property(Arbitrary = [typeof(PurchaseGenerator)])]
+  public void ProducesPurchaseDetailsChangedFactWhenUpdatePurchaseDetails(Purchase purchase)
+  {
+    DateOnly today = new DateOnly(2000, 1, 1);
+    List<Fact> facts =
+    [
+      new ReceiptCreated("id", "store", today, today),
+      new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, "d"),
+    ];
+
+    purchase = purchase with { Id = Id.Create("pId") };
+    Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+
+    receipt = receipt.UpdatePurchaseDetails(purchase);
+
+    PurchaseDetailsChanged fact = receipt.UnsavedChanges.OfType<PurchaseDetailsChanged>().Single();
+    fact.ReceiptId.Should().Be(receipt.Id.Value);
+    fact.PurchaseId.Should().Be(purchase.Id.Value);
+    fact.Item.Should().Be(purchase.Item.Name);
+    fact.Category.Should().Be(purchase.Category.Name);
+    fact.Quantity.Should().Be(purchase.Quantity.Value);
+    fact.UnitPrice.Should().Be(purchase.UnitPrice.Value);
+    fact.TotalDiscount.Should().Be(purchase.TotalDiscount.Value);
+    fact.Description.Should().Be(purchase.Description.Value);
+  }
+
   [Fact]
   public void CanBeRecreatedFromFacts()
   {

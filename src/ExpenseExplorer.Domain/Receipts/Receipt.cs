@@ -84,12 +84,10 @@ public class Receipt
   public Receipt UpdatePurchaseDetails(Purchase purchase)
   {
     ArgumentNullException.ThrowIfNull(purchase);
-    return new Receipt(Id, Store, PurchaseDate, ReplaceUpdated(purchase).ToList(), _unsavedChanges, Version);
-
-    IEnumerable<Purchase> ReplaceUpdated(Purchase updated)
-    {
-      return Purchases.Select(p => p.Id == updated.Id ? updated : p);
-    }
+    Fact purchaseAdded = PurchaseDetailsChanged.Create(Id, purchase);
+    List<Fact> allChanges = _unsavedChanges.Append(purchaseAdded).ToList();
+    List<Purchase> allPurchases = Purchases.Select(p => p.Id == purchase.Id ? purchase : p).ToList();
+    return new Receipt(Id, Store, PurchaseDate, allPurchases, allChanges, Version);
   }
 
   public Receipt WithVersion(Version version)
