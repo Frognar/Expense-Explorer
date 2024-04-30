@@ -1,7 +1,7 @@
 @ExpenseExplorer.API_HostAddress = https://localhost:7163
 @receiptId = 084c5fecc8a648b399472c75947e3ed8
 
-GET {{ExpenseExplorer.API_HostAddress}}/api/receipts?page=1&pageSize=10
+GET {{ExpenseExplorer.API_HostAddress}}/api/receipts?pageNumber=1&pageSize=10
 
 ###
 
