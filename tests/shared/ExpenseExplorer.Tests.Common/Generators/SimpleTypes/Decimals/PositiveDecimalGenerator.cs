@@ -5,8 +5,7 @@ public static class PositiveDecimalGenerator
   public static Gen<decimal> Gen()
     =>
       from value in ArbMap.Default.GeneratorFor<decimal>()
-      where value > 0
-      select value;
+      select value == decimal.Zero ? 1 : Math.Abs(value);
 
   public static Arbitrary<decimal> Arbitrary() => Gen().ToArbitrary();
 }
