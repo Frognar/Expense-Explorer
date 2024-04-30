@@ -4,9 +4,8 @@ public static class FutureDateOnlyGenerator
 {
   public static Gen<DateOnly> Gen()
     =>
-      from dateOnly in DateOnlyGenerator.Gen()
-      where dateOnly > TodayDateOnly
-      select dateOnly;
+      from daysToAdd in FsCheck.Fluent.Gen.Choose(1, 365)
+      select TodayDateOnly.AddDays(daysToAdd);
 
   public static Arbitrary<DateOnly> Arbitrary() => Gen().ToArbitrary();
 }
