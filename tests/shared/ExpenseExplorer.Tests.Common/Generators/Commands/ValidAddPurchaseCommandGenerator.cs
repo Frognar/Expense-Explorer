@@ -12,8 +12,7 @@ public static class ValidAddPurchaseCommandGenerator
       from category in NonEmptyStringGenerator.Gen()
       from quantity in PositiveDecimalGenerator.Gen()
       from unitPrice in NonNegativeDecimalGenerator.Gen()
-      from totalDiscount in ArbMap.Default.GeneratorFor<decimal?>()
-      where !totalDiscount.HasValue || totalDiscount.Value >= 0
+      from totalDiscount in NullableNonNegativeDecimalGenerator.Gen()
       from description in ArbMap.Default.GeneratorFor<string>()
       select new AddPurchaseCommand(
         "receiptId",

@@ -13,8 +13,7 @@ public static class InvalidAddPurchaseCommandGenerator
       from category in NonEmptyStringGenerator.Gen()
       from quantity in PositiveDecimalGenerator.Gen()
       from unitPrice in NonNegativeDecimalGenerator.Gen()
-      from totalDiscount in ArbMap.Default.GeneratorFor<decimal?>()
-      where !totalDiscount.HasValue || totalDiscount.Value >= 0
+      from totalDiscount in NullableNonNegativeDecimalGenerator.Gen()
       from description in ArbMap.Default.GeneratorFor<string>()
       select new AddPurchaseCommand(
         "receiptId",
@@ -30,8 +29,7 @@ public static class InvalidAddPurchaseCommandGenerator
       from category in EmptyOrWhiteSpaceStringGenerator.Gen()
       from quantity in PositiveDecimalGenerator.Gen()
       from unitPrice in NonNegativeDecimalGenerator.Gen()
-      from totalDiscount in ArbMap.Default.GeneratorFor<decimal?>()
-      where !totalDiscount.HasValue || totalDiscount.Value >= 0
+      from totalDiscount in NullableNonNegativeDecimalGenerator.Gen()
       from description in ArbMap.Default.GeneratorFor<string>()
       select new AddPurchaseCommand(
         "receiptId",
@@ -47,8 +45,7 @@ public static class InvalidAddPurchaseCommandGenerator
       from category in NonEmptyStringGenerator.Gen()
       from quantity in NonPositiveDecimalGenerator.Gen()
       from unitPrice in NonNegativeDecimalGenerator.Gen()
-      from totalDiscount in ArbMap.Default.GeneratorFor<decimal?>()
-      where !totalDiscount.HasValue || totalDiscount.Value >= 0
+      from totalDiscount in NullableNonNegativeDecimalGenerator.Gen()
       from description in ArbMap.Default.GeneratorFor<string>()
       select new AddPurchaseCommand(
         "receiptId",
@@ -64,8 +61,7 @@ public static class InvalidAddPurchaseCommandGenerator
       from category in NonEmptyStringGenerator.Gen()
       from quantity in PositiveDecimalGenerator.Gen()
       from unitPrice in NegativeDecimalGenerator.Gen()
-      from totalDiscount in ArbMap.Default.GeneratorFor<decimal?>()
-      where !totalDiscount.HasValue || totalDiscount.Value >= 0
+      from totalDiscount in NullableNonNegativeDecimalGenerator.Gen()
       from description in ArbMap.Default.GeneratorFor<string>()
       select new AddPurchaseCommand(
         "receiptId",
