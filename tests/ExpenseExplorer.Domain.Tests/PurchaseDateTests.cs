@@ -28,6 +28,6 @@ public class PurchaseDateTests
 
   private static PurchaseDate CreatePurchaseDate(DateOnly date)
   {
-    return PurchaseDate.Create(date, TodayDateOnly);
+    return PurchaseDate.Create(date, Today);
   }
 }

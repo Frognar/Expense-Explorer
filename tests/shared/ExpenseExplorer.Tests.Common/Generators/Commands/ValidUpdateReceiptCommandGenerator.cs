@@ -10,7 +10,7 @@ public static class ValidUpdateReceiptCommandGenerator
     =>
       from store in NullableNonEmptyStringGenerator.Gen()
       from purchaseDate in NullableNonFutureDateOnlyGenerator.Gen()
-      select new UpdateReceiptCommand("receiptId", store, purchaseDate, TodayDateOnly);
+      select new UpdateReceiptCommand("receiptId", store, purchaseDate, Today);
 
   public static Arbitrary<UpdateReceiptCommand> Arbitrary() => Gen().ToArbitrary();
 }

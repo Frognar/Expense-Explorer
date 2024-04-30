@@ -8,7 +8,7 @@ public static class PurchaseDateGenerator
   public static Gen<PurchaseDate> Gen()
     =>
       from date in NonFutureDateOnlyGenerator.Gen()
-      select PurchaseDate.Create(date, TodayDateOnly);
+      select PurchaseDate.Create(date, Today);
 
   public static Arbitrary<PurchaseDate> Arbitrary() => Gen().ToArbitrary();
 }

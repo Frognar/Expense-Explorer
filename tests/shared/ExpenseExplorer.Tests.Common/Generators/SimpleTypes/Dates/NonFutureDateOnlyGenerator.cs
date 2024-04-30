@@ -5,7 +5,7 @@ public static class NonFutureDateOnlyGenerator
   public static Gen<DateOnly> Gen()
     =>
       from daysToAdd in FsCheck.Fluent.Gen.Choose(1, 365)
-      select TodayDateOnly.AddDays(-daysToAdd);
+      select Today.AddDays(-daysToAdd);
 
   public static Arbitrary<DateOnly> Arbitrary() => Gen().ToArbitrary();
 }

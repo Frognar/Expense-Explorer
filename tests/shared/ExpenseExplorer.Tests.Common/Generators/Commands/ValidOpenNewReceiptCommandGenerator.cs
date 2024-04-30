@@ -10,7 +10,7 @@ public static class ValidOpenNewReceiptCommandGenerator
     =>
       from storeName in NonEmptyStringGenerator.Gen()
       from purchaseDate in NonFutureDateOnlyGenerator.Gen()
-      select new OpenNewReceiptCommand(storeName, purchaseDate, TodayDateOnly);
+      select new OpenNewReceiptCommand(storeName, purchaseDate, Today);
 
   public static Arbitrary<OpenNewReceiptCommand> Arbitrary() => Gen().ToArbitrary();
 }

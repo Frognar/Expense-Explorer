@@ -8,7 +8,7 @@ public static class ReceiptGenerator
     =>
       from store in StoreGenerator.Gen()
       from purchaseDate in PurchaseDateGenerator.Gen()
-      select Receipt.New(store, purchaseDate, TodayDateOnly).ClearChanges();
+      select Receipt.New(store, purchaseDate, Today).ClearChanges();
 
   public static Arbitrary<Receipt> Arbitrary() => Gen().ToArbitrary();
 }

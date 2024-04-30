@@ -11,12 +11,12 @@ public static class InvalidUpdateReceiptCommandGenerator
     Gen<UpdateReceiptCommand> invalidStore =
       from store in WhiteSpaceStringGenerator.Gen()
       from purchaseDate in NullableNonFutureDateOnlyGenerator.Gen()
-      select new UpdateReceiptCommand("receiptId", store, purchaseDate, TodayDateOnly);
+      select new UpdateReceiptCommand("receiptId", store, purchaseDate, Today);
 
     Gen<UpdateReceiptCommand> invalidPurchaseDate =
       from store in NullableNonEmptyStringGenerator.Gen()
       from purchaseDate in FutureDateOnlyGenerator.Gen()
-      select new UpdateReceiptCommand("receiptId", store, purchaseDate, TodayDateOnly);
+      select new UpdateReceiptCommand("receiptId", store, purchaseDate, Today);
 
     return FsCheck.Fluent.Gen.OneOf(invalidStore, invalidPurchaseDate);
   }
