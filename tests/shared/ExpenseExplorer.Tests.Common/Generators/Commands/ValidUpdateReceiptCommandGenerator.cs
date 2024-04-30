@@ -1,16 +1,16 @@
 namespace ExpenseExplorer.Tests.Common.Generators.Commands;
 
 using ExpenseExplorer.Application.Receipts.Commands;
+using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Dates;
+using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
 
 public static class ValidUpdateReceiptCommandGenerator
 {
   public static Gen<UpdateReceiptCommand> Gen()
     =>
-      from store in ArbMap.Default.GeneratorFor<NonWhiteSpaceString?>()
-        .Select(str => str?.Item)
-      from purchaseDate in ArbMap.Default.GeneratorFor<DateTime?>()
-        .Select(dateTime => dateTime.HasValue ? DateOnly.FromDateTime(dateTime.Value) : (DateOnly?)null)
-      select new UpdateReceiptCommand("receiptId", store, purchaseDate, purchaseDate ?? DateOnly.MaxValue);
+      from store in NullableNonEmptyStringGenerator.Gen()
+      from purchaseDate in NullableNonFutureDateOnlyGenerator.Gen()
+      select new UpdateReceiptCommand("receiptId", store, purchaseDate, TodayDateOnly);
 
   public static Arbitrary<UpdateReceiptCommand> Arbitrary() => Gen().ToArbitrary();
 }
