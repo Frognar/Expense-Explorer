@@ -20,7 +20,7 @@ public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
       from patchModel in UpdateReceiptValidator.Validate(command)
       from id in Id.TryCreate(command.ReceiptId).ToResult(() => CommonFailures.InvalidReceiptId)
       from receipt in _receiptRepository.GetAsync(id, cancellationToken)
-      from updated in Success.From(Update(receipt, patchModel))
+      let updated = Update(receipt, patchModel)
       from version in _receiptRepository.SaveAsync(updated, cancellationToken)
       select updated.WithVersion(version).ClearChanges());
   }

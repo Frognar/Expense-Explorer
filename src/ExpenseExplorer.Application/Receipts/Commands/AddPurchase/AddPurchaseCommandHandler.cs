@@ -20,7 +20,7 @@ public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
       from purchase in AddPurchaseValidator.Validate(command)
       from id in Id.TryCreate(command.ReceiptId).ToResult(() => CommonFailures.InvalidReceiptId)
       from receipt in _receiptRepository.GetAsync(id, cancellationToken)
-      from receiptWithPurchase in Success.From(receipt.AddPurchase(purchase))
+      let receiptWithPurchase = receipt.AddPurchase(purchase)
       from version in _receiptRepository.SaveAsync(receiptWithPurchase, cancellationToken)
       select receiptWithPurchase.WithVersion(version).ClearChanges());
   }

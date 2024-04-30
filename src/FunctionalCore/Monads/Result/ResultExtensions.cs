@@ -27,6 +27,23 @@ public static class ResultExtensions
   [SuppressMessage(
     "Design",
     "VSTHRD200:Use \"Async\" suffix for async methods",
+    Justification = "Need to be named Select to work with LINQ query syntax")]
+  [SuppressMessage(
+    "Design",
+    "VSTHRD003:Avoid awaiting foreign Tasks",
+    Justification = "Required to enable seamless LINQ integration with asynchronous operations.")]
+  public static async Task<Result<TResult>> Select<T, TResult>(
+    this Task<Result<T>> source,
+    Func<T, TResult> selector)
+  {
+    ArgumentNullException.ThrowIfNull(source);
+    ArgumentNullException.ThrowIfNull(selector);
+    return (await source).Map(selector);
+  }
+
+  [SuppressMessage(
+    "Design",
+    "VSTHRD200:Use \"Async\" suffix for async methods",
     Justification = "Need to be named SelectMany to work with LINQ query syntax")]
   public static async Task<Result<TResult>> SelectMany<T, U, TResult>(
     this Result<T> source,
