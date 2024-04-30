@@ -3,6 +3,7 @@ namespace ExpenseExplorer.Domain.Exceptions;
 public class NonPositiveQuantityException : Exception
 {
   public NonPositiveQuantityException()
+    : base("Quantity must be positive")
   {
   }
 

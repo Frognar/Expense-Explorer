@@ -14,8 +14,22 @@ public class QuantityTests
   }
 
   [Property(Arbitrary = [typeof(PositiveDecimalGenerator)])]
-  public void ValueIsRoundTo4DecimalPlaces(decimal value)
+  public void ValueIsRoundToQuantityPrecision(decimal value)
   {
-    Quantity.Create(value).Value.Should().Be(Math.Round(value, 4));
+    Quantity.Create(value).Value.Should().Be(Math.Round(value, Quantity.Precision));
+  }
+
+  [Property(Arbitrary = [typeof(NonPositiveDecimalGenerator)])]
+  public void ThrowsExceptionWhenValueIsNotPositiveWithRecordSyntax(decimal value)
+  {
+    Action act = () => _ = Quantity.Create(1) with { Value = value };
+    act.Should().Throw<NonPositiveQuantityException>();
+  }
+
+  [Property(Arbitrary = [typeof(PositiveDecimalGenerator)])]
+  public void ValueIsRoundToQuantityPrecisionWithRecordSyntax(decimal value)
+  {
+    Quantity quantity = Quantity.Create(1) with { Value = value };
+    quantity.Value.Should().Be(Math.Round(value, Quantity.Precision));
   }
 }

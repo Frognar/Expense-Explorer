@@ -20,6 +20,20 @@ public class PurchaseDateTests
     act.Should().Throw<FutureDateException>();
   }
 
+  [Property(Arbitrary = [typeof(NonFutureDateOnlyGenerator)])]
+  public void SetsDateWithRecordSyntax(DateOnly date)
+  {
+    PurchaseDate purchaseDate = CreatePurchaseDate(Today) with { Date = date };
+    purchaseDate.Date.Should().Be(date);
+  }
+
+  [Property(Arbitrary = [typeof(FutureDateOnlyGenerator)])]
+  public void ThrowsExceptionWhenDateIsInTheFutureWithRecordSyntax(DateOnly date)
+  {
+    Action act = () => _ = CreatePurchaseDate(Today) with { Date = date };
+    act.Should().Throw<FutureDateException>();
+  }
+
   [Fact]
   public void CanCreateMinimumDate()
   {

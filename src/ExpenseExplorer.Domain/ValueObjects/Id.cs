@@ -2,15 +2,9 @@ namespace ExpenseExplorer.Domain.ValueObjects;
 
 using FunctionalCore.Monads;
 
-public record Id
+public readonly record struct Id(string Value)
 {
-  private Id(string value)
-  {
-    ArgumentNullException.ThrowIfNull(value);
-    Value = value.Trim();
-  }
-
-  public string Value { get; }
+  public string Value { get; } = Value.Trim();
 
   public static Id Unique()
   {

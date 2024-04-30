@@ -3,6 +3,7 @@ namespace ExpenseExplorer.Domain.Exceptions;
 public class FutureDateException : Exception
 {
   public FutureDateException()
+    : base("Purchase date cannot be in the future")
   {
   }
 
@@ -19,13 +20,5 @@ public class FutureDateException : Exception
   public FutureDateException(DateOnly date, DateOnly today)
     : base($"Purchase date cannot be in the future. Given date: {date:yyyy-MM-dd}, today: {today:yyyy-MM-dd}")
   {
-  }
-
-  public static void ThrowIfFutureDate(DateOnly date, DateOnly today)
-  {
-    if (date > today)
-    {
-      throw new FutureDateException(date, today);
-    }
   }
 }

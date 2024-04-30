@@ -3,15 +3,15 @@ namespace ExpenseExplorer.Domain.ValueObjects;
 using ExpenseExplorer.Domain.Exceptions;
 using FunctionalCore.Monads;
 
-public record Store
+public readonly record struct Store(string Name)
 {
-  private Store(string name)
-  {
-    EmptyStoreNameException.ThrowIfEmpty(name);
-    Name = name.Trim();
-  }
+  private readonly string _name = TrimOrThrow(Name);
 
-  public string Name { get; }
+  public string Name
+  {
+    get => _name;
+    init => _name = TrimOrThrow(value);
+  }
 
   public static Store Create(string name)
   {
@@ -23,5 +23,16 @@ public record Store
     return string.IsNullOrWhiteSpace(name)
       ? None.OfType<Store>()
       : Some.From(new Store(name));
+  }
+
+  private static string TrimOrThrow(string name)
+  {
+    ArgumentNullException.ThrowIfNull(name);
+    return IsValid(name) ? name.Trim() : throw new EmptyStoreNameException();
+  }
+
+  private static bool IsValid(string name)
+  {
+    return !string.IsNullOrWhiteSpace(name);
   }
 }

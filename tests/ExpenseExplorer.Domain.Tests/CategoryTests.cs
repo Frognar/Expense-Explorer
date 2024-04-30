@@ -18,4 +18,18 @@ public class CategoryTests
   {
     Category.Create(name).Name.Should().Be(name.Trim());
   }
+
+  [Property(Arbitrary = [typeof(NonEmptyStringGenerator)])]
+  public void NameIsTrimmedWithRecordSyntax(string name)
+  {
+    Category category = Category.Create("123") with { Name = name };
+    category.Name.Should().Be(name.Trim());
+  }
+
+  [Property(Arbitrary = [typeof(EmptyOrWhiteSpaceStringGenerator)])]
+  public void ThrowsExceptionWhenNameIsEmptyWithRecordSyntax(string name)
+  {
+    Action act = () => _ = Category.Create("123") with { Name = name };
+    act.Should().Throw<EmptyCategoryNameException>();
+  }
 }

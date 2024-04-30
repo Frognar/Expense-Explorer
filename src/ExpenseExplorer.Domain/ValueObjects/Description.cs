@@ -1,13 +1,8 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-public record Description
+public readonly record struct Description(string? Value)
 {
-  private Description(string? value)
-  {
-    Value = value?.Trim() ?? string.Empty;
-  }
-
-  public string Value { get; }
+  public string Value { get; } = Value?.Trim() ?? string.Empty;
 
   public static Description Create(string? value)
   {

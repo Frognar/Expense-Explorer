@@ -3,17 +3,18 @@ namespace ExpenseExplorer.Domain.ValueObjects;
 using ExpenseExplorer.Domain.Exceptions;
 using FunctionalCore.Monads;
 
-public record Money
+public readonly record struct Money(decimal Value)
 {
-  public static readonly Money Zero = new(0);
+  public const int Precision = 3;
+  public static readonly Money Zero = new(decimal.Zero);
 
-  private Money(decimal value)
+  private readonly decimal _value = RoundOrThrow(Value);
+
+  public decimal Value
   {
-    NegativeMoneyException.ThrowIfNegative(value);
-    Value = Math.Round(value, 3);
+    get => _value;
+    init => _value = RoundOrThrow(value);
   }
-
-  public decimal Value { get; }
 
   public static Money Create(decimal value)
   {
@@ -22,8 +23,23 @@ public record Money
 
   public static Maybe<Money> TryCreate(decimal value)
   {
-    return value < 0
-      ? None.OfType<Money>()
-      : Some.From(new Money(value));
+    return IsValid(value)
+      ? Some.From(new Money(value))
+      : None.OfType<Money>();
+  }
+
+  private static decimal RoundOrThrow(decimal value)
+  {
+    if (IsValid(value))
+    {
+      return Math.Round(value, Precision);
+    }
+
+    throw new NegativeMoneyException();
+  }
+
+  private static bool IsValid(decimal value)
+  {
+    return value >= decimal.Zero;
   }
 }

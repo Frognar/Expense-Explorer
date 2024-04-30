@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 public class EmptyCategoryNameException : Exception
 {
   public EmptyCategoryNameException()
+    : base("Category name cannot be empty.")
   {
   }
 
@@ -22,7 +23,7 @@ public class EmptyCategoryNameException : Exception
   {
     if (string.IsNullOrWhiteSpace(name))
     {
-      throw new EmptyCategoryNameException("Category name cannot be empty.");
+      throw new EmptyCategoryNameException();
     }
   }
 }

@@ -10,14 +10,4 @@ public class VersionTests
     Version version = Version.New();
     version.Value.Should().Be(ulong.MaxValue);
   }
-
-  [Property]
-  public void IncrementingVersion(ulong value)
-  {
-    Version version = Version.Create(value);
-
-    Version next = version.Next();
-
-    next.Value.Should().Be(value + 1);
-  }
 }

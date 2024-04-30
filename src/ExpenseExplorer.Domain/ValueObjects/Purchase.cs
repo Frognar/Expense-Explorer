@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-public record Purchase(
+public readonly record struct Purchase(
   Id Id,
   Item Item,
   Category Category,
