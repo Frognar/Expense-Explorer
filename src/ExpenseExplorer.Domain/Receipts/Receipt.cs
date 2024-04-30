@@ -3,10 +3,9 @@ namespace ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
-public class Receipt
+public sealed record Receipt
 {
   private static readonly Receipt _empty = new();
-  private readonly IEnumerable<Fact> _unsavedChanges;
 
   private Receipt()
     : this(Id.Create("[EMPTY]"), Store.Create("[EMPTY]"), PurchaseDate.MinValue, [], [], Version.Create(0))
@@ -25,21 +24,21 @@ public class Receipt
     Store = store;
     PurchaseDate = purchaseDate;
     Purchases = purchases;
-    _unsavedChanges = unsavedChanges;
+    UnsavedChanges = unsavedChanges;
     Version = version;
   }
 
-  public Id Id { get; }
+  public Id Id { get; private init; }
 
-  public Store Store { get; }
+  public Store Store { get; private init; }
 
-  public PurchaseDate PurchaseDate { get; }
+  public PurchaseDate PurchaseDate { get; private init; }
 
-  public ICollection<Purchase> Purchases { get; }
+  public ICollection<Purchase> Purchases { get; private init; }
 
-  public IEnumerable<Fact> UnsavedChanges => _unsavedChanges;
+  public IEnumerable<Fact> UnsavedChanges { get; private init; }
 
-  public Version Version { get; }
+  public Version Version { get; private init; }
 
   public static Receipt New(Store store, PurchaseDate purchaseDate, DateOnly createdDate)
   {
@@ -50,49 +49,52 @@ public class Receipt
 
   public static Receipt Recreate(IEnumerable<Fact> facts, Version version)
   {
-    Receipt receipt = facts.Aggregate(_empty, (receipt, fact) => receipt.ApplyFact(fact));
-    return receipt.WithVersion(version);
+    return facts.Aggregate(_empty, (receipt, fact) => receipt.ApplyFact(fact)) with { Version = version };
   }
 
   public Receipt ClearChanges()
   {
-    return new Receipt(Id, Store, PurchaseDate, Purchases, [], Version);
+    return this with { UnsavedChanges = [] };
   }
 
   public Receipt CorrectStore(Store store)
   {
     Fact storeCorrected = StoreCorrected.Create(Id, store);
-    List<Fact> allChanges = _unsavedChanges.Append(storeCorrected).ToList();
-    return new Receipt(Id, store, PurchaseDate, Purchases, allChanges, Version);
+    return this with { Store = store, UnsavedChanges = UnsavedChanges.Append(storeCorrected).ToList() };
   }
 
   public Receipt ChangePurchaseDate(PurchaseDate purchaseDate, DateOnly requestedDate)
   {
     Fact purchaseDateChanged = PurchaseDateChanged.Create(Id, purchaseDate, requestedDate);
-    List<Fact> allChanges = _unsavedChanges.Append(purchaseDateChanged).ToList();
-    return new Receipt(Id, Store, purchaseDate, Purchases, allChanges, Version);
+    return this with
+    {
+      PurchaseDate = purchaseDate, UnsavedChanges = UnsavedChanges.Append(purchaseDateChanged).ToList(),
+    };
   }
 
   public Receipt AddPurchase(Purchase purchase)
   {
     Fact purchaseAdded = PurchaseAdded.Create(Id, purchase);
-    List<Fact> allChanges = _unsavedChanges.Append(purchaseAdded).ToList();
-    List<Purchase> allPurchases = Purchases.Append(purchase).ToList();
-    return new Receipt(Id, Store, PurchaseDate, allPurchases, allChanges, Version);
+    return this with
+    {
+      Purchases = Purchases.Append(purchase).ToList(), UnsavedChanges = UnsavedChanges.Append(purchaseAdded).ToList(),
+    };
   }
 
   public Receipt UpdatePurchaseDetails(Purchase purchase)
   {
     ArgumentNullException.ThrowIfNull(purchase);
-    Fact purchaseAdded = PurchaseDetailsChanged.Create(Id, purchase);
-    List<Fact> allChanges = _unsavedChanges.Append(purchaseAdded).ToList();
-    List<Purchase> allPurchases = Purchases.Select(p => p.Id == purchase.Id ? purchase : p).ToList();
-    return new Receipt(Id, Store, PurchaseDate, allPurchases, allChanges, Version);
+    Fact purchaseDetailsChanged = PurchaseDetailsChanged.Create(Id, purchase);
+    return this with
+    {
+      Purchases = Purchases.Select(p => p.Id == purchase.Id ? purchase : p).ToList(),
+      UnsavedChanges = UnsavedChanges.Append(purchaseDetailsChanged).ToList(),
+    };
   }
 
   public Receipt WithVersion(Version version)
   {
-    return new Receipt(Id, Store, PurchaseDate, Purchases, _unsavedChanges, version);
+    return this with { Version = version };
   }
 
   private Receipt ApplyFact(Fact fact)
@@ -113,13 +115,13 @@ public class Receipt
     Id receiptId = Id.Create(fact.Id);
     Store store = Store.Create(fact.Store);
     PurchaseDate purchaseDate = PurchaseDate.Create(fact.PurchaseDate, fact.CreatedDate);
-    return new Receipt(receiptId, store, purchaseDate, Purchases, _unsavedChanges.ToList(), Version);
+    return this with { Id = receiptId, Store = store, PurchaseDate = purchaseDate };
   }
 
   private Receipt Apply(StoreCorrected fact)
   {
     Store store = Store.Create(fact.Store);
-    return new Receipt(Id, store, PurchaseDate, Purchases, _unsavedChanges.ToList(), Version);
+    return this with { Store = store };
   }
 
   private Receipt Apply(PurchaseAdded fact)
@@ -133,13 +135,7 @@ public class Receipt
       Money.Create(fact.TotalDiscount),
       Description.Create(fact.Description));
 
-    return new Receipt(
-      Id,
-      Store,
-      PurchaseDate,
-      Purchases.Append(purchase).ToList(),
-      _unsavedChanges.ToList(),
-      Version);
+    return this with { Purchases = Purchases.Append(purchase).ToList() };
   }
 
   private Receipt Apply(PurchaseDetailsChanged fact)
@@ -153,18 +149,12 @@ public class Receipt
       Money.Create(fact.TotalDiscount),
       Description.Create(fact.Description));
 
-    return new Receipt(
-      Id,
-      Store,
-      PurchaseDate,
-      Purchases.Select(p => p.Id == purchase.Id ? purchase : p).ToList(),
-      _unsavedChanges.ToList(),
-      Version);
+    return this with { Purchases = Purchases.Select(p => p.Id == purchase.Id ? purchase : p).ToList() };
   }
 
   private Receipt Apply(PurchaseDateChanged fact)
   {
     PurchaseDate purchaseDate = PurchaseDate.Create(fact.PurchaseDate, fact.RequestedDate);
-    return new Receipt(Id, Store, purchaseDate, Purchases, _unsavedChanges.ToList(), Version);
+    return this with { PurchaseDate = purchaseDate };
   }
 }
