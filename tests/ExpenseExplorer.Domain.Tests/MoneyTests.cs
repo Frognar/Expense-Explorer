@@ -2,6 +2,7 @@ namespace ExpenseExplorer.Domain.Tests;
 
 using ExpenseExplorer.Domain.Exceptions;
 using ExpenseExplorer.Domain.ValueObjects;
+using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Decimals;
 
 public class MoneyTests
 {

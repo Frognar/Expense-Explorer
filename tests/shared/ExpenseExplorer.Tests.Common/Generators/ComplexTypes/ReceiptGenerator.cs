@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Tests.Common.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 
 using ExpenseExplorer.Domain.Receipts;
 

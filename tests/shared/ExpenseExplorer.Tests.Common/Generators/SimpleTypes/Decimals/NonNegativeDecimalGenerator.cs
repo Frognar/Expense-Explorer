@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Tests.Common.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Decimals;
 
 public static class NonNegativeDecimalGenerator
 {

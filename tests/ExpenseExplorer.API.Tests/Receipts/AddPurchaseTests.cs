@@ -1,6 +1,8 @@
 namespace ExpenseExplorer.API.Tests.Receipts;
 
 using ExpenseExplorer.API.Contract;
+using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Decimals;
+using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
 
 public class AddPurchaseTests
 {

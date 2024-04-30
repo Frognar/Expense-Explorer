@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Tests.Common.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
 
 public static class NonEmptyStringGenerator
 {

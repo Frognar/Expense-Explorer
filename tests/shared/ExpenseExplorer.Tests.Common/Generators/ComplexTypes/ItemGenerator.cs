@@ -1,6 +1,7 @@
-namespace ExpenseExplorer.Tests.Common.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 
 using ExpenseExplorer.Domain.ValueObjects;
+using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
 
 public static class ItemGenerator
 {

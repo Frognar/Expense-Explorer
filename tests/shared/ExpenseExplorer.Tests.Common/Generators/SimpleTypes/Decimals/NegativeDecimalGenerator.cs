@@ -1,11 +1,11 @@
-namespace ExpenseExplorer.Tests.Common.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Decimals;
 
-public static class PositiveDecimalGenerator
+public static class NegativeDecimalGenerator
 {
   public static Gen<decimal> Gen()
     =>
       from value in ArbMap.Default.GeneratorFor<decimal>()
-      where value > 0
+      where value < 0
       select value;
 
   public static Arbitrary<decimal> Arbitrary() => Gen().ToArbitrary();

@@ -3,6 +3,7 @@ namespace ExpenseExplorer.Domain.Tests;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 
 public class ReceiptTests
 {

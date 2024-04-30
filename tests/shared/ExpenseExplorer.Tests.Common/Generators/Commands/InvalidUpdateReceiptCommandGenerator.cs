@@ -1,6 +1,7 @@
-namespace ExpenseExplorer.Tests.Common.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators.Commands;
 
 using ExpenseExplorer.Application.Receipts.Commands;
+using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Dates;
 
 public static class InvalidUpdateReceiptCommandGenerator
 {

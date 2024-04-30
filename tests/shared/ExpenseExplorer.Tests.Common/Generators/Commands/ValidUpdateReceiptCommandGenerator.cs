@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Tests.Common.Generators;
+namespace ExpenseExplorer.Tests.Common.Generators.Commands;
 
 using ExpenseExplorer.Application.Receipts.Commands;
 
