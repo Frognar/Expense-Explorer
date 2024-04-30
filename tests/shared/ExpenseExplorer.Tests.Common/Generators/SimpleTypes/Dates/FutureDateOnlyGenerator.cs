@@ -4,9 +4,9 @@ public static class FutureDateOnlyGenerator
 {
   public static Gen<DateOnly> Gen()
     =>
-      from dateTime in ArbMap.Default.GeneratorFor<DateTime>()
-      where dateTime.Date > Today
-      select DateOnly.FromDateTime(dateTime);
+      from dateOnly in DateOnlyGenerator.Gen()
+      where dateOnly > TodayDateOnly
+      select dateOnly;
 
   public static Arbitrary<DateOnly> Arbitrary() => Gen().ToArbitrary();
 }

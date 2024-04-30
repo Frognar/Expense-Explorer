@@ -9,7 +9,7 @@ public static class InvalidOpenNewReceiptCommandGenerator
   public static Arbitrary<OpenNewReceiptCommand> InvalidOpenNewReceiptCommandGen()
   {
     Gen<OpenNewReceiptCommand> invalidStoreName =
-      from storeName in EmptyStringGenerator.Gen()
+      from storeName in EmptyOrWhiteSpaceStringGenerator.Gen()
       from purchaseDate in NonFutureDateOnlyGenerator.Gen()
       select new OpenNewReceiptCommand(storeName, purchaseDate, TodayDateOnly);
 
@@ -19,7 +19,7 @@ public static class InvalidOpenNewReceiptCommandGenerator
       select new OpenNewReceiptCommand(storeName, purchaseDate, TodayDateOnly);
 
     Gen<OpenNewReceiptCommand> invalidStoreNameAndPurchaseDate =
-      from storeName in EmptyStringGenerator.Gen()
+      from storeName in EmptyOrWhiteSpaceStringGenerator.Gen()
       from purchaseDate in FutureDateOnlyGenerator.Gen()
       select new OpenNewReceiptCommand(storeName, purchaseDate, TodayDateOnly);
 

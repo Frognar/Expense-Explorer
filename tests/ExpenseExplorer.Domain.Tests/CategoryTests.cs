@@ -6,7 +6,7 @@ using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
 
 public class CategoryTests
 {
-  [Property(Arbitrary = [typeof(EmptyStringGenerator)])]
+  [Property(Arbitrary = [typeof(EmptyOrWhiteSpaceStringGenerator)])]
   public void ThrowsExceptionWhenNameIsEmpty(string name)
   {
     Action act = () => _ = Category.Create(name);

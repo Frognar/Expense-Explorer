@@ -9,7 +9,7 @@ public static class InvalidAddPurchaseCommandGenerator
   public static Gen<AddPurchaseCommand> Gen()
   {
     Gen<AddPurchaseCommand> invalidItemName =
-      from item in EmptyStringGenerator.Gen()
+      from item in EmptyOrWhiteSpaceStringGenerator.Gen()
       from category in NonEmptyStringGenerator.Gen()
       from quantity in PositiveDecimalGenerator.Gen()
       from unitPrice in NonNegativeDecimalGenerator.Gen()
@@ -27,7 +27,7 @@ public static class InvalidAddPurchaseCommandGenerator
 
     Gen<AddPurchaseCommand> invalidCategory =
       from item in NonEmptyStringGenerator.Gen()
-      from category in EmptyStringGenerator.Gen()
+      from category in EmptyOrWhiteSpaceStringGenerator.Gen()
       from quantity in PositiveDecimalGenerator.Gen()
       from unitPrice in NonNegativeDecimalGenerator.Gen()
       from totalDiscount in ArbMap.Default.GeneratorFor<decimal?>()

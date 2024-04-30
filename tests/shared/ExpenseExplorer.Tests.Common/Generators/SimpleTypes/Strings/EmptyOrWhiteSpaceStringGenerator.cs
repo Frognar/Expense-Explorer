@@ -1,12 +1,11 @@
 namespace ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
 
-public static class EmptyStringGenerator
+public static class EmptyOrWhiteSpaceStringGenerator
 {
   public static Gen<string> Gen()
-    =>
-      from str in ArbMap.Default.GeneratorFor<string>()
-      where str is not null && str.Trim().Length == 0
-      select str;
+    => FsCheck.Fluent.Gen.OneOf(
+      FsCheck.Fluent.Gen.Constant(string.Empty),
+      WhiteSpaceStringGenerator.Gen());
 
   public static Arbitrary<string> Arbitrary() => Gen().ToArbitrary();
 }
