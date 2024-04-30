@@ -4,15 +4,16 @@ using ExpenseExplorer.Application.Receipts.Commands;
 
 public static class InvalidAddPurchaseCommandGenerator
 {
-  public static Arbitrary<AddPurchaseCommand> InvalidAddPurchaseCommandGen()
+  public static Gen<AddPurchaseCommand> Gen()
   {
-    var invalidItemName =
-      from item in EmptyStringGenerator.EmptyStringGen().Generator
-      from category in NonEmptyStringGenerator.NonEmptyStringGen().Generator
-      from quantity in PositiveDecimalGenerator.PositiveDecimalGen().Generator
-      from unitPrice in NonNegativeDecimalGenerator.NonNegativeDecimalGen().Generator
-      from totalDiscount in ArbMap.Default.ArbFor<decimal?>().Filter(d => !d.HasValue || d.Value >= 0).Generator
-      from description in ArbMap.Default.ArbFor<string>().Generator
+    Gen<AddPurchaseCommand> invalidItemName =
+      from item in EmptyStringGenerator.Gen()
+      from category in NonEmptyStringGenerator.Gen()
+      from quantity in PositiveDecimalGenerator.Gen()
+      from unitPrice in NonNegativeDecimalGenerator.Gen()
+      from totalDiscount in ArbMap.Default.GeneratorFor<decimal?>()
+      where !totalDiscount.HasValue || totalDiscount.Value >= 0
+      from description in ArbMap.Default.GeneratorFor<string>()
       select new AddPurchaseCommand(
         "receiptId",
         item,
@@ -22,13 +23,14 @@ public static class InvalidAddPurchaseCommandGenerator
         totalDiscount,
         description);
 
-    var invalidCategory =
-      from item in NonEmptyStringGenerator.NonEmptyStringGen().Generator
-      from category in EmptyStringGenerator.EmptyStringGen().Generator
-      from quantity in PositiveDecimalGenerator.PositiveDecimalGen().Generator
-      from unitPrice in NonNegativeDecimalGenerator.NonNegativeDecimalGen().Generator
-      from totalDiscount in ArbMap.Default.ArbFor<decimal?>().Filter(d => !d.HasValue || d.Value >= 0).Generator
-      from description in ArbMap.Default.ArbFor<string>().Generator
+    Gen<AddPurchaseCommand> invalidCategory =
+      from item in NonEmptyStringGenerator.Gen()
+      from category in EmptyStringGenerator.Gen()
+      from quantity in PositiveDecimalGenerator.Gen()
+      from unitPrice in NonNegativeDecimalGenerator.Gen()
+      from totalDiscount in ArbMap.Default.GeneratorFor<decimal?>()
+      where !totalDiscount.HasValue || totalDiscount.Value >= 0
+      from description in ArbMap.Default.GeneratorFor<string>()
       select new AddPurchaseCommand(
         "receiptId",
         item,
@@ -38,13 +40,14 @@ public static class InvalidAddPurchaseCommandGenerator
         totalDiscount,
         description);
 
-    var invalidQuantity =
-      from item in NonEmptyStringGenerator.NonEmptyStringGen().Generator
-      from category in NonEmptyStringGenerator.NonEmptyStringGen().Generator
-      from quantity in NonPositiveDecimalGenerator.NonPositiveDecimalGen().Generator
-      from unitPrice in NonNegativeDecimalGenerator.NonNegativeDecimalGen().Generator
-      from totalDiscount in ArbMap.Default.ArbFor<decimal?>().Filter(d => !d.HasValue || d.Value >= 0).Generator
-      from description in ArbMap.Default.ArbFor<string>().Generator
+    Gen<AddPurchaseCommand> invalidQuantity =
+      from item in NonEmptyStringGenerator.Gen()
+      from category in NonEmptyStringGenerator.Gen()
+      from quantity in NonPositiveDecimalGenerator.Gen()
+      from unitPrice in NonNegativeDecimalGenerator.Gen()
+      from totalDiscount in ArbMap.Default.GeneratorFor<decimal?>()
+      where !totalDiscount.HasValue || totalDiscount.Value >= 0
+      from description in ArbMap.Default.GeneratorFor<string>()
       select new AddPurchaseCommand(
         "receiptId",
         item,
@@ -54,13 +57,14 @@ public static class InvalidAddPurchaseCommandGenerator
         totalDiscount,
         description);
 
-    var invalidUnitPrice =
-      from item in NonEmptyStringGenerator.NonEmptyStringGen().Generator
-      from category in NonEmptyStringGenerator.NonEmptyStringGen().Generator
-      from quantity in PositiveDecimalGenerator.PositiveDecimalGen().Generator
-      from unitPrice in NegativeDecimalGenerator.NegativeDecimalGen().Generator
-      from totalDiscount in ArbMap.Default.ArbFor<decimal?>().Filter(d => !d.HasValue || d.Value >= 0).Generator
-      from description in ArbMap.Default.ArbFor<string>().Generator
+    Gen<AddPurchaseCommand> invalidUnitPrice =
+      from item in NonEmptyStringGenerator.Gen()
+      from category in NonEmptyStringGenerator.Gen()
+      from quantity in PositiveDecimalGenerator.Gen()
+      from unitPrice in NegativeDecimalGenerator.Gen()
+      from totalDiscount in ArbMap.Default.GeneratorFor<decimal?>()
+      where !totalDiscount.HasValue || totalDiscount.Value >= 0
+      from description in ArbMap.Default.GeneratorFor<string>()
       select new AddPurchaseCommand(
         "receiptId",
         item,
@@ -70,13 +74,13 @@ public static class InvalidAddPurchaseCommandGenerator
         totalDiscount,
         description);
 
-    var invalidTotalDiscount =
-      from item in NonEmptyStringGenerator.NonEmptyStringGen().Generator
-      from category in NonEmptyStringGenerator.NonEmptyStringGen().Generator
-      from quantity in PositiveDecimalGenerator.PositiveDecimalGen().Generator
-      from unitPrice in NonNegativeDecimalGenerator.NonNegativeDecimalGen().Generator
-      from totalDiscount in NegativeDecimalGenerator.NegativeDecimalGen().Generator
-      from description in ArbMap.Default.ArbFor<string>().Generator
+    Gen<AddPurchaseCommand> invalidTotalDiscount =
+      from item in NonEmptyStringGenerator.Gen()
+      from category in NonEmptyStringGenerator.Gen()
+      from quantity in PositiveDecimalGenerator.Gen()
+      from unitPrice in NonNegativeDecimalGenerator.Gen()
+      from totalDiscount in NegativeDecimalGenerator.Gen()
+      from description in ArbMap.Default.GeneratorFor<string>()
       select new AddPurchaseCommand(
         "receiptId",
         item,
@@ -86,12 +90,13 @@ public static class InvalidAddPurchaseCommandGenerator
         totalDiscount,
         description);
 
-    return Gen.OneOf(
-        invalidItemName,
-        invalidCategory,
-        invalidQuantity,
-        invalidUnitPrice,
-        invalidTotalDiscount)
-      .ToArbitrary();
+    return FsCheck.Fluent.Gen.OneOf(
+      invalidItemName,
+      invalidCategory,
+      invalidQuantity,
+      invalidUnitPrice,
+      invalidTotalDiscount);
   }
+
+  public static Arbitrary<AddPurchaseCommand> Arbitrary() => Gen().ToArbitrary();
 }

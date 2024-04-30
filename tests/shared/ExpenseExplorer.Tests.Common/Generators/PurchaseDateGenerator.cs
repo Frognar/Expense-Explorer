@@ -4,11 +4,10 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public static class PurchaseDateGenerator
 {
-  public static Arbitrary<PurchaseDate> PurchaseDateGen()
-  {
-    return NonFutureDateOnlyGenerator.NonFutureDateOnlyGen()
-      .Generator
-      .Select(date => PurchaseDate.Create(date, TodayDateOnly))
-      .ToArbitrary();
-  }
+  public static Gen<PurchaseDate> Gen()
+    =>
+      from date in NonFutureDateOnlyGenerator.Gen()
+      select PurchaseDate.Create(date, TodayDateOnly);
+
+  public static Arbitrary<PurchaseDate> Arbitrary() => Gen().ToArbitrary();
 }

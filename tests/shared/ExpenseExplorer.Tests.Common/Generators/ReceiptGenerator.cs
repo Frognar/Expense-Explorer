@@ -4,12 +4,11 @@ using ExpenseExplorer.Domain.Receipts;
 
 public static class ReceiptGenerator
 {
-  public static Arbitrary<Receipt> ReceiptGen()
-  {
-    return (
-        from store in StoreGenerator.StoreGen().Generator
-        from purchaseDate in PurchaseDateGenerator.PurchaseDateGen().Generator
-        select Receipt.New(store, purchaseDate, TodayDateOnly).ClearChanges())
-      .ToArbitrary();
-  }
+  public static Gen<Receipt> Gen()
+    =>
+      from store in StoreGenerator.Gen()
+      from purchaseDate in PurchaseDateGenerator.Gen()
+      select Receipt.New(store, purchaseDate, TodayDateOnly).ClearChanges();
+
+  public static Arbitrary<Receipt> Arbitrary() => Gen().ToArbitrary();
 }

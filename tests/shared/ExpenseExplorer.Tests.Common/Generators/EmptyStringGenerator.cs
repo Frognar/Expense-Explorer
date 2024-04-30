@@ -2,9 +2,11 @@ namespace ExpenseExplorer.Tests.Common.Generators;
 
 public static class EmptyStringGenerator
 {
-  public static Arbitrary<string> EmptyStringGen()
-  {
-    return ArbMap.Default.ArbFor<string>()
-      .Filter(s => s is not null && s.Trim().Length == 0);
-  }
+  public static Gen<string> Gen()
+    =>
+      from str in ArbMap.Default.GeneratorFor<string>()
+      where str is not null && str.Trim().Length == 0
+      select str;
+
+  public static Arbitrary<string> Arbitrary() => Gen().ToArbitrary();
 }

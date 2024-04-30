@@ -4,12 +4,11 @@ using ExpenseExplorer.Application.Receipts.Commands;
 
 public static class ValidOpenNewReceiptCommandGenerator
 {
-  public static Arbitrary<OpenNewReceiptCommand> ValidOpenNewReceiptCommandGen()
-  {
-    return (
-        from storeName in NonEmptyStringGenerator.NonEmptyStringGen().Generator
-        from purchaseDate in NonFutureDateOnlyGenerator.NonFutureDateOnlyGen().Generator
-        select new OpenNewReceiptCommand(storeName, purchaseDate, TodayDateOnly))
-      .ToArbitrary();
-  }
+  public static Gen<OpenNewReceiptCommand> Gen()
+    =>
+      from storeName in NonEmptyStringGenerator.Gen()
+      from purchaseDate in NonFutureDateOnlyGenerator.Gen()
+      select new OpenNewReceiptCommand(storeName, purchaseDate, TodayDateOnly);
+
+  public static Arbitrary<OpenNewReceiptCommand> Arbitrary() => Gen().ToArbitrary();
 }

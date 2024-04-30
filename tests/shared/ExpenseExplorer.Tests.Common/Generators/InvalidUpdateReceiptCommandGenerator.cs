@@ -4,22 +4,22 @@ using ExpenseExplorer.Application.Receipts.Commands;
 
 public static class InvalidUpdateReceiptCommandGenerator
 {
-  public static Arbitrary<UpdateReceiptCommand> InvalidUpdateReceiptCommandGen()
+  public static Gen<UpdateReceiptCommand> Gen()
   {
-    var invalidStore =
-      from store in ArbMap.Default.ArbFor<string>()
-        .Filter(s => s is not null && s.Length > 0 && s.Trim().Length == 0)
-        .Generator
-      from purchaseDate in ArbMap.Default.ArbFor<DateTime?>()
-        .Generator
+    Gen<UpdateReceiptCommand> invalidStore =
+      from store in ArbMap.Default.GeneratorFor<string>()
+      where store is not null && store.Length > 0 && store.Trim().Length == 0
+      from purchaseDate in ArbMap.Default.GeneratorFor<DateTime?>()
         .Select(dateTime => dateTime.HasValue ? DateOnly.FromDateTime(dateTime.Value) : (DateOnly?)null)
       select new UpdateReceiptCommand("receiptId", store, purchaseDate, purchaseDate ?? DateOnly.MaxValue);
 
-    var invalidPurchaseDate =
-      from store in ArbMap.Default.ArbFor<NonWhiteSpaceString?>().Generator.Select(str => str?.Item)
-      from purchaseDate in DateOnlyGenerator.DateOnlyGen().Generator
+    Gen<UpdateReceiptCommand> invalidPurchaseDate =
+      from store in ArbMap.Default.GeneratorFor<NonWhiteSpaceString?>().Select(str => str?.Item)
+      from purchaseDate in DateOnlyGenerator.Gen()
       select new UpdateReceiptCommand("receiptId", store, purchaseDate, purchaseDate.AddDays(-1));
 
-    return Gen.OneOf(invalidStore, invalidPurchaseDate).ToArbitrary();
+    return FsCheck.Fluent.Gen.OneOf(invalidStore, invalidPurchaseDate);
   }
+
+  public static Arbitrary<UpdateReceiptCommand> Arbitrary() => Gen().ToArbitrary();
 }

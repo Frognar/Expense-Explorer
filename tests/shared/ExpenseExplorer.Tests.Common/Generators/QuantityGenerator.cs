@@ -4,11 +4,10 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public static class QuantityGenerator
 {
-  public static Arbitrary<Quantity> QuantityGen()
-  {
-    return PositiveDecimalGenerator.PositiveDecimalGen()
-      .Generator
-      .Select(Quantity.Create)
-      .ToArbitrary();
-  }
+  public static Gen<Quantity> Gen()
+    =>
+      from value in PositiveDecimalGenerator.Gen()
+      select Quantity.Create(value);
+
+  public static Arbitrary<Quantity> Arbitrary() => Gen().ToArbitrary();
 }

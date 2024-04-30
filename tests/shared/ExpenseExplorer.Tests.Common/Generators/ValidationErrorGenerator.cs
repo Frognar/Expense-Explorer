@@ -4,13 +4,10 @@ using FunctionalCore.Failures;
 
 public static class ValidationErrorGenerator
 {
-  public static Arbitrary<ValidationError> ValidationErrorGen()
-  {
-    return ArbMap.Default.ArbFor<NonEmptyString>()
-      .Generator
-      .Select(str => CreateError(str.Item))
-      .ToArbitrary();
+  public static Gen<ValidationError> Gen()
+    =>
+      from str in ArbMap.Default.GeneratorFor<NonEmptyString>()
+      select ValidationError.Create("PROP." + str.Item, str.Item);
 
-    ValidationError CreateError(string str) => ValidationError.Create("PROP." + str, str);
-  }
+  public static Arbitrary<ValidationError> Arbitrary() => Gen().ToArbitrary();
 }

@@ -4,11 +4,10 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public static class CategoryGenerator
 {
-  public static Arbitrary<Category> CategoryGen()
-  {
-    return NonEmptyStringGenerator.NonEmptyStringGen()
-      .Generator
-      .Select(Category.Create)
-      .ToArbitrary();
-  }
+  public static Gen<Category> Gen()
+    =>
+      from str in NonEmptyStringGenerator.Gen()
+      select Category.Create(str);
+
+  public static Arbitrary<Category> Arbitrary() => Gen().ToArbitrary();
 }

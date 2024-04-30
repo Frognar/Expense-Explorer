@@ -6,22 +6,22 @@ public static class InvalidOpenNewReceiptCommandGenerator
 {
   public static Arbitrary<OpenNewReceiptCommand> InvalidOpenNewReceiptCommandGen()
   {
-    var invalidStoreName =
-      from storeName in EmptyStringGenerator.EmptyStringGen().Generator
-      from purchaseDate in NonFutureDateOnlyGenerator.NonFutureDateOnlyGen().Generator
+    Gen<OpenNewReceiptCommand> invalidStoreName =
+      from storeName in EmptyStringGenerator.Gen()
+      from purchaseDate in NonFutureDateOnlyGenerator.Gen()
       select new OpenNewReceiptCommand(storeName, purchaseDate, TodayDateOnly);
 
-    var invalidPurchaseDate =
-      from storeName in NonEmptyStringGenerator.NonEmptyStringGen().Generator
-      from purchaseDate in FutureDateOnlyGenerator.FutureDateOnlyGen().Generator
+    Gen<OpenNewReceiptCommand> invalidPurchaseDate =
+      from storeName in NonEmptyStringGenerator.Gen()
+      from purchaseDate in FutureDateOnlyGenerator.Gen()
       select new OpenNewReceiptCommand(storeName, purchaseDate, TodayDateOnly);
 
-    var invalidStoreNameAndPurchaseDate =
-      from storeName in EmptyStringGenerator.EmptyStringGen().Generator
-      from purchaseDate in FutureDateOnlyGenerator.FutureDateOnlyGen().Generator
+    Gen<OpenNewReceiptCommand> invalidStoreNameAndPurchaseDate =
+      from storeName in EmptyStringGenerator.Gen()
+      from purchaseDate in FutureDateOnlyGenerator.Gen()
       select new OpenNewReceiptCommand(storeName, purchaseDate, TodayDateOnly);
 
-    return Gen.OneOf(
+    return FsCheck.Fluent.Gen.OneOf(
         invalidStoreName,
         invalidPurchaseDate,
         invalidStoreNameAndPurchaseDate)

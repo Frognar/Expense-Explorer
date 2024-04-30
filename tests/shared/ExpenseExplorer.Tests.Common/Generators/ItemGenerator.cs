@@ -4,11 +4,10 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 public static class ItemGenerator
 {
-  public static Arbitrary<Item> ItemGen()
-  {
-    return NonEmptyStringGenerator.NonEmptyStringGen()
-      .Generator
-      .Select(Item.Create)
-      .ToArbitrary();
-  }
+  public static Gen<Item> Gen()
+    =>
+      from str in NonEmptyStringGenerator.Gen()
+      select Item.Create(str);
+
+  public static Arbitrary<Item> Arbitrary() => Gen().ToArbitrary();
 }

@@ -2,12 +2,11 @@ namespace ExpenseExplorer.Tests.Common.Generators;
 
 public static class FutureDateOnlyGenerator
 {
-  public static Arbitrary<DateOnly> FutureDateOnlyGen()
-  {
-    return ArbMap.Default.ArbFor<DateTime>()
-      .Filter(dt => dt.Date > Today)
-      .Generator
-      .Select(DateOnly.FromDateTime)
-      .ToArbitrary();
-  }
+  public static Gen<DateOnly> Gen()
+    =>
+      from dateTime in ArbMap.Default.GeneratorFor<DateTime>()
+      where dateTime.Date > Today
+      select DateOnly.FromDateTime(dateTime);
+
+  public static Arbitrary<DateOnly> Arbitrary() => Gen().ToArbitrary();
 }
