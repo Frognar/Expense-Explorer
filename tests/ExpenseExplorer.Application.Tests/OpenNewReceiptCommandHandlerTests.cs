@@ -1,11 +1,8 @@
 namespace ExpenseExplorer.Application.Tests;
 
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using ExpenseExplorer.Application.Receipts.Commands;
-using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
@@ -16,9 +13,7 @@ public class OpenNewReceiptCommandHandlerTests
   [Property(Arbitrary = [typeof(ValidOpenNewReceiptCommandGenerator)])]
   public async Task CanHandleValidCommand(OpenNewReceiptCommand command)
   {
-    var receipt = (await Handle(command))
-      .Match(_ => throw new UnreachableException(), receipt => receipt);
-
+    Receipt receipt = await HandleValid(command);
     receipt.Store.Name.Should().Be(command.StoreName.Trim());
     receipt.PurchaseDate.Date.Should().Be(command.PurchaseDate);
     receipt.Version.Value.Should().Be(0);
@@ -27,40 +22,23 @@ public class OpenNewReceiptCommandHandlerTests
   [Property(Arbitrary = [typeof(InvalidOpenNewReceiptCommandGenerator)])]
   public async Task CanHandleInvalidCommand(OpenNewReceiptCommand command)
   {
-    var failure = (await Handle(command))
-      .Match(failure => failure, _ => throw new UnreachableException());
-
+    Failure failure = await HandleInvalid(command);
     failure.Should().BeOfType<ValidationFailure>();
   }
 
   [Property(Arbitrary = [typeof(ValidOpenNewReceiptCommandGenerator)])]
   public async Task SavesReceiptWhenValidCommand(OpenNewReceiptCommand command)
   {
-    var receipt = (await Handle(command))
-      .Match(_ => throw new UnreachableException(), receipt => receipt);
-
+    Receipt receipt = await HandleValid(command);
     _receiptRepository.Should().Contain(r => r.Id == receipt.Id);
   }
 
+  private async Task<Failure> HandleInvalid(OpenNewReceiptCommand command)
+    => (await Handle(command)).Match(f => f, _ => throw new UnreachableException());
+
+  private async Task<Receipt> HandleValid(OpenNewReceiptCommand command)
+    => (await Handle(command)).Match(_ => throw new UnreachableException(), r => r);
+
   private async Task<Result<Receipt>> Handle(OpenNewReceiptCommand command)
-  {
-    OpenNewReceiptCommandHandler handler = new(_receiptRepository);
-    return await handler.HandleAsync(command);
-  }
-
-  private sealed class FakeReceiptRepository : Collection<Receipt>, IReceiptRepository
-  {
-    public Task<Result<Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
-    {
-      cancellationToken.ThrowIfCancellationRequested();
-      Add(receipt);
-      return Task.FromResult(Success.From(Version.Create(receipt.Version.Value + 1)));
-    }
-
-    public Task<Result<Receipt>> GetAsync(Id id, CancellationToken cancellationToken)
-    {
-      cancellationToken.ThrowIfCancellationRequested();
-      return Task.FromResult(Fail.OfType<Receipt>(new NotFoundFailure("Receipt not found", id.Value)));
-    }
-  }
+    => await new OpenNewReceiptCommandHandler(_receiptRepository).HandleAsync(command);
 }

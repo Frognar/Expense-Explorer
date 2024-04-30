@@ -1,12 +1,8 @@
 namespace ExpenseExplorer.Application.Tests;
 
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using ExpenseExplorer.Application.Receipts.Commands;
-using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.Receipts.Facts;
-using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
@@ -25,19 +21,20 @@ public class UpdateReceiptCommandHandlerTests
   {
     DateOnly? data = ticks.HasValue ? DateOnly.FromDateTime(new DateTime(ticks.Value, DateTimeKind.Utc)) : null;
     UpdateReceiptCommand command = new("receiptId", storeName, data, data ?? DateOnly.MaxValue);
+
     Receipt receipt = await HandleValid(command);
+
     receipt.Store.Name.Should().Be(storeName ?? _originalStoreName);
     receipt.PurchaseDate.Date.Should().Be(data ?? _originalPurchaseDate);
-    receipt.Version.Value.Should().Be(1UL + (storeName is null ? 0UL : 1UL) + (ticks is null ? 0UL : 1UL));
+    receipt.Version.Value.Should().Be((storeName is null ? 0UL : 1UL) + (ticks is null ? 0UL : 1UL));
   }
 
   [Fact]
   public async Task SavesReceiptWhenValidCommand()
   {
     DateOnly today = new(2024, 1, 1);
-    UpdateReceiptCommand command = new("receiptId", "new store", today, today);
 
-    Receipt receipt = await HandleValid(command);
+    Receipt receipt = await HandleValid(new UpdateReceiptCommand("receiptId", "new store", today, today));
 
     _receiptRepository.Should()
       .Contain(r => r.Id == receipt.Id && r.PurchaseDate.Date == today && r.Store.Name == "new store");
@@ -46,52 +43,23 @@ public class UpdateReceiptCommandHandlerTests
   [Property(Arbitrary = [typeof(ValidUpdateReceiptCommandGenerator)])]
   public async Task ReturnsNotFoundFailureWhenReceiptNotFound(UpdateReceiptCommand command)
   {
-    Result<Receipt> result = await Handle(command with { ReceiptId = "invalid-Id" });
-    Failure failure = result.Match(e => e, _ => throw new UnreachableException());
+    Failure failure = await HandleInvalid(command with { ReceiptId = "invalid-Id" });
     failure.Should().BeOfType<NotFoundFailure>();
   }
 
   [Property(Arbitrary = [typeof(InvalidUpdateReceiptCommandGenerator)])]
   public async Task ReturnsValidationFailureWhenRequestIsInvalid(UpdateReceiptCommand command)
   {
-    Result<Receipt> result = await Handle(command);
-    Failure failure = result.Match(e => e, _ => throw new UnreachableException());
+    Failure failure = await HandleInvalid(command);
     failure.Should().BeOfType<ValidationFailure>();
   }
 
+  private async Task<Failure> HandleInvalid(UpdateReceiptCommand command)
+    => (await Handle(command)).Match(f => f, _ => throw new UnreachableException());
+
   private async Task<Receipt> HandleValid(UpdateReceiptCommand command)
-  {
-    Result<Receipt> result = await Handle(command);
-    return result.Match(_ => throw new UnreachableException(), r => r);
-  }
+    => (await Handle(command)).Match(_ => throw new UnreachableException(), r => r);
 
   private async Task<Result<Receipt>> Handle(UpdateReceiptCommand command)
-  {
-    UpdateReceiptCommandHandler handler = new(_receiptRepository);
-    return await handler.HandleAsync(command);
-  }
-
-  private sealed class FakeReceiptRepository : Collection<Receipt>, IReceiptRepository
-  {
-    public FakeReceiptRepository()
-    {
-      Fact fact = new ReceiptCreated("receiptId", _originalStoreName, _originalPurchaseDate, _originalPurchaseDate);
-      Add(Receipt.Recreate([fact], Version.Create(1UL)));
-    }
-
-    public Task<Result<Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
-    {
-      Version version = Version.Create(receipt.Version.Value + (ulong)receipt.UnsavedChanges.Count());
-      this[0] = receipt.WithVersion(version).ClearChanges();
-      return Task.FromResult(Success.From(version));
-    }
-
-    public Task<Result<Receipt>> GetAsync(Id id, CancellationToken cancellationToken)
-    {
-      Receipt? receipt = this.SingleOrDefault(r => r.Id == id);
-      return receipt is null
-        ? Task.FromResult(Fail.OfType<Receipt>(Failure.NotFound("Receipt not found", id.Value)))
-        : Task.FromResult(Success.From(receipt));
-    }
-  }
+    => await new UpdateReceiptCommandHandler(_receiptRepository).HandleAsync(command);
 }
