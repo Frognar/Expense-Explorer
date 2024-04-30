@@ -2,7 +2,7 @@ namespace ExpenseExplorer.Domain.Receipts.Facts;
 
 using ExpenseExplorer.Domain.ValueObjects;
 
-public record PurchaseDateChanged(string ReceiptId, DateOnly PurchaseDate, DateOnly RequestedDate) : Fact
+public sealed record PurchaseDateChanged(string ReceiptId, DateOnly PurchaseDate, DateOnly RequestedDate) : Fact
 {
   public static PurchaseDateChanged Create(Id receiptId, PurchaseDate purchaseDate, DateOnly requestedDate)
   {

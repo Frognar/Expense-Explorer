@@ -2,7 +2,7 @@ namespace ExpenseExplorer.Domain.Receipts.Facts;
 
 using ExpenseExplorer.Domain.ValueObjects;
 
-public record StoreCorrected(string ReceiptId, string Store) : Fact
+public sealed record StoreCorrected(string ReceiptId, string Store) : Fact
 {
   public static StoreCorrected Create(Id receiptId, Store store)
   {

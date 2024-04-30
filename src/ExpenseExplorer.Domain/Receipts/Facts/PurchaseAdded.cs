@@ -2,7 +2,7 @@ namespace ExpenseExplorer.Domain.Receipts.Facts;
 
 using ExpenseExplorer.Domain.ValueObjects;
 
-public record PurchaseAdded(
+public sealed record PurchaseAdded(
   string ReceiptId,
   string PurchaseId,
   string Item,
