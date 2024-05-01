@@ -13,8 +13,17 @@ internal sealed class FakeReceiptRepository : Collection<Receipt>, IReceiptRepos
   public FakeReceiptRepository()
   {
     DateOnly today = new DateOnly(2000, 1, 1);
-    ReceiptCreated createFact = new("receiptId", "store", today, today);
-    Add(Receipt.Recreate([createFact], Version.Create(0UL)));
+    Receipt receipt = Receipt.Recreate([new ReceiptCreated("receiptId", "store", today, today)], Version.Create(0UL));
+    Add(receipt);
+
+    Receipt receiptWithPurchase = Receipt.Recreate(
+      [
+        new ReceiptCreated("receiptWithPurchaseId", "store", today, today),
+        new PurchaseAdded("receiptWithPurchaseId", "purchaseId", "item", "category", 1, 1, 0, string.Empty),
+      ],
+      Version.Create(1UL));
+
+    Add(receiptWithPurchase);
   }
 
   public Task<Result<Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
