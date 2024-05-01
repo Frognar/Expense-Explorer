@@ -18,11 +18,13 @@ public sealed class UpdatePurchaseDetailsCommandHandler(IReceiptRepository recei
   {
     ArgumentNullException.ThrowIfNull(command);
     return await (
+      from patchModel in UpdatePurchaseDetailsValidator.Validate(command)
       from receiptId in Id.TryCreate(command.ReceiptId).ToResult(() => CommonFailures.InvalidReceiptId)
       from receipt in _receiptRepository.GetAsync(receiptId, cancellationToken)
       from purchaseId in Id.TryCreate(command.PurchaseId).ToResult(() => CommonFailures.InvalidPurchaseId)
       from purchase in TryGetPurchase(receipt, purchaseId)
-      select receipt.UpdatePurchaseDetails(Update(purchase, CreatePatchModel(command))));
+      let updatedPurchase = Update(purchase, patchModel)
+      select receipt.UpdatePurchaseDetails(updatedPurchase));
   }
 
   private static Result<Purchase> TryGetPurchase(Receipt receipt, Id purchaseId)
@@ -31,37 +33,6 @@ public sealed class UpdatePurchaseDetailsCommandHandler(IReceiptRepository recei
     return purchase != default
       ? Success.From(purchase)
       : Fail.OfType<Purchase>(Failure.NotFound("Purchase not found.", purchaseId.Value));
-  }
-
-  private static PurchasePatchModel CreatePatchModel(UpdatePurchaseDetailsCommand command)
-  {
-    Maybe<Item> item = string.IsNullOrWhiteSpace(command.Item) ? None.OfType<Item>() : Item.TryCreate(command.Item);
-    Maybe<Category> category = string.IsNullOrWhiteSpace(command.Category)
-      ? None.OfType<Category>()
-      : Category.TryCreate(command.Category);
-
-    Maybe<Quantity> quantity = command.Quantity.HasValue
-      ? Quantity.TryCreate(command.Quantity.Value)
-      : None.OfType<Quantity>();
-
-    Maybe<Money> unitPrice
-      = command.UnitPrice.HasValue ? Money.TryCreate(command.UnitPrice.Value) : None.OfType<Money>();
-
-    Maybe<Money> totalDiscount = command.TotalDiscount.HasValue
-      ? Money.TryCreate(command.TotalDiscount.Value)
-      : None.OfType<Money>();
-
-    Maybe<Description> description = string.IsNullOrWhiteSpace(command.Description)
-      ? None.OfType<Description>()
-      : Some.From(Description.Create(command.Description));
-
-    return PurchasePatchModel.Create(
-      item,
-      category,
-      quantity,
-      unitPrice,
-      totalDiscount,
-      description);
   }
 
   private static Purchase Update(Purchase purchase, PurchasePatchModel patchModel)
