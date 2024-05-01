@@ -14,8 +14,7 @@ public class UpdatePurchaseDetailsCommandHandlerTests
   [Property(Arbitrary = [typeof(ValidUpdatePurchaseDetailsCommandGenerator)])]
   public async Task CanHandleValidCommand(UpdatePurchaseDetailsCommand command)
   {
-    Result<Receipt> result = await new UpdatePurchaseDetailsCommandHandler(_receiptRepository).HandleAsync(command);
-    Receipt receipt = result.Match(_ => throw new UnreachableException(), r => r);
+    Receipt receipt = await HandleValid(command);
     receipt.Id.Value.Should().Be(command.ReceiptId);
     receipt.Version.Value.Should().BeGreaterThan(0);
   }
@@ -23,20 +22,23 @@ public class UpdatePurchaseDetailsCommandHandlerTests
   [Property(Arbitrary = [typeof(ValidUpdatePurchaseDetailsCommandGenerator)])]
   public async Task ReturnsFailureWhenReceiptNotFound(UpdatePurchaseDetailsCommand command)
   {
-    Result<Receipt> result = await new UpdatePurchaseDetailsCommandHandler(_receiptRepository)
-      .HandleAsync(command with { ReceiptId = "invalid-Id" });
-
-    Failure failure = result.Match(f => f, _ => throw new UnreachableException());
+    Failure failure = await HandleInvalid(command with { ReceiptId = "invalid-Id" });
     failure.Should().BeOfType<NotFoundFailure>();
   }
 
   [Property(Arbitrary = [typeof(ValidUpdatePurchaseDetailsCommandGenerator)])]
   public async Task ReturnsFailureWhenPurchaseNotFound(UpdatePurchaseDetailsCommand command)
   {
-    Result<Receipt> result = await new UpdatePurchaseDetailsCommandHandler(_receiptRepository)
-      .HandleAsync(command with { PurchaseId = "invalid-Id" });
-
-    Failure failure = result.Match(f => f, _ => throw new UnreachableException());
+    Failure failure = await HandleInvalid(command with { PurchaseId = "invalid-Id" });
     failure.Should().BeOfType<NotFoundFailure>();
   }
+
+  private async Task<Failure> HandleInvalid(UpdatePurchaseDetailsCommand command)
+    => (await Handle(command)).Match(f => f, _ => throw new UnreachableException());
+
+  private async Task<Receipt> HandleValid(UpdatePurchaseDetailsCommand command)
+    => (await Handle(command)).Match(_ => throw new UnreachableException(), r => r);
+
+  private async Task<Result<Receipt>> Handle(UpdatePurchaseDetailsCommand command)
+    => await new UpdatePurchaseDetailsCommandHandler(_receiptRepository).HandleAsync(command);
 }
