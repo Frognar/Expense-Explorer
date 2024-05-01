@@ -29,4 +29,14 @@ public class UpdatePurchaseDetailsCommandHandlerTests
     Failure failure = result.Match(f => f, _ => throw new UnreachableException());
     failure.Should().BeOfType<NotFoundFailure>();
   }
+
+  [Property(Arbitrary = [typeof(ValidUpdatePurchaseDetailsCommandGenerator)])]
+  public async Task ReturnsFailureWhenPurchaseNotFound(UpdatePurchaseDetailsCommand command)
+  {
+    Result<Receipt> result = await new UpdatePurchaseDetailsCommandHandler(_receiptRepository)
+      .HandleAsync(command with { PurchaseId = "invalid-Id" });
+
+    Failure failure = result.Match(f => f, _ => throw new UnreachableException());
+    failure.Should().BeOfType<NotFoundFailure>();
+  }
 }
