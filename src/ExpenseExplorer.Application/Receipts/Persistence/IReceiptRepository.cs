@@ -2,7 +2,6 @@ namespace ExpenseExplorer.Application.Receipts.Persistence;
 
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
 public interface IReceiptRepository

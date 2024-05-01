@@ -29,7 +29,16 @@ internal sealed class FakeReceiptRepository : Collection<Receipt>, IReceiptRepos
   public Task<Result<Version>> SaveAsync(Receipt receipt, CancellationToken cancellationToken)
   {
     Version version = Version.Create(receipt.Version.Value + (ulong)receipt.UnsavedChanges.Count());
-    this[0] = receipt.WithVersion(version).ClearChanges();
+    if (this.FirstOrDefault(r => r.Id == receipt.Id) is { } fromDb)
+    {
+      int i = IndexOf(fromDb);
+      this[i] = receipt.WithVersion(version).ClearChanges();
+    }
+    else
+    {
+      Add(receipt.WithVersion(version).ClearChanges());
+    }
+
     return Task.FromResult(Success.From(version));
   }
 

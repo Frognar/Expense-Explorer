@@ -23,7 +23,7 @@ internal static class UpdatePurchaseDetailsValidator
       ? Money.TryCreate(command.TotalDiscount.Value)
       : None.OfType<Money>();
 
-    Maybe<Description> description = string.IsNullOrWhiteSpace(command.Description)
+    Maybe<Description> description = command.Description is null
       ? None.OfType<Description>()
       : Some.From(Description.Create(command.Description));
 

@@ -23,8 +23,9 @@ public sealed class UpdatePurchaseDetailsCommandHandler(IReceiptRepository recei
       from receipt in _receiptRepository.GetAsync(receiptId, cancellationToken)
       from purchaseId in Id.TryCreate(command.PurchaseId).ToResult(() => CommonFailures.InvalidPurchaseId)
       from purchase in TryGetPurchase(receipt, purchaseId)
-      let updatedPurchase = Update(purchase, patchModel)
-      select receipt.UpdatePurchaseDetails(updatedPurchase));
+      let receiptWithUpdatedPurchase = receipt.UpdatePurchaseDetails(Update(purchase, patchModel))
+      from version in _receiptRepository.SaveAsync(receiptWithUpdatedPurchase, cancellationToken)
+      select receiptWithUpdatedPurchase.WithVersion(version).ClearChanges());
   }
 
   private static Result<Purchase> TryGetPurchase(Receipt receipt, Id purchaseId)
