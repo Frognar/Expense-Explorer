@@ -2,7 +2,10 @@ namespace ExpenseExplorer.Application.Tests;
 
 using System.Diagnostics;
 using ExpenseExplorer.Application.Receipts.Commands;
+using ExpenseExplorer.Application.Tests.TestData;
 using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.Domain.Receipts.Facts;
+using ExpenseExplorer.Domain.ValueObjects;
 using ExpenseExplorer.Tests.Common.Generators.Commands;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
@@ -11,23 +14,24 @@ public class UpdateReceiptCommandHandlerTests
 {
   private const string _originalStoreName = "store";
   private static readonly DateOnly _originalPurchaseDate = new(2000, 1, 1);
-  private readonly FakeReceiptRepository _receiptRepository = new();
+
+  private readonly FakeReceiptRepository _receiptRepository =
+  [
+    Receipt.Recreate(
+      [new ReceiptCreated("receiptId", _originalStoreName, _originalPurchaseDate, _originalPurchaseDate)],
+      Version.Create(0UL))
+  ];
 
   [Theory]
-  [InlineData(null, null)]
-  [InlineData("new store", null)]
-  [InlineData(null, 100000L)]
-  [InlineData("new store", 100000L)]
-  public async Task UpdatesValuesOnReceiptWhenValidCommand(string? storeName, long? ticks)
+  [ClassData(typeof(ValidUpdateReceiptCommandData))]
+  public async Task UpdatesValuesOnReceiptWhenValidCommand(UpdateReceiptCommand command)
   {
-    DateOnly? data = ticks.HasValue ? DateOnly.FromDateTime(new DateTime(ticks.Value, DateTimeKind.Utc)) : null;
-    UpdateReceiptCommand command = new("receiptId", storeName, data, data ?? DateOnly.MaxValue);
-
     Receipt receipt = await HandleValid(command);
 
-    receipt.Store.Name.Should().Be(storeName ?? _originalStoreName);
-    receipt.PurchaseDate.Date.Should().Be(data ?? _originalPurchaseDate);
-    receipt.Version.Value.Should().Be((storeName is null ? 0UL : 1UL) + (ticks is null ? 0UL : 1UL));
+    receipt.Store.Name.Should().Be(command.StoreName ?? _originalStoreName);
+    receipt.PurchaseDate.Date.Should().Be(command.PurchaseDate ?? _originalPurchaseDate);
+    receipt.Version.Value.Should()
+      .Be((command.StoreName is null ? 0UL : 1UL) + (command.PurchaseDate is null ? 0UL : 1UL));
   }
 
   [Fact]
@@ -38,7 +42,11 @@ public class UpdateReceiptCommandHandlerTests
     Receipt receipt = await HandleValid(new UpdateReceiptCommand("receiptId", "new store", today, today));
 
     _receiptRepository.Should()
-      .Contain(r => r.Id == receipt.Id && r.PurchaseDate.Date == today && r.Store.Name == "new store");
+      .Contain(
+        r => r.Id == receipt.Id
+             && r.PurchaseDate.Date == today
+             && r.Store.Name == "new store"
+             && r.Version.Value == 2UL);
   }
 
   [Property(Arbitrary = [typeof(ValidUpdateReceiptCommandGenerator)])]
@@ -49,7 +57,7 @@ public class UpdateReceiptCommandHandlerTests
   }
 
   [Property(Arbitrary = [typeof(InvalidUpdateReceiptCommandGenerator)])]
-  public async Task ReturnsValidationFailureWhenRequestIsInvalid(UpdateReceiptCommand command)
+  public async Task ReturnsValidationFailureWhenInvalidCommand(UpdateReceiptCommand command)
   {
     Failure failure = await HandleInvalid(command);
     failure.Should().BeOfType<ValidationFailure>();

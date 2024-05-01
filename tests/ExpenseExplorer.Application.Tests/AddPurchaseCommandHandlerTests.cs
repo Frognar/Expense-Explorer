@@ -3,26 +3,26 @@ namespace ExpenseExplorer.Application.Tests;
 using System.Diagnostics;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.Domain.Receipts.Facts;
+using ExpenseExplorer.Domain.ValueObjects;
 using ExpenseExplorer.Tests.Common.Generators.Commands;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
 public class AddPurchaseCommandHandlerTests
 {
-  private readonly FakeReceiptRepository _receiptRepository = new();
-
-  [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]
-  public async Task CanHandleValidCommand(AddPurchaseCommand command)
-  {
-    Receipt result = await HandleValid(command);
-    result.Id.Value.Should().Be(command.ReceiptId);
-    result.Version.Value.Should().BeGreaterThan(0);
-  }
+  private readonly FakeReceiptRepository _receiptRepository =
+  [
+    Receipt.Recreate(
+      [new ReceiptCreated("receiptId", "store", new DateOnly(2000, 1, 1), new DateOnly(2000, 1, 1))],
+      Version.Create(0UL))
+  ];
 
   [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]
   public async Task AddsPurchaseToReceipt(AddPurchaseCommand command)
   {
     Receipt result = await HandleValid(command);
+    result.Id.Value.Should().Be(command.ReceiptId);
     result.Purchases.Should().NotBeEmpty();
   }
 
@@ -41,7 +41,7 @@ public class AddPurchaseCommandHandlerTests
   }
 
   [Property(Arbitrary = [typeof(InvalidAddPurchaseCommandGenerator)])]
-  public async Task ReturnsFailureWhenRequestIsInvalid(AddPurchaseCommand command)
+  public async Task ReturnsFailureWhenInvalidCommand(AddPurchaseCommand command)
   {
     Failure failure = await HandleInvalid(command);
     failure.Should().NotBeNull();
