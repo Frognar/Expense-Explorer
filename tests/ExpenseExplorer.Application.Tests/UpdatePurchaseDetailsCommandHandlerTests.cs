@@ -17,36 +17,16 @@ public class UpdatePurchaseDetailsCommandHandlerTests
   {
     Receipt receipt = await HandleValid(command);
 
-    receipt.Id.Value
-      .Should()
-      .Be(command.ReceiptId);
-
-    Purchase purchase = receipt.Purchases
-      .Single(p => p.Id == Id.Create(command.PurchaseId));
-
-    purchase.Item.Name
-      .Should()
-      .Be(command.Item?.Trim() ?? purchase.Item.Name);
-
-    purchase.Category.Name
-      .Should()
-      .Be(command.Category?.Trim() ?? purchase.Category.Name);
-
-    purchase.Quantity.Value
-      .Should()
-      .Be(Math.Round(command.Quantity ?? purchase.Quantity.Value, Quantity.Precision));
-
-    purchase.UnitPrice.Value
-      .Should()
-      .Be(Math.Round(command.UnitPrice ?? purchase.UnitPrice.Value, Money.Precision));
-
-    purchase.TotalDiscount.Value
-      .Should()
-      .Be(Math.Round(command.TotalDiscount ?? purchase.TotalDiscount.Value, Money.Precision));
-
-    purchase.Description.Value
-      .Should()
-      .Be(command.Description?.Trim() ?? purchase.Description.Value);
+    receipt.Id.Value.Should().Be(command.ReceiptId);
+    Purchase purchase = receipt.Purchases.Single(p => p.Id == Id.Create(command.PurchaseId));
+    AssertPurchase(
+      purchase,
+      command.Item?.Trim(),
+      command.Category?.Trim(),
+      command.Quantity.HasValue ? Math.Round(command.Quantity.Value, Quantity.Precision) : null,
+      command.UnitPrice.HasValue ? Math.Round(command.UnitPrice.Value, Money.Precision) : null,
+      command.TotalDiscount.HasValue ? Math.Round(command.TotalDiscount.Value, Money.Precision) : null,
+      command.Description?.Trim() ?? purchase.Description.Value);
   }
 
   [Fact]
@@ -59,12 +39,7 @@ public class UpdatePurchaseDetailsCommandHandlerTests
     Receipt receipt = _receiptRepository.Single(r => r.Id.Value == "receiptWithPurchaseId");
     receipt.Version.Value.Should().Be(2UL);
     Purchase purchase = receipt.Purchases.Single(p => p.Id == Id.Create(command.PurchaseId));
-    purchase.Item.Name.Should().Be("i");
-    purchase.Category.Name.Should().Be("c");
-    purchase.Quantity.Value.Should().Be(1);
-    purchase.UnitPrice.Value.Should().Be(1);
-    purchase.TotalDiscount.Value.Should().Be(0);
-    purchase.Description.Value.Should().Be("d");
+    AssertPurchase(purchase, "i", "c", 1, 1, 0, "d");
   }
 
   [Property(Arbitrary = [typeof(ValidUpdatePurchaseDetailsCommandGenerator)])]
@@ -79,6 +54,51 @@ public class UpdatePurchaseDetailsCommandHandlerTests
   {
     Failure failure = await HandleInvalid(command with { PurchaseId = "invalid-Id" });
     failure.Should().BeOfType<NotFoundFailure>();
+  }
+
+  private static void AssertPurchase(
+    Purchase purchase,
+    string? expectedItem,
+    string? expectedCategory,
+    decimal? expectedQuantity,
+    decimal? expectedUnitPrice,
+    decimal? expectedTotalDiscount,
+    string? expectedDescription)
+  {
+    if (expectedItem is not null)
+    {
+      purchase.Item.Name.Should().Be(expectedItem);
+    }
+
+    if (expectedCategory is not null)
+    {
+      purchase.Category.Name.Should().Be(expectedCategory);
+    }
+
+    if (expectedQuantity is not null)
+    {
+      purchase.Quantity.Value.Should().Be(expectedQuantity);
+    }
+
+    if (expectedUnitPrice is not null)
+    {
+      purchase.UnitPrice.Value.Should().Be(expectedUnitPrice);
+    }
+
+    if (expectedTotalDiscount is not null)
+    {
+      purchase.TotalDiscount.Value.Should().Be(expectedTotalDiscount);
+    }
+
+    if (expectedDescription is not null)
+    {
+      purchase.Description.Value.Should().Be(expectedDescription);
+    }
+
+    if (expectedItem is not null)
+    {
+      purchase.Item.Name.Should().Be(expectedItem);
+    }
   }
 
   private async Task<Failure> HandleInvalid(UpdatePurchaseDetailsCommand command)
