@@ -1,6 +1,8 @@
 namespace ExpenseExplorer.ReadModel;
 
 using CommandHub;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,6 +12,14 @@ public static class ReadModelDependencyInjection
   {
     serviceCollection.AddReadModelDb(configuration);
     serviceCollection.AddFactProcessor(configuration);
+  }
+
+  public static void ConfigureReadModel(this IApplicationBuilder app)
+  {
+    ArgumentNullException.ThrowIfNull(app);
+    using IServiceScope serviceScope = app.ApplicationServices.CreateScope();
+    ExpenseExplorerContext context = serviceScope.ServiceProvider.GetRequiredService<ExpenseExplorerContext>();
+    context.Database.Migrate();
   }
 
   private static void AddFactProcessor(this IServiceCollection serviceCollection, IConfiguration configuration)

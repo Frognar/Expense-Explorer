@@ -24,6 +24,8 @@ WebApplication app = builder.Build();
 
 app.UseHttpsRedirection();
 
+app.ConfigureReadModel();
+
 app.MapEndpoints();
 
 app.Run();

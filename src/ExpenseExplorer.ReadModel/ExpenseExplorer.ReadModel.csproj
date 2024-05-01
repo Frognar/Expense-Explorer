@@ -2,6 +2,7 @@
 
     <ItemGroup>
         <PackageReference Include="EventStore.Client.Grpc.Streams" Version="23.2.1"/>
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.3"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.3"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.3">
@@ -14,12 +15,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="ExpenseExplorer.API.Tests.Integration"/>
+        <ProjectReference Include="..\CommandHub\CommandHub.csproj"/>
+        <ProjectReference Include="..\FunctionalCore\FunctionalCore.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CommandHub\CommandHub.csproj"/>
-        <ProjectReference Include="..\FunctionalCore\FunctionalCore.csproj" />
+        <InternalsVisibleTo Include="ExpenseExplorer.API.Tests.Integration"/>
     </ItemGroup>
 
 </Project>
