@@ -4,6 +4,7 @@ using System.Diagnostics;
 using CommandHub.Commands;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Domain.Receipts;
+using ExpenseExplorer.Tests.Common.Generators.Commands;
 using FunctionalCore.Monads;
 
 public class UpdatePurchaseDetailsCommandHandlerTests
@@ -17,19 +18,9 @@ public class UpdatePurchaseDetailsCommandHandlerTests
     handler.Should().BeAssignableTo<ICommandHandler<UpdatePurchaseDetailsCommand, Result<Receipt>>>();
   }
 
-  [Fact]
-  public async Task CanHandleValidCommand()
+  [Property(Arbitrary = [typeof(ValidUpdatePurchaseDetailsCommandGenerator)])]
+  public async Task CanHandleValidCommand(UpdatePurchaseDetailsCommand command)
   {
-    UpdatePurchaseDetailsCommand command = new(
-      "receiptWithPurchaseId",
-      "purchaseId",
-      (string?)"item",
-      (string?)"category",
-      (decimal?)1m,
-      (decimal?)1m,
-      (decimal?)1m,
-      (string?)"description");
-
     Result<Receipt> result = await new UpdatePurchaseDetailsCommandHandler(_receiptRepository).HandleAsync(command);
     Receipt receipt = result.Match(_ => throw new UnreachableException(), r => r);
     receipt.Id.Value.Should().Be(command.ReceiptId);
