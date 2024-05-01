@@ -6,6 +6,8 @@ public static class CommonFailures
 {
   public static readonly ValidationFailure InvalidReceiptId = Failure.Validation("ReceiptId", "INVALID_RECEIPT_ID");
 
+  public static readonly ValidationFailure InvalidPurchaseId = Failure.Validation("PurchaseId", "INVALID_PURCHASE_ID");
+
   public static readonly ValidationFailure EmptyStoreName = Failure.Validation("StoreName", "EMPTY_STORE_NAME");
 
   public static readonly ValidationFailure FutureDate = Failure.Validation("PurchaseDate", "EMPTY_STORE_NAME");

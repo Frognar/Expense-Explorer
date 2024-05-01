@@ -17,12 +17,14 @@ public sealed class UpdatePurchaseDetailsCommandHandler(IReceiptRepository recei
     CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Result<Receipt> resultOfReceipt
-      = await _receiptRepository.GetAsync(Id.Create(command.ReceiptId), cancellationToken);
-
-    return resultOfReceipt.FlatMap(
-      r => r.Purchases.Any(p => p.Id == Id.Create(command.PurchaseId))
-        ? Success.From(r)
-        : Fail.OfType<Receipt>(Failure.NotFound("Purchase not found", command.PurchaseId)));
+    return await (
+      from receiptId in Id.TryCreate(command.ReceiptId).ToResult(() => CommonFailures.InvalidReceiptId)
+      from receipt in _receiptRepository.GetAsync(receiptId, cancellationToken)
+      from purchaseId in Id.TryCreate(command.PurchaseId).ToResult(() => CommonFailures.InvalidPurchaseId)
+      let purchase = receipt.Purchases.SingleOrDefault(p => p.Id == purchaseId)
+      from result in purchase != default
+        ? Success.From(receipt)
+        : Fail.OfType<Receipt>(Failure.NotFound("Purchase not found", command.PurchaseId))
+      select result);
   }
 }
