@@ -3,7 +3,7 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Monads;
 
-public readonly record struct PurchasePatchModel(
+internal readonly record struct PurchasePatchModel(
   Maybe<Item> Item,
   Maybe<Category> Category,
   Maybe<Quantity> Quantity,
