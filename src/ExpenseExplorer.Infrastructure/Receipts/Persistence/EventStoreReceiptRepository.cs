@@ -43,7 +43,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
       (List<Fact> facts, Version version) = await _eventStore.GetEventsAsync(id, cancellationToken);
       return facts.Count == 0
         ? Fail.OfType<Receipt>(new NotFoundFailure("Receipt not found", id.Value))
-        : Success.From(Receipt.Recreate(facts, version));
+        : Receipt.Recreate(facts, version);
     }
     catch (FactReadException ex)
     {

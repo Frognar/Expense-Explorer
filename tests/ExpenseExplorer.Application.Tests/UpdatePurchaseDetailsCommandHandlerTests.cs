@@ -22,19 +22,20 @@ public class UpdatePurchaseDetailsCommandHandlerTests
   private readonly FakeReceiptRepository _receiptRepository =
   [
     Receipt.Recreate(
-      [
-        new ReceiptCreated("receiptWithPurchaseId", "store", new DateOnly(2000, 1, 1), new DateOnly(2000, 1, 1)),
-        new PurchaseAdded(
-          "receiptWithPurchaseId",
-          "purchaseId",
-          _originalItem,
-          _originalCategory,
-          _originalQuantity,
-          _originalUnitPrice,
-          _originalTotalDiscount,
-          _originalDescription)
-      ],
-      Version.Create(1UL))
+        [
+          new ReceiptCreated("receiptWithPurchaseId", "store", new DateOnly(2000, 1, 1), new DateOnly(2000, 1, 1)),
+          new PurchaseAdded(
+            "receiptWithPurchaseId",
+            "purchaseId",
+            _originalItem,
+            _originalCategory,
+            _originalQuantity,
+            _originalUnitPrice,
+            _originalTotalDiscount,
+            _originalDescription)
+        ],
+        Version.Create(1UL))
+      .Match(_ => throw new UnreachableException(), r => r)
   ];
 
   [Theory]

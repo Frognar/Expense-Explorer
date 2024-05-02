@@ -18,8 +18,9 @@ public class UpdateReceiptCommandHandlerTests
   private readonly FakeReceiptRepository _receiptRepository =
   [
     Receipt.Recreate(
-      [new ReceiptCreated("receiptId", _originalStoreName, _originalPurchaseDate, _originalPurchaseDate)],
-      Version.Create(0UL))
+        [new ReceiptCreated("receiptId", _originalStoreName, _originalPurchaseDate, _originalPurchaseDate)],
+        Version.Create(0UL))
+      .Match(_ => throw new UnreachableException(), r => r)
   ];
 
   [Theory]

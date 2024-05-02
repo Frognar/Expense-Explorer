@@ -1,9 +1,12 @@
 namespace ExpenseExplorer.Domain.Tests;
 
+using System.Diagnostics;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 using ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
+using FunctionalCore.Failures;
+using FunctionalCore.Monads;
 
 public class ReceiptTests
 {
@@ -115,7 +118,8 @@ public class ReceiptTests
     ];
 
     purchase = purchase with { Id = Id.Create("pId") };
-    Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Receipt receipt = resultOfReceipt.Match(_ => throw new UnreachableException(), r => r);
 
     receipt = receipt.UpdatePurchaseDetails(purchase);
 
@@ -139,7 +143,8 @@ public class ReceiptTests
     ];
 
     purchase = purchase with { Id = Id.Create("pId") };
-    Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Receipt receipt = resultOfReceipt.Match(_ => throw new UnreachableException(), r => r);
 
     receipt = receipt.UpdatePurchaseDetails(purchase);
 
@@ -167,7 +172,8 @@ public class ReceiptTests
       new PurchaseDetailsChanged("id", "pId", "it", "ca", 2, 2, 1, "de")
     ];
 
-    Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Receipt receipt = resultOfReceipt.Match(_ => throw new UnreachableException(), r => r);
 
     receipt.Id.Value.Should().Be("id");
     receipt.Store.Name.Should().Be("newStore");
@@ -196,19 +202,21 @@ public class ReceiptTests
       new PurchaseDetailsChanged("id", "pId", "it", "ca", 2, 2, 1, "de")
     ];
 
-    Receipt receipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Receipt receipt = resultOfReceipt.Match(_ => throw new UnreachableException(), r => r);
 
     receipt.UnsavedChanges.Should().BeEmpty();
   }
 
   [Fact]
-  public void ThrowsWhenRecreatedWithUnsupportedFact()
+  public void ReturnsFailureWhenRecreatedWithUnsupportedFact()
   {
     Fact unknown = new UnknownFact();
 
-    Action act = () => Receipt.Recreate([unknown], Version.New());
+    Result<Receipt> resultOfReceipt = Receipt.Recreate([unknown], Version.Create(0UL));
+    Failure failure = resultOfReceipt.Match(f => f, _ => throw new UnreachableException());
 
-    act.Should().Throw<ArgumentException>();
+    failure.Should().NotBeNull();
   }
 
   private sealed record UnknownFact : Fact;

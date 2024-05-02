@@ -14,8 +14,9 @@ public class AddPurchaseCommandHandlerTests
   private readonly FakeReceiptRepository _receiptRepository =
   [
     Receipt.Recreate(
-      [new ReceiptCreated("receiptId", "store", new DateOnly(2000, 1, 1), new DateOnly(2000, 1, 1))],
-      Version.Create(0UL))
+        [new ReceiptCreated("receiptId", "store", new DateOnly(2000, 1, 1), new DateOnly(2000, 1, 1))],
+        Version.Create(0UL))
+      .Match(_ => throw new UnreachableException(), r => r)
   ];
 
   [Property(Arbitrary = [typeof(ValidAddPurchaseCommandGenerator)])]

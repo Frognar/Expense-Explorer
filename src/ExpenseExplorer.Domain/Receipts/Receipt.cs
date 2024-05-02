@@ -2,6 +2,8 @@ namespace ExpenseExplorer.Domain.Receipts;
 
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore.Failures;
+using FunctionalCore.Monads;
 
 public sealed record Receipt
 {
@@ -47,9 +49,11 @@ public sealed record Receipt
     return new Receipt(id, store, purchaseDate, [], [receiptCreated], Version.New());
   }
 
-  public static Receipt Recreate(IEnumerable<Fact> facts, Version version)
+  public static Result<Receipt> Recreate(IEnumerable<Fact> facts, Version version)
   {
-    return facts.Aggregate(_empty, (receipt, fact) => receipt.ApplyFact(fact)) with { Version = version };
+    return facts
+      .Aggregate(Success.From(_empty), (receipt, fact) => receipt.FlatMap(r => r.ApplyFact(fact)))
+      .Map(r => r with { Version = version });
   }
 
   public Receipt ClearChanges()
@@ -97,16 +101,17 @@ public sealed record Receipt
     return this with { Version = version };
   }
 
-  private Receipt ApplyFact(Fact fact)
+  private Result<Receipt> ApplyFact(Fact fact)
   {
     return fact switch
     {
-      ReceiptCreated receiptCreated => Apply(receiptCreated),
-      StoreCorrected storeCorrected => Apply(storeCorrected),
-      PurchaseAdded purchaseAdded => Apply(purchaseAdded),
-      PurchaseDateChanged purchaseDateChanged => Apply(purchaseDateChanged),
-      PurchaseDetailsChanged purchaseDetailsChanged => Apply(purchaseDetailsChanged),
-      _ => throw new ArgumentException($"Unknown fact type: {fact.GetType()}", nameof(fact)),
+      ReceiptCreated receiptCreated => Success.From(Apply(receiptCreated)),
+      StoreCorrected storeCorrected => Success.From(Apply(storeCorrected)),
+      PurchaseAdded purchaseAdded => Success.From(Apply(purchaseAdded)),
+      PurchaseDateChanged purchaseDateChanged => Success.From(Apply(purchaseDateChanged)),
+      PurchaseDetailsChanged purchaseDetailsChanged => Success.From(Apply(purchaseDetailsChanged)),
+      _ => Fail.OfType<Receipt>(
+        Failure.Fatal(new ArgumentException($"Unknown fact type: {fact.GetType()}", nameof(fact)))),
     };
   }
 
