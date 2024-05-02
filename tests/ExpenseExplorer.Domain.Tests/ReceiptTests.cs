@@ -234,6 +234,22 @@ public class ReceiptTests
     failure.Should().NotBeNull();
   }
 
+  [Fact]
+  public void ReturnsFailureWhenRecreatedWithMultipleReceiptCreatedFacts()
+  {
+    DateOnly today = new DateOnly(2000, 1, 1);
+    List<Fact> facts =
+    [
+      new ReceiptCreated("id", "store", today, today),
+      new ReceiptCreated("id", "store", today, today),
+    ];
+
+    Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create(0UL));
+    Failure failure = resultOfReceipt.Match(f => f, _ => throw new UnreachableException());
+
+    failure.Should().NotBeNull();
+  }
+
   [Theory]
   [ClassData(typeof(ReceiptCorruptedFactsForRecreate))]
   public void ReturnsFailureWhenRecreatedWithCorruptedFact(Fact[] facts)

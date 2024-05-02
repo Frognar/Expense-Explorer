@@ -48,7 +48,7 @@ public sealed record Receipt
     if (facts.FirstOrDefault() is ReceiptCreated receiptCreated)
     {
       return facts.Skip(1)
-        .Aggregate(Create(receiptCreated), (receipt, fact) => receipt.FlatMap(r => r.ApplyFact(fact)))
+        .Aggregate(Apply(receiptCreated), (receipt, fact) => receipt.FlatMap(r => r.ApplyFact(fact)))
         .Map(r => r with { Version = version });
     }
 
@@ -105,7 +105,6 @@ public sealed record Receipt
   {
     return fact switch
     {
-      ReceiptCreated receiptCreated => Apply(receiptCreated),
       StoreCorrected storeCorrected => Apply(storeCorrected),
       PurchaseAdded purchaseAdded => Apply(purchaseAdded),
       PurchaseDateChanged purchaseDateChanged => Apply(purchaseDateChanged),
@@ -115,14 +114,14 @@ public sealed record Receipt
     };
   }
 
-  private Result<Receipt> Apply(ReceiptCreated fact)
+  private static Result<Receipt> Apply(ReceiptCreated receiptCreated)
   {
     return (
-        from receiptId in Id.TryCreate(fact.Id)
-        from store in Store.TryCreate(fact.Store)
-        from purchaseDate in PurchaseDate.TryCreate(fact.PurchaseDate, fact.CreatedDate)
-        select this with { Id = receiptId, Store = store, PurchaseDate = purchaseDate })
-      .ToResult(() => Failure.Fatal(new AggregateException($"Failed to recreate receipt from {fact}.")));
+        from id in Id.TryCreate(receiptCreated.Id)
+        from store in Store.TryCreate(receiptCreated.Store)
+        from purchaseDate in PurchaseDate.TryCreate(receiptCreated.PurchaseDate, receiptCreated.CreatedDate)
+        select new Receipt(id, store, purchaseDate, [], [], Version.New()))
+      .ToResult(() => Failure.Fatal(new ArgumentException($"Failed to create receipt from {receiptCreated}.")));
   }
 
   private Result<Receipt> Apply(StoreCorrected fact)
@@ -169,15 +168,5 @@ public sealed record Receipt
         from purchaseDate in PurchaseDate.TryCreate(fact.PurchaseDate, fact.RequestedDate)
         select this with { PurchaseDate = purchaseDate })
       .ToResult(() => Failure.Fatal(new ArgumentException($"Failed to recreate receipt from {fact}.")));
-  }
-
-  private static Result<Receipt> Create(ReceiptCreated receiptCreated)
-  {
-    return (
-        from id in Id.TryCreate(receiptCreated.Id)
-        from store in Store.TryCreate(receiptCreated.Store)
-        from purchaseDate in PurchaseDate.TryCreate(receiptCreated.PurchaseDate, receiptCreated.CreatedDate)
-        select new Receipt(id, store, purchaseDate, [], [], Version.New()))
-      .ToResult(() => Failure.Fatal(new ArgumentException($"Failed to create receipt from {receiptCreated}.")));
   }
 }
