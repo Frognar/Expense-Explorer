@@ -17,6 +17,7 @@ public sealed class ValidUpdatePurchaseDetailsCommandData : IEnumerable<object[]
     [new UpdatePurchaseDetailsCommand(_rId, _pId, null, null, null, 5, null, null)],
     [new UpdatePurchaseDetailsCommand(_rId, _pId, null, null, null, null, 1, null)],
     [new UpdatePurchaseDetailsCommand(_rId, _pId, null, null, null, null, null, "desc")],
+    [new UpdatePurchaseDetailsCommand(_rId, _pId, null, null, null, null, null, string.Empty)],
     [new UpdatePurchaseDetailsCommand(_rId, _pId, "i", "c", 5, 5, 1, "desc")],
   ];
 

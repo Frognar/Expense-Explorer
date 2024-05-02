@@ -2,38 +2,96 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Monads;
+using FunctionalCore.Validations;
 
 internal static class UpdatePurchaseDetailsValidator
 {
   public static Result<PurchasePatchModel> Validate(UpdatePurchaseDetailsCommand command)
   {
-    Maybe<Item> item = string.IsNullOrWhiteSpace(command.Item) ? None.OfType<Item>() : Item.TryCreate(command.Item);
-    Maybe<Category> category = string.IsNullOrWhiteSpace(command.Category)
-      ? None.OfType<Category>()
-      : Category.TryCreate(command.Category);
+    ArgumentNullException.ThrowIfNull(command);
+    Func<Maybe<Item>, Maybe<Category>, Maybe<Quantity>, Maybe<Money>, Maybe<Money>, Maybe<Description>,
+      PurchasePatchModel> createPatchModel = PurchasePatchModel.Create;
 
-    Maybe<Quantity> quantity = command.Quantity.HasValue
-      ? Quantity.TryCreate(command.Quantity.Value)
-      : None.OfType<Quantity>();
+    return createPatchModel
+      .Apply(ValidateItem(command.Item))
+      .Apply(ValidateCategory(command.Category))
+      .Apply(ValidateQuantity(command.Quantity))
+      .Apply(ValidateUnitPrice(command.UnitPrice))
+      .Apply(ValidateTotalDiscount(command.TotalDiscount))
+      .Apply(ValidateDescription(command.Description))
+      .ToResult();
+  }
 
-    Maybe<Money> unitPrice
-      = command.UnitPrice.HasValue ? Money.TryCreate(command.UnitPrice.Value) : None.OfType<Money>();
+  private static Validated<Maybe<Item>> ValidateItem(string? item)
+  {
+    if (item is null)
+    {
+      return Validation.Succeeded(None.OfType<Item>());
+    }
 
-    Maybe<Money> totalDiscount = command.TotalDiscount.HasValue
-      ? Money.TryCreate(command.TotalDiscount.Value)
-      : None.OfType<Money>();
+    return Item.TryCreate(item)
+      .Match(
+        () => Validation.Failed<Maybe<Item>>(CommonFailures.EmptyItemName),
+        i => Validation.Succeeded(Some.From(i)));
+  }
 
-    Maybe<Description> description = command.Description is null
-      ? None.OfType<Description>()
-      : Some.From(Description.Create(command.Description));
+  private static Validated<Maybe<Category>> ValidateCategory(string? category)
+  {
+    if (category is null)
+    {
+      return Validation.Succeeded(None.OfType<Category>());
+    }
 
-    return Success.From(
-      PurchasePatchModel.Create(
-        item,
-        category,
-        quantity,
-        unitPrice,
-        totalDiscount,
-        description));
+    return Category.TryCreate(category)
+      .Match(
+        () => Validation.Failed<Maybe<Category>>(CommonFailures.EmptyCategory),
+        c => Validation.Succeeded(Some.From(c)));
+  }
+
+  private static Validated<Maybe<Quantity>> ValidateQuantity(decimal? quantity)
+  {
+    if (!quantity.HasValue)
+    {
+      return Validation.Succeeded(None.OfType<Quantity>());
+    }
+
+    return Quantity.TryCreate(quantity.Value)
+      .Match(
+        () => Validation.Failed<Maybe<Quantity>>(CommonFailures.NonPositiveQuantity),
+        q => Validation.Succeeded(Some.From(q)));
+  }
+
+  private static Validated<Maybe<Money>> ValidateUnitPrice(decimal? unitPrice)
+  {
+    if (!unitPrice.HasValue)
+    {
+      return Validation.Succeeded(None.OfType<Money>());
+    }
+
+    return Money.TryCreate(unitPrice.Value)
+      .Match(
+        () => Validation.Failed<Maybe<Money>>(CommonFailures.NegativeUnitPrice),
+        up => Validation.Succeeded(Some.From(up)));
+  }
+
+  private static Validated<Maybe<Money>> ValidateTotalDiscount(decimal? totalDiscount)
+  {
+    if (!totalDiscount.HasValue)
+    {
+      return Validation.Succeeded(None.OfType<Money>());
+    }
+
+    return Money.TryCreate(totalDiscount.Value)
+      .Match(
+        () => Validation.Failed<Maybe<Money>>(CommonFailures.NegativeTotalDiscount),
+        td => Validation.Succeeded(Some.From(td)));
+  }
+
+  private static Validated<Maybe<Description>> ValidateDescription(string? description)
+  {
+    return Validation.Succeeded(
+      description is null
+        ? None.OfType<Description>()
+        : Some.From(Description.Create(description)));
   }
 }

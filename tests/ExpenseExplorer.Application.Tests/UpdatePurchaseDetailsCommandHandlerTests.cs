@@ -16,7 +16,7 @@ public class UpdatePurchaseDetailsCommandHandlerTests
   private const string _originalCategory = "category";
   private const decimal _originalQuantity = 2;
   private const decimal _originalUnitPrice = 2;
-  private const decimal _originalTotalDiscount = 1;
+  private const decimal _originalTotalDiscount = 2;
   private const string _originalDescription = "description";
 
   private readonly FakeReceiptRepository _receiptRepository =
@@ -80,6 +80,13 @@ public class UpdatePurchaseDetailsCommandHandlerTests
   {
     Failure failure = await HandleInvalid(command with { PurchaseId = "invalid-Id" });
     failure.Should().BeOfType<NotFoundFailure>();
+  }
+
+  [Property(Arbitrary = [typeof(InvalidUpdatePurchaseDetailsCommandGenerator)])]
+  public async Task ReturnsFailureWhenInvalidCommand(UpdatePurchaseDetailsCommand command)
+  {
+    Failure failure = await HandleInvalid(command);
+    failure.Should().NotBeNull();
   }
 
   private static void AssertPurchase(
