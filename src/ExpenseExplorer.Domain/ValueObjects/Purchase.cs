@@ -1,5 +1,7 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
+using FunctionalCore.Monads;
+
 public readonly record struct Purchase(
   Id Id,
   Item Item,
@@ -26,5 +28,26 @@ public readonly record struct Purchase(
       unitPrice,
       totalDiscount,
       description);
+  }
+
+  public static Maybe<Purchase> TryCreate(
+    Maybe<Id> maybeId,
+    Maybe<Item> maybeItem,
+    Maybe<Category> maybeCategory,
+    Maybe<Quantity> maybeQuantity,
+    Maybe<Money> maybeUnitPrice,
+    Maybe<Money> maybeTotalDiscount,
+    Maybe<Description> maybeDescription)
+  {
+    ArgumentNullException.ThrowIfNull(maybeId);
+    return
+      from id in maybeId
+      from item in maybeItem
+      from category in maybeCategory
+      from quantity in maybeQuantity
+      from unitPrice in maybeUnitPrice
+      from totalDiscount in maybeTotalDiscount
+      from description in maybeDescription
+      select Create(id, item, category, quantity, unitPrice, totalDiscount, description);
   }
 }

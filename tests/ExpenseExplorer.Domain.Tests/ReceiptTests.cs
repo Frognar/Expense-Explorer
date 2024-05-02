@@ -3,6 +3,7 @@ namespace ExpenseExplorer.Domain.Tests;
 using System.Diagnostics;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Facts;
+using ExpenseExplorer.Domain.Tests.TestData;
 using ExpenseExplorer.Domain.ValueObjects;
 using ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 using FunctionalCore.Failures;
@@ -214,6 +215,16 @@ public class ReceiptTests
     Fact unknown = new UnknownFact();
 
     Result<Receipt> resultOfReceipt = Receipt.Recreate([unknown], Version.Create(0UL));
+    Failure failure = resultOfReceipt.Match(f => f, _ => throw new UnreachableException());
+
+    failure.Should().NotBeNull();
+  }
+
+  [Theory]
+  [ClassData(typeof(ReceiptCorruptedFactsForRecreate))]
+  public void ReturnsFailureWhenRecreatedWithCorruptedFact(Fact[] facts)
+  {
+    Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create(0UL));
     Failure failure = resultOfReceipt.Match(f => f, _ => throw new UnreachableException());
 
     failure.Should().NotBeNull();
