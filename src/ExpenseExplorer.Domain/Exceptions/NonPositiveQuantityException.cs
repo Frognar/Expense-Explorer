@@ -16,12 +16,4 @@ public class NonPositiveQuantityException : Exception
     : base(message, innerException)
   {
   }
-
-  public static void ThrowIfNotPositive(decimal value)
-  {
-    if (value <= 0)
-    {
-      throw new NonPositiveQuantityException("Quantity must be positive");
-    }
-  }
 }
