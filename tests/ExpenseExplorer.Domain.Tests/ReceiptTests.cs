@@ -220,6 +220,20 @@ public class ReceiptTests
     failure.Should().NotBeNull();
   }
 
+  [Fact]
+  public void ReturnsFailureWhenRecreatedWithoutReceiptCreatedFact()
+  {
+    List<Fact> facts =
+    [
+      new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, "d"),
+    ];
+
+    Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create(0UL));
+    Failure failure = resultOfReceipt.Match(f => f, _ => throw new UnreachableException());
+
+    failure.Should().NotBeNull();
+  }
+
   [Theory]
   [ClassData(typeof(ReceiptCorruptedFactsForRecreate))]
   public void ReturnsFailureWhenRecreatedWithCorruptedFact(Fact[] facts)

@@ -7,13 +7,6 @@ using FunctionalCore.Monads;
 
 public sealed record Receipt
 {
-  private static readonly Receipt _empty = new();
-
-  private Receipt()
-    : this(Id.Create("[EMPTY]"), Store.Create("[EMPTY]"), PurchaseDate.MinValue, [], [], Version.Create(0))
-  {
-  }
-
   private Receipt(
     Id id,
     Store store,
@@ -51,9 +44,16 @@ public sealed record Receipt
 
   public static Result<Receipt> Recreate(IEnumerable<Fact> facts, Version version)
   {
-    return facts
-      .Aggregate(Success.From(_empty), (receipt, fact) => receipt.FlatMap(r => r.ApplyFact(fact)))
-      .Map(r => r with { Version = version });
+    facts = facts.ToList();
+    if (facts.FirstOrDefault() is ReceiptCreated receiptCreated)
+    {
+      return facts.Skip(1)
+        .Aggregate(Create(receiptCreated), (receipt, fact) => receipt.FlatMap(r => r.ApplyFact(fact)))
+        .Map(r => r with { Version = version });
+    }
+
+    return Fail.OfType<Receipt>(
+      Failure.Fatal(new ArgumentException("First fact must be a ReceiptCreated fact.", nameof(facts))));
   }
 
   public Receipt ClearChanges()
@@ -169,5 +169,15 @@ public sealed record Receipt
         from purchaseDate in PurchaseDate.TryCreate(fact.PurchaseDate, fact.RequestedDate)
         select this with { PurchaseDate = purchaseDate })
       .ToResult(() => Failure.Fatal(new ArgumentException($"Failed to recreate receipt from {fact}.")));
+  }
+
+  private static Result<Receipt> Create(ReceiptCreated receiptCreated)
+  {
+    return (
+        from id in Id.TryCreate(receiptCreated.Id)
+        from store in Store.TryCreate(receiptCreated.Store)
+        from purchaseDate in PurchaseDate.TryCreate(receiptCreated.PurchaseDate, receiptCreated.CreatedDate)
+        select new Receipt(id, store, purchaseDate, [], [], Version.New()))
+      .ToResult(() => Failure.Fatal(new ArgumentException($"Failed to create receipt from {receiptCreated}.")));
   }
 }
