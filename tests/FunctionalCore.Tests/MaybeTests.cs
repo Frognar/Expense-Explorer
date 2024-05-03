@@ -148,5 +148,14 @@ public class MaybeTests
       .Be(value < 0 ? "Negative".Length : value);
   }
 
+  [Property]
+  public void ReturnsFallbackValueWhenNone(int value)
+  {
+    (value < 0 ? None.OfType<int>() : Some.From(value))
+      .OrElse(() => -1)
+      .Should()
+      .Be(value < 0 ? -1 : value);
+  }
+
   private sealed record TestFailure(string Message) : Failure(Message);
 }

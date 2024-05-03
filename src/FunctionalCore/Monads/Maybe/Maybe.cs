@@ -42,6 +42,12 @@ public class Maybe<T>
     return FlatMap(v => selector(v).Map(i => projector(v, i)));
   }
 
+  public T OrElse(Func<T> fallback)
+  {
+    ArgumentNullException.ThrowIfNull(fallback);
+    return Match(fallback, value => value);
+  }
+
   internal static Maybe<T> Some(T value) => new(new SomeValue(value));
 
   internal static Maybe<T> None() => new(default(NoneValue));
