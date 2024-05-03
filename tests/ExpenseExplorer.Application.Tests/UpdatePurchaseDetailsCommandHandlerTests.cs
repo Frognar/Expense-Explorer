@@ -1,15 +1,5 @@
 namespace ExpenseExplorer.Application.Tests;
 
-using System.Diagnostics;
-using ExpenseExplorer.Application.Receipts.Commands;
-using ExpenseExplorer.Application.Tests.TestData;
-using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.Receipts.Facts;
-using ExpenseExplorer.Domain.ValueObjects;
-using ExpenseExplorer.Tests.Common.Generators.Commands;
-using FunctionalCore.Failures;
-using FunctionalCore.Monads;
-
 public class UpdatePurchaseDetailsCommandHandlerTests
 {
   private const string _originalItem = "item";

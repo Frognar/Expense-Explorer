@@ -1,14 +1,5 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
-using System.Net;
-using System.Net.Http.Json;
-using ExpenseExplorer.API.Contract;
-using ExpenseExplorer.API.Tests.Integration.Receipts.TestData;
-using ExpenseExplorer.Application.Receipts.Persistence;
-using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.ValueObjects;
-using Microsoft.Extensions.DependencyInjection;
-
 public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
   private string _receiptId = string.Empty;

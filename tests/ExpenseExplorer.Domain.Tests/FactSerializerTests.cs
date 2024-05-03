@@ -1,9 +1,5 @@
 namespace ExpenseExplorer.Domain.Tests;
 
-using System.Diagnostics;
-using ExpenseExplorer.Domain.Facts;
-using ExpenseExplorer.Domain.Receipts.Facts;
-
 public class FactSerializerTests
 {
   [Fact]

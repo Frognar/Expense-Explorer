@@ -1,7 +1,5 @@
 namespace FunctionalCore.Tests;
 
-using FunctionalCore.Failures;
-
 public class FailureTests
 {
   [Fact]

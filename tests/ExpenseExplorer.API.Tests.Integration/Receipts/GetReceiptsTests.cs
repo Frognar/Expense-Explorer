@@ -1,14 +1,5 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
-using System.Net;
-using System.Net.Http.Json;
-using ExpenseExplorer.API.Contract.ReadModel;
-using ExpenseExplorer.ReadModel;
-using ExpenseExplorer.ReadModel.Models.Persistence;
-using ExpenseExplorer.ReadModel.Queries;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-
 public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
   private const int _totalReceipts = 51;

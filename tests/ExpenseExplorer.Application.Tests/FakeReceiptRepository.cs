@@ -2,10 +2,6 @@ namespace ExpenseExplorer.Application.Tests;
 
 using System.Collections.ObjectModel;
 using ExpenseExplorer.Application.Receipts.Persistence;
-using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 
 internal sealed class FakeReceiptRepository : Collection<Receipt>, IReceiptRepository
 {

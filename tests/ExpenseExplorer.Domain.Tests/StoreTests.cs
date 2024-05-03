@@ -1,9 +1,5 @@
 namespace ExpenseExplorer.Domain.Tests;
 
-using ExpenseExplorer.Domain.Exceptions;
-using ExpenseExplorer.Domain.ValueObjects;
-using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
-
 public class StoreTests
 {
   [Property(Arbitrary = [typeof(EmptyOrWhiteSpaceStringGenerator)])]

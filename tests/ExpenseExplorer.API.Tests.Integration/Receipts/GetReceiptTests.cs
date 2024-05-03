@@ -1,13 +1,5 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
-using System.Net;
-using System.Net.Http.Json;
-using ExpenseExplorer.API.Contract.ReadModel;
-using ExpenseExplorer.ReadModel;
-using ExpenseExplorer.ReadModel.Models.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-
 public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
   private static readonly DateOnly _today = DateOnly.FromDateTime(DateTime.Today);

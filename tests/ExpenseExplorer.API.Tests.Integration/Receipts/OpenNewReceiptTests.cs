@@ -1,7 +1,5 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
-using System.Net;
-using System.Net.Http.Json;
 using ExpenseExplorer.API.Tests.Integration.Receipts.TestData;
 
 public class OpenNewReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory)

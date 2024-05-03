@@ -1,14 +1,5 @@
 namespace ExpenseExplorer.Application.Tests;
 
-using System.Diagnostics;
-using ExpenseExplorer.Application.Receipts.Commands;
-using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.Receipts.Facts;
-using ExpenseExplorer.Domain.ValueObjects;
-using ExpenseExplorer.Tests.Common.Generators.Commands;
-using FunctionalCore.Failures;
-using FunctionalCore.Monads;
-
 public class AddPurchaseCommandHandlerTests
 {
   private readonly FakeReceiptRepository _receiptRepository =

@@ -2,11 +2,8 @@ namespace ExpenseExplorer.API.Tests.Integration;
 
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Infrastructure.Receipts.Persistence;
-using ExpenseExplorer.ReadModel;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Testcontainers.EventStoreDb;
 using Testcontainers.PostgreSql;

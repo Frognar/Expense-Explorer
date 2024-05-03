@@ -1,8 +1,5 @@
 namespace ExpenseExplorer.Application.Tests.TestData;
 
-using System.Collections;
-using ExpenseExplorer.Application.Receipts.Commands;
-
 public sealed class ValidUpdateReceiptCommandData : IEnumerable<object[]>
 {
   private const string _rId = "receiptId";

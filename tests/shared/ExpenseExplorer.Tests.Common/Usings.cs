@@ -6,4 +6,3 @@ global using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
 global using FsCheck;
 global using FsCheck.Fluent;
 global using FunctionalCore.Monads;
-global using static ExpenseExplorer.Tests.Common.Utils;

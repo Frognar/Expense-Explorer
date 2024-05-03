@@ -1,11 +1,7 @@
 namespace ExpenseExplorer.Domain.Tests;
 
-using System.Diagnostics;
 using ExpenseExplorer.Domain.Receipts;
-using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.Tests.TestData;
-using ExpenseExplorer.Domain.ValueObjects;
-using ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
@@ -14,7 +10,7 @@ public class ReceiptTests
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator)])]
   public void CanBeCreated(PurchaseDate purchaseDate, Store store)
   {
-    Receipt receipt = Receipt.New(store, purchaseDate, Today);
+    Receipt receipt = Receipt.New(store, purchaseDate, purchaseDate.Date);
     receipt.Should().NotBeNull();
     receipt.Id.Should().NotBeNull();
     receipt.Store.Should().Be(store);
@@ -25,7 +21,7 @@ public class ReceiptTests
   [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator)])]
   public void ProducesReceiptCreatedFactWhenCreated(PurchaseDate purchaseDate, Store store)
   {
-    Receipt receipt = Receipt.New(store, purchaseDate, Today);
+    Receipt receipt = Receipt.New(store, purchaseDate, purchaseDate.Date);
     receipt.UnsavedChanges.Count().Should().Be(1);
     ReceiptCreated receiptCreated = receipt.UnsavedChanges.OfType<ReceiptCreated>().Single();
     receiptCreated.Id.Should().Be(receipt.Id.Value);

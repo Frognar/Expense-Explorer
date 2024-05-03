@@ -1,8 +1,5 @@
 namespace FunctionalCore.Tests;
 
-using FunctionalCore.Failures;
-using FunctionalCore.Monads;
-
 public class MaybeTests
 {
   [Property]

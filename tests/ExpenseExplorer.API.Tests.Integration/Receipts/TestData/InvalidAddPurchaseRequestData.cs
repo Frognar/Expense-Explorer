@@ -1,7 +1,5 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts.TestData;
 
-using System.Collections;
-
 public class InvalidAddPurchaseRequestData : IEnumerable<object[]>
 {
   private static readonly List<object[]> _data =

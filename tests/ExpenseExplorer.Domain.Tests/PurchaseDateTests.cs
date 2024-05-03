@@ -1,36 +1,32 @@
 namespace ExpenseExplorer.Domain.Tests;
 
-using ExpenseExplorer.Domain.Exceptions;
-using ExpenseExplorer.Domain.ValueObjects;
-using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Dates;
-
 public class PurchaseDateTests
 {
-  [Property(Arbitrary = [typeof(NonFutureDateOnlyGenerator)])]
+  [Property(Arbitrary = [typeof(DateOnlyGenerator)])]
   public void SetsDate(DateOnly date)
   {
-    PurchaseDate purchaseDate = CreatePurchaseDate(date);
+    PurchaseDate purchaseDate = PurchaseDate.Create(date, date);
     purchaseDate.Date.Should().Be(date);
   }
 
-  [Property(Arbitrary = [typeof(FutureDateOnlyGenerator)])]
+  [Property(Arbitrary = [typeof(DateOnlyGenerator)])]
   public void ThrowsExceptionWhenDateIsInTheFuture(DateOnly date)
   {
-    Action act = () => _ = CreatePurchaseDate(date);
+    Action act = () => _ = PurchaseDate.Create(date.AddDays(1), date);
     act.Should().Throw<FutureDateException>();
   }
 
-  [Property(Arbitrary = [typeof(NonFutureDateOnlyGenerator)])]
+  [Property(Arbitrary = [typeof(DateOnlyGenerator)])]
   public void SetsDateWithRecordSyntax(DateOnly date)
   {
-    PurchaseDate purchaseDate = CreatePurchaseDate(Today) with { Date = date };
-    purchaseDate.Date.Should().Be(date);
+    PurchaseDate purchaseDate = PurchaseDate.Create(date, date) with { Date = date.AddDays(-1) };
+    purchaseDate.Date.Should().Be(date.AddDays(-1));
   }
 
-  [Property(Arbitrary = [typeof(FutureDateOnlyGenerator)])]
+  [Property(Arbitrary = [typeof(DateOnlyGenerator)])]
   public void ThrowsExceptionWhenDateIsInTheFutureWithRecordSyntax(DateOnly date)
   {
-    Action act = () => _ = CreatePurchaseDate(Today) with { Date = date };
+    Action act = () => _ = PurchaseDate.Create(date, date) with { Date = date.AddDays(1) };
     act.Should().Throw<FutureDateException>();
   }
 
@@ -38,10 +34,5 @@ public class PurchaseDateTests
   public void CanCreateMinimumDate()
   {
     PurchaseDate.MinValue.Date.Should().Be(DateOnly.MinValue);
-  }
-
-  private static PurchaseDate CreatePurchaseDate(DateOnly date)
-  {
-    return PurchaseDate.Create(date, Today);
   }
 }

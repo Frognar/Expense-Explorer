@@ -1,7 +1,6 @@
-global using ExpenseExplorer.Tests.Common;
-global using ExpenseExplorer.Tests.Common.Generators;
+global using ExpenseExplorer.API.Contract;
+global using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Dates;
+global using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Decimals;
+global using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
 global using FluentAssertions;
-global using FsCheck;
-global using FsCheck.Fluent;
 global using FsCheck.Xunit;
-global using static ExpenseExplorer.Tests.Common.Utils;

@@ -1,9 +1,5 @@
 namespace ExpenseExplorer.API.Tests.Receipts;
 
-using ExpenseExplorer.API.Contract;
-using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Dates;
-using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
-
 public class OpenNewReceiptTests
 {
   [Property(Arbitrary = [typeof(NonEmptyStringGenerator), typeof(DateOnlyGenerator)])]

@@ -1,8 +1,5 @@
 namespace ExpenseExplorer.Domain.Tests;
 
-using ExpenseExplorer.Domain.ValueObjects;
-using ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
-
 public class PurchaseTests
 {
   [Property(

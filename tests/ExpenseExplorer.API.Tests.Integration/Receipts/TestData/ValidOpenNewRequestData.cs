@@ -1,7 +1,5 @@
 namespace ExpenseExplorer.API.Tests.Integration.Receipts.TestData;
 
-using System.Collections;
-
 public class ValidOpenNewRequestData : IEnumerable<object[]>
 {
   private static readonly DateOnly _today = DateOnly.FromDateTime(DateTime.Today);
