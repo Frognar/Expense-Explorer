@@ -1,5 +1,4 @@
 global using System.Diagnostics;
-global using ExpenseExplorer.Domain.Exceptions;
 global using ExpenseExplorer.Domain.Facts;
 global using ExpenseExplorer.Domain.Receipts.Facts;
 global using ExpenseExplorer.Domain.ValueObjects;

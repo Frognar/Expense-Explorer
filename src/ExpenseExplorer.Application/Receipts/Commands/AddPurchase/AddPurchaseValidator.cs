@@ -17,7 +17,7 @@ internal static class AddPurchaseValidator
       .Apply(ValidateQuantity(command.Quantity))
       .Apply(ValidateUnitPrice(command.UnitPrice))
       .Apply(ValidateTotalDiscount(command.TotalDiscount))
-      .Apply(Validation.Succeeded(Description.Create(command.Description)))
+      .Apply(ValidateDescription(command.Description))
       .ToResult();
   }
 
@@ -63,6 +63,19 @@ internal static class AddPurchaseValidator
     return Money.TryCreate(totalDiscount.Value)
       .Match(
         () => Validation.Failed<Money>(CommonFailures.NegativeTotalDiscount),
+        Validation.Succeeded);
+  }
+
+  private static Validated<Description> ValidateDescription(string? description)
+  {
+    if (description is null)
+    {
+      return Validation.Succeeded(Description.Empty);
+    }
+
+    return Description.TryCreate(description)
+      .Match(
+        () => Validation.Failed<Description>(CommonFailures.InvalidDescription),
         Validation.Succeeded);
   }
 }

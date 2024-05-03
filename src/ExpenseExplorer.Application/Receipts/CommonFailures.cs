@@ -16,12 +16,14 @@ public static class CommonFailures
 
   public static readonly ValidationFailure EmptyCategory = Failure.Validation("Category", "EMPTY_CATEGORY");
 
-  public static readonly ValidationFailure
-    NonPositiveQuantity = Failure.Validation("Quantity", "NON_POSITIVE_QUANTITY");
+  public static readonly ValidationFailure NonPositiveQuantity
+    = Failure.Validation("Quantity", "NON_POSITIVE_QUANTITY");
 
   public static readonly ValidationFailure NegativeUnitPrice = Failure.Validation("UnitPrice", "NEGATIVE_UNIT_PRICE");
 
-  public static readonly ValidationFailure NegativeTotalDiscount = Failure.Validation(
-    "TotalDiscount",
-    "NEGATIVE_TOTAL_DISCOUNT");
+  public static readonly ValidationFailure NegativeTotalDiscount
+    = Failure.Validation("TotalDiscount", "NEGATIVE_TOTAL_DISCOUNT");
+
+  public static readonly ValidationFailure InvalidDescription
+    = Failure.Validation("Description", "INVALID_DESCRIPTION");
 }

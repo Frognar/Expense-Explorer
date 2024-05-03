@@ -2,17 +2,19 @@ namespace ExpenseExplorer.Domain.ValueObjects;
 
 using FunctionalCore.Monads;
 
-public readonly record struct Description(string? Value)
+public readonly record struct Description
 {
-  public string Value { get; } = Value?.Trim() ?? string.Empty;
+  public static readonly Description Empty = new(string.Empty);
 
-  public static Description Create(string? value)
+  private Description(string value)
   {
-    return new Description(value);
+    Value = value.Trim();
   }
+
+  public string Value { get; }
 
   public static Maybe<Description> TryCreate(string? value)
   {
-    return Some.From(new Description(value));
+    return Some.From(string.IsNullOrWhiteSpace(value) ? Empty : new Description(value));
   }
 }

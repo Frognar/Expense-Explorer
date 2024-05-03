@@ -89,9 +89,14 @@ internal static class UpdatePurchaseDetailsValidator
 
   private static Validated<Maybe<Description>> ValidateDescription(string? description)
   {
-    return Validation.Succeeded(
-      description is null
-        ? None.OfType<Description>()
-        : Some.From(Description.Create(description)));
+    if (description is null)
+    {
+      return Validation.Succeeded(None.OfType<Description>());
+    }
+
+    return Description.TryCreate(description)
+      .Match(
+        () => Validation.Failed<Maybe<Description>>(CommonFailures.InvalidDescription),
+        d => Validation.Succeeded(Some.From(d)));
   }
 }
