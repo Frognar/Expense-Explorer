@@ -1,38 +1,20 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-using ExpenseExplorer.Domain.Exceptions;
 using FunctionalCore.Monads;
 
-public readonly record struct Store(string Name)
+public readonly record struct Store
 {
-  private readonly string _name = TrimOrThrow(Name);
-
-  public string Name
+  private Store(string name)
   {
-    get => _name;
-    init => _name = TrimOrThrow(value);
+    Name = name.Trim();
   }
 
-  public static Store Create(string name)
-  {
-    return new Store(name);
-  }
+  public string Name { get; }
 
   public static Maybe<Store> TryCreate(string name)
   {
     return string.IsNullOrWhiteSpace(name)
       ? None.OfType<Store>()
       : Some.From(new Store(name));
-  }
-
-  private static string TrimOrThrow(string name)
-  {
-    ArgumentNullException.ThrowIfNull(name);
-    return IsValid(name) ? name.Trim() : throw new EmptyStoreNameException();
-  }
-
-  private static bool IsValid(string name)
-  {
-    return !string.IsNullOrWhiteSpace(name);
   }
 }

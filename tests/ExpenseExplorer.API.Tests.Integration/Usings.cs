@@ -10,6 +10,7 @@ global using ExpenseExplorer.Domain.ValueObjects;
 global using ExpenseExplorer.ReadModel;
 global using ExpenseExplorer.ReadModel.Models.Persistence;
 global using ExpenseExplorer.ReadModel.Queries;
+global using ExpenseExplorer.Tests.Common;
 global using FluentAssertions;
 global using FsCheck.Xunit;
 global using Microsoft.EntityFrameworkCore;

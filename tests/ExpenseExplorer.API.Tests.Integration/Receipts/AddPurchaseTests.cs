@@ -8,8 +8,7 @@ public class AddPurchaseTests(ReceiptApiFactory factory) : BaseIntegrationTest(f
   {
     IServiceScope scope = ServiceScopeFactory.CreateScope();
     IReceiptRepository repository = scope.ServiceProvider.GetRequiredService<IReceiptRepository>();
-    DateOnly today = DateOnly.FromDateTime(DateTime.Today);
-    Receipt receipt = Receipt.New(Store.Create("store"), PurchaseDate.Create(today, today), today);
+    Receipt receipt = TestFactory.Receipt("store", new DateOnly(2000, 1, 1));
     await repository.SaveAsync(receipt, default);
     _receiptId = receipt.Id.Value;
   }

@@ -2,7 +2,7 @@ namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 
 public class GetReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
-  private static readonly DateOnly _today = DateOnly.FromDateTime(DateTime.Today);
+  private static readonly DateOnly _today = new(2000, 1, 1);
 
   private static readonly Dictionary<string, DbReceipt> _receipts = new();
 

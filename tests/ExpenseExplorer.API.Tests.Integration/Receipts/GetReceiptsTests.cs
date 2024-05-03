@@ -3,7 +3,7 @@ namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 public class GetReceiptsTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
   private const int _totalReceipts = 51;
-  private readonly DateOnly _today = DateOnly.FromDateTime(DateTime.Today);
+  private readonly DateOnly _today = new(2000, 1, 1);
 
   public async Task InitializeAsync()
   {

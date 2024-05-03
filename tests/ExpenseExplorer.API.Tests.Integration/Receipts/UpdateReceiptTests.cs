@@ -3,14 +3,14 @@ namespace ExpenseExplorer.API.Tests.Integration.Receipts;
 public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest(factory), IAsyncLifetime
 {
   private readonly string _storeName = "store";
-  private readonly DateOnly _today = DateOnly.FromDateTime(DateTime.Today);
+  private readonly DateOnly _today = new(2000, 1, 1);
   private string _receiptId = string.Empty;
 
   public async Task InitializeAsync()
   {
     IServiceScope scope = ServiceScopeFactory.CreateScope();
     IReceiptRepository repository = scope.ServiceProvider.GetRequiredService<IReceiptRepository>();
-    Receipt receipt = Receipt.New(Store.Create(_storeName), PurchaseDate.Create(_today, _today), _today);
+    Receipt receipt = TestFactory.Receipt(_storeName, _today);
     await repository.SaveAsync(receipt, default);
     _receiptId = receipt.Id.Value;
   }

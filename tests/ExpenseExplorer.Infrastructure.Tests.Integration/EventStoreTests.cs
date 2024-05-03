@@ -2,7 +2,9 @@ namespace ExpenseExplorer.Infrastructure.Tests.Integration;
 
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
+using ExpenseExplorer.Tests.Common;
 using FluentAssertions;
+using FunctionalCore.Monads;
 
 public class EventStoreTests : BaseIntegrationTest
 {
@@ -10,11 +12,11 @@ public class EventStoreTests : BaseIntegrationTest
   public async Task FailsWhenConcurrentWriteOccurs()
   {
     Receipt receipt = await CreateReceipt();
-    Receipt receipt1 = receipt.CorrectStore(Store.Create("s1"));
-    Receipt receipt2 = receipt.CorrectStore(Store.Create("s2"));
+    Receipt receipt1 = receipt.CorrectStore(TestFactory.Store("s1"));
+    Receipt receipt2 = receipt.CorrectStore(TestFactory.Store("s2"));
 
-    var result1 = await ReceiptRepository.SaveAsync(receipt1, default);
-    var result2 = await ReceiptRepository.SaveAsync(receipt2, default);
+    Result<Version> result1 = await ReceiptRepository.SaveAsync(receipt1, default);
+    Result<Version> result2 = await ReceiptRepository.SaveAsync(receipt2, default);
 
     result1.Match(_ => false, _ => true).Should().BeTrue();
     result2.Match(_ => false, _ => true).Should().BeFalse();
@@ -22,10 +24,9 @@ public class EventStoreTests : BaseIntegrationTest
 
   private async Task<Receipt> CreateReceipt()
   {
-    DateOnly today = DateOnly.MinValue;
-    var receipt = Receipt.New(Store.Create("s"), PurchaseDate.Create(today, today), today);
-    var result = await ReceiptRepository.SaveAsync(receipt, default);
-    var version = result.Match(_ => Version.New(), v => v);
+    Receipt receipt = TestFactory.Receipt("s", new DateOnly(2000, 1, 1));
+    Result<Version> result = await ReceiptRepository.SaveAsync(receipt, default);
+    Version version = result.Match(_ => Version.New(), v => v);
     return receipt.WithVersion(version);
   }
 }
