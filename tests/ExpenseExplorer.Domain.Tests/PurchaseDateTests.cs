@@ -14,7 +14,7 @@ public class PurchaseDateTests
   [Property(Arbitrary = [typeof(DateOnlyGenerator)])]
   public void ReturnsNoneWhenDateIsInTheFuture(DateOnly date)
   {
-    PurchaseDate.TryCreate(date, date)
+    PurchaseDate.TryCreate(date.AddDays(1), date)
       .Match(() => DateOnly.MinValue, d => d.Date)
       .Should()
       .Be(DateOnly.MinValue);
