@@ -1,9 +1,9 @@
 namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
 using EventStore.Client;
-using ExpenseExplorer.Application.Exceptions;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using ExpenseExplorer.Infrastructure.Exceptions;
 using static ExpenseExplorer.Domain.Facts.FactSerializer;
 using static ExpenseExplorer.Domain.Facts.FactTypes;
 

@@ -1,10 +1,10 @@
 namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
-using ExpenseExplorer.Application.Exceptions;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using ExpenseExplorer.Infrastructure.Exceptions;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
