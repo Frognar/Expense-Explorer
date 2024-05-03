@@ -111,10 +111,9 @@ public class ReceiptTests
     List<Fact> facts =
     [
       new ReceiptCreated("id", "store", today, today),
-      new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, "d"),
+      new PurchaseAdded("id", purchase.Id.Value, "i", "c", 1, 1, 0, "d"),
     ];
 
-    purchase = purchase with { Id = Id.Create("pId") };
     Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
     Receipt receipt = resultOfReceipt.Match(_ => throw new UnreachableException(), r => r);
 
@@ -136,10 +135,9 @@ public class ReceiptTests
     List<Fact> facts =
     [
       new ReceiptCreated("id", "store", today, today),
-      new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, "d"),
+      new PurchaseAdded("id", purchase.Id.Value, "i", "c", 1, 1, 0, "d"),
     ];
 
-    purchase = purchase with { Id = Id.Create("pId") };
     Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
     Receipt receipt = resultOfReceipt.Match(_ => throw new UnreachableException(), r => r);
 

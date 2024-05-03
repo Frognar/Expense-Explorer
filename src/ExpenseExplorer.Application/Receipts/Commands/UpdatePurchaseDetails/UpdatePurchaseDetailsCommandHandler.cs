@@ -40,12 +40,12 @@ public sealed class UpdatePurchaseDetailsCommandHandler(IReceiptRepository recei
   {
     return purchase with
     {
-      Item = patchModel.Item.Match(() => purchase.Item, item => item),
-      Category = patchModel.Category.Match(() => purchase.Category, category => category),
-      Quantity = patchModel.Quantity.Match(() => purchase.Quantity, quantity => quantity),
-      UnitPrice = patchModel.UnitPrice.Match(() => purchase.UnitPrice, unitPrice => unitPrice),
-      TotalDiscount = patchModel.TotalDiscount.Match(() => purchase.TotalDiscount, totalDiscount => totalDiscount),
-      Description = patchModel.Description.Match(() => purchase.Description, description => description),
+      Item = patchModel.Item.OrElse(() => purchase.Item),
+      Category = patchModel.Category.OrElse(() => purchase.Category),
+      Quantity = patchModel.Quantity.OrElse(() => purchase.Quantity),
+      UnitPrice = patchModel.UnitPrice.OrElse(() => purchase.UnitPrice),
+      TotalDiscount = patchModel.TotalDiscount.OrElse(() => purchase.TotalDiscount),
+      Description = patchModel.Description.OrElse(() => purchase.Description),
     };
   }
 }
