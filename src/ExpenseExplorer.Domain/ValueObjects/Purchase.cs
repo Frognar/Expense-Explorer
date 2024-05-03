@@ -48,6 +48,6 @@ public readonly record struct Purchase(
       from unitPrice in maybeUnitPrice
       from totalDiscount in maybeTotalDiscount
       from description in maybeDescription
-      select Create(id, item, category, quantity, unitPrice, totalDiscount, description);
+      select new Purchase(id, item, category, quantity, unitPrice, totalDiscount, description);
   }
 }

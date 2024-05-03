@@ -1,14 +1,16 @@
 namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 
-using ExpenseExplorer.Domain.ValueObjects;
-using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Decimals;
-
 public static class QuantityGenerator
 {
-  public static Gen<Quantity> Gen()
+  public static Gen<Maybe<Quantity>> GenMaybe()
     =>
       from value in PositiveDecimalGenerator.Gen()
-      select Quantity.Create(value);
+      select Quantity.TryCreate(value);
+
+  public static Gen<Quantity> Gen()
+    =>
+      from maybe in GenMaybe()
+      select maybe.ForceValue();
 
   public static Arbitrary<Quantity> Arbitrary() => Gen().ToArbitrary();
 }

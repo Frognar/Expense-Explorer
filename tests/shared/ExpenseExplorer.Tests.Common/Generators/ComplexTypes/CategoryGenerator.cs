@@ -1,14 +1,16 @@
 namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 
-using ExpenseExplorer.Domain.ValueObjects;
-using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
-
 public static class CategoryGenerator
 {
-  public static Gen<Category> Gen()
+  public static Gen<Maybe<Category>> GenMaybe()
     =>
       from str in NonEmptyStringGenerator.Gen()
-      select Category.Create(str);
+      select Category.TryCreate(str);
+
+  public static Gen<Category> Gen()
+    =>
+      from maybe in GenMaybe()
+      select maybe.ForceValue();
 
   public static Arbitrary<Category> Arbitrary() => Gen().ToArbitrary();
 }

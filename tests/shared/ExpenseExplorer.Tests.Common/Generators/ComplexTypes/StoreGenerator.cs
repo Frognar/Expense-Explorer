@@ -1,14 +1,16 @@
 namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 
-using ExpenseExplorer.Domain.ValueObjects;
-using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
-
 public static class StoreGenerator
 {
-  public static Gen<Store> Gen()
+  public static Gen<Maybe<Store>> GenMaybe()
     =>
       from str in NonEmptyStringGenerator.Gen()
-      select Store.Create(str);
+      select Store.TryCreate(str);
+
+  public static Gen<Store> Gen()
+    =>
+      from maybe in GenMaybe()
+      select maybe.ForceValue();
 
   public static Arbitrary<Store> Arbitrary() => Gen().ToArbitrary();
 }

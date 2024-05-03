@@ -23,7 +23,7 @@ public sealed record Receipt
     Version = version;
   }
 
-  public Id Id { get; private init; }
+  public Id Id { get; }
 
   public Store Store { get; private init; }
 

@@ -1,18 +1,22 @@
 namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 
-using ExpenseExplorer.Domain.ValueObjects;
-
 public static class PurchaseGenerator
 {
+  public static Gen<Maybe<Purchase>> GenMaybe()
+    =>
+      from id in IdGenerator.GenMaybe()
+      from item in ItemGenerator.GenMaybe()
+      from category in CategoryGenerator.GenMaybe()
+      from quantity in QuantityGenerator.GenMaybe()
+      from unitPrice in MoneyGenerator.GenMaybe()
+      from totalDiscount in MoneyGenerator.GenMaybe()
+      from description in DescriptionGenerator.GenMaybe()
+      select Purchase.TryCreate(id, item, category, quantity, unitPrice, totalDiscount, description);
+
   public static Gen<Purchase> Gen()
     =>
-      from item in ItemGenerator.Gen()
-      from category in CategoryGenerator.Gen()
-      from quantity in QuantityGenerator.Gen()
-      from unitPrice in MoneyGenerator.Gen()
-      from totalDiscount in MoneyGenerator.Gen()
-      from description in DescriptionGenerator.Gen()
-      select new Purchase(Id.Unique(), item, category, quantity, unitPrice, totalDiscount, description);
+      from purchase in GenMaybe()
+      select purchase.ForceValue();
 
   public static Arbitrary<Purchase> Arbitrary() => Gen().ToArbitrary();
 }

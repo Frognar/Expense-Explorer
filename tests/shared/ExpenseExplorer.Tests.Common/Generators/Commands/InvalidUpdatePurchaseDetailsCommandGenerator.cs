@@ -1,9 +1,5 @@
 namespace ExpenseExplorer.Tests.Common.Generators.Commands;
 
-using ExpenseExplorer.Application.Receipts.Commands;
-using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Decimals;
-using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
-
 public static class InvalidUpdatePurchaseDetailsCommandGenerator
 {
   private const string _rId = "receiptWithPurchaseId";
