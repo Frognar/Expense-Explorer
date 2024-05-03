@@ -1,16 +1,17 @@
 ﻿namespace ExpenseExplorer.Domain.Tests;
 
+using ExpenseExplorer.Tests.Common;
+
 public class IdTests
 {
   [Fact]
   public void IdsAreConsiderEqualsWhenTheyHaveTheSameValue()
   {
-    Assert.Equal(Id.Create(string.Empty), Id.Create(string.Empty));
-    Assert.Equal(Id.Create("123"), Id.Create("123 "));
-    Assert.Equal(Id.Create("123"), Id.Create(" 123"));
-    Assert.Equal("123", Id.Create("123").Value);
-    Assert.NotEqual(Id.Create("123"), Id.Create("234"));
-    Assert.NotEqual(Id.Create("123"), Id.Create("234"));
+    Assert.Equal(Id.TryCreate("123").ForceValue(), Id.TryCreate("123 ").ForceValue());
+    Assert.Equal(Id.TryCreate("123").ForceValue(), Id.TryCreate(" 123").ForceValue());
+    Assert.Equal("123", Id.TryCreate("123").ForceValue().Value);
+    Assert.NotEqual(Id.TryCreate("123").ForceValue(), Id.TryCreate("234").ForceValue());
+    Assert.NotEqual(Id.TryCreate("123").ForceValue(), Id.TryCreate("234").ForceValue());
   }
 
   [Fact]

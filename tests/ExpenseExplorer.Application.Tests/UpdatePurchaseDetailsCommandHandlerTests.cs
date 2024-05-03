@@ -35,7 +35,7 @@ public class UpdatePurchaseDetailsCommandHandlerTests
     Receipt receipt = await HandleValid(command);
 
     receipt.Id.Value.Should().Be(command.ReceiptId);
-    Purchase purchase = receipt.Purchases.Single(p => p.Id == Id.Create(command.PurchaseId));
+    Purchase purchase = receipt.Purchases.Single(p => p.Id.Value == command.PurchaseId);
     AssertPurchase(
       purchase,
       command.Item?.Trim() ?? _originalItem,
@@ -55,7 +55,7 @@ public class UpdatePurchaseDetailsCommandHandlerTests
 
     Receipt receipt = _receiptRepository.Single(r => r.Id.Value == "receiptWithPurchaseId");
     receipt.Version.Value.Should().Be(2UL);
-    Purchase purchase = receipt.Purchases.Single(p => p.Id == Id.Create(command.PurchaseId));
+    Purchase purchase = receipt.Purchases.Single(p => p.Id.Value == command.PurchaseId);
     AssertPurchase(purchase, "i", "c", 1, 1, 0, "d");
   }
 
