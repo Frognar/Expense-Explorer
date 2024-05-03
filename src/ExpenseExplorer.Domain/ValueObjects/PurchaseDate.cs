@@ -1,46 +1,22 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-using ExpenseExplorer.Domain.Exceptions;
 using FunctionalCore.Monads;
 
-public readonly record struct PurchaseDate(DateOnly Date, DateOnly Today)
+public readonly record struct PurchaseDate
 {
-  public static readonly PurchaseDate MinValue = new(DateOnly.MinValue, DateOnly.MinValue);
+  public static readonly PurchaseDate MinValue = new(DateOnly.MinValue);
 
-  private readonly DateOnly _date = GetOrThrow(Date, Today);
-
-  public DateOnly Date
+  private PurchaseDate(DateOnly date)
   {
-    get => _date;
-    init => _date = GetOrThrow(value, Today);
+    Date = date;
   }
 
-  private DateOnly Today { get; } = Today;
-
-  public static PurchaseDate Create(DateOnly date, DateOnly today)
-  {
-    return new PurchaseDate(date, today);
-  }
+  public DateOnly Date { get; }
 
   public static Maybe<PurchaseDate> TryCreate(DateOnly date, DateOnly today)
   {
-    return IsValid(date, today)
-      ? Some.From(new PurchaseDate(date, today))
+    return date <= today
+      ? Some.From(new PurchaseDate(date))
       : None.OfType<PurchaseDate>();
-  }
-
-  private static DateOnly GetOrThrow(DateOnly date, DateOnly today)
-  {
-    if (IsValid(date, today))
-    {
-      return date;
-    }
-
-    throw new FutureDateException(date, today);
-  }
-
-  private static bool IsValid(DateOnly date, DateOnly today)
-  {
-    return date <= today;
   }
 }
