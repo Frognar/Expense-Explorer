@@ -96,6 +96,12 @@ public sealed record Receipt
     };
   }
 
+  public Receipt RemovePurchase(Id purchaseId)
+  {
+    ArgumentNullException.ThrowIfNull(purchaseId);
+    return this with { Purchases = Purchases.Where(p => p.Id != purchaseId).ToList(), };
+  }
+
   public Receipt WithVersion(Version version)
   {
     return this with { Version = version };

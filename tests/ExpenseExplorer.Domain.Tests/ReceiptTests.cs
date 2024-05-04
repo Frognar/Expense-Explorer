@@ -2,6 +2,7 @@ namespace ExpenseExplorer.Domain.Tests;
 
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Tests.TestData;
+using ExpenseExplorer.Tests.Common;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
@@ -152,6 +153,24 @@ public class ReceiptTests
     fact.UnitPrice.Should().Be(purchase.UnitPrice.Value);
     fact.TotalDiscount.Should().Be(purchase.TotalDiscount.Value);
     fact.Description.Should().Be(purchase.Description.Value);
+  }
+
+  [Fact]
+  public void CanRemovePurchase()
+  {
+    DateOnly today = new DateOnly(2000, 1, 1);
+    List<Fact> facts =
+    [
+      new ReceiptCreated("id", "store", today, today),
+      new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, "d"),
+    ];
+
+    Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Receipt receipt = resultOfReceipt.Match(_ => throw new UnreachableException(), r => r);
+
+    receipt = receipt.RemovePurchase(Id.TryCreate("pId").ForceValue());
+
+    receipt.Purchases.Should().BeEmpty();
   }
 
   [Fact]
