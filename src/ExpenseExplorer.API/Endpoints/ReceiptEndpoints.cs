@@ -1,6 +1,5 @@
 namespace ExpenseExplorer.API.Endpoints;
 
-using System.Diagnostics;
 using System.Net;
 using CommandHub;
 using ExpenseExplorer.API.Contract;
@@ -97,23 +96,22 @@ public static class ReceiptEndpoints
 
   private static IResult Handle(Failure failure)
   {
-    return failure switch
-    {
-      ValidationFailure validationFailure => HandleValidation(validationFailure),
-      NotFoundFailure notFoundFailure => HandleNotFound(notFoundFailure),
-      FatalFailure fatal => Results.Problem(detail: fatal.Message, statusCode: (int)HttpStatusCode.InternalServerError),
-      _ => throw new UnreachableException(),
-    };
+    return failure.Match(HandleFatal, HandleNotFound, HandleValidation);
   }
 
-  private static IResult HandleValidation(ValidationFailure validationFailure)
+  private static IResult HandleFatal(string message, Exception ex)
+  {
+    return Results.Problem(detail: message, statusCode: (int)HttpStatusCode.InternalServerError);
+  }
+
+  private static IResult HandleValidation(string message, IEnumerable<ValidationError> errors)
   {
     return Results.Problem(
-      detail: validationFailure.Message,
+      detail: message,
       statusCode: (int)HttpStatusCode.BadRequest,
       extensions: new Dictionary<string, object?>
       {
-        ["Errors"] = validationFailure.Errors
+        ["Errors"] = errors
           .GroupBy(e => e.Property)
           .ToDictionary(
             e => e.Key,
@@ -121,11 +119,11 @@ public static class ReceiptEndpoints
       });
   }
 
-  private static IResult HandleNotFound(NotFoundFailure notFoundFailure)
+  private static IResult HandleNotFound(string message, string id)
   {
     return Results.Problem(
-      detail: notFoundFailure.Message,
+      detail: message,
       statusCode: (int)HttpStatusCode.NotFound,
-      extensions: new Dictionary<string, object?> { ["Id"] = notFoundFailure.Id, });
+      extensions: new Dictionary<string, object?> { ["Id"] = id, });
   }
 }

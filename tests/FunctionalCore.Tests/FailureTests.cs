@@ -9,14 +9,21 @@ public class FailureTests
 
     Failure failure = Failure.Fatal(ex);
 
-    AssertFatal((FatalFailure)failure, ex);
+    failure.Match(
+      (message, exception) => AssertFatal(message, exception, ex),
+      (_, _) => throw new InvalidOperationException("Unexpected not found failure"),
+      (_, _) => throw new InvalidOperationException("Unexpected validation failure"));
   }
 
   [Fact]
   public void CanCreateNotFoundFailure()
   {
     Failure failure = Failure.NotFound("Not found", "ID");
-    AssertNotFound((NotFoundFailure)failure, "Not found", "ID");
+
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (message, id) => AssertNotFound(message, id, "Not found", "ID"),
+      (_, _) => throw new InvalidOperationException("Unexpected validation failure"));
   }
 
   [Fact]
@@ -26,7 +33,10 @@ public class FailureTests
 
     Failure failure = Failure.Validation([error]);
 
-    AssertValidationFailure((ValidationFailure)failure, error);
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, _) => throw new InvalidOperationException("Unexpected not found failure"),
+      (message, errors) => AssertValidationFailure(message, errors, error));
   }
 
   [Fact]
@@ -36,14 +46,21 @@ public class FailureTests
 
     Failure failure = Failure.Validation(error);
 
-    AssertValidationFailure((ValidationFailure)failure, error);
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, _) => throw new InvalidOperationException("Unexpected not found failure"),
+      (message, errors) => AssertValidationFailure(message, errors, error));
   }
 
   [Fact]
   public void CanCreateValidationFailureWithSinglePropertyError()
   {
     Failure failure = Failure.Validation("ID", "Invalid");
-    AssertValidationFailure((ValidationFailure)failure, ValidationError.Create("ID", "Invalid"));
+
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, _) => throw new InvalidOperationException("Unexpected not found failure"),
+      (message, errors) => AssertValidationFailure(message, errors, ValidationError.Create("ID", "Invalid")));
   }
 
   [Fact]
@@ -56,22 +73,27 @@ public class FailureTests
     failure.Message.Should().Be("Override");
   }
 
-  private static void AssertFatal(FatalFailure failure, Exception ex)
+  private static Unit AssertFatal(string failureMessage, Exception failureException, Exception ex)
   {
-    failure.Exception.Should().Be(ex);
-    failure.Message.Should().Be(ex.Message);
+    failureMessage.Should().Be(ex.Message);
+    failureException.Should().Be(ex);
+    return Unit.Instance;
   }
 
-  private static void AssertNotFound(NotFoundFailure failure, string message, string id)
+  private static Unit AssertNotFound(string failureMessage, string failureId, string message, string id)
   {
-    failure.Id.Should().Be(id);
-    failure.Message.Should().Be(message);
+    failureMessage.Should().Be(message);
+    failureId.Should().Be(id);
+    return Unit.Instance;
   }
 
-  private static void AssertValidationFailure(ValidationFailure failure, ValidationError containedError)
+  private static Unit AssertValidationFailure(
+    string failureMessage,
+    IEnumerable<ValidationError> failureErrors,
+    ValidationError containedError)
   {
-    failure.Errors.Should().Contain(containedError);
-    failure.Errors.Should().HaveCount(1);
-    failure.Message.Should().Be("One or more validation errors occurred.");
+    failureMessage.Should().Be("One or more validation errors occurred.");
+    failureErrors.Should().BeEquivalentTo([containedError]);
+    return Unit.Instance;
   }
 }
