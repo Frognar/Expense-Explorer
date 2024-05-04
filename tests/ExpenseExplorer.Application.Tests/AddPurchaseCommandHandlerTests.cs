@@ -29,14 +29,20 @@ public class AddPurchaseCommandHandlerTests
   public async Task ReturnsFailureWhenReceiptNotFound(AddPurchaseCommand command)
   {
     Failure failure = await HandleInvalid(command with { ReceiptId = "invalid-Id" });
-    failure.Should().BeOfType<NotFoundFailure>();
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, id) => id.Should().Be("invalid-Id"),
+      (_, _) => throw new InvalidOperationException("Unexpected validation failure"));
   }
 
   [Property(Arbitrary = [typeof(InvalidAddPurchaseCommandGenerator)])]
   public async Task ReturnsFailureWhenInvalidCommand(AddPurchaseCommand command)
   {
     Failure failure = await HandleInvalid(command);
-    failure.Should().NotBeNull();
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, _) => throw new InvalidOperationException("Unexpected not found failure"),
+      (_, errors) => errors.Should().NotBeEmpty());
   }
 
   private async Task<Failure> HandleInvalid(AddPurchaseCommand command)

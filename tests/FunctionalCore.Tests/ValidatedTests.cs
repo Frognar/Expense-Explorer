@@ -84,7 +84,12 @@ public class ValidatedTests
 
   private static string GetExpectedString(int value) => value < 0 ? "value: NEGATIVE_VALUE" : ToInvariantString(value);
 
-  private static string AggregateErrors(Failure errors) => AggregateErrors(((ValidationFailure)errors).Errors);
+  private static string AggregateErrors(Failure failure)
+    => AggregateErrors(
+      failure.Match(
+        (_, _) => Enumerable.Empty<ValidationError>(),
+        (_, _) => Enumerable.Empty<ValidationError>(),
+        (_, errors) => errors));
 
   private static string AggregateErrors(IEnumerable<ValidationError> errors)
     => string.Join(", ", errors.Select(e => $"{e.Property}: {e.ErrorCode}"));

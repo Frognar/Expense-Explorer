@@ -44,14 +44,20 @@ public class UpdateReceiptCommandHandlerTests
   public async Task ReturnsNotFoundFailureWhenReceiptNotFound(UpdateReceiptCommand command)
   {
     Failure failure = await HandleInvalid(command with { ReceiptId = "invalid-Id" });
-    failure.Should().BeOfType<NotFoundFailure>();
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, id) => id.Should().Be("invalid-Id"),
+      (_, _) => throw new InvalidOperationException("Unexpected validation failure"));
   }
 
   [Property(Arbitrary = [typeof(InvalidUpdateReceiptCommandGenerator)])]
   public async Task ReturnsValidationFailureWhenInvalidCommand(UpdateReceiptCommand command)
   {
     Failure failure = await HandleInvalid(command);
-    failure.Should().BeOfType<ValidationFailure>();
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, _) => throw new InvalidOperationException("Unexpected not found failure"),
+      (_, errors) => errors.Should().NotBeEmpty());
   }
 
   private async Task<Failure> HandleInvalid(UpdateReceiptCommand command)

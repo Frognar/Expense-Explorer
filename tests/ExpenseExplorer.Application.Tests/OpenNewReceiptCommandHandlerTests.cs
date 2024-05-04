@@ -17,7 +17,10 @@ public class OpenNewReceiptCommandHandlerTests
   public async Task CanHandleInvalidCommand(OpenNewReceiptCommand command)
   {
     Failure failure = await HandleInvalid(command);
-    failure.Should().BeOfType<ValidationFailure>();
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, _) => throw new InvalidOperationException("Unexpected not found failure"),
+      (_, errors) => errors.Should().NotBeEmpty());
   }
 
   [Property(Arbitrary = [typeof(ValidOpenNewReceiptCommandGenerator)])]

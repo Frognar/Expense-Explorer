@@ -63,21 +63,30 @@ public class UpdatePurchaseDetailsCommandHandlerTests
   public async Task ReturnsFailureWhenReceiptNotFound(UpdatePurchaseDetailsCommand command)
   {
     Failure failure = await HandleInvalid(command with { ReceiptId = "invalid-Id" });
-    failure.Should().BeOfType<NotFoundFailure>();
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, id) => id.Should().Be("invalid-Id"),
+      (_, _) => throw new InvalidOperationException("Unexpected validation failure"));
   }
 
   [Property(Arbitrary = [typeof(ValidUpdatePurchaseDetailsCommandGenerator)])]
   public async Task ReturnsFailureWhenPurchaseNotFound(UpdatePurchaseDetailsCommand command)
   {
     Failure failure = await HandleInvalid(command with { PurchaseId = "invalid-Id" });
-    failure.Should().BeOfType<NotFoundFailure>();
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, id) => id.Should().Be("invalid-Id"),
+      (_, _) => throw new InvalidOperationException("Unexpected validation failure"));
   }
 
   [Property(Arbitrary = [typeof(InvalidUpdatePurchaseDetailsCommandGenerator)])]
   public async Task ReturnsFailureWhenInvalidCommand(UpdatePurchaseDetailsCommand command)
   {
     Failure failure = await HandleInvalid(command);
-    failure.Should().NotBeNull();
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, _) => throw new InvalidOperationException("Unexpected not found failure"),
+      (_, errors) => errors.Should().NotBeEmpty());
   }
 
   private static void AssertPurchase(
