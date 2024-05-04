@@ -162,5 +162,25 @@ public class FactSerializerTests
     fact.Should().BeOfType<PurchaseRemoved>();
   }
 
+  [Fact]
+  public void SerializeReceiptDeleted()
+  {
+    Fact fact = new ReceiptDeleted("id");
+
+    byte[] data = FactSerializer.Serialize(fact);
+
+    data.Should().BeEquivalentTo("{\"ReceiptId\":\"id\"}"u8.ToArray());
+  }
+
+  [Fact]
+  public void DeserializeReceiptDeleted()
+  {
+    byte[] data = "{\"ReceiptId\":\"id\"}"u8.ToArray();
+
+    Fact fact = FactSerializer.Deserialize(FactTypes.ReceiptDeletedFactType, data);
+
+    fact.Should().BeOfType<ReceiptDeleted>();
+  }
+
   private sealed record UnknownFact : Fact;
 }

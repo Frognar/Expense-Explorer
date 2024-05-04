@@ -11,6 +11,7 @@ public static class FactTypes
   public const string PurchaseAddedFactType = "PURCHASE_ADDED";
   public const string PurchaseDetailsChangedFactType = "PURCHASE_DETAILS_CHANGED";
   public const string PurchaseRemovedFactType = "PURCHASE_REMOVED";
+  public const string ReceiptDeletedFactType = "RECEIPT_DELETED";
 
   public static string GetFactType(Fact fact)
   {
@@ -22,6 +23,7 @@ public static class FactTypes
       PurchaseAdded => PurchaseAddedFactType,
       PurchaseDetailsChanged => PurchaseDetailsChangedFactType,
       PurchaseRemoved => PurchaseRemovedFactType,
+      ReceiptDeleted => ReceiptDeletedFactType,
       _ => throw new UnreachableException(),
     };
   }

@@ -54,6 +54,13 @@ public class FactTypesTests
     AssertFactType(fact, FactTypes.PurchaseRemovedFactType);
   }
 
+  [Fact]
+  public void GetTypeForReceiptDeleted()
+  {
+    Fact fact = new ReceiptDeleted("id");
+    AssertFactType(fact, FactTypes.ReceiptDeletedFactType);
+  }
+
   private static void AssertFactType(Fact fact, string expectedType)
   {
     string type = FactTypes.GetFactType(fact);

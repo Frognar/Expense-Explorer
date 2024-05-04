@@ -17,6 +17,7 @@ public static class FactSerializer
       Receipts.Facts.PurchaseAdded purchaseAdded => Serialize(purchaseAdded),
       Receipts.Facts.PurchaseDetailsChanged purchaseDetailsChanged => Serialize(purchaseDetailsChanged),
       Receipts.Facts.PurchaseRemoved purchaseRemoved => Serialize(purchaseRemoved),
+      Receipts.Facts.ReceiptDeleted receiptDeleted => Serialize(receiptDeleted),
       _ => throw new UnreachableException(),
     };
   }
@@ -31,6 +32,7 @@ public static class FactSerializer
       FactTypes.PurchaseAddedFactType => Deserialize<Receipts.Facts.PurchaseAdded>(data),
       FactTypes.PurchaseDetailsChangedFactType => Deserialize<Receipts.Facts.PurchaseDetailsChanged>(data),
       FactTypes.PurchaseRemovedFactType => Deserialize<Receipts.Facts.PurchaseRemoved>(data),
+      FactTypes.ReceiptDeletedFactType => Deserialize<Receipts.Facts.ReceiptDeleted>(data),
       _ => throw new UnreachableException(),
     };
   }
