@@ -107,6 +107,11 @@ public sealed record Receipt
     };
   }
 
+  public Receipt Delete()
+  {
+    return this with { UnsavedChanges = UnsavedChanges.Append(ReceiptDeleted.Create(Id)).ToList() };
+  }
+
   public Receipt WithVersion(Version version)
   {
     return this with { Version = version };

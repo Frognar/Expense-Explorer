@@ -193,6 +193,15 @@ public class ReceiptTests
     fact.PurchaseId.Should().Be("pId");
   }
 
+  [Property(Arbitrary = [typeof(ReceiptGenerator)])]
+  public void ProducesReceiptDeletedFactWhenReceiptDeleted(Receipt receipt)
+  {
+    receipt = receipt.Delete();
+
+    ReceiptDeleted fact = receipt.UnsavedChanges.OfType<ReceiptDeleted>().Single();
+    fact.ReceiptId.Should().Be(receipt.Id.Value);
+  }
+
   [Fact]
   public void CanBeRecreatedFromFacts()
   {
