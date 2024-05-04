@@ -174,6 +174,26 @@ public class ReceiptTests
   }
 
   [Fact]
+  public void ProducesPurchaseRemovedFactWhenRemovePurchase()
+  {
+    DateOnly today = new DateOnly(2000, 1, 1);
+    List<Fact> facts =
+    [
+      new ReceiptCreated("id", "store", today, today),
+      new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, "d"),
+    ];
+
+    Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Receipt receipt = resultOfReceipt.Match(_ => throw new UnreachableException(), r => r);
+
+    receipt = receipt.RemovePurchase(Id.TryCreate("pId").ForceValue());
+
+    PurchaseRemoved fact = receipt.UnsavedChanges.OfType<PurchaseRemoved>().Single();
+    fact.ReceiptId.Should().Be(receipt.Id.Value);
+    fact.PurchaseId.Should().Be("pId");
+  }
+
+  [Fact]
   public void CanBeRecreatedFromFacts()
   {
     DateOnly today = new DateOnly(2000, 1, 1);
