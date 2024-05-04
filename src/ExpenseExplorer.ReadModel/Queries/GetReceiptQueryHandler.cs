@@ -35,6 +35,6 @@ public class GetReceiptQueryHandler(ExpenseExplorerContext context)
 
     return receipt is not null
       ? Right.From<Failure, Receipt>(receipt)
-      : Left.From<Failure, Receipt>(new NotFoundFailure("Receipt not found.", query.ReceiptId));
+      : Left.From<Failure, Receipt>(Failure.NotFound("Receipt not found.", query.ReceiptId));
   }
 }

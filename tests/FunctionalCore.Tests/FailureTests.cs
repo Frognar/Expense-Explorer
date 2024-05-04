@@ -43,7 +43,7 @@ public class FailureTests
   public void CanCreateValidationFailureWithSinglePropertyError()
   {
     ValidationFailure failure = Failure.Validation("ID", "Invalid");
-    AssertValidationFailure(failure, new ValidationError("ID", "Invalid"));
+    AssertValidationFailure(failure, ValidationError.Create("ID", "Invalid"));
   }
 
   [Fact]

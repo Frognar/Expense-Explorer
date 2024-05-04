@@ -40,7 +40,7 @@ public class GetReceiptsQueryHandler(ExpenseExplorerContext context)
     }
     catch (DbException ex)
     {
-      return Left.From<Failure, PageOf<ReceiptHeaders>>(new FatalFailure(ex));
+      return Left.From<Failure, PageOf<ReceiptHeaders>>(Failure.Fatal(ex));
     }
   }
 

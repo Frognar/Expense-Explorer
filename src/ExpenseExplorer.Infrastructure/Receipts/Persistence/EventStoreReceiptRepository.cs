@@ -32,7 +32,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     }
     catch (FactSaveException ex)
     {
-      return Fail.OfType<Version>(new FatalFailure(ex));
+      return Fail.OfType<Version>(Failure.Fatal(ex));
     }
   }
 
@@ -42,12 +42,12 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     {
       (List<Fact> facts, Version version) = await _eventStore.GetEventsAsync(id, cancellationToken);
       return facts.Count == 0
-        ? Fail.OfType<Receipt>(new NotFoundFailure("Receipt not found", id.Value))
+        ? Fail.OfType<Receipt>(Failure.NotFound("Receipt not found", id.Value))
         : Receipt.Recreate(facts, version);
     }
     catch (FactReadException ex)
     {
-      return Fail.OfType<Receipt>(new FatalFailure(ex));
+      return Fail.OfType<Receipt>(Failure.Fatal(ex));
     }
   }
 }
