@@ -22,6 +22,7 @@ public static class ReceiptEndpoints
     group.MapPost("/", OpenNewReceiptAsync);
     group.MapPatch("/{receiptId}", UpdateReceiptAsync);
     group.MapPost("/{receiptId}/purchases", AddPurchaseAsync);
+    group.MapPatch("/{receiptId}/purchases/{purchaseId}", UpdatePurchaseAsync);
     return endpointRouteBuilder;
   }
 
@@ -91,6 +92,19 @@ public static class ReceiptEndpoints
     Result<Receipt> result = await sender.SendAsync(request.MapToCommand(receiptId), cancellationToken);
     return result
       .Map(r => r.MapTo<AddPurchaseResponse>())
+      .Match(Handle, response => Results.CreatedAtRoute(_getReceiptRoute, new { receiptId = response.Id }, response));
+  }
+
+  private static async Task<IResult> UpdatePurchaseAsync(
+    string receiptId,
+    string purchaseId,
+    UpdatePurchaseRequest request,
+    ISender sender,
+    CancellationToken cancellationToken = default)
+  {
+    Result<Receipt> result = await sender.SendAsync(request.MapToCommand(receiptId, purchaseId), cancellationToken);
+    return result
+      .Map(r => r.MapTo<UpdatePurchaseResponse>())
       .Match(Handle, response => Results.CreatedAtRoute(_getReceiptRoute, new { receiptId = response.Id }, response));
   }
 

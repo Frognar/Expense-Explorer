@@ -32,9 +32,36 @@ public static class ReceiptMapper
       request.Description);
   }
 
+  public static UpdatePurchaseDetailsCommand MapToCommand(
+    this UpdatePurchaseRequest request,
+    string receiptId,
+    string purchaseId)
+  {
+    ArgumentNullException.ThrowIfNull(request);
+    return new UpdatePurchaseDetailsCommand(
+      receiptId,
+      purchaseId,
+      request.Item,
+      request.Category,
+      request.Quantity,
+      request.UnitPrice,
+      request.TotalDiscount,
+      request.Description);
+  }
+
   public static TResult MapTo<TResult>(this Receipt receipt)
   {
     ArgumentNullException.ThrowIfNull(receipt);
+    if (typeof(TResult) == typeof(UpdatePurchaseResponse))
+    {
+      return (TResult)(object)new UpdatePurchaseResponse(
+        receipt.Id.Value,
+        receipt.Store.Name,
+        receipt.PurchaseDate.Date,
+        receipt.Purchases.Select(MapToResponse),
+        receipt.Version.Value);
+    }
+
     if (typeof(TResult) == typeof(AddPurchaseResponse))
     {
       return (TResult)(object)new AddPurchaseResponse(
