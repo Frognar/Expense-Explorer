@@ -154,15 +154,13 @@ public class EitherTests
   public void ChangeToResult(int value)
   {
     var either = value < 0
-      ? Left.From<Failure, int>(new TestFailure("Negative"))
+      ? Left.From<Failure, int>(Failure.Validation("value", "Negative"))
       : Right.From<Failure, int>(value);
 
     var result = either.ToResult();
 
-    result.Match(f => f.Message.Length, s => s)
+    result.Match(f => f.Match((_, _) => 0, (_, _) => 0, (_, _) => 0), s => s)
       .Should()
-      .Be(value < 0 ? "Negative".Length : value);
+      .Be(value < 0 ? 0 : value);
   }
-
-  private sealed record TestFailure(string Message) : Failure(Message);
 }

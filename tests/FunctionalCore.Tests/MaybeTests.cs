@@ -141,11 +141,11 @@ public class MaybeTests
       ? None.OfType<int>()
       : Some.From(value);
 
-    var result = maybe.ToResult(() => new TestFailure("Negative"));
+    var result = maybe.ToResult(() => Failure.Validation("value", "Negative"));
 
-    result.Match(f => f.Message.Length, s => s)
+    result.Match(f => f.Match((_, _) => 0, (_, _) => 0, (_, _) => 0), s => s)
       .Should()
-      .Be(value < 0 ? "Negative".Length : value);
+      .Be(value < 0 ? 0 : value);
   }
 
   [Property]
@@ -156,6 +156,4 @@ public class MaybeTests
       .Should()
       .Be(value < 0 ? -1 : value);
   }
-
-  private sealed record TestFailure(string Message) : Failure(Message);
 }
