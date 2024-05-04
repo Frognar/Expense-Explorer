@@ -126,6 +126,7 @@ public sealed record Receipt
       PurchaseDateChanged purchaseDateChanged => Apply(purchaseDateChanged),
       PurchaseDetailsChanged purchaseDetailsChanged => Apply(purchaseDetailsChanged),
       PurchaseRemoved purchaseRemoved => Apply(purchaseRemoved),
+      ReceiptDeleted _ => Fail.OfType<Receipt>(Failure.NotFound("Receipt has been deleted.", Id.Value)),
       _ => Fail.OfType<Receipt>(
         Failure.Fatal(new ArgumentException($"Unknown fact type: {fact.GetType()}", nameof(fact)))),
     };
