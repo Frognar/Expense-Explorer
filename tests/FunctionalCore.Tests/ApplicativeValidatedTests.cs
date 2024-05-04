@@ -205,7 +205,7 @@ public class ApplicativeValidatedTests
   {
     ValidationError error = ValidationError.Create("test", "failure");
     Validated<Func<int, int, int, int, int, int, int, int, int, int, string>> failure =
-      Validation.Failed<Func<int, int, int, int, int, int, int, int, int, int, string>>(Failure.Validation(error));
+      Validation.Failed<Func<int, int, int, int, int, int, int, int, int, int, string>>([error]);
 
     Validated<string> validatedResult =
       failure
@@ -228,14 +228,14 @@ public class ApplicativeValidatedTests
 
   private static string GetExpectedErrorString(ValidationError error, int value, params int[] values)
   {
-    ValidationFailure errors = Failure.Validation(error).Concat(CreateErrors(CountInvalid(value, values)));
-    return AggregateErrors(errors);
+    IEnumerable<ValidationError> errors = [error];
+    return AggregateErrors(errors.Concat(CreateErrors(CountInvalid(value, values))));
   }
 
   private static string GetExpectedString(int value, params int[] values)
   {
-    ValidationFailure errors = CreateErrors(CountInvalid(value, values));
-    return errors.Errors.Any() ? AggregateErrors(errors) : ToInvariantString(Sum(value, values));
+    IEnumerable<ValidationError> errors = CreateErrors(CountInvalid(value, values)).ToList();
+    return errors.Any() ? AggregateErrors(errors) : ToInvariantString(Sum(value, values));
   }
 
   private static int CountInvalid(int value, params int[] values)
@@ -243,9 +243,9 @@ public class ApplicativeValidatedTests
     return values.Count(v => v < 0) + (value < 0 ? 1 : 0);
   }
 
-  private static ValidationFailure CreateErrors(int count)
+  private static IEnumerable<ValidationError> CreateErrors(int count)
   {
-    return Failure.Validation(Enumerable.Repeat(ValidationError.Create("value", "NEGATIVE_VALUE"), count));
+    return Enumerable.Repeat(ValidationError.Create("value", "NEGATIVE_VALUE"), count);
   }
 
   private static int Sum(int value, params int[] values)
@@ -253,12 +253,12 @@ public class ApplicativeValidatedTests
     return values.Sum() + value;
   }
 
-  private static string AggregateErrors(ValidationFailure errors)
-    => string.Join(", ", errors.Errors.Select(e => $"{e.Property}: {e.ErrorCode}"));
+  private static string AggregateErrors(IEnumerable<ValidationError> errors)
+    => string.Join(", ", errors.Select(e => $"{e.Property}: {e.ErrorCode}"));
 
   private static Validated<int> Validate(int value)
     => value < 0
-      ? Validation.Failed<int>(Failure.Validation("value", "NEGATIVE_VALUE"))
+      ? Validation.Failed<int>([ValidationError.Create("value", "NEGATIVE_VALUE")])
       : Validation.Succeeded(value);
 
   private static string ToInvariantString(int value) => value.ToString(CultureInfo.InvariantCulture);

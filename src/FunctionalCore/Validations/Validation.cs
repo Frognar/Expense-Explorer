@@ -7,18 +7,18 @@ public static class Validation
 {
   public static Validated<S> Succeeded<S>(S value) => Validated<S>.Success(value);
 
-  public static Validated<S> Failed<S>(ValidationFailure errors) => Validated<S>.Fail(errors);
+  public static Validated<S> Failed<S>(IEnumerable<ValidationError> errors) => Validated<S>.Fail(errors);
 
   public static Either<Failure, S> ToEither<S>(this Validated<S> validated)
   {
     ArgumentNullException.ThrowIfNull(validated);
-    return validated.Match(Left.From<Failure, S>, Right.From<Failure, S>);
+    return validated.Match(errors => Left.From<Failure, S>(Failure.Validation(errors)), Right.From<Failure, S>);
   }
 
   public static Result<S> ToResult<S>(this Validated<S> validated)
   {
     ArgumentNullException.ThrowIfNull(validated);
-    return validated.Match(Fail.OfType<S>, Success.From);
+    return validated.Match(errors => Fail.OfType<S>(Failure.Validation(errors)), Success.From);
   }
 
   public static Validated<S> Apply<T, S>(this Func<T, S> map, Validated<T> source)

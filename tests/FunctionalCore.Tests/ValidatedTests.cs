@@ -12,7 +12,7 @@ public class ValidatedTests
   [Property(Arbitrary = [typeof(ValidationErrorGenerator)])]
   public void IsInvalidWithErrors(ValidationError error)
   {
-    Validated<string> validated = Validation.Failed<string>(Failure.Validation(error));
+    Validated<string> validated = Validation.Failed<string>([error]);
     validated.IsValid.Should().BeFalse();
   }
 
@@ -84,14 +84,14 @@ public class ValidatedTests
 
   private static string GetExpectedString(int value) => value < 0 ? "value: NEGATIVE_VALUE" : ToInvariantString(value);
 
-  private static string AggregateErrors(Failure errors) => AggregateErrors((ValidationFailure)errors);
+  private static string AggregateErrors(Failure errors) => AggregateErrors(((ValidationFailure)errors).Errors);
 
-  private static string AggregateErrors(ValidationFailure errors)
-    => string.Join(", ", errors.Errors.Select(e => $"{e.Property}: {e.ErrorCode}"));
+  private static string AggregateErrors(IEnumerable<ValidationError> errors)
+    => string.Join(", ", errors.Select(e => $"{e.Property}: {e.ErrorCode}"));
 
   private static Validated<int> Validate(int value)
     => value < 0
-      ? Validation.Failed<int>(Failure.Validation("value", "NEGATIVE_VALUE"))
+      ? Validation.Failed<int>([ValidationError.Create("value", "NEGATIVE_VALUE")])
       : Validation.Succeeded(value);
 
   private static string ToInvariantString(int value) => value.ToString(CultureInfo.InvariantCulture);
