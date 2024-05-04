@@ -6,7 +6,7 @@ using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Monads;
 
-public class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
+public sealed class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<UpdateReceiptCommand, Result<Receipt>>
 {
   private readonly IReceiptRepository _receiptRepository = receiptRepository;

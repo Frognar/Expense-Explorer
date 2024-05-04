@@ -5,7 +5,7 @@ using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using FunctionalCore.Monads;
 
-public class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
+public sealed class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<OpenNewReceiptCommand, Result<Receipt>>
 {
   private readonly IReceiptRepository _receiptRepository = receiptRepository;

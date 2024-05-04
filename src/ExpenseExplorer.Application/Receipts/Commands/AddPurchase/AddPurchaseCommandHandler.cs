@@ -6,7 +6,7 @@ using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Monads;
 
-public class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
+public sealed class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<AddPurchaseCommand, Result<Receipt>>
 {
   private readonly IReceiptRepository _receiptRepository = receiptRepository;

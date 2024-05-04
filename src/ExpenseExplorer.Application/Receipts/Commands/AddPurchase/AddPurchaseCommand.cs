@@ -4,7 +4,7 @@ using CommandHub.Commands;
 using ExpenseExplorer.Domain.Receipts;
 using FunctionalCore.Monads;
 
-public record AddPurchaseCommand(
+public sealed record AddPurchaseCommand(
   string ReceiptId,
   string Item,
   string Category,
