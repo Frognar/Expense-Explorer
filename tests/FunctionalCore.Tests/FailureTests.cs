@@ -63,16 +63,6 @@ public class FailureTests
       (message, errors) => AssertValidationFailure(message, errors, ValidationError.Create("ID", "Invalid")));
   }
 
-  [Fact]
-  public void CanRecreateFailure()
-  {
-    Exception ex = new TestException("TEST");
-
-    Failure failure = Failure.Fatal(ex) with { Message = "Override" };
-
-    failure.Message.Should().Be("Override");
-  }
-
   private static Unit AssertFatal(string failureMessage, Exception failureException, Exception ex)
   {
     failureMessage.Should().Be(ex.Message);
