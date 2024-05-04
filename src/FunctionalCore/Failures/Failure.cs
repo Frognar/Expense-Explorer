@@ -2,13 +2,14 @@ namespace FunctionalCore.Failures;
 
 public abstract record Failure(string Message)
 {
-  public static FatalFailure Fatal(Exception ex) => new(ex);
+  public static Failure Fatal(Exception ex) => new FatalFailure(ex);
 
-  public static NotFoundFailure NotFound(string message, string id) => new(message, id);
+  public static Failure NotFound(string message, string id) => new NotFoundFailure(message, id);
 
-  public static ValidationFailure Validation(IEnumerable<ValidationError> errors) => new(errors);
+  public static Failure Validation(IEnumerable<ValidationError> errors) => new ValidationFailure(errors);
 
-  public static ValidationFailure Validation(ValidationError error) => new([error]);
+  public static Failure Validation(ValidationError error) => new ValidationFailure([error]);
 
-  public static ValidationFailure Validation(string key, string message) => new([ValidationError.Create(key, message)]);
+  public static Failure Validation(string key, string message)
+    => new ValidationFailure([ValidationError.Create(key, message)]);
 }

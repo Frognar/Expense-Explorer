@@ -7,16 +7,16 @@ public class FailureTests
   {
     Exception ex = new TestException("TEST");
 
-    FatalFailure failure = Failure.Fatal(ex);
+    Failure failure = Failure.Fatal(ex);
 
-    AssertFatal(failure, ex);
+    AssertFatal((FatalFailure)failure, ex);
   }
 
   [Fact]
   public void CanCreateNotFoundFailure()
   {
-    NotFoundFailure failure = Failure.NotFound("Not found", "ID");
-    AssertNotFound(failure, "Not found", "ID");
+    Failure failure = Failure.NotFound("Not found", "ID");
+    AssertNotFound((NotFoundFailure)failure, "Not found", "ID");
   }
 
   [Fact]
@@ -24,9 +24,9 @@ public class FailureTests
   {
     ValidationError error = new("ID", "Invalid");
 
-    ValidationFailure failure = Failure.Validation([error]);
+    Failure failure = Failure.Validation([error]);
 
-    AssertValidationFailure(failure, error);
+    AssertValidationFailure((ValidationFailure)failure, error);
   }
 
   [Fact]
@@ -34,16 +34,16 @@ public class FailureTests
   {
     ValidationError error = new("ID", "Invalid");
 
-    ValidationFailure failure = Failure.Validation(error);
+    Failure failure = Failure.Validation(error);
 
-    AssertValidationFailure(failure, error);
+    AssertValidationFailure((ValidationFailure)failure, error);
   }
 
   [Fact]
   public void CanCreateValidationFailureWithSinglePropertyError()
   {
-    ValidationFailure failure = Failure.Validation("ID", "Invalid");
-    AssertValidationFailure(failure, ValidationError.Create("ID", "Invalid"));
+    Failure failure = Failure.Validation("ID", "Invalid");
+    AssertValidationFailure((ValidationFailure)failure, ValidationError.Create("ID", "Invalid"));
   }
 
   [Fact]
@@ -51,7 +51,7 @@ public class FailureTests
   {
     Exception ex = new TestException("TEST");
 
-    FatalFailure failure = Failure.Fatal(ex) with { Message = "Override" };
+    Failure failure = Failure.Fatal(ex) with { Message = "Override" };
 
     failure.Message.Should().Be("Override");
   }
