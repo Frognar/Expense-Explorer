@@ -203,7 +203,9 @@ public class ReceiptTests
       new PurchaseAdded("id", "pId", "i", "c", 1, 1, 0, "d"),
       new StoreCorrected("id", "newStore"),
       new PurchaseDateChanged("id", today.AddDays(-1), today),
-      new PurchaseDetailsChanged("id", "pId", "it", "ca", 2, 2, 1, "de")
+      new PurchaseDetailsChanged("id", "pId", "it", "ca", 2, 2, 1, "de"),
+      new PurchaseAdded("id", "pId2", "i", "c", 1, 1, 0, "d"),
+      new PurchaseRemoved("id", "pId2")
     ];
 
     Result<Receipt> resultOfReceipt = Receipt.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));

@@ -120,6 +120,7 @@ public sealed record Receipt
       PurchaseAdded purchaseAdded => Apply(purchaseAdded),
       PurchaseDateChanged purchaseDateChanged => Apply(purchaseDateChanged),
       PurchaseDetailsChanged purchaseDetailsChanged => Apply(purchaseDetailsChanged),
+      PurchaseRemoved purchaseRemoved => Apply(purchaseRemoved),
       _ => Fail.OfType<Receipt>(
         Failure.Fatal(new ArgumentException($"Unknown fact type: {fact.GetType()}", nameof(fact)))),
     };
@@ -170,6 +171,14 @@ public sealed record Receipt
           Money.TryCreate(fact.TotalDiscount),
           Description.TryCreate(fact.Description))
         select this with { Purchases = Purchases.Select(p => p.Id == purchase.Id ? purchase : p).ToList() })
+      .ToResult(() => Failure.Fatal(new AggregateException($"Failed to recreate receipt from {fact}.")));
+  }
+
+  private Result<Receipt> Apply(PurchaseRemoved fact)
+  {
+    return (
+        from purchaseId in Id.TryCreate(fact.PurchaseId)
+        select this with { Purchases = Purchases.Where(p => p.Id != purchaseId).ToList() })
       .ToResult(() => Failure.Fatal(new AggregateException($"Failed to recreate receipt from {fact}.")));
   }
 
