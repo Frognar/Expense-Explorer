@@ -47,6 +47,13 @@ public class FactTypesTests
     AssertFactType(fact, FactTypes.PurchaseDetailsChangedFactType);
   }
 
+  [Fact]
+  public void GetTypeForPurchaseRemoved()
+  {
+    Fact fact = new PurchaseRemoved("id", "pid");
+    AssertFactType(fact, FactTypes.PurchaseRemovedFactType);
+  }
+
   private static void AssertFactType(Fact fact, string expectedType)
   {
     string type = FactTypes.GetFactType(fact);
