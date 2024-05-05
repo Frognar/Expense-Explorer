@@ -1,5 +1,6 @@
 @ExpenseExplorer.API_HostAddress = https://localhost:7163
-@receiptId = 084c5fecc8a648b399472c75947e3ed8
+@receiptId = 2ef4858817ba457ebd97fb91892165df
+@purchaseId = 10a78662fb5b41a69f65048ca475ce96
 
 GET {{ExpenseExplorer.API_HostAddress}}/api/receipts?pageNumber=1&pageSize=10
 
@@ -19,6 +20,16 @@ Content-Type: application/json
 
 ###
 
+PATCH {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}
+Content-Type: application/json
+
+{
+  "storeName": "New Store",
+  "purchaseDate": "2024-04-01"
+}
+
+###
+
 POST {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}/purchases
 Content-Type: application/json
 
@@ -30,3 +41,25 @@ Content-Type: application/json
   "totalDiscount": 0.8,
   "description": "Some description"
 }
+
+###
+
+PATCH {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}/purchases/{{purchaseId}}
+Content-Type: application/json
+
+{
+  "item": "New Item",
+  "Category": "New Category",
+  "quantity": 1,
+  "unitPrice": 2.59,
+  "totalDiscount": 1.8,
+  "description": "Some other description"
+}
+
+###
+
+DELETE {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}/purchases/{{purchaseId}}
+
+###
+
+DELETE {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}
