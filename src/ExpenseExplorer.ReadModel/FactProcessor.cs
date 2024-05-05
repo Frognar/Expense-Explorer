@@ -3,9 +3,11 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using CommandHub;
+using CommandHub.Commands;
 using EventStore.Client;
 using ExpenseExplorer.ReadModel.Commands;
 using ExpenseExplorer.ReadModel.Facts;
+using FunctionalCore;
 using Microsoft.Extensions.Hosting;
 
 [SuppressMessage(
@@ -35,11 +37,12 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
     {
       Task task = resolvedEvent.Event.EventType switch
       {
-        FactTypes.ReceiptCreatedFactType => HandleReceiptCreationAsync(resolvedEvent, stoppingToken),
-        FactTypes.StoreCorrectedFactType => HandleStoreCorrectionAsync(resolvedEvent, stoppingToken),
-        FactTypes.PurchaseDateChangedFactType => HandlePurchaseDateChangedAsync(resolvedEvent, stoppingToken),
-        FactTypes.PurchaseAddedFactType => HandlePurchaseAdditionAsync(resolvedEvent, stoppingToken),
-        FactTypes.PurchaseDetailsChangedFactType => HandlePurchaseDetailsUpdatedAsync(resolvedEvent, stoppingToken),
+        FactTypes.ReceiptCreatedFactType => HandleAsync<CreateReceiptCommand>(resolvedEvent, stoppingToken),
+        FactTypes.StoreCorrectedFactType => HandleAsync<CorrectStoreCommand>(resolvedEvent, stoppingToken),
+        FactTypes.PurchaseDateChangedFactType => HandleAsync<ChangePurchaseDateCommand>(resolvedEvent, stoppingToken),
+        FactTypes.PurchaseAddedFactType => HandleAsync<AddPurchaseCommand>(resolvedEvent, stoppingToken),
+        FactTypes.PurchaseDetailsChangedFactType
+          => HandleAsync<UpdatePurchaseDetailsCommand>(resolvedEvent, stoppingToken),
         _ => Task.FromResult(() => Console.WriteLine(resolvedEvent.Event.EventType)),
       };
 
@@ -61,38 +64,11 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
       ? position ?? Position.Start
       : Position.Start;
 
-  private async Task HandleReceiptCreationAsync(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
+  private async Task HandleAsync<TCommand>(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
+    where TCommand : ICommand<Unit>
   {
     string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
-    CreateReceiptCommand command = JsonSerializer.Deserialize<CreateReceiptCommand>(jsonFact)!;
-    await _sender.SendAsync(command, cancellationToken);
-  }
-
-  private async Task HandleStoreCorrectionAsync(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
-  {
-    string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
-    CorrectStoreCommand command = JsonSerializer.Deserialize<CorrectStoreCommand>(jsonFact)!;
-    await _sender.SendAsync(command, cancellationToken);
-  }
-
-  private async Task HandlePurchaseDateChangedAsync(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
-  {
-    string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
-    ChangePurchaseDateCommand command = JsonSerializer.Deserialize<ChangePurchaseDateCommand>(jsonFact)!;
-    await _sender.SendAsync(command, cancellationToken);
-  }
-
-  private async Task HandlePurchaseAdditionAsync(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
-  {
-    string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
-    AddPurchaseCommand command = JsonSerializer.Deserialize<AddPurchaseCommand>(jsonFact)!;
-    await _sender.SendAsync(command, cancellationToken);
-  }
-
-  private async Task HandlePurchaseDetailsUpdatedAsync(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
-  {
-    string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
-    UpdatePurchaseDetailsCommand command = JsonSerializer.Deserialize<UpdatePurchaseDetailsCommand>(jsonFact)!;
+    TCommand command = JsonSerializer.Deserialize<TCommand>(jsonFact)!;
     await _sender.SendAsync(command, cancellationToken);
   }
 }
