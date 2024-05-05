@@ -5,4 +5,4 @@ using ExpenseExplorer.ReadModel.Models;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
-public record GetReceiptQuery(string ReceiptId) : IQuery<Either<Failure, Receipt>>;
+public sealed record GetReceiptQuery(string ReceiptId) : IQuery<Either<Failure, Receipt>>;

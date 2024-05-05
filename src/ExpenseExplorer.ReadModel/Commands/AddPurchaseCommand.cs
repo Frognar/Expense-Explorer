@@ -2,7 +2,7 @@ namespace ExpenseExplorer.ReadModel.Commands;
 
 using CommandHub.Commands;
 
-public record AddPurchaseCommand(
+public sealed record AddPurchaseCommand(
   string ReceiptId,
   string PurchaseId,
   string Item,

@@ -8,7 +8,7 @@ using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
-public class GetReceiptQueryHandler(ExpenseExplorerContext context)
+public sealed class GetReceiptQueryHandler(ExpenseExplorerContext context)
   : IQueryHandler<GetReceiptQuery, Either<Failure, Receipt>>
 {
   private static readonly Expression<Func<DbReceipt, Receipt>> _receiptSelector = r =>

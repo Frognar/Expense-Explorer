@@ -10,7 +10,7 @@ using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
-public class GetReceiptsQueryHandler(ExpenseExplorerContext context)
+public sealed class GetReceiptsQueryHandler(ExpenseExplorerContext context)
   : IQueryHandler<GetReceiptsQuery, Either<Failure, PageOf<ReceiptHeaders>>>
 {
   private readonly ExpenseExplorerContext _context = context;

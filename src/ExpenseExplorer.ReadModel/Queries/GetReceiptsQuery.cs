@@ -5,7 +5,7 @@ using ExpenseExplorer.ReadModel.Models;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
-public record GetReceiptsQuery(
+public sealed record GetReceiptsQuery(
   int PageSize,
   int PageNumber,
   string Search,

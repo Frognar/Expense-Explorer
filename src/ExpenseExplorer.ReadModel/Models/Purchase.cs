@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.ReadModel.Models;
 
-public record Purchase(
+public sealed record Purchase(
   string Id,
   string Item,
   string Category,
