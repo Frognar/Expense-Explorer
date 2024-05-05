@@ -13,9 +13,9 @@ public sealed class DbReceipt(string id, string store, DateOnly purchaseDate, de
   public string Id { get; init; } = id;
 
   [MaxLength(128)]
-  public string Store { get; init; } = store;
+  public string Store { get; set; } = store;
 
-  public DateOnly PurchaseDate { get; init; } = purchaseDate;
+  public DateOnly PurchaseDate { get; set; } = purchaseDate;
 
   public decimal Total { get; set; } = total;
 
