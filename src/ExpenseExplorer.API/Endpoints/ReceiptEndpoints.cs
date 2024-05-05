@@ -105,7 +105,7 @@ public static class ReceiptEndpoints
     Result<Receipt> result = await sender.SendAsync(request.MapToCommand(receiptId, purchaseId), cancellationToken);
     return result
       .Map(r => r.MapTo<UpdatePurchaseResponse>())
-      .Match(Handle, response => Results.CreatedAtRoute(_getReceiptRoute, new { receiptId = response.Id }, response));
+      .Match(Handle, Results.Ok);
   }
 
   private static IResult Handle(Failure failure)
