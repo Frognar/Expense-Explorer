@@ -4,6 +4,7 @@ using System.Net;
 using CommandHub;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
+using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.ReadModel.Models;
 using ExpenseExplorer.ReadModel.Queries;
 using FunctionalCore.Failures;
@@ -23,6 +24,7 @@ public static class ReceiptEndpoints
     group.MapPatch("/{receiptId}", UpdateReceiptAsync);
     group.MapPost("/{receiptId}/purchases", AddPurchaseAsync);
     group.MapPatch("/{receiptId}/purchases/{purchaseId}", UpdatePurchaseAsync);
+    group.MapDelete("/{receiptId}/purchases/{purchaseId}", RemovePurchaseAsync);
     return endpointRouteBuilder;
   }
 
@@ -106,6 +108,19 @@ public static class ReceiptEndpoints
     return result
       .Map(r => r.MapTo<UpdatePurchaseResponse>())
       .Match(Handle, Results.Ok);
+  }
+
+  private static async Task<IResult> RemovePurchaseAsync(
+    string receiptId,
+    string purchaseId,
+    ISender sender,
+    CancellationToken cancellationToken = default)
+  {
+    Result<Receipt> result = await sender.SendAsync(
+      new RemovePurchaseCommand(receiptId, purchaseId),
+      cancellationToken);
+
+    return result.Match(Handle, _ => Results.NoContent());
   }
 
   private static IResult Handle(Failure failure)
