@@ -3,6 +3,7 @@ namespace ExpenseExplorer.ReadModel.Commands;
 using CommandHub.Commands;
 using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore;
+using Microsoft.EntityFrameworkCore;
 
 public sealed class RemovePurchaseCommandHandler(ExpenseExplorerContext context)
   : ICommandHandler<RemovePurchaseCommand, Unit>
@@ -12,16 +13,10 @@ public sealed class RemovePurchaseCommandHandler(ExpenseExplorerContext context)
   public async Task<Unit> HandleAsync(RemovePurchaseCommand command, CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    DbPurchase? dbPurchase = _context.Purchases
-      .FirstOrDefault(p => p.ReceiptId == command.ReceiptId && p.PurchaseId == command.PurchaseId);
+    await _context.Purchases
+      .Where(p => p.ReceiptId == command.ReceiptId && p.PurchaseId == command.PurchaseId)
+      .ExecuteDeleteAsync(cancellationToken);
 
-    if (dbPurchase is null)
-    {
-      return Unit.Instance;
-    }
-
-    _context.Purchases.Remove(dbPurchase);
-    await _context.SaveChangesAsync(cancellationToken);
     return Unit.Instance;
   }
 }

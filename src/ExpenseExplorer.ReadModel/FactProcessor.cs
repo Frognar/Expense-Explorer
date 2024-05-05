@@ -44,6 +44,7 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
         FactTypes.PurchaseDetailsChangedFactType
           => HandleAsync<UpdatePurchaseDetailsCommand>(resolvedEvent, stoppingToken),
         FactTypes.PurchaseRemovedFactType => HandleAsync<RemovePurchaseCommand>(resolvedEvent, stoppingToken),
+        FactTypes.ReceiptDeletedFactType => HandleAsync<DeleteReceiptCommand>(resolvedEvent, stoppingToken),
         _ => Task.FromResult(() => Console.WriteLine(resolvedEvent.Event.EventType)),
       };
 
