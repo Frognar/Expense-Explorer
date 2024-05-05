@@ -7,6 +7,7 @@ using ExpenseExplorer.API.Mappers;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.ReadModel.Models;
 using ExpenseExplorer.ReadModel.Queries;
+using FunctionalCore;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using Receipt = ExpenseExplorer.Domain.Receipts.Receipt;
@@ -25,6 +26,7 @@ public static class ReceiptEndpoints
     group.MapPost("/{receiptId}/purchases", AddPurchaseAsync);
     group.MapPatch("/{receiptId}/purchases/{purchaseId}", UpdatePurchaseAsync);
     group.MapDelete("/{receiptId}/purchases/{purchaseId}", RemovePurchaseAsync);
+    group.MapDelete("/{receiptId}", DeleteReceiptAsync);
     return endpointRouteBuilder;
   }
 
@@ -120,6 +122,15 @@ public static class ReceiptEndpoints
       new RemovePurchaseCommand(receiptId, purchaseId),
       cancellationToken);
 
+    return result.Match(Handle, _ => Results.NoContent());
+  }
+
+  private static async Task<IResult> DeleteReceiptAsync(
+    string receiptId,
+    ISender sender,
+    CancellationToken cancellationToken = default)
+  {
+    Result<Unit> result = await sender.SendAsync(new DeleteReceiptCommand(receiptId), cancellationToken);
     return result.Match(Handle, _ => Results.NoContent());
   }
 
