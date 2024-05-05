@@ -5,12 +5,8 @@ using CommandHub;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
 using ExpenseExplorer.Application.Receipts.Commands;
-using ExpenseExplorer.ReadModel.Models;
 using ExpenseExplorer.ReadModel.Queries;
-using FunctionalCore;
 using FunctionalCore.Failures;
-using FunctionalCore.Monads;
-using Receipt = ExpenseExplorer.Domain.Receipts.Receipt;
 
 public static class ReceiptEndpoints
 {
@@ -21,12 +17,14 @@ public static class ReceiptEndpoints
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/receipts");
     group.MapGet("/", GetReceiptsAsync);
     group.MapGet("/{receiptId}", GetReceiptAsync).WithName(_getReceiptRoute);
+
     group.MapPost("/", OpenNewReceiptAsync);
     group.MapPatch("/{receiptId}", UpdateReceiptAsync);
+    group.MapDelete("/{receiptId}", DeleteReceiptAsync);
+
     group.MapPost("/{receiptId}/purchases", AddPurchaseAsync);
     group.MapPatch("/{receiptId}/purchases/{purchaseId}", UpdatePurchaseAsync);
     group.MapDelete("/{receiptId}/purchases/{purchaseId}", RemovePurchaseAsync);
-    group.MapDelete("/{receiptId}", DeleteReceiptAsync);
     return endpointRouteBuilder;
   }
 
@@ -42,8 +40,7 @@ public static class ReceiptEndpoints
     CancellationToken cancellationToken = default)
   {
     GetReceiptsQuery query = new(pageSize, pageNumber, search, after, before, minTotal, maxTotal);
-    Either<Failure, PageOf<ReceiptHeaders>> result = await sender.SendAsync(query, cancellationToken);
-    return result
+    return (await sender.SendAsync(query, cancellationToken))
       .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
   }
@@ -53,9 +50,7 @@ public static class ReceiptEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    GetReceiptQuery query = new(receiptId);
-    Either<Failure, ReadModel.Models.Receipt> result = await sender.SendAsync(query, cancellationToken);
-    return result
+    return (await sender.SendAsync(new GetReceiptQuery(receiptId), cancellationToken))
       .MapRight(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
   }
@@ -67,8 +62,7 @@ public static class ReceiptEndpoints
     CancellationToken cancellationToken = default)
   {
     DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
-    Result<Receipt> result = await sender.SendAsync(request.MapToCommand(today), cancellationToken);
-    return result
+    return (await sender.SendAsync(request.MapToCommand(today), cancellationToken))
       .Map(r => r.MapTo<OpenNewReceiptResponse>())
       .Match(Handle, response => Results.CreatedAtRoute(_getReceiptRoute, new { receiptId = response.Id }, response));
   }
@@ -80,9 +74,8 @@ public static class ReceiptEndpoints
     ISender sender,
     CancellationToken cancellationToken)
   {
-    DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
-    Result<Receipt> result = await sender.SendAsync(request.MapToCommand(receiptId, today), cancellationToken);
-    return result
+    var today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
+    return (await sender.SendAsync(request.MapToCommand(receiptId, today), cancellationToken))
       .Map(r => r.MapTo<UpdateReceiptResponse>())
       .Match(Handle, Results.Ok);
   }
@@ -93,8 +86,7 @@ public static class ReceiptEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    Result<Receipt> result = await sender.SendAsync(request.MapToCommand(receiptId), cancellationToken);
-    return result
+    return (await sender.SendAsync(request.MapToCommand(receiptId), cancellationToken))
       .Map(r => r.MapTo<AddPurchaseResponse>())
       .Match(Handle, response => Results.CreatedAtRoute(_getReceiptRoute, new { receiptId = response.Id }, response));
   }
@@ -106,8 +98,7 @@ public static class ReceiptEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    Result<Receipt> result = await sender.SendAsync(request.MapToCommand(receiptId, purchaseId), cancellationToken);
-    return result
+    return (await sender.SendAsync(request.MapToCommand(receiptId, purchaseId), cancellationToken))
       .Map(r => r.MapTo<UpdatePurchaseResponse>())
       .Match(Handle, Results.Ok);
   }
@@ -118,11 +109,8 @@ public static class ReceiptEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    Result<Receipt> result = await sender.SendAsync(
-      new RemovePurchaseCommand(receiptId, purchaseId),
-      cancellationToken);
-
-    return result.Match(Handle, _ => Results.NoContent());
+    return (await sender.SendAsync(new RemovePurchaseCommand(receiptId, purchaseId), cancellationToken))
+      .Match(Handle, _ => Results.NoContent());
   }
 
   private static async Task<IResult> DeleteReceiptAsync(
@@ -130,8 +118,8 @@ public static class ReceiptEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    Result<Unit> result = await sender.SendAsync(new DeleteReceiptCommand(receiptId), cancellationToken);
-    return result.Match(Handle, _ => Results.NoContent());
+    return (await sender.SendAsync(new DeleteReceiptCommand(receiptId), cancellationToken))
+      .Match(Handle, _ => Results.NoContent());
   }
 
   private static IResult Handle(Failure failure)
