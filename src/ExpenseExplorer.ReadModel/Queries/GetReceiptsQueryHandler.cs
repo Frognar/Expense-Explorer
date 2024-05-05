@@ -11,11 +11,11 @@ using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class GetReceiptsQueryHandler(ExpenseExplorerContext context)
-  : IQueryHandler<GetReceiptsQuery, Either<Failure, PageOf<ReceiptHeaders>>>
+  : IQueryHandler<GetReceiptsQuery, Result<PageOf<ReceiptHeaders>>>
 {
   private readonly ExpenseExplorerContext _context = context;
 
-  public async Task<Either<Failure, PageOf<ReceiptHeaders>>> HandleAsync(
+  public async Task<Result<PageOf<ReceiptHeaders>>> HandleAsync(
     GetReceiptsQuery query,
     CancellationToken cancellationToken = default)
   {
@@ -36,11 +36,11 @@ public sealed class GetReceiptsQueryHandler(ExpenseExplorerContext context)
 
       int totalCount = await _context.Receipts.CountAsync(cancellationToken);
       PageOf<ReceiptHeaders> response = Page.Of(receipts, totalCount, query.PageSize, query.PageNumber);
-      return Right.From<Failure, PageOf<ReceiptHeaders>>(response);
+      return Success.From(response);
     }
     catch (DbException ex)
     {
-      return Left.From<Failure, PageOf<ReceiptHeaders>>(Failure.Fatal(ex));
+      return Fail.OfType<PageOf<ReceiptHeaders>>(Failure.Fatal(ex));
     }
   }
 

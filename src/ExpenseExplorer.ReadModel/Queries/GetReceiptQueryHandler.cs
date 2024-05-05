@@ -9,7 +9,7 @@ using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class GetReceiptQueryHandler(ExpenseExplorerContext context)
-  : IQueryHandler<GetReceiptQuery, Either<Failure, Receipt>>
+  : IQueryHandler<GetReceiptQuery, Result<Receipt>>
 {
   private static readonly Expression<Func<DbReceipt, Receipt>> _receiptSelector = r =>
     new Receipt(
@@ -23,7 +23,7 @@ public sealed class GetReceiptQueryHandler(ExpenseExplorerContext context)
 
   private readonly ExpenseExplorerContext _context = context;
 
-  public async Task<Either<Failure, Receipt>> HandleAsync(
+  public async Task<Result<Receipt>> HandleAsync(
     GetReceiptQuery query,
     CancellationToken cancellationToken = default)
   {
@@ -34,7 +34,7 @@ public sealed class GetReceiptQueryHandler(ExpenseExplorerContext context)
       .FirstOrDefaultAsync(cancellationToken: cancellationToken);
 
     return receipt is not null
-      ? Right.From<Failure, Receipt>(receipt)
-      : Left.From<Failure, Receipt>(Failure.NotFound("Receipt not found.", query.ReceiptId));
+      ? Success.From(receipt)
+      : Fail.OfType<Receipt>(Failure.NotFound("Receipt not found.", query.ReceiptId));
   }
 }

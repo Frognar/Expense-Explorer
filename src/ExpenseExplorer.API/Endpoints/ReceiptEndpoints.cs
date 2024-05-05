@@ -41,7 +41,7 @@ public static class ReceiptEndpoints
   {
     GetReceiptsQuery query = new(pageSize, pageNumber, search, after, before, minTotal, maxTotal);
     return (await sender.SendAsync(query, cancellationToken))
-      .MapRight(r => r.MapToResponse())
+      .Map(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
   }
 
@@ -51,7 +51,7 @@ public static class ReceiptEndpoints
     CancellationToken cancellationToken = default)
   {
     return (await sender.SendAsync(new GetReceiptQuery(receiptId), cancellationToken))
-      .MapRight(r => r.MapToResponse())
+      .Map(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
   }
 

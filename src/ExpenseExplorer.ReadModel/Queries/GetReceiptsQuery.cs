@@ -13,7 +13,7 @@ public sealed record GetReceiptsQuery(
   DateOnly Before,
   decimal MinTotal,
   decimal MaxTotal)
-  : IQuery<Either<Failure, PageOf<ReceiptHeaders>>>
+  : IQuery<Result<PageOf<ReceiptHeaders>>>
 {
   public const int DefaultPageSize = 10;
   public const int MaxPageSize = 50;
