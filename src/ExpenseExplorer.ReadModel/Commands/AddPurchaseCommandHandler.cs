@@ -2,6 +2,7 @@ namespace ExpenseExplorer.ReadModel.Commands;
 
 using CommandHub.Commands;
 using ExpenseExplorer.ReadModel.Models.Persistence;
+using FunctionalCore;
 
 public sealed class AddPurchaseCommandHandler(ExpenseExplorerContext context)
   : ICommandHandler<AddPurchaseCommand, Unit>
