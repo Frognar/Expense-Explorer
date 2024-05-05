@@ -37,6 +37,7 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
       {
         FactTypes.ReceiptCreatedFactType => HandleReceiptCreationAsync(resolvedEvent, stoppingToken),
         FactTypes.StoreCorrectedFactType => HandleStoreCorrectionAsync(resolvedEvent, stoppingToken),
+        FactTypes.PurchaseDateChangedFactType => HandlePurchaseDateChangedAsync(resolvedEvent, stoppingToken),
         FactTypes.PurchaseAddedFactType => HandlePurchaseAdditionAsync(resolvedEvent, stoppingToken),
         FactTypes.PurchaseDetailsChangedFactType => HandlePurchaseDetailsUpdatedAsync(resolvedEvent, stoppingToken),
         _ => Task.FromResult(() => Console.WriteLine(resolvedEvent.Event.EventType)),
@@ -71,6 +72,13 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
   {
     string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
     CorrectStoreCommand command = JsonSerializer.Deserialize<CorrectStoreCommand>(jsonFact)!;
+    await _sender.SendAsync(command, cancellationToken);
+  }
+
+  private async Task HandlePurchaseDateChangedAsync(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
+  {
+    string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
+    ChangePurchaseDateCommand command = JsonSerializer.Deserialize<ChangePurchaseDateCommand>(jsonFact)!;
     await _sender.SendAsync(command, cancellationToken);
   }
 
