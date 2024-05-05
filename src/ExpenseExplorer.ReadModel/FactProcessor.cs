@@ -31,12 +31,13 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
       FromAll.After(lastProcessedPosition),
       cancellationToken: stoppingToken);
 
-    await foreach (ResolvedEvent resolvedEvent in result.WithCancellation(stoppingToken))
+    await foreach (ResolvedEvent resolvedEvent in result)
     {
       Task task = resolvedEvent.Event.EventType switch
       {
         FactTypes.ReceiptCreatedFactType => HandleReceiptCreationAsync(resolvedEvent, stoppingToken),
         FactTypes.PurchaseAddedFactType => HandlePurchaseAdditionAsync(resolvedEvent, stoppingToken),
+        FactTypes.PurchaseDetailsChangedFactType => HandlePurchaseDetailsUpdatedAsync(resolvedEvent, stoppingToken),
         _ => Task.FromResult(() => Console.WriteLine(resolvedEvent.Event.EventType)),
       };
 
@@ -61,25 +62,21 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
   private async Task HandleReceiptCreationAsync(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
   {
     string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
-    OpenNewReceiptFact receiptCreated = JsonSerializer.Deserialize<OpenNewReceiptFact>(jsonFact)!;
-    CreateReceiptCommand command = new(receiptCreated.Id, receiptCreated.Store, receiptCreated.PurchaseDate);
+    CreateReceiptCommand command = JsonSerializer.Deserialize<CreateReceiptCommand>(jsonFact)!;
     await _sender.SendAsync(command, cancellationToken);
   }
 
   private async Task HandlePurchaseAdditionAsync(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
   {
     string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
-    AddPurchaseFact purchaseAdded = JsonSerializer.Deserialize<AddPurchaseFact>(jsonFact)!;
-    AddPurchaseCommand command = new(
-      purchaseAdded.ReceiptId,
-      purchaseAdded.PurchaseId,
-      purchaseAdded.Item,
-      purchaseAdded.Category,
-      purchaseAdded.Quantity,
-      purchaseAdded.UnitPrice,
-      purchaseAdded.TotalDiscount,
-      purchaseAdded.Description);
+    AddPurchaseCommand command = JsonSerializer.Deserialize<AddPurchaseCommand>(jsonFact)!;
+    await _sender.SendAsync(command, cancellationToken);
+  }
 
+  private async Task HandlePurchaseDetailsUpdatedAsync(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
+  {
+    string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
+    UpdatePurchaseDetailsCommand command = JsonSerializer.Deserialize<UpdatePurchaseDetailsCommand>(jsonFact)!;
     await _sender.SendAsync(command, cancellationToken);
   }
 }
