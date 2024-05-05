@@ -63,3 +63,6 @@ DELETE {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}/purchases/
 ###
 
 DELETE {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}
+
+###
+GET {{ExpenseExplorer.API_HostAddress}}/api/stores?pageNumber=1&pageSize=10

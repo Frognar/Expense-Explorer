@@ -4,6 +4,17 @@ using ExpenseExplorer.API.Contract.ReadModel;
 
 public static class ReadModelReceiptMapper
 {
+  public static GetStoresResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.Store> page)
+  {
+    ArgumentNullException.ThrowIfNull(page);
+    return new GetStoresResponse(
+      page.Items.Select(store => store.Name),
+      page.TotalCount,
+      page.PageSize,
+      page.PageNumber,
+      page.PageCount);
+  }
+
   public static GetReceiptsResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.ReceiptHeaders> page)
   {
     ArgumentNullException.ThrowIfNull(page);
