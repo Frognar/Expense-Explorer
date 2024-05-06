@@ -65,4 +65,9 @@ DELETE {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}/purchases/
 DELETE {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}
 
 ###
+
 GET {{ExpenseExplorer.API_HostAddress}}/api/stores?pageNumber=1&pageSize=10
+
+###
+
+GET {{ExpenseExplorer.API_HostAddress}}/api/reports?from=2024-03-01&to=2024-03-20
