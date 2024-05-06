@@ -24,6 +24,12 @@ public static class ResultExtensions
       async value => await map(value));
   }
 
+  public static Result<TResult> Select<T, TResult>(this Result<T> source, Func<T, TResult> selector)
+  {
+    ArgumentNullException.ThrowIfNull(source);
+    return source.Map(selector);
+  }
+
   [SuppressMessage(
     "Design",
     "VSTHRD200:Use \"Async\" suffix for async methods",
@@ -39,6 +45,17 @@ public static class ResultExtensions
     ArgumentNullException.ThrowIfNull(source);
     ArgumentNullException.ThrowIfNull(selector);
     return (await source).Map(selector);
+  }
+
+  public static Result<TResult> SelectMany<T, U, TResult>(
+    this Result<T> source,
+    Func<T, Result<U>> selector,
+    Func<T, U, TResult> projector)
+  {
+    ArgumentNullException.ThrowIfNull(source);
+    ArgumentNullException.ThrowIfNull(selector);
+    ArgumentNullException.ThrowIfNull(projector);
+    return source.FlatMap(value => selector(value).Map(u => projector(value, u)));
   }
 
   [SuppressMessage(
