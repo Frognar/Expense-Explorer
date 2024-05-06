@@ -23,7 +23,10 @@ public sealed class GenerateReportQueryHandler(ExpenseExplorerContext context)
         .SelectMany(r => r.Purchases)
         .Select(p => new { p.Category, TotalPrice = (p.Quantity * p.UnitPrice) - p.TotalDiscount })
         .GroupBy(d => d.Category)
-        .ToDictionaryAsync(d => d.Key, d => d.Sum(p => p.TotalPrice), cancellationToken);
+        .Select(d => new { Category = d.Key, TotalCost = d.Sum(p => p.TotalPrice) })
+        .OrderByDescending(d => d.TotalCost)
+        .ThenBy(d => d.Category)
+        .ToDictionaryAsync(d => d.Category, d => d.TotalCost, cancellationToken);
 
       Report report = new(data);
       return Success.From(report);
