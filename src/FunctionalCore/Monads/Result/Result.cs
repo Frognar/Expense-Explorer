@@ -4,15 +4,22 @@ using FunctionalCore.Failures;
 
 public sealed class Result<T>
 {
-  private readonly Either<Failure, T> _either;
+  private readonly IResult _resultType;
 
-  private Result(Either<Failure, T> either) => _either = either;
+  private Result(IResult resultType) => _resultType = resultType;
+
+  private interface IResult;
 
   public TResult Match<TResult>(Func<Failure, TResult> onFailure, Func<T, TResult> onSuccess)
   {
     ArgumentNullException.ThrowIfNull(onFailure);
     ArgumentNullException.ThrowIfNull(onSuccess);
-    return _either.Match(onFailure, onSuccess);
+    return _resultType switch
+    {
+      FailureType failureType => onFailure(failureType.Failure),
+      SuccessType successType => onSuccess(successType.Value),
+      _ => throw new InvalidOperationException("Unknown result type."),
+    };
   }
 
   public Result<TResult> Map<TResult>(Func<T, TResult> map)
@@ -39,7 +46,11 @@ public sealed class Result<T>
     return FlatMap(value => selector(value).Map(u => projector(value, u)));
   }
 
-  internal static Result<T> Success(T value) => new(Right.From<Failure, T>(value));
+  internal static Result<T> Success(T value) => new(new SuccessType(value));
 
-  internal static Result<T> Fail(Failure failure) => new(Left.From<Failure, T>(failure));
+  internal static Result<T> Fail(Failure failure) => new(new FailureType(failure));
+
+  private readonly record struct FailureType(Failure Failure) : IResult;
+
+  private readonly record struct SuccessType(T Value) : IResult;
 }
