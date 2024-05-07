@@ -11,7 +11,7 @@ public class MaybeTests
   }
 
   [Property]
-  public void MapsWhenSome(int value)
+  public void MapsSomeValue(int value)
   {
     var maybe = GetMaybe(value);
 
@@ -21,7 +21,7 @@ public class MaybeTests
   }
 
   [Property]
-  public async Task MapsAsyncWhenSome(int value)
+  public async Task MapsSomeValueWhenSelectorIsAsync(int value)
   {
     var maybe = GetMaybe(value);
 
@@ -31,19 +31,27 @@ public class MaybeTests
   }
 
   [Property]
-  public void MapsWithQuerySyntax(int value)
+  public async Task MapsSomeValueWhenSourceIsAsync(int value)
   {
-    var maybe = GetMaybe(value);
+    var result = Task.FromResult(GetMaybe(value));
 
-    var projected =
-      from v in maybe
-      select v * 2;
+    var projected = await result.MapAsync(v => v * 2);
 
     AssertMaybe(projected, expectNone: value < 0, expectedValue: value * 2);
   }
 
   [Property]
-  public void FlatMapsWhenSome(int value)
+  public async Task MapsSomeValueWhenBothSourceAndSelectorAreAsync(int value)
+  {
+    var result = Task.FromResult(GetMaybe(value));
+
+    var projected = await result.MapAsync(v => Task.FromResult(v * 2));
+
+    AssertMaybe(projected, expectNone: value < 0, expectedValue: value * 2);
+  }
+
+  [Property]
+  public void FlatMapsSomeValue(int value)
   {
     var maybe = GetMaybe(value);
 
@@ -53,39 +61,33 @@ public class MaybeTests
   }
 
   [Property]
-  public async Task FlatMapsAsyncWhenSome(int value)
+  public async Task FlatMapsSuccessValueWhenSelectorIsAsync(int value)
   {
-    var maybe = GetMaybe(value);
+    var result = GetMaybe(value);
 
-    var projected = await maybe.FlatMapAsync(v => Task.FromResult(Some.From(v * 2)));
+    var projected = await result.FlatMapAsync(v => Task.FromResult(Some.From(v * 2)));
 
     AssertMaybe(projected, expectNone: value < 0, expectedValue: value * 2);
   }
 
   [Property]
-  public void FlatMapsWithQuerySyntax(int value)
+  public async Task FlatMapsSuccessValueWhenSourceIsAsync(int value)
   {
-    var maybe = GetMaybe(value);
+    var result = Task.FromResult(GetMaybe(value));
 
-    var projected =
-      from v in maybe
-      from v1 in maybe
-      select v + v1;
+    var projected = await result.FlatMapAsync(v => Some.From(v * 2));
 
-    AssertMaybe(projected, expectNone: value < 0, expectedValue: value + value);
+    AssertMaybe(projected, expectNone: value < 0, expectedValue: value * 2);
   }
 
   [Property]
-  public async Task FlatMapsAsyncWithQuerySyntax(int value)
+  public async Task FlatMapsSuccessValueWhenBothSourceAndSelectorAreAsync(int value)
   {
-    var maybe = GetMaybe(value);
+    var result = Task.FromResult(GetMaybe(value));
 
-    var projected = await (
-      from v in maybe
-      from v1 in Task.FromResult(maybe)
-      select v + v1);
+    var projected = await result.FlatMapAsync(v => Task.FromResult(Some.From(v * 2)));
 
-    AssertMaybe(projected, expectNone: value < 0, expectedValue: value + value);
+    AssertMaybe(projected, expectNone: value < 0, expectedValue: value * 2);
   }
 
   [Property]
@@ -95,7 +97,7 @@ public class MaybeTests
 
     var result = maybe.ToResult(() => Failure.Validation("value", "Negative"));
 
-    result.Match(f => f.Match((_, _) => 0, (_, _) => 0, (_, _) => 0), s => s)
+    result.Match(_ => 0, s => s)
       .Should()
       .Be(value < 0 ? 0 : value);
   }
