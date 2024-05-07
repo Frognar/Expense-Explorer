@@ -10,14 +10,14 @@ public sealed class Result<T>
 
   private interface IResult;
 
-  public TResult Match<TResult>(Func<Failure, TResult> onFailure, Func<T, TResult> onSuccess)
+  public TResult Match<TResult>(Func<Failure, TResult> failure, Func<T, TResult> success)
   {
-    ArgumentNullException.ThrowIfNull(onFailure);
-    ArgumentNullException.ThrowIfNull(onSuccess);
+    ArgumentNullException.ThrowIfNull(failure);
+    ArgumentNullException.ThrowIfNull(success);
     return _resultType switch
     {
-      FailureType failureType => onFailure(failureType.Failure),
-      SuccessType successType => onSuccess(successType.Value),
+      FailureType failureType => failure(failureType.Failure),
+      SuccessType successType => success(successType.Value),
       _ => throw new InvalidOperationException("Unknown result type."),
     };
   }

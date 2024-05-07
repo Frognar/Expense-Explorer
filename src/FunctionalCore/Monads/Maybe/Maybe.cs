@@ -2,23 +2,23 @@ namespace FunctionalCore.Monads;
 
 public class Maybe<T>
 {
-  private readonly IMaybe _maybe;
+  private readonly IMaybe _maybeType;
 
-  private Maybe(IMaybe maybe)
+  private Maybe(IMaybe maybeType)
   {
-    _maybe = maybe;
+    _maybeType = maybeType;
   }
 
   private interface IMaybe;
 
-  public TResult Match<TResult>(Func<TResult> onNone, Func<T, TResult> onSome)
+  public TResult Match<TResult>(Func<TResult> none, Func<T, TResult> some)
   {
-    ArgumentNullException.ThrowIfNull(onNone);
-    ArgumentNullException.ThrowIfNull(onSome);
-    return _maybe switch
+    ArgumentNullException.ThrowIfNull(none);
+    ArgumentNullException.ThrowIfNull(some);
+    return _maybeType switch
     {
-      NoneType => onNone(),
-      SomeType some => onSome(some.Value),
+      NoneType => none(),
+      SomeType someType => some(someType.Value),
       _ => throw new InvalidOperationException("Unknown maybe type."),
     };
   }
