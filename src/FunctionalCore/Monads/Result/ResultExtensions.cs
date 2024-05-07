@@ -18,9 +18,7 @@ public static class ResultExtensions
   {
     ArgumentNullException.ThrowIfNull(source);
     ArgumentNullException.ThrowIfNull(map);
-    return await (await source).Match(
-      failure => Task.FromResult(Fail.OfType<TResult>(failure)),
-      async value => Success.From(await map(value)));
+    return await (await source).MapAsync(map);
   }
 
   public static async Task<Result<TResult>> MapAsync<T, TResult>(
@@ -45,22 +43,20 @@ public static class ResultExtensions
 
   public static async Task<Result<TResult>> FlatMapAsync<T, TResult>(
     this Task<Result<T>> source,
-    Func<T, Task<Result<TResult>>> map)
-  {
-    ArgumentNullException.ThrowIfNull(source);
-    ArgumentNullException.ThrowIfNull(map);
-    return await (await source).Match(
-      failure => Task.FromResult(Fail.OfType<TResult>(failure)),
-      async value => await map(value));
-  }
-
-  public static async Task<Result<TResult>> FlatMapAsync<T, TResult>(
-    this Task<Result<T>> source,
     Func<T, Result<TResult>> map)
   {
     ArgumentNullException.ThrowIfNull(source);
     ArgumentNullException.ThrowIfNull(map);
     return (await source).FlatMap(map);
+  }
+
+  public static async Task<Result<TResult>> FlatMapAsync<T, TResult>(
+    this Task<Result<T>> source,
+    Func<T, Task<Result<TResult>>> map)
+  {
+    ArgumentNullException.ThrowIfNull(source);
+    ArgumentNullException.ThrowIfNull(map);
+    return await (await source).FlatMapAsync(map);
   }
 }
 #pragma warning restore VSTHRD003

@@ -59,7 +59,7 @@ public static class ResultLinqExtensions
     ArgumentNullException.ThrowIfNull(source);
     ArgumentNullException.ThrowIfNull(selector);
     ArgumentNullException.ThrowIfNull(projector);
-    return await source.FlatMapAsync(async value => (await selector(value)).Map(u => projector(value, u)));
+    return await source.FlatMapAsync(async value => await selector(value).MapAsync(u => projector(value, u)));
   }
 
   public static async Task<Result<TResult>> SelectMany<T, U, TResult>(
@@ -103,7 +103,18 @@ public static class ResultLinqExtensions
     ArgumentNullException.ThrowIfNull(source);
     ArgumentNullException.ThrowIfNull(selector);
     ArgumentNullException.ThrowIfNull(projector);
-    return await source.FlatMapAsync(async value => (await selector(value)).Map(u => projector(value, u)));
+    return await source.FlatMapAsync(async value => await selector(value).MapAsync(u => projector(value, u)));
+  }
+
+  public static async Task<Result<TResult>> SelectMany<T, U, TResult>(
+    this Task<Result<T>> source,
+    Func<T, Result<U>> selector,
+    Func<T, U, Task<TResult>> projector)
+  {
+    ArgumentNullException.ThrowIfNull(source);
+    ArgumentNullException.ThrowIfNull(selector);
+    ArgumentNullException.ThrowIfNull(projector);
+    return await source.FlatMapAsync(async value => await selector(value).MapAsync(u => projector(value, u)));
   }
 
   public static async Task<Result<TResult>> SelectMany<T, U, TResult>(
@@ -114,7 +125,7 @@ public static class ResultLinqExtensions
     ArgumentNullException.ThrowIfNull(source);
     ArgumentNullException.ThrowIfNull(selector);
     ArgumentNullException.ThrowIfNull(projector);
-    return await source.FlatMapAsync(async value => await (await selector(value)).MapAsync(u => projector(value, u)));
+    return await source.FlatMapAsync(async value => await selector(value).MapAsync(u => projector(value, u)));
   }
 }
 #pragma warning restore VSTHRD200
