@@ -27,6 +27,7 @@ public static class ResultExtensions
   public static Result<TResult> Select<T, TResult>(this Result<T> source, Func<T, TResult> selector)
   {
     ArgumentNullException.ThrowIfNull(source);
+    ArgumentNullException.ThrowIfNull(selector);
     return source.Map(selector);
   }
 

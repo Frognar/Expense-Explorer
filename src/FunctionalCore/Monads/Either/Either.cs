@@ -2,23 +2,25 @@
 
 public sealed class Either<L, R>
 {
-  private readonly IEither _either;
+  private readonly IEither _eitherType;
 
-  private Either(IEither either)
+  private Either(IEither eitherType)
   {
-    _either = either;
+    _eitherType = eitherType;
   }
 
-  private interface IEither
-  {
-    T Match<T>(Func<L, T> onLeft, Func<R, T> onRight);
-  }
+  private interface IEither;
 
-  public T Match<T>(Func<L, T> onLeft, Func<R, T> onRight)
+  public T Match<T>(Func<L, T> left, Func<R, T> right)
   {
-    ArgumentNullException.ThrowIfNull(onLeft);
-    ArgumentNullException.ThrowIfNull(onRight);
-    return _either.Match(onLeft, onRight);
+    ArgumentNullException.ThrowIfNull(left);
+    ArgumentNullException.ThrowIfNull(right);
+    return _eitherType switch
+    {
+      EitherLeft leftType => left(leftType.Value),
+      EitherRight rightType => right(rightType.Value),
+      _ => throw new InvalidOperationException("Unknown either type."),
+    };
   }
 
   public Either<L1, R> MapLeft<L1>(Func<L, L1> map)
@@ -32,8 +34,6 @@ public sealed class Either<L, R>
     ArgumentNullException.ThrowIfNull(map);
     return Match(Either<L, R1>.Left, right => Either<L, R1>.Right(map(right)));
   }
-
-  public Either<L, R1> Select<R1>(Func<R, R1> selector) => MapRight(selector);
 
   public Either<L1, R1> MapBoth<L1, R1>(Func<L, L1> lmap, Func<R, R1> rmap)
   {
@@ -63,32 +63,11 @@ public sealed class Either<L, R>
     return Match(lmap, rmap);
   }
 
-  public Either<L, R1> SelectMany<R1, T>(Func<R, Either<L, T>> selector, Func<R, T, R1> projector)
-  {
-    ArgumentNullException.ThrowIfNull(selector);
-    ArgumentNullException.ThrowIfNull(projector);
-    return FlatMapRight(right => selector(right).MapRight(t => projector(right, t)));
-  }
-
   internal static Either<L, R> Left(L left) => new(new EitherLeft(left));
 
   internal static Either<L, R> Right(R right) => new(new EitherRight(right));
 
-  private sealed class EitherLeft : IEither
-  {
-    private readonly L _left;
+  private readonly record struct EitherLeft(L Value) : IEither;
 
-    public EitherLeft(L left) => _left = left;
-
-    public T Match<T>(Func<L, T> onLeft, Func<R, T> onRight) => onLeft(_left);
-  }
-
-  private sealed class EitherRight : IEither
-  {
-    private readonly R _right;
-
-    public EitherRight(R right) => _right = right;
-
-    public T Match<T>(Func<L, T> onLeft, Func<R, T> onRight) => onRight(_right);
-  }
+  private readonly record struct EitherRight(R Value) : IEither;
 }

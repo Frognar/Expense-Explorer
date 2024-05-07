@@ -44,6 +44,7 @@ public static class MaybeExtensions
     Func<T, TResult> selector)
   {
     ArgumentNullException.ThrowIfNull(source);
+    ArgumentNullException.ThrowIfNull(selector);
     return source.Map(selector);
   }
 
