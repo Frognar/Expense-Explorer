@@ -2,7 +2,7 @@ namespace FunctionalCore.Monads;
 
 using FunctionalCore.Failures;
 
-public sealed class Result<T>
+public readonly record struct Result<T>
 {
   private readonly IResult _resultType;
 
