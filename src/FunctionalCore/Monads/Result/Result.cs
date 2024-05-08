@@ -55,9 +55,7 @@ public readonly partial record struct Result<T>
   public async Task<Result<TResult>> FlatMapAsync<TResult>(Func<T, Task<Result<TResult>>> map)
   {
     ArgumentNullException.ThrowIfNull(map);
-    return await MatchAsync(
-      failure => Task.FromResult(Result<TResult>.Fail(failure)),
-      map);
+    return await MatchAsync(failure => Task.FromResult(Result<TResult>.Fail(failure)), map);
   }
 
   internal static Result<T> Success(T value) => new(new SuccessType(value));

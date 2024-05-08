@@ -19,15 +19,6 @@ public static class MaybeExtensions
     return source.Match(fallback, value => value);
   }
 
-  public static async Task<Maybe<TResult>> MapAsync<T, TResult>(this Maybe<T> source, Func<T, Task<TResult>> map)
-  {
-    ArgumentNullException.ThrowIfNull(source);
-    ArgumentNullException.ThrowIfNull(map);
-    return await source.Match(
-      () => Task.FromResult(None.OfType<TResult>()),
-      async value => Some.From(await map(value)));
-  }
-
   public static async Task<Maybe<TResult>> MapAsync<T, TResult>(this Task<Maybe<T>> source, Func<T, TResult> map)
   {
     ArgumentNullException.ThrowIfNull(source);
@@ -40,17 +31,6 @@ public static class MaybeExtensions
     ArgumentNullException.ThrowIfNull(source);
     ArgumentNullException.ThrowIfNull(map);
     return await (await source).MapAsync(map);
-  }
-
-  public static async Task<Maybe<TResult>> FlatMapAsync<T, TResult>(
-    this Maybe<T> source,
-    Func<T, Task<Maybe<TResult>>> map)
-  {
-    ArgumentNullException.ThrowIfNull(source);
-    ArgumentNullException.ThrowIfNull(map);
-    return await source.Match(
-      () => Task.FromResult(None.OfType<TResult>()),
-      async value => await map(value));
   }
 
   public static async Task<Maybe<TResult>> FlatMapAsync<T, TResult>(
