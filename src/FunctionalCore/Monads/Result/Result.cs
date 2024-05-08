@@ -2,13 +2,11 @@ namespace FunctionalCore.Monads;
 
 using FunctionalCore.Failures;
 
-public readonly record struct Result<T>
+public readonly partial record struct Result<T>
 {
   private readonly IResult _resultType;
 
   private Result(IResult resultType) => _resultType = resultType;
-
-  private interface IResult;
 
   public TResult Match<TResult>(Func<Failure, TResult> failure, Func<T, TResult> success)
   {
@@ -65,8 +63,4 @@ public readonly record struct Result<T>
   internal static Result<T> Success(T value) => new(new SuccessType(value));
 
   internal static Result<T> Fail(Failure failure) => new(new FailureType(failure));
-
-  private readonly record struct FailureType(Failure Failure) : IResult;
-
-  private readonly record struct SuccessType(T Value) : IResult;
 }
