@@ -22,7 +22,7 @@ public static class StoreEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    GetStoresQuery query = new(pageSize ?? 10, pageNumber ?? 1, search ?? string.Empty);
+    GetStoresQuery query = new(pageSize, pageNumber, search);
     return (await sender.SendAsync(query, cancellationToken))
       .Map(page => page.MapToResponse())
       .Match(Handle, Results.Ok);
