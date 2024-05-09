@@ -7,28 +7,34 @@ using CommandHub.Commands;
 using EventStore.Client;
 using ExpenseExplorer.ReadModel.Commands;
 using ExpenseExplorer.ReadModel.Facts;
+using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 
 [SuppressMessage(
   "Performance",
   "CA1812:Avoid uninstantiated internal classes",
   Justification = "Instantiated by DI container")]
-internal sealed class FactProcessor(string connectionString, ISender sender) : BackgroundService
+internal sealed class FactProcessor(
+  string connectionString,
+  string postgresConnectionString,
+  ISender sender) : BackgroundService
 {
-  private const string _file = "lastProcessedPosition.txt";
   private readonly EventStoreClient _client = new(EventStoreClientSettings.Create(connectionString));
+  private readonly ExpenseExplorerContext _context = new(postgresConnectionString);
   private readonly ISender _sender = sender;
 
   public override void Dispose()
   {
     _client.Dispose();
+    _context.Dispose();
     base.Dispose();
   }
 
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
   {
-    Position lastProcessedPosition = await GetLastProcessedPositionAsync();
+    Position lastProcessedPosition = await GetLastProcessedPositionAsync(stoppingToken);
     EventStoreClient.StreamSubscriptionResult result = _client.SubscribeToAll(
       FromAll.After(lastProcessedPosition),
       cancellationToken: stoppingToken);
@@ -50,21 +56,25 @@ internal sealed class FactProcessor(string connectionString, ISender sender) : B
 
       await task;
       lastProcessedPosition = resolvedEvent.Event.Position;
-      await File.WriteAllTextAsync(_file, lastProcessedPosition.ToString(), stoppingToken);
+      await SavePositionAsync(lastProcessedPosition, stoppingToken);
     }
   }
 
-  private static async Task<Position> GetLastProcessedPositionAsync()
-    => FileWithPositionExists()
-      ? await ReadPositionFromFileAsync()
-      : Position.Start;
+  private async Task<Position> GetLastProcessedPositionAsync(CancellationToken cancellationToken)
+  {
+    Position position = await _context.Positions
+      .OrderByDescending(p => p.CommitPosition)
+      .Select(p => new Position(p.CommitPosition, p.PreparePosition))
+      .LastOrDefaultAsync(cancellationToken);
 
-  private static bool FileWithPositionExists() => File.Exists(_file);
+    return position == default ? Position.Start : position;
+  }
 
-  private static async Task<Position> ReadPositionFromFileAsync()
-    => Position.TryParse(await File.ReadAllTextAsync(_file), out Position? position)
-      ? position ?? Position.Start
-      : Position.Start;
+  private async Task SavePositionAsync(Position position, CancellationToken cancellationToken)
+  {
+    _context.Positions.Add(new DbPosition(position.CommitPosition, position.PreparePosition));
+    await _context.SaveChangesAsync(cancellationToken);
+  }
 
   private async Task HandleAsync<TCommand>(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
     where TCommand : ICommand<Unit>

@@ -22,17 +22,19 @@ public static class ReadModelDependencyInjection
     context.Database.Migrate();
   }
 
-  private static void AddFactProcessor(this IServiceCollection serviceCollection, IConfiguration configuration)
-  {
-    string? connectionString = configuration.GetConnectionString("EventStore");
-    ArgumentNullException.ThrowIfNull(connectionString);
-    serviceCollection.AddHostedService(sp => new FactProcessor(connectionString, sp.GetRequiredService<ISender>()));
-  }
-
   private static void AddReadModelDb(this IServiceCollection serviceCollection, IConfiguration configuration)
   {
     string? connectionString = configuration.GetConnectionString("Postgres");
     ArgumentNullException.ThrowIfNull(connectionString);
     serviceCollection.AddScoped<ExpenseExplorerContext>(_ => new ExpenseExplorerContext(connectionString));
+  }
+
+  private static void AddFactProcessor(this IServiceCollection serviceCollection, IConfiguration configuration)
+  {
+    string? connectionString = configuration.GetConnectionString("EventStore");
+    string? postgresConnectionString = configuration.GetConnectionString("Postgres");
+    ArgumentNullException.ThrowIfNull(connectionString);
+    ArgumentNullException.ThrowIfNull(postgresConnectionString);
+    serviceCollection.AddHostedService(sp => new FactProcessor(connectionString, postgresConnectionString, sp.GetRequiredService<ISender>()));
   }
 }
