@@ -7,6 +7,8 @@ public sealed class ExpenseExplorerContext(string connectionString) : DbContext
 {
   private readonly string _connectionString = connectionString;
 
+  public DbSet<DbPosition> Positions { get; set; } = default!;
+
   public DbSet<DbReceipt> Receipts { get; set; } = default!;
 
   public DbSet<DbPurchase> Purchases { get; set; } = default!;
@@ -24,5 +26,8 @@ public sealed class ExpenseExplorerContext(string connectionString) : DbContext
       .WithOne()
       .HasForeignKey(p => p.ReceiptId)
       .IsRequired();
+
+    modelBuilder.Entity<DbPosition>()
+      .HasKey(p => new { p.CommitPosition, p.PreparePosition });
   }
 }
