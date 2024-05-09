@@ -1,7 +1,6 @@
 namespace ExpenseExplorer.ReadModel.Commands;
 
 using CommandHub.Commands;
-using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore;
 using Microsoft.EntityFrameworkCore;
 
