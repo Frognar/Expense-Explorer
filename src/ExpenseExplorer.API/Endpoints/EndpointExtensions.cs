@@ -7,6 +7,7 @@ public static class EndpointExtensions
     return endpointRouteBuilder
       .MapReceiptEndpoints()
       .MapStoreEndpoints()
+      .MapItemEndpoints()
       .MapReportEndpoints();
   }
 }
