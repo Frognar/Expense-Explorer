@@ -8,6 +8,7 @@ public static class EndpointExtensions
       .MapReceiptEndpoints()
       .MapStoreEndpoints()
       .MapItemEndpoints()
+      .MapCategoryEndpoints()
       .MapReportEndpoints();
   }
 }
