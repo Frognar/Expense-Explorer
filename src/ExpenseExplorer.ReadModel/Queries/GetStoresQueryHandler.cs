@@ -31,7 +31,7 @@ public sealed class GetStoresQueryHandler(ExpenseExplorerContext context)
 
       int totalCount = await storeNames.CountAsync(cancellationToken);
       List<Store> storeList = await storeNames
-        .Filter(StoreContains(query.Search))
+        .WhereContains(query.Search)
         .GetPage(query.PageNumber, query.PageSize)
         .Select(name => new Store(name))
         .ToListAsync(cancellationToken);
@@ -43,24 +43,5 @@ public sealed class GetStoresQueryHandler(ExpenseExplorerContext context)
     {
       return Fail.OfType<PageOf<Store>>(Failure.Fatal(ex));
     }
-  }
-
-  private static Expression<Func<string, bool>> StoreContains(string search)
-  {
-    if (string.IsNullOrWhiteSpace(search))
-    {
-      return s => true;
-    }
-
-    search = search.ToUpperInvariant();
-
-    // EFCore does not support StringComparison and CultureInfo enums in LINQ queries
-#pragma warning disable CA1304
-#pragma warning disable CA1311
-#pragma warning disable CA1862
-    return storeName => storeName.ToUpper().Contains(search);
-#pragma warning restore CA1862
-#pragma warning restore CA1311
-#pragma warning restore CA1304
   }
 }

@@ -29,4 +29,22 @@ public static class QueryableExtensions
     IQueryable<T> filtered = source.Where(predicate);
     return predicates.Aggregate(filtered, (current, p) => current.Where(p));
   }
+
+  public static IQueryable<string> WhereContains(this IQueryable<string> source, string search)
+  {
+    ArgumentNullException.ThrowIfNull(source);
+    if (string.IsNullOrWhiteSpace(search))
+    {
+      return source;
+    }
+
+    search = search.ToUpperInvariant();
+#pragma warning disable CA1304
+#pragma warning disable CA1311
+#pragma warning disable CA1862
+    return source.Where(str => str.ToUpper().Contains(search));
+#pragma warning restore CA1862
+#pragma warning restore CA1311
+#pragma warning restore CA1304
+  }
 }
