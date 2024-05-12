@@ -65,7 +65,7 @@ internal sealed class FactProcessor(
     Position position = await _context.Positions
       .OrderByDescending(p => p.CommitPosition)
       .Select(p => new Position(p.CommitPosition, p.PreparePosition))
-      .LastOrDefaultAsync(cancellationToken);
+      .FirstOrDefaultAsync(cancellationToken);
 
     return position == default ? Position.Start : position;
   }
