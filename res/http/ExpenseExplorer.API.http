@@ -1,8 +1,9 @@
 @ExpenseExplorer.API_HostAddress = https://localhost:7163
-@receiptId = 2ef4858817ba457ebd97fb91892165df
-@purchaseId = 10a78662fb5b41a69f65048ca475ce96
+@receiptId = 874bf4516eb44b969338e6535cae355c
+@purchaseId = 6ca96c9a0bf34273abeae223afbfa330
 
-GET {{ExpenseExplorer.API_HostAddress}}/api/receipts?pageNumber=1&pageSize=10
+GET {{ExpenseExplorer.API_HostAddress}}/api/receipts?pageNumber=1&pageSize=10&search=stc&after=2021-10-02&
+    before=2021-10-02&minTotal=1&maxTotal=10
 
 ###
 
@@ -14,8 +15,8 @@ POST {{ExpenseExplorer.API_HostAddress}}/api/receipts
 Content-Type: application/json
 
 {
-  "storeName": "Store",
-  "purchaseDate": "2024-03-01"
+  "storeName": "Walmart",
+  "purchaseDate": "2021-10-01"
 }
 
 ###
@@ -24,8 +25,8 @@ PATCH {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}
 Content-Type: application/json
 
 {
-  "storeName": "New Store",
-  "purchaseDate": "2024-04-01"
+  "storeName": "Costco",
+  "purchaseDate": "2021-10-02"
 }
 
 ###
@@ -34,12 +35,12 @@ POST {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}/purchases
 Content-Type: application/json
 
 {
-  "item": "Item",
-  "Category": "General",
-  "quantity": 5,
-  "unitPrice": 5.59,
-  "totalDiscount": 0.8,
-  "description": "Some description"
+  "item": "Milk",
+  "Category": "Groceries",
+  "quantity": 2,
+  "unitPrice": 2.5,
+  "totalDiscount": 0.5,
+  "description": "2% milk"
 }
 
 ###
@@ -48,12 +49,12 @@ PATCH {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}/purchases/{
 Content-Type: application/json
 
 {
-  "item": "New Item",
-  "Category": "New Category",
+  "item": "Coca Cola",
+  "Category": "Treats",
   "quantity": 1,
-  "unitPrice": 2.59,
-  "totalDiscount": 1.8,
-  "description": "Some other description"
+  "unitPrice": 1.5,
+  "totalDiscount": 0,
+  "description": "Coke"
 }
 
 ###
@@ -66,8 +67,16 @@ DELETE {{ExpenseExplorer.API_HostAddress}}/api/receipts/{{receiptId}}
 
 ###
 
-GET {{ExpenseExplorer.API_HostAddress}}/api/stores?pageNumber=1&pageSize=10
+GET {{ExpenseExplorer.API_HostAddress}}/api/stores?pageNumber=1&pageSize=10&search=cos
 
 ###
 
-GET {{ExpenseExplorer.API_HostAddress}}/api/reports?from=2024-03-01&to=2024-03-20
+GET {{ExpenseExplorer.API_HostAddress}}/api/items?pageNumber=1&pageSize=10&search=cola
+
+###
+
+GET {{ExpenseExplorer.API_HostAddress}}/api/categories?pageNumber=1&pageSize=10&search=tre
+
+###
+
+GET {{ExpenseExplorer.API_HostAddress}}/api/reports?from=2021-10-01&to=2021-10-31

@@ -12,17 +12,18 @@ Expense Explorer is a simple expense tracking application designed to run on a h
 
 ## Features
 
-- **Add Receipts:** Users can easily add receipts along with all items.
-- **Edit Receipts:** Receipts can be edited to update details or add/remove items.
-- **Category Assignment:** Items can be assigned to specific categories during entry into the system by users.
-- **Browse Receipts:** Users can browse through saved receipts effortlessly.
-- **Expense Reports:** Generate reports to visualize total spending and spending by category within any given time range.
+- [x] **Receipt Management:** Add, edit, and delete receipts.
+- [x] **Purchase Management:** Add, edit, and delete purchases associated with receipts.
+- [X] **Browse Receipts:** View and search through receipts based on store, date, and total amount.
+- [x] **Browse Stores, Items, and Categories:** View and search through stores, items, and categories used in receipts
+  and purchases.
+- [x] **Reporting:** Generate category-wise expense reports for a given date range.
 
 ## Nice to Have
 
-- **GUI:** A simple web-based GUI to interact with the application.
-- **OCR Integration:** Automatically extract receipt details using OCR.
-- **Income Tracking:** Track income and compare with expenses.
+- [ ] **GUI:** A simple web-based GUI to interact with the application.
+- [ ] **OCR Integration:** Automatically extract receipt details using OCR.
+- [ ] **Income Tracking:** Track income and compare with expenses.
 
 ## Note
 
@@ -35,6 +36,7 @@ I know that instead of implementing certain functionalities myself, I should use
 ## Getting Started
 
 The project is currently under development. Stay tuned for future updates on setup and usage instructions.
+API is already implemented and can be used, [documentation](#API) is available below.
 
 1. **Clone the Repository:** Begin by cloning the Expense Explorer repository to your local machine:
     ```bash
@@ -59,11 +61,256 @@ The project is currently under development. Stay tuned for future updates on set
    can interact with the receipt endpoints by sending HTTP requests to `/api/receipts`. You can use tools like Postman
    or curl to make requests.
 
-Request:
-> ![add receipt request](res/imgs/addReceiptRequest.png)
+## API
 
-Response:
-> ![add receipt response](res/imgs/addReceiptResponse.png)
+### Receipts
+
+#### Add Receipt
+
+- **URL:** `/api/receipts`
+- **Method:** `POST`
+- **Request Body:**
+    ```json
+    {
+        "storeName": "Walmart",
+        "purchaseDate": "2021-10-01"
+    }
+    ```
+- **Response Body:**
+    ```json
+    {
+        "id": "386c7c4014304b039d23f99fe9d9869e",
+        "storeName": "Walmart",
+        "purchaseDate": "2021-10-01",
+        "version": 0
+    }
+    ```
+
+#### Edit Receipt
+
+- **URL:** `/api/receipts/{id}`
+- **Method:** `PATCH`
+- **Request Body:**
+    ```json
+    {
+        "storeName": "Costco",        // optional
+        "purchaseDate": "2021-10-02"  // optional
+    }
+    ```
+- **Response Body:**
+    ```json
+    {
+        "id": "386c7c4014304b039d23f99fe9d9869e",
+        "storeName": "Costco",
+        "purchaseDate": "2021-10-02",
+        "version": 2
+    }
+    ```
+
+#### Delete Receipt
+
+- **URL:** `/api/receipts/{id}`
+- **Method:** `DELETE`
+
+#### Add Purchase
+
+- **URL:** `/api/receipts/{id}/purchases`
+- **Method:** `POST`
+- **Request Body:**
+    ```json
+    {
+      "item": "Milk",
+      "Category": "Groceries",
+      "quantity": 2,
+      "unitPrice": 2.5,
+      "totalDiscount": 0.5,
+      "description": "2% milk"
+    }
+    ```
+- **Response Body:**
+    ```json
+    {
+        "id": "386c7c4014304b039d23f99fe9d9869e",
+        "storeName": "Costco",
+        "purchaseDate": "2021-10-02",
+        "purchases": [
+            {
+                "id": "bd0e0d05518d486dbbfce32df7e6da3b",
+                "item": "Milk",
+                "category": "Groceries",
+                "quantity": 2,
+                "unitPrice": 2.5,
+                "totalDiscount": 0.5,
+                "description": "2% milk"
+            }
+        ],
+        "version": 3
+    }
+    ```
+
+#### Edit Purchase
+
+- **URL:** `/api/receipts/{id}/purchases/{purchaseId}`
+- **Method:** `PATCH`
+- **Request Body:**
+    ```json
+    {
+        "item": "Coca Cola",    // optional
+        "Category": "Treats",   // optional
+        "quantity": 1,          // optional
+        "unitPrice": 1.5,       // optional
+        "totalDiscount": 0,     // optional
+        "description": "Coke"   // optional
+    }
+    ```
+- **Response Body:**
+    ```json
+    {
+        "id": "386c7c4014304b039d23f99fe9d9869e",
+        "storeName": "Costco",
+        "purchaseDate": "2021-10-02",
+        "purchases": [
+            {
+                "id": "bd0e0d05518d486dbbfce32df7e6da3b",
+                "item": "Coca Cola",
+                "category": "Treats",
+                "quantity": 1,
+                "unitPrice": 1.5,
+                "totalDiscount": 0,
+                "description": "Coke"
+            }
+        ],
+        "version": 4
+    }
+    ```
+
+#### Delete Purchase
+
+- **URL:** `/api/receipts/{id}/purchases/{purchaseId}`
+- **Method:** `DELETE`
+
+#### Get Receipts
+
+- **URL:** `/api/receipts?pageNumber=1&pageSize=10&search=stc&after=2021-10-02&before=2021-10-02&minTotal=1&maxTotal=10`
+- **Method:** `GET`
+- **Response Body:**
+    ```json
+    {
+        "receipts": [
+            {
+                "id": "386c7c4014304b039d23f99fe9d9869e",
+                "store": "Costco",
+                "purchaseDate": "2021-10-02",
+                "total": 1.5
+            }
+        ],
+        "totalCount": 1,
+        "pageSize": 10,
+        "pageNumber": 1,
+        "pageCount": 1
+    }
+    ```
+
+#### Get Receipt
+
+- **URL:** `/api/receipts/{id}`
+- **Method:** `GET`
+- **Response Body:**
+    ```json
+    {
+        "id": "386c7c4014304b039d23f99fe9d9869e",
+        "store": "Costco",
+        "purchaseDate": "2021-10-02",
+        "total": 1.5,
+        "purchases": [
+            {
+                "id": "bd0e0d05518d486dbbfce32df7e6da3b",
+                "item": "Coca Cola",
+                "category": "Treats",
+                "quantity": 1,
+                "unitPrice": 1.5,
+                "totalDiscount": 0,
+                "description": "Coke"
+            }
+        ]
+    }
+    ```
+
+### Reports
+
+#### Get Report
+
+- **URL:** `/api/report?from=2021-10-01&to=2021-10-31`
+- **Method:** `GET`
+- **Response Body:**
+    ```json
+    {
+        "total": 1.5,
+        "categories": [
+            {
+                "category": "Treats",
+                "total": 1.5
+            }
+        ]
+    }
+    ```
+
+### Stores
+
+#### Get Stores
+
+- **URL:** `/api/stores?pageNumber=1&pageSize=10&search=cos`
+- **Method:** `GET`
+- **Response Body:**
+    ```json
+    {
+        "stores": [
+          "Costco"
+        ],
+        "totalCount": 1,
+        "pageSize": 10,
+        "pageNumber": 1,
+        "pageCount": 1
+    }
+    ```
+
+### Items
+
+#### Get Items
+
+- **URL:** `/api/items?pageNumber=1&pageSize=10&search=cola`
+- **Method:** `GET`
+- **Response Body:**
+    ```json
+    {
+        "items": [
+          "Coca Cola"
+        ],
+        "totalCount": 1,
+        "pageSize": 10,
+        "pageNumber": 1,
+        "pageCount": 1
+    }
+    ```
+
+### Categories
+
+#### Get Categories
+
+- **URL:** `/api/categories?pageNumber=1&pageSize=10&search=tre`
+- **Method:** `GET`
+- **Response Body:**
+    ```json
+    {
+        "categories": [
+          "Treats"
+        ],
+        "totalCount": 1,
+        "pageSize": 10,
+        "pageNumber": 1,
+        "pageCount": 1
+    }
+    ```
 
 ## Contributing
 
