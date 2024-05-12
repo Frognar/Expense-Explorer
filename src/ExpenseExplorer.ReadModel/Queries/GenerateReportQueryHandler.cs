@@ -28,7 +28,9 @@ public sealed class GenerateReportQueryHandler(ExpenseExplorerContext context)
         .ThenBy(d => d.Category)
         .ToDictionaryAsync(d => d.Category, d => d.TotalCost, cancellationToken);
 
-      Report report = new(data);
+      decimal total = data.Values.Sum();
+      List<ReportEntry> reportEntries = data.Select(d => new ReportEntry(d.Key, d.Value)).ToList();
+      Report report = new(total, reportEntries);
       return Success.From(report);
     }
     catch (DbException ex)

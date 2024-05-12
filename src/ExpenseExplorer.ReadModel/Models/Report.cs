@@ -1,3 +1,3 @@
 namespace ExpenseExplorer.ReadModel.Models;
 
-public sealed record Report(Dictionary<string, decimal> Data);
+public sealed record Report(decimal Total, IEnumerable<ReportEntry> Categories);

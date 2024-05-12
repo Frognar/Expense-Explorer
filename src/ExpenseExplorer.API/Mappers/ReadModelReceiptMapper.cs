@@ -62,7 +62,13 @@ public static class ReadModelReceiptMapper
   public static GenerateReportResponse MapToResponse(this ReadModel.Models.Report report)
   {
     ArgumentNullException.ThrowIfNull(report);
-    return new GenerateReportResponse(report.Data);
+    return new GenerateReportResponse(report.Total, report.Categories.Select(MapToResponse));
+  }
+
+  private static ReportEntryResponse MapToResponse(this ReadModel.Models.ReportEntry entry)
+  {
+    ArgumentNullException.ThrowIfNull(entry);
+    return new ReportEntryResponse(entry.Category, entry.Total);
   }
 
   private static GetReceiptPurchaseResponse MapToResponse(this ReadModel.Models.Purchase purchase)

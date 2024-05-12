@@ -1,3 +1,3 @@
 namespace ExpenseExplorer.API.Contract.ReadModel;
 
-public record GenerateReportResponse(Dictionary<string, decimal> Data);
+public record GenerateReportResponse(decimal Total, IEnumerable<ReportEntryResponse> Categories);
