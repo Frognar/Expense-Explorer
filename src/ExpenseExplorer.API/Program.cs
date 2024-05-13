@@ -1,12 +1,14 @@
 using CommandHub.DependencyInjection;
 using ExpenseExplorer.API.Endpoints;
+using ExpenseExplorer.API.Middlewares;
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Infrastructure;
 using ExpenseExplorer.ReadModel;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddConfiguration(
-  new ConfigurationBuilder().SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+  new ConfigurationBuilder()
+    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
     .AddJsonFile("appsettings.json")
     .Build());
 
@@ -20,9 +22,14 @@ builder.Services.AddCommandHub(
   typeof(ApplicationDependencyInjection).Assembly,
   typeof(ReadModelDependencyInjection).Assembly);
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 WebApplication app = builder.Build();
 
 app.UseHttpsRedirection();
+
+app.UseExceptionHandler();
 
 app.ConfigureReadModel();
 
