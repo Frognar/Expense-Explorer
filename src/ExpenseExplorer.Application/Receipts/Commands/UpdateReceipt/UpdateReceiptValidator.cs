@@ -9,7 +9,7 @@ internal static class UpdateReceiptValidator
   public static Result<ReceiptPatchModel> Validate(UpdateReceiptCommand command)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Func<Maybe<Store>, Maybe<PurchaseDate>, DateOnly, ReceiptPatchModel> createPatchModel
+    Func<Maybe<Store>, Maybe<NonFutureDate>, DateOnly, ReceiptPatchModel> createPatchModel
       = ReceiptPatchModel.Create;
 
     return createPatchModel
@@ -32,16 +32,16 @@ internal static class UpdateReceiptValidator
         store => Validation.Succeeded(Some.From(store)));
   }
 
-  private static Validated<Maybe<PurchaseDate>> Validate(DateOnly? date, DateOnly today)
+  private static Validated<Maybe<NonFutureDate>> Validate(DateOnly? date, DateOnly today)
   {
     if (!date.HasValue)
     {
-      return Validation.Succeeded(None.OfType<PurchaseDate>());
+      return Validation.Succeeded(None.OfType<NonFutureDate>());
     }
 
-    return PurchaseDate.TryCreate(date.Value, today)
+    return NonFutureDate.TryCreate(date.Value, today)
       .Match(
-        () => Validation.Failed<Maybe<PurchaseDate>>(CommonFailures.FutureDate),
+        () => Validation.Failed<Maybe<NonFutureDate>>(CommonFailures.FutureDate),
         purchaseDate => Validation.Succeeded(Some.From(purchaseDate)));
   }
 }

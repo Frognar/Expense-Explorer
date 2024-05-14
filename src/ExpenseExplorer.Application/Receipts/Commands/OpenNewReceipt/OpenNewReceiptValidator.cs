@@ -10,7 +10,7 @@ internal static class OpenNewReceiptValidator
   public static Result<Receipt> Validate(OpenNewReceiptCommand command)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Func<Store, PurchaseDate, DateOnly, Receipt> createReceipt = Receipt.New;
+    Func<Store, NonFutureDate, DateOnly, Receipt> createReceipt = Receipt.New;
     return createReceipt
       .Apply(Validate(command.StoreName))
       .Apply(Validate(command.PurchaseDate, command.Today))
@@ -26,11 +26,11 @@ internal static class OpenNewReceiptValidator
         Validation.Succeeded);
   }
 
-  private static Validated<PurchaseDate> Validate(DateOnly purchaseDate, DateOnly today)
+  private static Validated<NonFutureDate> Validate(DateOnly purchaseDate, DateOnly today)
   {
-    return PurchaseDate.TryCreate(purchaseDate, today)
+    return NonFutureDate.TryCreate(purchaseDate, today)
       .Match(
-        () => Validation.Failed<PurchaseDate>(CommonFailures.FutureDate),
+        () => Validation.Failed<NonFutureDate>(CommonFailures.FutureDate),
         Validation.Succeeded);
   }
 }

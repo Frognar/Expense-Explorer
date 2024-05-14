@@ -3,7 +3,6 @@ namespace ExpenseExplorer.Domain.Facts;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using ExpenseExplorer.Domain.Receipts.Facts;
 
 public static class FactSerializer
 {
@@ -18,6 +17,7 @@ public static class FactSerializer
       Receipts.Facts.PurchaseDetailsChanged purchaseDetailsChanged => Serialize(purchaseDetailsChanged),
       Receipts.Facts.PurchaseRemoved purchaseRemoved => Serialize(purchaseRemoved),
       Receipts.Facts.ReceiptDeleted receiptDeleted => Serialize(receiptDeleted),
+      Incomes.Facts.IncomeCreated incomeCreated => Serialize(incomeCreated),
       _ => throw new UnreachableException(),
     };
   }
@@ -33,6 +33,7 @@ public static class FactSerializer
       FactTypes.PurchaseDetailsChangedFactType => Deserialize<Receipts.Facts.PurchaseDetailsChanged>(data),
       FactTypes.PurchaseRemovedFactType => Deserialize<Receipts.Facts.PurchaseRemoved>(data),
       FactTypes.ReceiptDeletedFactType => Deserialize<Receipts.Facts.ReceiptDeleted>(data),
+      FactTypes.IncomeCreatedFactType => Deserialize<Incomes.Facts.IncomeCreated>(data),
       _ => throw new UnreachableException(),
     };
   }

@@ -8,8 +8,8 @@ using FunctionalCore.Monads;
 
 public class ReceiptTests
 {
-  [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator)])]
-  public void CanBeCreated(PurchaseDate purchaseDate, Store store)
+  [Property(Arbitrary = [typeof(NonFutureDateGenerator), typeof(StoreGenerator)])]
+  public void CanBeCreated(NonFutureDate purchaseDate, Store store)
   {
     Receipt receipt = Receipt.New(store, purchaseDate, purchaseDate.Date);
     receipt.Should().NotBeNull();
@@ -19,8 +19,8 @@ public class ReceiptTests
     receipt.Version.Should().Be(Version.Create(ulong.MaxValue));
   }
 
-  [Property(Arbitrary = [typeof(PurchaseDateGenerator), typeof(StoreGenerator)])]
-  public void ProducesReceiptCreatedFactWhenCreated(PurchaseDate purchaseDate, Store store)
+  [Property(Arbitrary = [typeof(NonFutureDateGenerator), typeof(StoreGenerator)])]
+  public void ProducesReceiptCreatedFactWhenCreated(NonFutureDate purchaseDate, Store store)
   {
     Receipt receipt = Receipt.New(store, purchaseDate, purchaseDate.Date);
     receipt.UnsavedChanges.Count().Should().Be(1);
@@ -86,8 +86,8 @@ public class ReceiptTests
     purchaseAdded.Description.Should().Be(last.Description.Value);
   }
 
-  [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(PurchaseDateGenerator)])]
-  public void CanChangePurchaseDate(Receipt receipt, PurchaseDate newPurchaseDate)
+  [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(NonFutureDateGenerator)])]
+  public void CanChangePurchaseDate(Receipt receipt, NonFutureDate newPurchaseDate)
   {
     receipt
       .ChangePurchaseDate(newPurchaseDate, newPurchaseDate.Date)
@@ -96,8 +96,8 @@ public class ReceiptTests
       .Be(newPurchaseDate);
   }
 
-  [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(PurchaseDateGenerator)])]
-  public void ProducesPurchaseDateChangedFactWhenPurchaseDateChanged(Receipt receipt, PurchaseDate newPurchaseDate)
+  [Property(Arbitrary = [typeof(ReceiptGenerator), typeof(NonFutureDateGenerator)])]
+  public void ProducesPurchaseDateChangedFactWhenPurchaseDateChanged(Receipt receipt, NonFutureDate newPurchaseDate)
   {
     receipt = receipt.ChangePurchaseDate(newPurchaseDate, newPurchaseDate.Date);
     PurchaseDateChanged purchaseDateChanged = receipt.UnsavedChanges.OfType<PurchaseDateChanged>().Single();

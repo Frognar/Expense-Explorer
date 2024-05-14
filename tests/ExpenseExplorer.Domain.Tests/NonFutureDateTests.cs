@@ -1,11 +1,11 @@
 namespace ExpenseExplorer.Domain.Tests;
 
-public class PurchaseDateTests
+public class NonFutureDateTests
 {
   [Property(Arbitrary = [typeof(DateOnlyGenerator)])]
   public void SetsDate(DateOnly date)
   {
-    PurchaseDate.TryCreate(date, date)
+    NonFutureDate.TryCreate(date, date)
       .Match(() => DateOnly.MinValue, d => d.Date)
       .Should()
       .Be(date);
@@ -14,7 +14,7 @@ public class PurchaseDateTests
   [Property(Arbitrary = [typeof(DateOnlyGenerator)])]
   public void ReturnsNoneWhenDateIsInTheFuture(DateOnly date)
   {
-    PurchaseDate.TryCreate(date.AddDays(1), date)
+    NonFutureDate.TryCreate(date.AddDays(1), date)
       .Match(() => DateOnly.MinValue, d => d.Date)
       .Should()
       .Be(DateOnly.MinValue);
@@ -23,7 +23,7 @@ public class PurchaseDateTests
   [Fact]
   public void CanCreateMinimumDate()
   {
-    PurchaseDate.MinValue.Date
+    NonFutureDate.MinValue.Date
       .Should()
       .Be(DateOnly.MinValue);
   }

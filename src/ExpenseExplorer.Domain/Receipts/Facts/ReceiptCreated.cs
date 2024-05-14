@@ -1,10 +1,11 @@
 namespace ExpenseExplorer.Domain.Receipts.Facts;
 
+using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public sealed record ReceiptCreated(string Id, string Store, DateOnly PurchaseDate, DateOnly CreatedDate) : Fact
 {
-  public static ReceiptCreated Create(Id id, Store store, PurchaseDate purchaseDate, DateOnly createdDate)
+  public static ReceiptCreated Create(Id id, Store store, NonFutureDate purchaseDate, DateOnly createdDate)
   {
     ArgumentNullException.ThrowIfNull(id);
     ArgumentNullException.ThrowIfNull(store);
