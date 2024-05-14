@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.Domain.Facts;
 
 using System.Diagnostics;
+using ExpenseExplorer.Domain.Incomes.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 
 public static class FactTypes
@@ -12,6 +13,7 @@ public static class FactTypes
   public const string PurchaseDetailsChangedFactType = "PURCHASE_DETAILS_CHANGED";
   public const string PurchaseRemovedFactType = "PURCHASE_REMOVED";
   public const string ReceiptDeletedFactType = "RECEIPT_DELETED";
+  public const string IncomeCreatedFactType = "INCOME_CREATED";
 
   public static string GetFactType(Fact fact)
   {
@@ -24,6 +26,7 @@ public static class FactTypes
       PurchaseDetailsChanged => PurchaseDetailsChangedFactType,
       PurchaseRemoved => PurchaseRemovedFactType,
       ReceiptDeleted => ReceiptDeletedFactType,
+      IncomeCreated => IncomeCreatedFactType,
       _ => throw new UnreachableException(),
     };
   }

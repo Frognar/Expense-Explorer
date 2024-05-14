@@ -1,5 +1,7 @@
 namespace ExpenseExplorer.Domain.Tests;
 
+using ExpenseExplorer.Domain.Incomes.Facts;
+
 public class FactTypesTests
 {
   [Fact]
@@ -59,6 +61,13 @@ public class FactTypesTests
   {
     Fact fact = new ReceiptDeleted("id");
     AssertFactType(fact, FactTypes.ReceiptDeletedFactType);
+  }
+
+  [Fact]
+  public void GetTypeForIncomeCreated()
+  {
+    Fact fact = new IncomeCreated("id", "s", 1, new DateOnly(2000, 1, 1), "c", "d", new DateOnly(2001, 1, 1));
+    AssertFactType(fact, FactTypes.IncomeCreatedFactType);
   }
 
   private static void AssertFactType(Fact fact, string expectedType)

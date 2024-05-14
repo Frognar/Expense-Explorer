@@ -1,5 +1,7 @@
 namespace ExpenseExplorer.Domain.Tests;
 
+using ExpenseExplorer.Domain.Incomes.Facts;
+
 public class FactSerializerTests
 {
   [Fact]
@@ -78,8 +80,7 @@ public class FactSerializerTests
     byte[] data = FactSerializer.Serialize(fact);
 
     data.Should()
-      .BeEquivalentTo(
-        "{\"ReceiptId\":\"id\",\"PurchaseDate\":\"2000-01-01\",\"RequestedDate\":\"2001-01-01\"}"u8.ToArray());
+      .BeEquivalentTo("{\"ReceiptId\":\"id\",\"PurchaseDate\":\"2000-01-01\",\"RequestedDate\":\"2001-01-01\"}"u8.ToArray());
   }
 
   [Fact]
@@ -180,6 +181,31 @@ public class FactSerializerTests
     Fact fact = FactSerializer.Deserialize(FactTypes.ReceiptDeletedFactType, data);
 
     fact.Should().BeOfType<ReceiptDeleted>();
+  }
+
+  [Fact]
+  public void SerializeIncomeCreated()
+  {
+    Fact fact = new IncomeCreated("id", "s", 1, new DateOnly(2000, 1, 1), "c", "d", new DateOnly(2001, 1, 1));
+
+    byte[] data = FactSerializer.Serialize(fact);
+
+    data.Should()
+      .BeEquivalentTo(
+        "{\"IncomeId\":\"id\",\"Source\":\"s\",\"Amount\":1,\"ReceivedDate\":\"2000-01-01\",\"Category\":\"c\",\"Description\":\"d\",\"CreatedDate\":\"2001-01-01\"}"u8
+          .ToArray());
+  }
+
+  [Fact]
+  public void DeserializeIncomeCreated()
+  {
+    byte[] data
+      = "{\"IncomeId\":\"id\",\"Source\":\"s\",\"Amount\":1,\"ReceivedDate\":\"2000-01-01\",\"Category\":\"c\",\"Description\":\"d\",\"CreatedDate\":\"2001-01-01\"}"u8
+        .ToArray();
+
+    Fact fact = FactSerializer.Deserialize(FactTypes.IncomeCreatedFactType, data);
+
+    fact.Should().BeOfType<IncomeCreated>();
   }
 
   private sealed record UnknownFact : Fact;
