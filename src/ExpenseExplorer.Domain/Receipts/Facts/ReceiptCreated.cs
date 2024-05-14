@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.Domain.Receipts.Facts;
 
+using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public sealed record ReceiptCreated(string Id, string Store, DateOnly PurchaseDate, DateOnly CreatedDate) : Fact

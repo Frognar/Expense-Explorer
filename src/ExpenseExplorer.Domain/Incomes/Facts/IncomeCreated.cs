@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Domain.Incomes.Facts;
 
-using ExpenseExplorer.Domain.Receipts.Facts;
+using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public sealed record IncomeCreated(

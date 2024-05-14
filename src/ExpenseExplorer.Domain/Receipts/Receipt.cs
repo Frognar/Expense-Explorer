@@ -1,5 +1,6 @@
 namespace ExpenseExplorer.Domain.Receipts;
 
+using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Failures;

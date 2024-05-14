@@ -3,7 +3,6 @@ namespace ExpenseExplorer.Domain.Facts;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using ExpenseExplorer.Domain.Receipts.Facts;
 
 public static class FactSerializer
 {
