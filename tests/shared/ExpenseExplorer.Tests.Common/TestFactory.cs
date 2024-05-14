@@ -14,8 +14,8 @@ public static class TestFactory
     return Domain.ValueObjects.Store.TryCreate(store).ForceValue();
   }
 
-  public static PurchaseDate PurchaseDate(DateOnly date)
+  public static NonFutureDate PurchaseDate(DateOnly date)
   {
-    return Domain.ValueObjects.PurchaseDate.TryCreate(date, date).ForceValue();
+    return Domain.ValueObjects.NonFutureDate.TryCreate(date, date).ForceValue();
   }
 }

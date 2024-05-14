@@ -10,7 +10,7 @@ public sealed record Receipt
   private Receipt(
     Id id,
     Store store,
-    PurchaseDate purchaseDate,
+    NonFutureDate purchaseDate,
     ICollection<Purchase> purchases,
     IEnumerable<Fact> unsavedChanges,
     Version version)
@@ -27,7 +27,7 @@ public sealed record Receipt
 
   public Store Store { get; private init; }
 
-  public PurchaseDate PurchaseDate { get; private init; }
+  public NonFutureDate PurchaseDate { get; private init; }
 
   public ICollection<Purchase> Purchases { get; private init; }
 
@@ -35,7 +35,7 @@ public sealed record Receipt
 
   public Version Version { get; private init; }
 
-  public static Receipt New(Store store, PurchaseDate purchaseDate, DateOnly createdDate)
+  public static Receipt New(Store store, NonFutureDate purchaseDate, DateOnly createdDate)
   {
     Id id = Id.Unique();
     Fact receiptCreated = ReceiptCreated.Create(id, store, purchaseDate, createdDate);
@@ -52,8 +52,7 @@ public sealed record Receipt
         .Map(r => r with { Version = version });
     }
 
-    return Fail.OfType<Receipt>(
-      Failure.Fatal(new ArgumentException("First fact must be a ReceiptCreated fact.", nameof(facts))));
+    return Fail.OfType<Receipt>(Failure.Fatal(new ArgumentException("First fact must be a ReceiptCreated fact.", nameof(facts))));
   }
 
   public Receipt ClearChanges()
@@ -67,22 +66,16 @@ public sealed record Receipt
     return this with { Store = store, UnsavedChanges = UnsavedChanges.Append(storeCorrected).ToList() };
   }
 
-  public Receipt ChangePurchaseDate(PurchaseDate purchaseDate, DateOnly requestedDate)
+  public Receipt ChangePurchaseDate(NonFutureDate purchaseDate, DateOnly requestedDate)
   {
     Fact purchaseDateChanged = PurchaseDateChanged.Create(Id, purchaseDate, requestedDate);
-    return this with
-    {
-      PurchaseDate = purchaseDate, UnsavedChanges = UnsavedChanges.Append(purchaseDateChanged).ToList(),
-    };
+    return this with { PurchaseDate = purchaseDate, UnsavedChanges = UnsavedChanges.Append(purchaseDateChanged).ToList(), };
   }
 
   public Receipt AddPurchase(Purchase purchase)
   {
     Fact purchaseAdded = PurchaseAdded.Create(Id, purchase);
-    return this with
-    {
-      Purchases = Purchases.Append(purchase).ToList(), UnsavedChanges = UnsavedChanges.Append(purchaseAdded).ToList(),
-    };
+    return this with { Purchases = Purchases.Append(purchase).ToList(), UnsavedChanges = UnsavedChanges.Append(purchaseAdded).ToList(), };
   }
 
   public Receipt UpdatePurchaseDetails(Purchase purchase)
@@ -91,8 +84,7 @@ public sealed record Receipt
     Fact purchaseDetailsChanged = PurchaseDetailsChanged.Create(Id, purchase);
     return this with
     {
-      Purchases = Purchases.Select(p => p.Id == purchase.Id ? purchase : p).ToList(),
-      UnsavedChanges = UnsavedChanges.Append(purchaseDetailsChanged).ToList(),
+      Purchases = Purchases.Select(p => p.Id == purchase.Id ? purchase : p).ToList(), UnsavedChanges = UnsavedChanges.Append(purchaseDetailsChanged).ToList(),
     };
   }
 
@@ -100,11 +92,7 @@ public sealed record Receipt
   {
     ArgumentNullException.ThrowIfNull(purchaseId);
     Fact purchaseRemoved = PurchaseRemoved.Create(Id, purchaseId);
-    return this with
-    {
-      Purchases = Purchases.Where(p => p.Id != purchaseId).ToList(),
-      UnsavedChanges = UnsavedChanges.Append(purchaseRemoved).ToList(),
-    };
+    return this with { Purchases = Purchases.Where(p => p.Id != purchaseId).ToList(), UnsavedChanges = UnsavedChanges.Append(purchaseRemoved).ToList(), };
   }
 
   public Receipt Delete()
@@ -127,8 +115,7 @@ public sealed record Receipt
       PurchaseDetailsChanged purchaseDetailsChanged => Apply(purchaseDetailsChanged),
       PurchaseRemoved purchaseRemoved => Apply(purchaseRemoved),
       ReceiptDeleted _ => Fail.OfType<Receipt>(Failure.NotFound("Receipt has been deleted.", Id.Value)),
-      _ => Fail.OfType<Receipt>(
-        Failure.Fatal(new ArgumentException($"Unknown fact type: {fact.GetType()}", nameof(fact)))),
+      _ => Fail.OfType<Receipt>(Failure.Fatal(new ArgumentException($"Unknown fact type: {fact.GetType()}", nameof(fact)))),
     };
   }
 
@@ -137,7 +124,7 @@ public sealed record Receipt
     return (
         from id in Id.TryCreate(receiptCreated.Id)
         from store in Store.TryCreate(receiptCreated.Store)
-        from purchaseDate in PurchaseDate.TryCreate(receiptCreated.PurchaseDate, receiptCreated.CreatedDate)
+        from purchaseDate in NonFutureDate.TryCreate(receiptCreated.PurchaseDate, receiptCreated.CreatedDate)
         select new Receipt(id, store, purchaseDate, [], [], Version.New()))
       .ToResult(() => Failure.Fatal(new ArgumentException($"Failed to create receipt from {receiptCreated}.")));
   }
@@ -191,7 +178,7 @@ public sealed record Receipt
   private Result<Receipt> Apply(PurchaseDateChanged fact)
   {
     return (
-        from purchaseDate in PurchaseDate.TryCreate(fact.PurchaseDate, fact.RequestedDate)
+        from purchaseDate in NonFutureDate.TryCreate(fact.PurchaseDate, fact.RequestedDate)
         select this with { PurchaseDate = purchaseDate })
       .ToResult(() => Failure.Fatal(new ArgumentException($"Failed to recreate receipt from {fact}.")));
   }

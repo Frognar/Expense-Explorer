@@ -5,7 +5,7 @@ using FunctionalCore.Monads;
 
 internal readonly record struct ReceiptPatchModel
 {
-  private ReceiptPatchModel(Maybe<Store> store, Maybe<PurchaseDate> purchaseDate, DateOnly today)
+  private ReceiptPatchModel(Maybe<Store> store, Maybe<NonFutureDate> purchaseDate, DateOnly today)
   {
     Store = store;
     PurchaseDate = purchaseDate;
@@ -14,10 +14,9 @@ internal readonly record struct ReceiptPatchModel
 
   public Maybe<Store> Store { get; }
 
-  public Maybe<PurchaseDate> PurchaseDate { get; }
+  public Maybe<NonFutureDate> PurchaseDate { get; }
 
   public DateOnly Today { get; }
 
-  public static ReceiptPatchModel Create(Maybe<Store> store, Maybe<PurchaseDate> purchaseDate, DateOnly today)
-    => new(store, purchaseDate, today);
+  public static ReceiptPatchModel Create(Maybe<Store> store, Maybe<NonFutureDate> purchaseDate, DateOnly today) => new(store, purchaseDate, today);
 }
