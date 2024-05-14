@@ -1,5 +1,7 @@
 namespace ExpenseExplorer.Domain.Incomes;
 
+using ExpenseExplorer.Domain.Incomes.Facts;
+using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 public sealed record Income
@@ -11,6 +13,7 @@ public sealed record Income
     NonFutureDate receivedDate,
     Description description,
     Category category,
+    IEnumerable<Fact> unsavedChanges,
     Version version)
   {
     Id = id;
@@ -19,6 +22,7 @@ public sealed record Income
     ReceivedDate = receivedDate;
     Description = description;
     Category = category;
+    UnsavedChanges = unsavedChanges;
     Version = version;
   }
 
@@ -34,10 +38,14 @@ public sealed record Income
 
   public Category Category { get; private init; }
 
+  public IEnumerable<Fact> UnsavedChanges { get; private init; }
+
   public Version Version { get; private init; }
 
   public static Income New(Source source, Money amount, NonFutureDate receivedDate, Category category, Description description, DateOnly createdDate)
   {
-    return new Income(Id.Unique(), source, amount, receivedDate, description, category, Version.New());
+    Id id = Id.Unique();
+    IncomeCreated incomeCreated = IncomeCreated.Create(id, source, amount, receivedDate, category, description, createdDate);
+    return new Income(id, source, amount, receivedDate, description, category, [incomeCreated], Version.New());
   }
 }
