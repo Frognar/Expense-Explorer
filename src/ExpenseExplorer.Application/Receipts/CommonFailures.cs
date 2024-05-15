@@ -33,4 +33,13 @@ internal static class CommonFailures
 
   public static readonly IEnumerable<ValidationError> InvalidDescription
     = [ValidationError.Create("Description", "INVALID_DESCRIPTION")];
+
+  public static readonly IEnumerable<ValidationError> EmptySource
+    = [ValidationError.Create("Source", "EMPTY_SOURCE_NAME")];
+
+  public static readonly IEnumerable<ValidationError> NegativeAmount
+    = [ValidationError.Create("Amount", "NEGATIVE_AMOUNT")];
+
+  public static readonly IEnumerable<ValidationError> FutureReceivedDate
+    = [ValidationError.Create("ReceivedDate", "DATE_IN_FUTURE")];
 }

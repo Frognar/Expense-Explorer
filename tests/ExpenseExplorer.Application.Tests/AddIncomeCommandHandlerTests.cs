@@ -16,6 +16,16 @@ public class AddIncomeCommandHandlerTests
     income.Version.Value.Should().Be(0);
   }
 
+  [Property(Arbitrary = [typeof(InvalidAddIncomeCommandGenerator)])]
+  public async Task CanHandleInvalidCommand(AddIncomeCommand command)
+  {
+    Failure failure = await HandleInvalid(command);
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, _) => throw new InvalidOperationException("Unexpected not found failure"),
+      (_, errors) => errors.Should().NotBeEmpty());
+  }
+
   [Property(Arbitrary = [typeof(ValidAddIncomeCommandGenerator)])]
   public async Task SavesReceiptWhenValidCommand(AddIncomeCommand command)
   {
@@ -23,7 +33,9 @@ public class AddIncomeCommandHandlerTests
     _incomeRepository.Should().Contain(r => r.Id == income.Id);
   }
 
-  private async Task<Income> HandleValid(AddIncomeCommand command) => (await Handle(command)).Match(_ => throw new UnreachableException(), r => r);
+  private async Task<Failure> HandleInvalid(AddIncomeCommand command) => (await Handle(command)).Match(f => f, _ => throw new UnreachableException());
+
+  private async Task<Income> HandleValid(AddIncomeCommand command) => (await Handle(command)).Match(_ => throw new UnreachableException(), i => i);
 
   private async Task<Result<Income>> Handle(AddIncomeCommand command) => await new AddIncomeCommandHandler(_incomeRepository).HandleAsync(command);
 }
