@@ -1,6 +1,8 @@
 namespace ExpenseExplorer.Infrastructure;
 
+using ExpenseExplorer.Application.Incomes.Persistence;
 using ExpenseExplorer.Application.Receipts.Persistence;
+using ExpenseExplorer.Infrastructure.Incomes.Persistence;
 using ExpenseExplorer.Infrastructure.Receipts.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,5 +19,6 @@ public static class InfrastructureDependencyInjection
     string? connectionString = configuration.GetConnectionString("EventStore");
     ArgumentNullException.ThrowIfNull(connectionString);
     serviceCollection.AddScoped<IReceiptRepository>(_ => new EventStoreReceiptRepository(connectionString));
+    serviceCollection.AddScoped<IIncomeRepository>(_ => new EventStoreIncomeRepository(connectionString));
   }
 }

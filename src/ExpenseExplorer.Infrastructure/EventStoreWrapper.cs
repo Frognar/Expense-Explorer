@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
+namespace ExpenseExplorer.Infrastructure;
 
 using EventStore.Client;
 using ExpenseExplorer.Domain.Facts;
