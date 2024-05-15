@@ -1,3 +1,4 @@
+global using ExpenseExplorer.Application.Incomes.Commands;
 global using ExpenseExplorer.Application.Receipts.Commands;
 global using ExpenseExplorer.Domain.ValueObjects;
 global using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Dates;
