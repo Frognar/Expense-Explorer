@@ -16,7 +16,7 @@ public class IncomeTests
     ])]
   public void CanBeCreated(Source source, Money amount, NonFutureDate receivedDate, Category category, Description description)
   {
-    Income receipt = Income.New(source, amount, receivedDate, category, description, receivedDate.Date);
+    Income receipt = Income.New(source, amount, category, receivedDate, description, receivedDate.Date);
     receipt.Should().NotBeNull();
     receipt.Id.Should().NotBeNull();
     receipt.Source.Should().Be(source);
@@ -39,7 +39,7 @@ public class IncomeTests
     ])]
   public void ProducesIncomeCreatedFactWhenCreated(Source source, Money amount, NonFutureDate receivedDate, Category category, Description description)
   {
-    Income income = Income.New(source, amount, receivedDate, category, description, receivedDate.Date);
+    Income income = Income.New(source, amount, category, receivedDate, description, receivedDate.Date);
     income.UnsavedChanges.Count().Should().Be(1);
     IncomeCreated incomeCreated = income.UnsavedChanges.OfType<IncomeCreated>().Single();
     incomeCreated.IncomeId.Should().Be(income.Id.Value);
