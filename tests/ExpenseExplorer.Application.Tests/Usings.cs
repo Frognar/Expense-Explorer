@@ -1,5 +1,6 @@
 global using System.Collections;
 global using System.Diagnostics;
+global using ExpenseExplorer.Application.Incomes.Commands;
 global using ExpenseExplorer.Application.Receipts.Commands;
 global using ExpenseExplorer.Application.Tests.TestData;
 global using ExpenseExplorer.Domain.Incomes;
