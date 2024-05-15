@@ -2,6 +2,7 @@ global using System.Collections;
 global using System.Diagnostics;
 global using ExpenseExplorer.Application.Receipts.Commands;
 global using ExpenseExplorer.Application.Tests.TestData;
+global using ExpenseExplorer.Domain.Incomes;
 global using ExpenseExplorer.Domain.Receipts;
 global using ExpenseExplorer.Domain.Receipts.Facts;
 global using ExpenseExplorer.Domain.ValueObjects;

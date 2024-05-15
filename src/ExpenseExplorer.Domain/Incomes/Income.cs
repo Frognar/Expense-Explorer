@@ -48,4 +48,14 @@ public sealed record Income
     IncomeCreated incomeCreated = IncomeCreated.Create(id, source, amount, receivedDate, category, description, createdDate);
     return new Income(id, source, amount, category, receivedDate, description, [incomeCreated], Version.New());
   }
+
+  public Income ClearChanges()
+  {
+    return this with { UnsavedChanges = [] };
+  }
+
+  public Income WithVersion(Version version)
+  {
+    return this with { Version = version };
+  }
 }
