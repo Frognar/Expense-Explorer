@@ -13,8 +13,8 @@ internal static class CommonFailures
   public static readonly IEnumerable<ValidationError> EmptyStoreName
     = [ValidationError.Create("StoreName", "EMPTY_STORE_NAME")];
 
-  public static readonly IEnumerable<ValidationError> FutureDate
-    = [ValidationError.Create("PurchaseDate", "EMPTY_STORE_NAME")];
+  public static readonly IEnumerable<ValidationError> FuturePurchaseDate
+    = [ValidationError.Create("PurchaseDate", "DATE_IN_FUTURE")];
 
   public static readonly IEnumerable<ValidationError> EmptyItemName
     = [ValidationError.Create("Item", "EMPTY_ITEM_NAME")];

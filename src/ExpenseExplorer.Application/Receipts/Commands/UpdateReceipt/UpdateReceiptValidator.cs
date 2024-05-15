@@ -41,7 +41,7 @@ internal static class UpdateReceiptValidator
 
     return NonFutureDate.TryCreate(date.Value, today)
       .Match(
-        () => Validation.Failed<Maybe<NonFutureDate>>(CommonFailures.FutureDate),
+        () => Validation.Failed<Maybe<NonFutureDate>>(CommonFailures.FuturePurchaseDate),
         purchaseDate => Validation.Succeeded(Some.From(purchaseDate)));
   }
 }

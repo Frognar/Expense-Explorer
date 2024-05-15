@@ -30,7 +30,7 @@ internal static class OpenNewReceiptValidator
   {
     return NonFutureDate.TryCreate(purchaseDate, today)
       .Match(
-        () => Validation.Failed<NonFutureDate>(CommonFailures.FutureDate),
+        () => Validation.Failed<NonFutureDate>(CommonFailures.FuturePurchaseDate),
         Validation.Succeeded);
   }
 }
