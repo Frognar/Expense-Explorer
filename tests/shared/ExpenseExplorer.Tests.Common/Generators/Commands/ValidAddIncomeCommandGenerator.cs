@@ -5,7 +5,7 @@ public static class ValidAddIncomeCommandGenerator
   public static Gen<AddIncomeCommand> Gen()
     =>
       from source in NonEmptyStringGenerator.Gen()
-      from amount in PositiveDecimalGenerator.Gen()
+      from amount in NonNegativeDecimalGenerator.Gen()
       from category in NonEmptyStringGenerator.Gen()
       from receivedDate in DateOnlyGenerator.Gen()
       from description in ArbMap.Default.GeneratorFor<string>()

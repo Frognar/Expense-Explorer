@@ -14,7 +14,7 @@ public static class InvalidAddIncomeCommandGenerator
 
     Gen<AddIncomeCommand> invalidAmount =
       from source in NonEmptyStringGenerator.Gen()
-      from amount in NonPositiveDecimalGenerator.Gen()
+      from amount in NegativeDecimalGenerator.Gen()
       from category in NonEmptyStringGenerator.Gen()
       from receivedDate in DateOnlyGenerator.Gen()
       from description in ArbMap.Default.GeneratorFor<string>()
