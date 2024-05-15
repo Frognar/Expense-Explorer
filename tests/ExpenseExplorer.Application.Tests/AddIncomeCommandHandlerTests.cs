@@ -13,7 +13,14 @@ public class AddIncomeCommandHandlerTests
     income.Category.Name.Should().Be(command.Category.Trim());
     income.ReceivedDate.Date.Should().Be(command.ReceivedDate);
     income.Description.Value.Should().Be(command.Description?.Trim() ?? string.Empty);
-    income.Version.Value.Should().Be(ulong.MaxValue);
+    income.Version.Value.Should().Be(0);
+  }
+
+  [Property(Arbitrary = [typeof(ValidAddIncomeCommandGenerator)])]
+  public async Task SavesReceiptWhenValidCommand(AddIncomeCommand command)
+  {
+    Income income = await HandleValid(command);
+    _incomeRepository.Should().Contain(r => r.Id == income.Id);
   }
 
   private async Task<Income> HandleValid(AddIncomeCommand command) => (await Handle(command)).Match(_ => throw new UnreachableException(), r => r);
