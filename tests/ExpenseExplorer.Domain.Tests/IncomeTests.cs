@@ -88,4 +88,23 @@ public class IncomeTests
     amountCorrected.IncomeId.Should().Be(income.Id.Value);
     amountCorrected.Amount.Should().Be(newAmount.Value);
   }
+
+  [Property(Arbitrary = [typeof(IncomeGenerator), typeof(CategoryGenerator)])]
+  public void CanCorrectCategory(Income income, Category newCategory)
+  {
+    income
+      .CorrectCategory(newCategory)
+      .Category
+      .Should()
+      .Be(newCategory);
+  }
+
+  [Property(Arbitrary = [typeof(IncomeGenerator), typeof(CategoryGenerator)])]
+  public void ProducesCategoryUpdatedFactWhenCategoryUpdated(Income income, Category newCategory)
+  {
+    income = income.CorrectCategory(newCategory);
+    CategoryCorrected categoryCorrected = income.UnsavedChanges.OfType<CategoryCorrected>().Single();
+    categoryCorrected.IncomeId.Should().Be(income.Id.Value);
+    categoryCorrected.Category.Should().Be(newCategory.Name);
+  }
 }
