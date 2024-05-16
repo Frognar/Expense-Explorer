@@ -107,4 +107,23 @@ public class IncomeTests
     categoryCorrected.IncomeId.Should().Be(income.Id.Value);
     categoryCorrected.Category.Should().Be(newCategory.Name);
   }
+
+  [Property(Arbitrary = [typeof(IncomeGenerator), typeof(NonFutureDateGenerator)])]
+  public void CanCorrectReceivedDate(Income income, NonFutureDate newReceivedDate)
+  {
+    income
+      .CorrectReceivedDate(newReceivedDate)
+      .ReceivedDate
+      .Should()
+      .Be(newReceivedDate);
+  }
+
+  [Property(Arbitrary = [typeof(IncomeGenerator), typeof(NonFutureDateGenerator)])]
+  public void ProducesReceivedDateUpdatedFactWhenReceivedDateUpdated(Income income, NonFutureDate newReceivedDate)
+  {
+    income = income.CorrectReceivedDate(newReceivedDate);
+    ReceivedDateCorrected receivedDateCorrected = income.UnsavedChanges.OfType<ReceivedDateCorrected>().Single();
+    receivedDateCorrected.IncomeId.Should().Be(income.Id.Value);
+    receivedDateCorrected.ReceivedDate.Should().Be(newReceivedDate.Date);
+  }
 }
