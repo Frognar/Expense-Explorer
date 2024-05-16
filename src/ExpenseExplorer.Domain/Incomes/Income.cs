@@ -55,6 +55,12 @@ public sealed record Income
     return this with { Source = newSource, UnsavedChanges = UnsavedChanges.Append(fact).ToList() };
   }
 
+  public Income CorrectAmount(Money newAmount)
+  {
+    Fact fact = AmountCorrected.Create(Id, newAmount);
+    return this with { Amount = newAmount, UnsavedChanges = UnsavedChanges.Append(fact).ToList() };
+  }
+
   public Income ClearChanges()
   {
     return this with { UnsavedChanges = [] };
