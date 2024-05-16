@@ -2,6 +2,7 @@ namespace ExpenseExplorer.Domain.Tests;
 
 using ExpenseExplorer.Domain.Incomes;
 using ExpenseExplorer.Domain.Incomes.Facts;
+using FunctionalCore.Monads;
 
 public class IncomeTests
 {
@@ -144,5 +145,32 @@ public class IncomeTests
     DescriptionCorrected descriptionCorrected = income.UnsavedChanges.OfType<DescriptionCorrected>().Single();
     descriptionCorrected.IncomeId.Should().Be(income.Id.Value);
     descriptionCorrected.Description.Should().Be(newDescription.Value);
+  }
+
+  [Fact]
+  public void CanBeRecreatedFromFacts()
+  {
+    DateOnly today = new DateOnly(2000, 1, 1);
+    List<Fact> facts =
+    [
+      new IncomeCreated("id", "s", 0, today, "c", "d", today),
+      new SourceCorrected("id", "source"),
+      new AmountCorrected("id", 100),
+      new CategoryCorrected("id", "category"),
+      new ReceivedDateCorrected("id", today.AddDays(-1)),
+      new DescriptionCorrected("id", "description")
+    ];
+
+    Result<Income> resultOfIncome = Income.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Income income = resultOfIncome.Match(_ => throw new UnreachableException(), i => i);
+
+    income.Id.Value.Should().Be("id");
+    income.Source.Name.Should().Be("source");
+    income.Amount.Value.Should().Be(100);
+    income.Category.Name.Should().Be("category");
+    income.ReceivedDate.Date.Should().Be(today.AddDays(-1));
+    income.Description.Value.Should().Be("description");
+    income.UnsavedChanges.Should().BeEmpty();
+    income.Version.Value.Should().Be((ulong)(facts.Count - 1));
   }
 }
