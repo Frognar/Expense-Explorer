@@ -126,4 +126,23 @@ public class IncomeTests
     receivedDateCorrected.IncomeId.Should().Be(income.Id.Value);
     receivedDateCorrected.ReceivedDate.Should().Be(newReceivedDate.Date);
   }
+
+  [Property(Arbitrary = [typeof(IncomeGenerator), typeof(DescriptionGenerator)])]
+  public void CanCorrectDescription(Income income, Description newDescription)
+  {
+    income
+      .CorrectDescription(newDescription)
+      .Description
+      .Should()
+      .Be(newDescription);
+  }
+
+  [Property(Arbitrary = [typeof(IncomeGenerator), typeof(DescriptionGenerator)])]
+  public void ProducesDescriptionUpdatedFactWhenDescriptionUpdated(Income income, Description newDescription)
+  {
+    income = income.CorrectDescription(newDescription);
+    DescriptionCorrected descriptionCorrected = income.UnsavedChanges.OfType<DescriptionCorrected>().Single();
+    descriptionCorrected.IncomeId.Should().Be(income.Id.Value);
+    descriptionCorrected.Description.Should().Be(newDescription.Value);
+  }
 }

@@ -73,6 +73,12 @@ public sealed record Income
     return this with { ReceivedDate = newReceivedDate, UnsavedChanges = UnsavedChanges.Append(fact).ToList() };
   }
 
+  public Income CorrectDescription(Description newDescription)
+  {
+    Fact fact = DescriptionCorrected.Create(Id, newDescription);
+    return this with { Description = newDescription, UnsavedChanges = UnsavedChanges.Append(fact).ToList() };
+  }
+
   public Income ClearChanges()
   {
     return this with { UnsavedChanges = [] };
