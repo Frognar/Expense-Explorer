@@ -70,6 +70,41 @@ public class FactTypesTests
     AssertFactType(fact, FactTypes.IncomeCreatedFactType);
   }
 
+  [Fact]
+  public void GetTypeForIncomeSourceCorrected()
+  {
+    Fact fact = new SourceCorrected("id", "s");
+    AssertFactType(fact, FactTypes.IncomeSourceCorrectedFactType);
+  }
+
+  [Fact]
+  public void GetTypeForIncomeAmountCorrected()
+  {
+    Fact fact = new AmountCorrected("id", 1);
+    AssertFactType(fact, FactTypes.IncomeAmountCorrectedFactType);
+  }
+
+  [Fact]
+  public void GetTypeForIncomeCategoryCorrected()
+  {
+    Fact fact = new CategoryCorrected("id", "c");
+    AssertFactType(fact, FactTypes.IncomeCategoryCorrectedFactType);
+  }
+
+  [Fact]
+  public void GetTypeForIncomeReceivedDateCorrected()
+  {
+    Fact fact = new ReceivedDateCorrected("id", new DateOnly(2000, 1, 1));
+    AssertFactType(fact, FactTypes.IncomeReceivedDateCorrectedFactType);
+  }
+
+  [Fact]
+  public void GetTypeForIncomeDescriptionCorrected()
+  {
+    Fact fact = new DescriptionCorrected("id", "d");
+    AssertFactType(fact, FactTypes.IncomeDescriptionCorrectedFactType);
+  }
+
   private static void AssertFactType(Fact fact, string expectedType)
   {
     string type = FactTypes.GetFactType(fact);

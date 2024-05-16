@@ -18,6 +18,11 @@ public static class FactSerializer
       Receipts.Facts.PurchaseRemoved purchaseRemoved => Serialize(purchaseRemoved),
       Receipts.Facts.ReceiptDeleted receiptDeleted => Serialize(receiptDeleted),
       Incomes.Facts.IncomeCreated incomeCreated => Serialize(incomeCreated),
+      Incomes.Facts.SourceCorrected sourceCorrected => Serialize(sourceCorrected),
+      Incomes.Facts.AmountCorrected amountCorrected => Serialize(amountCorrected),
+      Incomes.Facts.CategoryCorrected categoryCorrected => Serialize(categoryCorrected),
+      Incomes.Facts.ReceivedDateCorrected receivedDateCorrected => Serialize(receivedDateCorrected),
+      Incomes.Facts.DescriptionCorrected descriptionCorrected => Serialize(descriptionCorrected),
       _ => throw new UnreachableException(),
     };
   }
@@ -34,6 +39,11 @@ public static class FactSerializer
       FactTypes.PurchaseRemovedFactType => Deserialize<Receipts.Facts.PurchaseRemoved>(data),
       FactTypes.ReceiptDeletedFactType => Deserialize<Receipts.Facts.ReceiptDeleted>(data),
       FactTypes.IncomeCreatedFactType => Deserialize<Incomes.Facts.IncomeCreated>(data),
+      FactTypes.IncomeSourceCorrectedFactType => Deserialize<Incomes.Facts.SourceCorrected>(data),
+      FactTypes.IncomeAmountCorrectedFactType => Deserialize<Incomes.Facts.AmountCorrected>(data),
+      FactTypes.IncomeCategoryCorrectedFactType => Deserialize<Incomes.Facts.CategoryCorrected>(data),
+      FactTypes.IncomeReceivedDateCorrectedFactType => Deserialize<Incomes.Facts.ReceivedDateCorrected>(data),
+      FactTypes.IncomeDescriptionCorrectedFactType => Deserialize<Incomes.Facts.DescriptionCorrected>(data),
       _ => throw new UnreachableException(),
     };
   }
