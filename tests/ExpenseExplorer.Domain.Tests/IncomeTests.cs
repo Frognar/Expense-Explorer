@@ -2,6 +2,7 @@ namespace ExpenseExplorer.Domain.Tests;
 
 using ExpenseExplorer.Domain.Incomes;
 using ExpenseExplorer.Domain.Incomes.Facts;
+using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
 public class IncomeTests
@@ -173,4 +174,36 @@ public class IncomeTests
     income.UnsavedChanges.Should().BeEmpty();
     income.Version.Value.Should().Be((ulong)(facts.Count - 1));
   }
+
+  [Fact]
+  public void ReturnsFailureWhenRecreatedWithoudIncomeCreatedFact()
+  {
+    DateOnly today = new DateOnly(2000, 1, 1);
+    List<Fact> facts =
+    [
+      new SourceCorrected("id", "source"),
+      new AmountCorrected("id", 100),
+      new CategoryCorrected("id", "category"),
+      new ReceivedDateCorrected("id", today.AddDays(-1)),
+      new DescriptionCorrected("id", "description")
+    ];
+
+    Result<Income> resultOfIncome = Income.Recreate(facts, Version.Create((ulong)(facts.Count - 1)));
+    Failure failure = resultOfIncome.Match(f => f, _ => throw new UnreachableException());
+
+    failure.Should().NotBeNull();
+  }
+
+  [Fact]
+  public void ReturnsFailureWhenRecreatedWithUnsupportedFact()
+  {
+    Fact unknown = new UnknownFact();
+
+    Result<Income> resultOfReceipt = Income.Recreate([unknown], Version.Create(0UL));
+    Failure failure = resultOfReceipt.Match(f => f, _ => throw new UnreachableException());
+
+    failure.Should().NotBeNull();
+  }
+
+  private sealed record UnknownFact : Fact;
 }

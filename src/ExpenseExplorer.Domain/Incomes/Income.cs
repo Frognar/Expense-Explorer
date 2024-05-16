@@ -54,9 +54,14 @@ public sealed record Income
   public static Result<Income> Recreate(IEnumerable<Fact> facts, Version version)
   {
     facts = facts.ToList();
-    return facts.Skip(1)
-      .Aggregate(Apply((IncomeCreated)facts.First()), (income, fact) => income.FlatMap(i => i.ApplyFact(fact)))
-      .Map(i => i with { Version = version });
+    if (facts.FirstOrDefault() is IncomeCreated incomeCreated)
+    {
+      return facts.Skip(1)
+        .Aggregate(Apply(incomeCreated), (income, fact) => income.FlatMap(i => i.ApplyFact(fact)))
+        .Map(i => i with { Version = version });
+    }
+
+    return Fail.OfType<Income>(Failure.Fatal(new ArgumentException("First fact must be an IncomeCreated fact.", nameof(facts))));
   }
 
   public Income CorrectSource(Source newSource)
