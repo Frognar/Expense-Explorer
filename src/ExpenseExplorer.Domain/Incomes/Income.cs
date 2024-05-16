@@ -49,6 +49,12 @@ public sealed record Income
     return new Income(id, source, amount, category, receivedDate, description, [incomeCreated], Version.New());
   }
 
+  public Income CorrectSource(Source newSource)
+  {
+    Fact fact = SourceCorrected.Create(Id, newSource);
+    return this with { Source = newSource, UnsavedChanges = UnsavedChanges.Append(fact).ToList() };
+  }
+
   public Income ClearChanges()
   {
     return this with { UnsavedChanges = [] };

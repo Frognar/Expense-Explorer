@@ -50,4 +50,23 @@ public class IncomeTests
     incomeCreated.Description.Should().Be(description.Value);
     incomeCreated.CreatedDate.Should().Be(receivedDate.Date);
   }
+
+  [Property(Arbitrary = [typeof(IncomeGenerator), typeof(SourceGenerator)])]
+  public void CanCorrectSource(Income income, Source newSource)
+  {
+    income
+      .CorrectSource(newSource)
+      .Source
+      .Should()
+      .Be(newSource);
+  }
+
+  [Property(Arbitrary = [typeof(IncomeGenerator), typeof(SourceGenerator)])]
+  public void ProducesSourceUpdatedFactWhenSourceUpdated(Income income, Source newSource)
+  {
+    income = income.CorrectSource(newSource);
+    SourceCorrected sourceCorrected = income.UnsavedChanges.OfType<SourceCorrected>().Single();
+    sourceCorrected.IncomeId.Should().Be(income.Id.Value);
+    sourceCorrected.Source.Should().Be(newSource.Name);
+  }
 }

@@ -11,7 +11,7 @@ public static class IncomeGenerator
       from category in CategoryGenerator.Gen()
       from receivedDate in NonFutureDateGenerator.Gen()
       from description in DescriptionGenerator.Gen()
-      select Income.New(source, amount, category, receivedDate, description, receivedDate.Date);
+      select Income.New(source, amount, category, receivedDate, description, receivedDate.Date).ClearChanges();
 
   public static Arbitrary<Income> Arbitrary() => Gen().ToArbitrary();
 }
