@@ -118,6 +118,7 @@ public sealed record Income
       CategoryCorrected categoryCorrected => Apply(categoryCorrected),
       ReceivedDateCorrected receivedDateCorrected => Apply(receivedDateCorrected),
       DescriptionCorrected descriptionCorrected => Apply(descriptionCorrected),
+      IncomeDeleted _ => Fail.OfType<Income>(Failure.NotFound("Income has been deleted.", Id.Value)),
       _ => Fail.OfType<Income>(Failure.Fatal(new ArgumentException($"Failed to apply fact {fact} to income {this}"))),
     };
   }

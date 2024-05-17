@@ -2,6 +2,7 @@ namespace ExpenseExplorer.Domain.Tests;
 
 using ExpenseExplorer.Domain.Incomes;
 using ExpenseExplorer.Domain.Incomes.Facts;
+using ExpenseExplorer.Domain.Tests.TestData;
 using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 
@@ -18,16 +19,16 @@ public class IncomeTests
     ])]
   public void CanBeCreated(Source source, Money amount, NonFutureDate receivedDate, Category category, Description description)
   {
-    Income receipt = Income.New(source, amount, category, receivedDate, description, receivedDate.Date);
-    receipt.Should().NotBeNull();
-    receipt.Id.Should().NotBeNull();
-    receipt.Source.Should().Be(source);
-    receipt.Amount.Should().Be(amount);
-    receipt.ReceivedDate.Should().Be(receivedDate);
-    receipt.Category.Should().Be(category);
-    receipt.Description.Should().Be(description);
-    receipt.UnsavedChanges.Should().HaveCount(1);
-    receipt.Version.Should().Be(Version.Create(ulong.MaxValue));
+    Income income = Income.New(source, amount, category, receivedDate, description, receivedDate.Date);
+    income.Should().NotBeNull();
+    income.Id.Should().NotBeNull();
+    income.Source.Should().Be(source);
+    income.Amount.Should().Be(amount);
+    income.ReceivedDate.Should().Be(receivedDate);
+    income.Category.Should().Be(category);
+    income.Description.Should().Be(description);
+    income.UnsavedChanges.Should().HaveCount(1);
+    income.Version.Should().Be(Version.Create(ulong.MaxValue));
   }
 
   [Property(
@@ -149,7 +150,7 @@ public class IncomeTests
   }
 
   [Property(Arbitrary = [typeof(IncomeGenerator)])]
-  public void ProducesIncomeDeletedFactWhenReceiptDeleted(Income income)
+  public void ProducesIncomeDeletedFactWhenIncomeDeleted(Income income)
   {
     income = income.Delete();
 
@@ -185,6 +186,25 @@ public class IncomeTests
   }
 
   [Fact]
+  public void ReturnsNotFoundFailureWhenRecreatedWithIncomeDeletedFact()
+  {
+    DateOnly today = new DateOnly(2000, 1, 1);
+    List<Fact> facts =
+    [
+      new IncomeCreated("id", "s", 0, today, "c", "d", today),
+      new IncomeDeleted("id"),
+      new SourceCorrected("id", "source"),
+    ];
+
+    Result<Income> resultOfIncome = Income.Recreate(facts, Version.Create(0UL));
+    Failure failure = resultOfIncome.Match(f => f, _ => throw new UnreachableException());
+
+    failure.Match((_, _) => string.Empty, (_, id) => id, (_, _) => string.Empty)
+      .Should()
+      .Be("id");
+  }
+
+  [Fact]
   public void ReturnsFailureWhenRecreatedWithoutIncomeCreatedFact()
   {
     DateOnly today = new DateOnly(2000, 1, 1);
@@ -204,12 +224,28 @@ public class IncomeTests
   }
 
   [Fact]
+  public void ReturnsFailureWhenRecreatedWithMultipleIncomeCreatedFacts()
+  {
+    DateOnly today = new DateOnly(2000, 1, 1);
+    List<Fact> facts =
+    [
+      new IncomeCreated("id", "s", 0, today, "c", "d", today),
+      new IncomeCreated("id", "s", 0, today, "c", "d", today),
+    ];
+
+    Result<Income> resultOfIncome = Income.Recreate(facts, Version.Create(0UL));
+    Failure failure = resultOfIncome.Match(f => f, _ => throw new UnreachableException());
+
+    failure.Should().NotBeNull();
+  }
+
+  [Fact]
   public void ReturnsFailureWhenRecreatedWithUnsupportedFact()
   {
     Fact unknown = new UnknownFact();
 
-    Result<Income> resultOfReceipt = Income.Recreate([unknown], Version.Create(0UL));
-    Failure failure = resultOfReceipt.Match(f => f, _ => throw new UnreachableException());
+    Result<Income> resultOfIncome = Income.Recreate([unknown], Version.Create(0UL));
+    Failure failure = resultOfIncome.Match(f => f, _ => throw new UnreachableException());
 
     failure.Should().NotBeNull();
   }
