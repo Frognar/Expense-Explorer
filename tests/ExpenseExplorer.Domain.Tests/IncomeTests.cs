@@ -115,7 +115,7 @@ public class IncomeTests
   public void CanCorrectReceivedDate(Income income, NonFutureDate newReceivedDate)
   {
     income
-      .CorrectReceivedDate(newReceivedDate)
+      .CorrectReceivedDate(newReceivedDate, newReceivedDate.Date)
       .ReceivedDate
       .Should()
       .Be(newReceivedDate);
@@ -124,7 +124,7 @@ public class IncomeTests
   [Property(Arbitrary = [typeof(IncomeGenerator), typeof(NonFutureDateGenerator)])]
   public void ProducesReceivedDateUpdatedFactWhenReceivedDateUpdated(Income income, NonFutureDate newReceivedDate)
   {
-    income = income.CorrectReceivedDate(newReceivedDate);
+    income = income.CorrectReceivedDate(newReceivedDate, newReceivedDate.Date);
     ReceivedDateCorrected receivedDateCorrected = income.UnsavedChanges.OfType<ReceivedDateCorrected>().Single();
     receivedDateCorrected.IncomeId.Should().Be(income.Id.Value);
     receivedDateCorrected.ReceivedDate.Should().Be(newReceivedDate.Date);
@@ -168,7 +168,7 @@ public class IncomeTests
       new SourceCorrected("id", "source"),
       new AmountCorrected("id", 100),
       new CategoryCorrected("id", "category"),
-      new ReceivedDateCorrected("id", today.AddDays(-1)),
+      new ReceivedDateCorrected("id", today.AddDays(-1), today),
       new DescriptionCorrected("id", "description")
     ];
 
@@ -213,7 +213,7 @@ public class IncomeTests
       new SourceCorrected("id", "source"),
       new AmountCorrected("id", 100),
       new CategoryCorrected("id", "category"),
-      new ReceivedDateCorrected("id", today.AddDays(-1)),
+      new ReceivedDateCorrected("id", today.AddDays(-1), today),
       new DescriptionCorrected("id", "description")
     ];
 

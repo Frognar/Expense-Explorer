@@ -82,9 +82,9 @@ public sealed record Income
     return this with { Category = newCategory, UnsavedChanges = UnsavedChanges.Append(fact).ToList() };
   }
 
-  public Income CorrectReceivedDate(NonFutureDate newReceivedDate)
+  public Income CorrectReceivedDate(NonFutureDate newReceivedDate, DateOnly requestedDate)
   {
-    Fact fact = ReceivedDateCorrected.Create(Id, newReceivedDate);
+    Fact fact = ReceivedDateCorrected.Create(Id, newReceivedDate, requestedDate);
     return this with { ReceivedDate = newReceivedDate, UnsavedChanges = UnsavedChanges.Append(fact).ToList() };
   }
 
@@ -163,7 +163,7 @@ public sealed record Income
   private Result<Income> Apply(ReceivedDateCorrected receivedDateCorrected)
   {
     return (
-        from receivedDate in NonFutureDate.TryCreate(receivedDateCorrected.ReceivedDate, receivedDateCorrected.ReceivedDate)
+        from receivedDate in NonFutureDate.TryCreate(receivedDateCorrected.ReceivedDate, receivedDateCorrected.RequestedDate)
         select this with { ReceivedDate = receivedDate })
       .ToResult(() => Failure.Fatal(new AggregateException($"Failed to apply fact {receivedDateCorrected} to income {this}")));
   }

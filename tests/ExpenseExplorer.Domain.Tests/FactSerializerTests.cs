@@ -271,17 +271,17 @@ public class FactSerializerTests
   [Fact]
   public void SerializeIncomeReceivedDateCorrected()
   {
-    Fact fact = new ReceivedDateCorrected("id", new DateOnly(2000, 1, 1));
+    Fact fact = new ReceivedDateCorrected("id", new DateOnly(2000, 1, 1), new DateOnly(2000, 1, 1));
 
     byte[] data = FactSerializer.Serialize(fact);
 
-    data.Should().BeEquivalentTo("{\"IncomeId\":\"id\",\"ReceivedDate\":\"2000-01-01\"}"u8.ToArray());
+    data.Should().BeEquivalentTo("{\"IncomeId\":\"id\",\"ReceivedDate\":\"2000-01-01\",\"RequestedDate\":\"2000-01-01\"}"u8.ToArray());
   }
 
   [Fact]
   public void DeserializeIncomeReceivedDateCorrected()
   {
-    byte[] data = "{\"IncomeId\":\"id\",\"ReceivedDate\":\"2000-01-01\"}"u8.ToArray();
+    byte[] data = "{\"IncomeId\":\"id\",\"ReceivedDate\":\"2000-01-01\",\"RequestedDate\":\"2000-01-01\"}"u8.ToArray();
 
     Fact fact = FactSerializer.Deserialize(FactTypes.IncomeReceivedDateCorrectedFactType, data);
 

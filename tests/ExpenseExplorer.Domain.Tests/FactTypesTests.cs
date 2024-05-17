@@ -94,7 +94,7 @@ public class FactTypesTests
   [Fact]
   public void GetTypeForIncomeReceivedDateCorrected()
   {
-    Fact fact = new ReceivedDateCorrected("id", new DateOnly(2000, 1, 1));
+    Fact fact = new ReceivedDateCorrected("id", new DateOnly(2000, 1, 1), new DateOnly(2000, 1, 1));
     AssertFactType(fact, FactTypes.IncomeReceivedDateCorrectedFactType);
   }
 
