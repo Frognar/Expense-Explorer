@@ -250,5 +250,15 @@ public class IncomeTests
     failure.Should().NotBeNull();
   }
 
+  [Theory]
+  [ClassData(typeof(IncomeCorruptedFactsForRecreate))]
+  public void ReturnsFailureWhenRecreatedWithCorruptedFact(Fact[] facts)
+  {
+    Result<Income> resultOfIncome = Income.Recreate(facts, Version.Create(0UL));
+    Failure failure = resultOfIncome.Match(f => f, _ => throw new UnreachableException());
+
+    failure.Should().NotBeNull();
+  }
+
   private sealed record UnknownFact : Fact;
 }
