@@ -19,6 +19,7 @@ public static class FactTypes
   public const string IncomeCategoryCorrectedFactType = "INCOME_CATEGORY_CORRECTED";
   public const string IncomeReceivedDateCorrectedFactType = "INCOME_RECEIVED_DATE_CORRECTED";
   public const string IncomeDescriptionCorrectedFactType = "INCOME_DESCRIPTION_CORRECTED";
+  public const string IncomeDeletedFactType = "INCOME_DELETED";
 
   public static string GetFactType(Fact fact)
   {
@@ -37,6 +38,7 @@ public static class FactTypes
       CategoryCorrected => IncomeCategoryCorrectedFactType,
       ReceivedDateCorrected => IncomeReceivedDateCorrectedFactType,
       DescriptionCorrected => IncomeDescriptionCorrectedFactType,
+      IncomeDeleted => IncomeDeletedFactType,
       _ => throw new UnreachableException(),
     };
   }

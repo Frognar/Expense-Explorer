@@ -23,6 +23,7 @@ public static class FactSerializer
       Incomes.Facts.CategoryCorrected categoryCorrected => Serialize(categoryCorrected),
       Incomes.Facts.ReceivedDateCorrected receivedDateCorrected => Serialize(receivedDateCorrected),
       Incomes.Facts.DescriptionCorrected descriptionCorrected => Serialize(descriptionCorrected),
+      Incomes.Facts.IncomeDeleted incomeDeleted => Serialize(incomeDeleted),
       _ => throw new UnreachableException(),
     };
   }
@@ -44,6 +45,7 @@ public static class FactSerializer
       FactTypes.IncomeCategoryCorrectedFactType => Deserialize<Incomes.Facts.CategoryCorrected>(data),
       FactTypes.IncomeReceivedDateCorrectedFactType => Deserialize<Incomes.Facts.ReceivedDateCorrected>(data),
       FactTypes.IncomeDescriptionCorrectedFactType => Deserialize<Incomes.Facts.DescriptionCorrected>(data),
+      FactTypes.IncomeDeletedFactType => Deserialize<Incomes.Facts.IncomeDeleted>(data),
       _ => throw new UnreachableException(),
     };
   }

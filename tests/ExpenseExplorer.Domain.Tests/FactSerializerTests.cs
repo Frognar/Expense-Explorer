@@ -308,5 +308,25 @@ public class FactSerializerTests
     fact.Should().BeOfType<DescriptionCorrected>();
   }
 
+  [Fact]
+  public void SerializeIncomeDeleted()
+  {
+    Fact fact = new IncomeDeleted("id");
+
+    byte[] data = FactSerializer.Serialize(fact);
+
+    data.Should().BeEquivalentTo("{\"IncomeId\":\"id\"}"u8.ToArray());
+  }
+
+  [Fact]
+  public void DeserializeIncomeDeleted()
+  {
+    byte[] data = "{\"IncomeId\":\"id\"}"u8.ToArray();
+
+    Fact fact = FactSerializer.Deserialize(FactTypes.IncomeDeletedFactType, data);
+
+    fact.Should().BeOfType<IncomeDeleted>();
+  }
+
   private sealed record UnknownFact : Fact;
 }

@@ -105,6 +105,13 @@ public class FactTypesTests
     AssertFactType(fact, FactTypes.IncomeDescriptionCorrectedFactType);
   }
 
+  [Fact]
+  public void GetTypeForIncomeDeleted()
+  {
+    Fact fact = new IncomeDeleted("id");
+    AssertFactType(fact, FactTypes.IncomeDeletedFactType);
+  }
+
   private static void AssertFactType(Fact fact, string expectedType)
   {
     string type = FactTypes.GetFactType(fact);
