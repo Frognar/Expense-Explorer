@@ -94,6 +94,11 @@ public sealed record Income
     return this with { Description = newDescription, UnsavedChanges = UnsavedChanges.Append(fact).ToList() };
   }
 
+  public Income Delete()
+  {
+    return this with { UnsavedChanges = UnsavedChanges.Append(IncomeDeleted.Create(Id)).ToList() };
+  }
+
   public Income ClearChanges()
   {
     return this with { UnsavedChanges = [] };

@@ -148,6 +148,15 @@ public class IncomeTests
     descriptionCorrected.Description.Should().Be(newDescription.Value);
   }
 
+  [Property(Arbitrary = [typeof(IncomeGenerator)])]
+  public void ProducesIncomeDeletedFactWhenReceiptDeleted(Income income)
+  {
+    income = income.Delete();
+
+    IncomeDeleted fact = income.UnsavedChanges.OfType<IncomeDeleted>().Single();
+    fact.IncomeId.Should().Be(income.Id.Value);
+  }
+
   [Fact]
   public void CanBeRecreatedFromFacts()
   {
@@ -176,7 +185,7 @@ public class IncomeTests
   }
 
   [Fact]
-  public void ReturnsFailureWhenRecreatedWithoudIncomeCreatedFact()
+  public void ReturnsFailureWhenRecreatedWithoutIncomeCreatedFact()
   {
     DateOnly today = new DateOnly(2000, 1, 1);
     List<Fact> facts =
