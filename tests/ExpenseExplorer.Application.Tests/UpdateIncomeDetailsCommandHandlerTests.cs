@@ -33,13 +33,23 @@ public class UpdateIncomeDetailsCommandHandlerTests
   }
 
   [Property(Arbitrary = [typeof(ValidUpdateIncomeDetailsCommandGenerator)])]
-  public async Task ReturnsFailureWhenReceiptNotFound(UpdateIncomeDetailsCommand command)
+  public async Task ReturnsFailureWhenIncomeNotFound(UpdateIncomeDetailsCommand command)
   {
     Failure failure = await HandleInvalid(command with { IncomeId = "invalid-Id" });
     failure.Match(
       (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
       (_, id) => id.Should().Be("invalid-Id"),
       (_, _) => throw new InvalidOperationException("Unexpected validation failure"));
+  }
+
+  [Property(Arbitrary = [typeof(InvalidUpdateIncomeDetailsCommandGenerator)])]
+  public async Task ReturnsFailureWhenInvalidCommand(UpdateIncomeDetailsCommand command)
+  {
+    Failure failure = await HandleInvalid(command);
+    failure.Match(
+      (_, _) => throw new InvalidOperationException("Unexpected fatal failure"),
+      (_, _) => throw new InvalidOperationException("Unexpected not found failure"),
+      (_, errors) => errors.Should().NotBeEmpty());
   }
 
   private async Task<Failure> HandleInvalid(UpdateIncomeDetailsCommand command) => (await Handle(command)).Match(f => f, _ => throw new UnreachableException());
