@@ -4,6 +4,7 @@ using CommandHub.Commands;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore;
 using FunctionalCore.Monads;
 
 public sealed class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
@@ -27,8 +28,8 @@ public sealed class UpdateReceiptCommandHandler(IReceiptRepository receiptReposi
 
   private static Receipt Update(Receipt receipt, ReceiptPatchModel patchModel)
   {
-    return patchModel.PurchaseDate.Match(
-      () => patchModel.Store.Match(() => receipt, receipt.CorrectStore),
-      date => patchModel.Store.Match(() => receipt, receipt.CorrectStore).ChangePurchaseDate(date, patchModel.Today));
+    return receipt
+      .Apply(r => patchModel.PurchaseDate.Match(() => r, pd => r.ChangePurchaseDate(pd, patchModel.Today)))
+      .Apply(r => patchModel.Store.Match(() => r, r.CorrectStore));
   }
 }

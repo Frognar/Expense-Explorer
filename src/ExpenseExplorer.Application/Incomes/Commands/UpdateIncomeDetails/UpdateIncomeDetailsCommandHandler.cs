@@ -5,6 +5,7 @@ using ExpenseExplorer.Application.Incomes.Persistence;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Domain.Incomes;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore;
 using FunctionalCore.Monads;
 
 public sealed class UpdateIncomeDetailsCommandHandler(IIncomeRepository incomeRepository)
@@ -26,10 +27,11 @@ public sealed class UpdateIncomeDetailsCommandHandler(IIncomeRepository incomeRe
 
   private static Income Update(Income income, IncomePatchModel patchModel)
   {
-    var updated0 = patchModel.Source.Match(() => income, income.CorrectSource);
-    var updated1 = patchModel.Amount.Match(() => updated0, updated0.CorrectAmount);
-    var updated2 = patchModel.Category.Match(() => updated1, updated1.CorrectCategory);
-    var updated3 = patchModel.ReceivedDate.Match(() => updated2, rd => updated2.CorrectReceivedDate(rd, patchModel.Today));
-    return patchModel.Description.Match(() => updated3, updated3.CorrectDescription);
+    return income
+      .Apply(i => patchModel.Source.Match(() => i, i.CorrectSource))
+      .Apply(i => patchModel.Amount.Match(() => i, i.CorrectAmount))
+      .Apply(i => patchModel.Category.Match(() => i, i.CorrectCategory))
+      .Apply(i => patchModel.ReceivedDate.Match(() => i, rd => i.CorrectReceivedDate(rd, patchModel.Today)))
+      .Apply(i => patchModel.Description.Match(() => i, i.CorrectDescription));
   }
 }
