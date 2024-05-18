@@ -19,18 +19,17 @@ public sealed class UpdateIncomeDetailsCommandHandler(IIncomeRepository incomeRe
       from patchModel in UpdateIncomeDetailsValidator.Validate(command)
       from incomeId in Id.TryCreate(command.IncomeId).ToResult(() => CommonFailures.InvalidIncomeId)
       from income in _incomeRepository.GetAsync(incomeId, cancellationToken)
-      select Update(income, patchModel));
+      let updatedIncome = Update(income, patchModel)
+      from version in _incomeRepository.SaveAsync(updatedIncome, cancellationToken)
+      select updatedIncome.WithVersion(version).ClearChanges());
   }
 
   private static Income Update(Income income, IncomePatchModel patchModel)
   {
-    return income with
-    {
-      Source = patchModel.Source.OrElse(() => income.Source),
-      Amount = patchModel.Amount.OrElse(() => income.Amount),
-      Category = patchModel.Category.OrElse(() => income.Category),
-      ReceivedDate = patchModel.ReceivedDate.OrElse(() => income.ReceivedDate),
-      Description = patchModel.Description.OrElse(() => income.Description),
-    };
+    var updated0 = patchModel.Source.Match(() => income, income.CorrectSource);
+    var updated1 = patchModel.Amount.Match(() => updated0, updated0.CorrectAmount);
+    var updated2 = patchModel.Category.Match(() => updated1, updated1.CorrectCategory);
+    var updated3 = patchModel.ReceivedDate.Match(() => updated2, rd => updated2.CorrectReceivedDate(rd, patchModel.Today));
+    return patchModel.Description.Match(() => updated3, updated3.CorrectDescription);
   }
 }

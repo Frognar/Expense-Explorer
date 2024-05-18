@@ -20,16 +20,27 @@ public class UpdateIncomeDetailsCommandHandlerTests
       .Match(_ => throw new UnreachableException(), i => i)
   ];
 
-  [Property(Arbitrary = [typeof(ValidUpdateIncomeDetailsCommandGenerator)])]
+  [Theory]
+  [ClassData(typeof(ValidUpdateIncomeDetailsCommandData))]
   public async Task CanHandleValidCommand(UpdateIncomeDetailsCommand command)
   {
     Income income = await HandleValid(command);
     income.Source.Name.Should().Be(command.Source?.Trim() ?? _originalSource);
-    income.Amount.Value.Should().Be(Math.Round(command.Amount ?? _originalAmount, Money.Precision));
+    income.Amount.Value.Should().Be(command.Amount.HasValue ? Math.Round(command.Amount.Value, Money.Precision) : _originalAmount);
     income.Category.Name.Should().Be(command.Category?.Trim() ?? _originalCategory);
     income.ReceivedDate.Date.Should().Be(command.ReceivedDate ?? _originalReceivedDate);
     income.Description.Value.Should().Be(command.Description?.Trim() ?? _originalDescription);
-    income.Version.Value.Should().Be(0);
+  }
+
+  [Fact]
+  public async Task SavesReceiptWhenValidCommand()
+  {
+    UpdateIncomeDetailsCommand command = new("incomeId", "s", 1, "c", new DateOnly(2024, 1, 1), "d", new DateOnly(2024, 1, 1));
+
+    _ = await HandleValid(command);
+
+    Income income = _incomeRepository.Single(r => r.Id.Value == "incomeId");
+    income.Version.Value.Should().Be(5UL);
   }
 
   [Property(Arbitrary = [typeof(ValidUpdateIncomeDetailsCommandGenerator)])]

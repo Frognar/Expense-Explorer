@@ -10,7 +10,13 @@ internal static class UpdateIncomeDetailsValidator
   public static Result<IncomePatchModel> Validate(UpdateIncomeDetailsCommand command)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Func<Maybe<Source>, Maybe<Money>, Maybe<Category>, Maybe<NonFutureDate>, Maybe<Description>,
+    Func<
+      Maybe<Source>,
+      Maybe<Money>,
+      Maybe<Category>,
+      Maybe<NonFutureDate>,
+      Maybe<Description>,
+      DateOnly,
       IncomePatchModel> createPatchModel = IncomePatchModel.Create;
 
     return createPatchModel
@@ -19,6 +25,7 @@ internal static class UpdateIncomeDetailsValidator
       .Apply(ValidateCategory(command.Category))
       .Apply(ValidateReceivedDate(command.ReceivedDate, command.Today))
       .Apply(ValidateDescription(command.Description))
+      .Apply(Validation.Succeeded(command.Today))
       .ToResult();
   }
 

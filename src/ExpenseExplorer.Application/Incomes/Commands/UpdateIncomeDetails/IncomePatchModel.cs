@@ -10,13 +10,15 @@ internal readonly record struct IncomePatchModel
     Maybe<Money> amount,
     Maybe<Category> category,
     Maybe<NonFutureDate> receivedDate,
-    Maybe<Description> description)
+    Maybe<Description> description,
+    DateOnly today)
   {
     Source = source;
     Amount = amount;
     Category = category;
     ReceivedDate = receivedDate;
     Description = description;
+    Today = today;
   }
 
   public Maybe<Source> Source { get; }
@@ -29,11 +31,14 @@ internal readonly record struct IncomePatchModel
 
   public Maybe<Description> Description { get; }
 
+  public DateOnly Today { get; }
+
   public static IncomePatchModel Create(
     Maybe<Source> source,
     Maybe<Money> amount,
     Maybe<Category> category,
     Maybe<NonFutureDate> receivedDate,
-    Maybe<Description> description)
-    => new(source, amount, category, receivedDate, description);
+    Maybe<Description> description,
+    DateOnly today)
+    => new(source, amount, category, receivedDate, description, today);
 }
