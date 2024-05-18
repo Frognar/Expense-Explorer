@@ -30,15 +30,15 @@ public sealed record Income
 
   public Id Id { get; }
 
-  public Source Source { get; private init; }
+  public Source Source { get; init; }
 
-  public Money Amount { get; private init; }
+  public Money Amount { get; init; }
 
-  public Category Category { get; private init; }
+  public Category Category { get; init; }
 
-  public NonFutureDate ReceivedDate { get; private init; }
+  public NonFutureDate ReceivedDate { get; init; }
 
-  public Description Description { get; private init; }
+  public Description Description { get; init; }
 
   public IEnumerable<Fact> UnsavedChanges { get; private init; }
 

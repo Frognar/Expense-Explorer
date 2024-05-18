@@ -7,6 +7,9 @@ internal static class CommonFailures
   public static readonly Failure InvalidReceiptId
     = Failure.Validation("ReceiptId", "INVALID_RECEIPT_ID");
 
+  public static readonly Failure InvalidIncomeId
+    = Failure.Validation("IncomeId", "INVALID_Income_ID");
+
   public static readonly Failure InvalidPurchaseId
     = Failure.Validation("PurchaseId", "INVALID_PURCHASE_ID");
 
