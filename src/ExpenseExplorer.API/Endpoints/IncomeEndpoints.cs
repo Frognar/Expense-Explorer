@@ -3,6 +3,7 @@ namespace ExpenseExplorer.API.Endpoints;
 using CommandHub;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
+using ExpenseExplorer.Application.Incomes.Commands;
 using static ExpenseExplorer.API.Endpoints.FailureHandler;
 
 public static class IncomeEndpoints
@@ -12,6 +13,7 @@ public static class IncomeEndpoints
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/incomes");
     group.MapPost("/", AddIncomeAsync);
     group.MapPatch("/{incomeId}", UpdateIncomeDetailsAsync);
+    group.MapDelete("/{incomeId}", DeleteIncomeAsync);
     return endpointRouteBuilder;
   }
 
@@ -38,5 +40,14 @@ public static class IncomeEndpoints
     return (await sender.SendAsync(request.MapToCommand(incomeId, today), cancellationToken))
       .Map(r => r.MapTo<UpdateIncomeDetailsResponse>())
       .Match(Handle, Results.Ok);
+  }
+
+  private static async Task<IResult> DeleteIncomeAsync(
+    string incomeId,
+    ISender sender,
+    CancellationToken cancellationToken = default)
+  {
+    return (await sender.SendAsync(new DeleteIncomeCommand(incomeId), cancellationToken))
+      .Match(Handle, _ => Results.NoContent());
   }
 }
