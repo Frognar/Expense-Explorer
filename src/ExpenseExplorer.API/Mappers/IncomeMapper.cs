@@ -12,10 +12,10 @@ public static class IncomeMapper
     return new AddIncomeCommand(request.Source, request.Amount, request.Category, request.ReceivedDate, request.Description, today);
   }
 
-  public static UpdateIncomeDetailsCommand MapToCommand(this UpdateIncomeDetailsRequest request, DateOnly today)
+  public static UpdateIncomeDetailsCommand MapToCommand(this UpdateIncomeDetailsRequest request, string incomeId, DateOnly today)
   {
     ArgumentNullException.ThrowIfNull(request);
-    return new UpdateIncomeDetailsCommand(request.IncomeId, request.Source, request.Amount, request.Category, request.ReceivedDate, request.Description, today);
+    return new UpdateIncomeDetailsCommand(incomeId, request.Source, request.Amount, request.Category, request.ReceivedDate, request.Description, today);
   }
 
   public static TResult MapTo<TResult>(this Income income)

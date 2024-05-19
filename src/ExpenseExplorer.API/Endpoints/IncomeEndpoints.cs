@@ -11,6 +11,7 @@ public static class IncomeEndpoints
   {
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/incomes");
     group.MapPost("/", AddIncomeAsync);
+    group.MapPatch("/{incomeId}", UpdateIncomeDetailsAsync);
     return endpointRouteBuilder;
   }
 
@@ -24,5 +25,18 @@ public static class IncomeEndpoints
     return (await sender.SendAsync(request.MapToCommand(today), cancellationToken))
       .Map(r => r.MapTo<AddIncomeResponse>())
       .Match(Handle, response => Results.Created((string?)null, response));
+  }
+
+  private static async Task<IResult> UpdateIncomeDetailsAsync(
+    string incomeId,
+    UpdateIncomeDetailsRequest request,
+    TimeProvider timeProvider,
+    ISender sender,
+    CancellationToken cancellationToken)
+  {
+    var today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
+    return (await sender.SendAsync(request.MapToCommand(incomeId, today), cancellationToken))
+      .Map(r => r.MapTo<UpdateIncomeDetailsResponse>())
+      .Match(Handle, Results.Ok);
   }
 }
