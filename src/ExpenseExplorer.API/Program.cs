@@ -10,6 +10,7 @@ builder.Configuration.AddConfiguration(
   new ConfigurationBuilder()
     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
     .AddJsonFile("appsettings.json")
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json")
     .Build());
 
 builder.Services.AddEndpointsApiExplorer();
