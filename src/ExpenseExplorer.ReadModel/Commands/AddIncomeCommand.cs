@@ -8,5 +8,5 @@ public sealed record AddIncomeCommand(
   string Source,
   decimal Amount,
   string Category,
-  DateTime ReceivedDate,
+  DateOnly ReceivedDate,
   string Description) : ICommand<Unit>;
