@@ -486,3 +486,9 @@ $RECYCLE.BIN/
 # EventStore data
 /res/eventstore/data/*
 /res/eventstore/logs/*
+/res/fullapi/eventstore-data/*
+/res/fullapi/eventstore-logs/*
+
+# PostgreSql data
+/res/postgresql/data/*
+/res/fullapi/postgresql-data/*
