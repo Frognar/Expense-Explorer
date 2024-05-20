@@ -12,15 +12,15 @@ public sealed class AddIncomeCommandHandler(ExpenseExplorerContext context)
   public async Task<Unit> HandleAsync(AddIncomeCommand command, CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    DbIncome purchase = new(
-      command.Id,
+    DbIncome income = new(
+      command.IncomeId,
       command.Source,
       command.Amount,
       command.Category,
       command.ReceivedDate,
       command.Description);
 
-    _context.Incomes.Add(purchase);
+    _context.Incomes.Add(income);
     await _context.SaveChangesAsync(cancellationToken);
     return Unit.Instance;
   }
