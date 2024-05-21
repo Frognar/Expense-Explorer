@@ -76,6 +76,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionalCore", "src\Funct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FunctionalCore.Tests", "tests\FunctionalCore.Tests\FunctionalCore.Tests.csproj", "{8F62A501-4151-4D82-BB05-4D2E8E9BF9E0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fullapi", "fullapi", "{A2A3F5B4-6029-4D24-A783-1458A79B1EAE}"
+	ProjectSection(SolutionItems) = preProject
+		res\fullapi\docker-compose.yml = res\fullapi\docker-compose.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -170,5 +175,6 @@ Global
 		{69598234-543F-4668-9CFD-0CEBBEAC1AED} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
 		{BED2B1E2-0B9A-4387-9E4E-B163A1E3E39B} = {D6D2E4BD-EC45-49DE-B202-C4E1408BB024}
 		{8F62A501-4151-4D82-BB05-4D2E8E9BF9E0} = {74FEB020-4690-4D99-A72F-BCE3EA8953F9}
+		{A2A3F5B4-6029-4D24-A783-1458A79B1EAE} = {6AF97930-820B-407C-824D-C1DE857832EE}
 	EndGlobalSection
 EndGlobal
