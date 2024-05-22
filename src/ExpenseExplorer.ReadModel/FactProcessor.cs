@@ -35,9 +35,8 @@ internal sealed class FactProcessor(
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
   {
     Position lastProcessedPosition = await GetLastProcessedPositionAsync(stoppingToken);
-    EventStoreClient.StreamSubscriptionResult result = _client.SubscribeToAll(
-      FromAll.After(lastProcessedPosition),
-      cancellationToken: stoppingToken);
+    EventStoreClient.StreamSubscriptionResult result =
+      _client.SubscribeToAll(FromAll.After(lastProcessedPosition), cancellationToken: stoppingToken);
 
     await foreach (ResolvedEvent resolvedEvent in result)
     {
@@ -52,7 +51,10 @@ internal sealed class FactProcessor(
         FactTypes.PurchaseRemovedFactType => HandleAsync<RemovePurchaseCommand>(resolvedEvent, stoppingToken),
         FactTypes.ReceiptDeletedFactType => HandleAsync<DeleteReceiptCommand>(resolvedEvent, stoppingToken),
         FactTypes.IncomeCreatedFactType => HandleAsync<AddIncomeCommand>(resolvedEvent, stoppingToken),
-        FactTypes.IncomeSourceCorrectedFactType => HandleAsync<CorrectIncomeSourceCommand>(resolvedEvent, stoppingToken),
+        FactTypes.IncomeSourceCorrectedFactType
+          => HandleAsync<CorrectIncomeSourceCommand>(resolvedEvent, stoppingToken),
+        FactTypes.IncomeAmountCorrectedFactType
+          => HandleAsync<CorrectIncomeAmountCommand>(resolvedEvent, stoppingToken),
         _ => Task.FromResult(() => Console.WriteLine(resolvedEvent.Event.EventType)),
       };
 
