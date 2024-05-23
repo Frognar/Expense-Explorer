@@ -60,7 +60,7 @@ internal sealed class FactProcessor(
         FactTypes.IncomeReceivedDateCorrectedFactType
           => HandleAsync<CorrectIncomeReceivedDateCommand>(resolvedEvent, stoppingToken),
         FactTypes.IncomeDescriptionCorrectedFactType
-          => HandleAsync<CorrectIncomeReceivedDateCommand>(resolvedEvent, stoppingToken),
+          => HandleAsync<CorrectIncomeDescriptionCommand>(resolvedEvent, stoppingToken),
         _ => Task.FromResult(() => Console.WriteLine(resolvedEvent.Event.EventType)),
       };
 
