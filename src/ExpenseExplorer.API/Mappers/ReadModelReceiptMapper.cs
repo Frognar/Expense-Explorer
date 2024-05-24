@@ -59,6 +59,24 @@ public static class ReadModelReceiptMapper
       receipt.Purchases.Select(MapToResponse));
   }
 
+  public static GetIncomesResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.Income> page)
+  {
+    ArgumentNullException.ThrowIfNull(page);
+    return new GetIncomesResponse(
+      page.Items.Select(
+        i => new IncomeResponse(
+          i.Id,
+          i.Source,
+          i.Amount,
+          i.Category,
+          i.ReceivedDate,
+          i.Description)),
+      page.TotalCount,
+      page.PageSize,
+      page.PageNumber,
+      page.PageCount);
+  }
+
   public static GenerateReportResponse MapToResponse(this ReadModel.Models.Report report)
   {
     ArgumentNullException.ThrowIfNull(report);
