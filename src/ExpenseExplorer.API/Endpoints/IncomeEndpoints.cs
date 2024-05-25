@@ -9,11 +9,13 @@ using static ExpenseExplorer.API.Endpoints.FailureHandler;
 
 public static class IncomeEndpoints
 {
+  private const string _getIncomeRoute = "GetIncome";
+
   public static IEndpointRouteBuilder MapIncomeEndpoints(this IEndpointRouteBuilder endpointRouteBuilder)
   {
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/incomes");
     group.MapGet("/", GetIncomesAsync);
-    group.MapGet("/{incomeId}", GetIncomeAsync);
+    group.MapGet("/{incomeId}", GetIncomeAsync).WithName(_getIncomeRoute);
     group.MapPost("/", AddIncomeAsync);
     group.MapPatch("/{incomeId}", UpdateIncomeDetailsAsync);
     group.MapDelete("/{incomeId}", DeleteIncomeAsync);
@@ -57,7 +59,7 @@ public static class IncomeEndpoints
     DateOnly today = DateOnly.FromDateTime(timeProvider.GetLocalNow().DateTime);
     return (await sender.SendAsync(request.MapToCommand(today), cancellationToken))
       .Map(r => r.MapTo<AddIncomeResponse>())
-      .Match(Handle, response => Results.Created((string?)null, response));
+      .Match(Handle, response => Results.CreatedAtRoute(_getIncomeRoute, new { incomeId = response.Id }, response));
   }
 
   private static async Task<IResult> UpdateIncomeDetailsAsync(
