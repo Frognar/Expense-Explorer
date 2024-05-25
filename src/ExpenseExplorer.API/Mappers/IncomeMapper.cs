@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.API.Mappers;
 
 using ExpenseExplorer.API.Contract;
+using ExpenseExplorer.API.Contract.ReadModel;
 using ExpenseExplorer.Application.Incomes.Commands;
 using ExpenseExplorer.Domain.Incomes;
 
@@ -9,13 +10,29 @@ public static class IncomeMapper
   public static AddIncomeCommand MapToCommand(this AddIncomeRequest request, DateOnly today)
   {
     ArgumentNullException.ThrowIfNull(request);
-    return new AddIncomeCommand(request.Source, request.Amount, request.Category, request.ReceivedDate, request.Description, today);
+    return new AddIncomeCommand(
+      request.Source,
+      request.Amount,
+      request.Category,
+      request.ReceivedDate,
+      request.Description,
+      today);
   }
 
-  public static UpdateIncomeDetailsCommand MapToCommand(this UpdateIncomeDetailsRequest request, string incomeId, DateOnly today)
+  public static UpdateIncomeDetailsCommand MapToCommand(
+    this UpdateIncomeDetailsRequest request,
+    string incomeId,
+    DateOnly today)
   {
     ArgumentNullException.ThrowIfNull(request);
-    return new UpdateIncomeDetailsCommand(incomeId, request.Source, request.Amount, request.Category, request.ReceivedDate, request.Description, today);
+    return new UpdateIncomeDetailsCommand(
+      incomeId,
+      request.Source,
+      request.Amount,
+      request.Category,
+      request.ReceivedDate,
+      request.Description,
+      today);
   }
 
   public static TResult MapTo<TResult>(this Income income)
@@ -41,5 +58,23 @@ public static class IncomeMapper
       income.ReceivedDate.Date,
       income.Description.Value,
       income.Version.Value);
+  }
+
+  public static GetIncomesResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.Income> page)
+  {
+    ArgumentNullException.ThrowIfNull(page);
+    return new GetIncomesResponse(
+      page.Items.Select(
+        i => new IncomeResponse(
+          i.Id,
+          i.Source,
+          i.Amount,
+          i.Category,
+          i.ReceivedDate,
+          i.Description)),
+      page.TotalCount,
+      page.PageSize,
+      page.PageNumber,
+      page.PageCount);
   }
 }
