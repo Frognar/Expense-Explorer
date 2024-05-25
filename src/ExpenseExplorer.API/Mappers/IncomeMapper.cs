@@ -77,4 +77,16 @@ public static class IncomeMapper
       page.PageNumber,
       page.PageCount);
   }
+
+  public static GetIncomeResponse MapToResponse(this ReadModel.Models.Income income)
+  {
+    ArgumentNullException.ThrowIfNull(income);
+    return new GetIncomeResponse(
+      income.Id,
+      income.Source,
+      income.Amount,
+      income.Category,
+      income.ReceivedDate,
+      income.Description);
+  }
 }
