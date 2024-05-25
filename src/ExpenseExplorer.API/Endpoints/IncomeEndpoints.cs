@@ -13,6 +13,7 @@ public static class IncomeEndpoints
   {
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/incomes");
     group.MapGet("/", GetIncomesAsync);
+    group.MapGet("/{incomeId}", GetIncomeAsync);
     group.MapPost("/", AddIncomeAsync);
     group.MapPatch("/{incomeId}", UpdateIncomeDetailsAsync);
     group.MapDelete("/{incomeId}", DeleteIncomeAsync);
@@ -31,6 +32,17 @@ public static class IncomeEndpoints
     CancellationToken cancellationToken = default)
   {
     GetIncomesQuery query = new(pageSize, pageNumber, search, receivedAfter, receivedBefore, minAmount, maxAmount);
+    return (await sender.SendAsync(query, cancellationToken))
+      .Map(r => r.MapToResponse())
+      .Match(Handle, Results.Ok);
+  }
+
+  private static async Task<IResult> GetIncomeAsync(
+    string incomeId,
+    ISender sender,
+    CancellationToken cancellationToken = default)
+  {
+    GetIncomeQuery query = new(incomeId);
     return (await sender.SendAsync(query, cancellationToken))
       .Map(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
