@@ -84,6 +84,10 @@ GET {{ExpenseExplorer.API_HostAddress}}/api/reports?from=2021-10-01&to=2021-10-3
 
 ###
 
+GET {{ExpenseExplorer.API_HostAddress}}/api/reports/income-to-expense?from=2021-10-01&to=2021-10-31
+
+###
+
 GET {{ExpenseExplorer.API_HostAddress}}/api/incomes
 
 ###
