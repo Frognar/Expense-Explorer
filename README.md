@@ -240,7 +240,7 @@ API is already implemented and can be used, [documentation](#API) is available b
 
 #### Get Report
 
-- **URL:** `/api/report?from=2021-10-01&to=2021-10-31`
+- **URL:** `/api/reports/category-based-expense?from=2021-10-01&to=2021-10-31`
 - **Method:** `GET`
 - **Response Body:**
     ```json

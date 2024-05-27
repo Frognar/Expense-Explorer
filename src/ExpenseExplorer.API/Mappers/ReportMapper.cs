@@ -10,15 +10,16 @@ public static class ReportMapper
     return new GenerateIncomeToExpenseReportResponse(report.TotalIncome, report.TotalExpense);
   }
 
-  public static GenerateReportResponse MapToResponse(this ReadModel.Models.Report report)
+  public static GenerateCategoryBasedExpenseReportResponse MapToResponse(
+    this ReadModel.Models.CategoryBasedExpenseReport report)
   {
     ArgumentNullException.ThrowIfNull(report);
-    return new GenerateReportResponse(report.Total, report.Categories.Select(MapToResponse));
+    return new GenerateCategoryBasedExpenseReportResponse(report.Total, report.Categories.Select(MapToResponse));
   }
 
-  private static ReportEntryResponse MapToResponse(this ReadModel.Models.ReportEntry entry)
+  private static CategoryBasedEntryResponse MapToResponse(this ReadModel.Models.ReportEntry entry)
   {
     ArgumentNullException.ThrowIfNull(entry);
-    return new ReportEntryResponse(entry.Category, entry.Total);
+    return new CategoryBasedEntryResponse(entry.Category, entry.Total);
   }
 }
