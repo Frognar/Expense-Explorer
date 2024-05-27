@@ -1,7 +1,7 @@
 @ExpenseExplorer.API_HostAddress = https://localhost:7163
-@receiptId = 874bf4516eb44b969338e6535cae355c
-@purchaseId = 6ca96c9a0bf34273abeae223afbfa330
-@incomeId = 33c9242e06004f859ab4648ac2d9d56d
+@receiptId = 14b3b065aed2471e9e08be8b739ab6e2
+@purchaseId = 52b0d17ad9924caeb76d20c49e198087
+@incomeId = da5da2ff8d7545f1b7f2b7da7647ea51
 
 GET {{ExpenseExplorer.API_HostAddress}}/api/receipts?pageNumber=1&pageSize=10&search=stc&after=2021-10-02&
     before=2021-10-02&minTotal=1&maxTotal=10
@@ -103,7 +103,7 @@ Content-Type: application/json
   "source": "Work",
   "amount": 1500,
   "category": "Salary",
-  "receivedDate": "2024-05-01",
+  "receivedDate": "2021-10-10",
   "description": "Monthly salary"
 }
 
@@ -116,7 +116,7 @@ Content-Type: application/json
   "source": "Investments",
   "amount": 200,
   "category": "Dividends",
-  "receivedDate": "2024-05-08",
+  "receivedDate": "2021-10-12",
   "description": "Quarterly dividends"
 }
 

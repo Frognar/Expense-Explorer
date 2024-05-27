@@ -23,7 +23,7 @@ Expense Explorer is a simple expense tracking application designed to run on a h
 
 - [ ] **GUI:** A simple web-based GUI to interact with the application.
 - [ ] **OCR Integration:** Automatically extract receipt details using OCR.
-- [ ] **Income Tracking:** Track income and compare with expenses.
+- [x] **Income Tracking:** Track income and compare with expenses.
 
 ## Note
 
@@ -124,7 +124,7 @@ API is already implemented and can be used, [documentation](#API) is available b
       "quantity": 2,
       "unitPrice": 2.5,
       "totalDiscount": 0.5,
-      "description": "2% milk"
+      "description": "2% milk"  // optional
     }
     ```
 - **Response Body:**
@@ -236,6 +236,114 @@ API is already implemented and can be used, [documentation](#API) is available b
     }
     ```
 
+### Income
+
+#### Add Income
+
+- **URL:** `/api/incomes`
+- **Method:** `POST`
+- **Request Body:**
+    ```json
+    {
+    "source": "Work",
+    "amount": 1500,
+    "category": "Salary",
+    "receivedDate": "2021-10-10",
+    "description": "Monthly salary"
+    }
+    ```
+- **Response Body:**
+    ```json
+    {
+      "id": "da5da2ff8d7545f1b7f2b7da7647ea51",
+      "source": "Work",
+      "amount": 1500,
+      "category": "Salary",
+      "receivedDate": "2021-10-10",
+      "description": "Monthly salary",
+      "version": 0
+    }
+    ```
+
+#### Edit Income
+
+- **URL:** `/api/incomes/{incomeId}`
+- **Method:** `PATCH`
+- **Request Body:**
+    ```json
+    {
+        "source": "Investments",
+        "amount": 200,
+        "category": "Dividends",
+        "receivedDate": "2021-10-12",
+        "description": "Quarterly dividends"
+    }
+    ```
+- **Response Body:**
+    ```json
+    {
+      "id": "da5da2ff8d7545f1b7f2b7da7647ea51",
+      "source": "Investments",
+      "amount": 200,
+      "category": "Dividends",
+      "receivedDate": "2021-10-12",
+      "description": "Quarterly dividends",
+      "version": 5
+    }
+    ```
+
+#### Delete Income
+
+- **URL:** `/api/incomes/{incomeId}`
+- **Method:** `DELETE`
+
+#### Get Incomes
+
+- **URL:** `/api/receipts?pageNumber=1&pageSize=10&search=stc&after=2021-10-02&before=2021-10-02&minTotal=1&maxTotal=10`
+- **Method:** `GET`
+- **Response Body:**
+    ```json
+    {
+        "receipts": [
+            {
+                "id": "386c7c4014304b039d23f99fe9d9869e",
+                "store": "Costco",
+                "purchaseDate": "2021-10-02",
+                "total": 1.5
+            }
+        ],
+        "totalCount": 1,
+        "pageSize": 10,
+        "pageNumber": 1,
+        "pageCount": 1
+    }
+    ```
+
+#### Get Income
+
+- **URL:** `/api/receipts/{id}`
+- **Method:** `GET`
+- **Response Body:**
+    ```json
+    {
+        "id": "386c7c4014304b039d23f99fe9d9869e",
+        "store": "Costco",
+        "purchaseDate": "2021-10-02",
+        "total": 1.5,
+        "purchases": [
+            {
+                "id": "bd0e0d05518d486dbbfce32df7e6da3b",
+                "item": "Coca Cola",
+                "category": "Treats",
+                "quantity": 1,
+                "unitPrice": 1.5,
+                "totalDiscount": 0,
+                "description": "Coke"
+            }
+        ]
+    }
+    ```
+
 ### Reports
 
 #### Get Report
@@ -252,6 +360,16 @@ API is already implemented and can be used, [documentation](#API) is available b
                 "total": 1.5
             }
         ]
+    }
+    ```
+
+- **URL:** `/api/reports/income-to-expense?from=2021-10-01&to=2021-10-31`
+- **Method:** `GET`
+- **Response Body:**
+    ```json
+    {
+        "totalIncome": 200,
+        "totalExpense": 1.5
     }
     ```
 
