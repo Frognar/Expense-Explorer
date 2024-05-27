@@ -18,6 +18,7 @@ public sealed class GenerateCategoryBasedExpenseReportQueryHandler(ExpenseExplor
   {
     try
     {
+      ArgumentNullException.ThrowIfNull(query);
       Dictionary<string, decimal> data = await _context.Receipts.AsNoTracking()
         .Where(r => r.PurchaseDate >= query.From && r.PurchaseDate <= query.To)
         .SelectMany(r => r.Purchases)
@@ -30,7 +31,7 @@ public sealed class GenerateCategoryBasedExpenseReportQueryHandler(ExpenseExplor
 
       decimal total = data.Values.Sum();
       List<ReportEntry> reportEntries = data.Select(d => new ReportEntry(d.Key, d.Value)).ToList();
-      CategoryBasedExpenseReport report = new(total, reportEntries);
+      CategoryBasedExpenseReport report = new(query.From, query.To, total, reportEntries);
       return Success.From(report);
     }
     catch (DbException ex)

@@ -18,6 +18,7 @@ public sealed class GenerateIncomeToExpenseReportQueryHandler(ExpenseExplorerCon
   {
     try
     {
+      ArgumentNullException.ThrowIfNull(query);
       decimal totalIncome = await _context.Incomes.AsNoTracking()
         .Where(i => i.ReceivedDate >= query.From && i.ReceivedDate <= query.To)
         .SumAsync(i => i.Amount, cancellationToken);
@@ -27,7 +28,7 @@ public sealed class GenerateIncomeToExpenseReportQueryHandler(ExpenseExplorerCon
         .SelectMany(r => r.Purchases)
         .SumAsync(p => (p.UnitPrice * p.Quantity) - p.TotalDiscount, cancellationToken);
 
-      IncomeToExportReport report = new(totalIncome, totalExpense);
+      IncomeToExportReport report = new(query.From, query.To, totalIncome, totalExpense);
       return Success.From(report);
     }
     catch (DbException ex)

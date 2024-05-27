@@ -1,3 +1,7 @@
 namespace ExpenseExplorer.API.Contract.ReadModel;
 
-public record GenerateIncomeToExpenseReportResponse(decimal TotalIncome, decimal TotalExpense);
+public record GenerateIncomeToExpenseReportResponse(
+  DateOnly StartDate,
+  DateOnly EndDate,
+  decimal TotalIncome,
+  decimal TotalExpense);

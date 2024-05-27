@@ -1,3 +1,3 @@
 namespace ExpenseExplorer.ReadModel.Models;
 
-public record IncomeToExportReport(decimal TotalIncome, decimal TotalExpense);
+public record IncomeToExportReport(DateOnly StartDate, DateOnly EndDate, decimal TotalIncome, decimal TotalExpense);

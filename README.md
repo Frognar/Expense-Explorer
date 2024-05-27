@@ -347,6 +347,8 @@ API is already implemented and can be used, [documentation](#API) is available b
 - **Response Body:**
     ```json
     {
+        "startDate": "2021-10-01",
+        "endDate": "2021-10-31",
         "total": 1.5,
         "categories": [
             {
@@ -362,6 +364,8 @@ API is already implemented and can be used, [documentation](#API) is available b
 - **Response Body:**
     ```json
     {
+        "startDate": "2021-10-01",
+        "endDate": "2021-10-31",
         "totalIncome": 200,
         "totalExpense": 1.5
     }
