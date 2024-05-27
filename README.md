@@ -299,17 +299,20 @@ API is already implemented and can be used, [documentation](#API) is available b
 
 #### Get Incomes
 
-- **URL:** `/api/receipts?pageNumber=1&pageSize=10&search=stc&after=2021-10-02&before=2021-10-02&minTotal=1&maxTotal=10`
+- **URL:
+  ** `/api/incoems?pageNumber=1&pageSize=10&search=dividends&receivedAfter=2021-10-02&receivedBefore=2021-10-22&minAmount=1&maxAmount=200`
 - **Method:** `GET`
 - **Response Body:**
     ```json
     {
-        "receipts": [
+        "incomes": [
             {
-                "id": "386c7c4014304b039d23f99fe9d9869e",
-                "store": "Costco",
-                "purchaseDate": "2021-10-02",
-                "total": 1.5
+                "id": "da5da2ff8d7545f1b7f2b7da7647ea51",
+                "source": "Investments",
+                "amount": 200,
+                "category": "Dividends",
+                "receivedDate": "2021-10-12",
+                "description": "Quarterly dividends"
             }
         ],
         "totalCount": 1,
@@ -321,26 +324,17 @@ API is already implemented and can be used, [documentation](#API) is available b
 
 #### Get Income
 
-- **URL:** `/api/receipts/{id}`
+- **URL:** `/api/incomes/{id}`
 - **Method:** `GET`
 - **Response Body:**
     ```json
     {
-        "id": "386c7c4014304b039d23f99fe9d9869e",
-        "store": "Costco",
-        "purchaseDate": "2021-10-02",
-        "total": 1.5,
-        "purchases": [
-            {
-                "id": "bd0e0d05518d486dbbfce32df7e6da3b",
-                "item": "Coca Cola",
-                "category": "Treats",
-                "quantity": 1,
-                "unitPrice": 1.5,
-                "totalDiscount": 0,
-                "description": "Coke"
-            }
-        ]
+        "id": "da5da2ff8d7545f1b7f2b7da7647ea51",
+        "source": "Investments",
+        "amount": 200,
+        "category": "Dividends",
+        "receivedDate": "2021-10-12",
+        "description": "Quarterly dividends"
     }
     ```
 

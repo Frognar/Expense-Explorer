@@ -88,7 +88,8 @@ GET {{ExpenseExplorer.API_HostAddress}}/api/reports/income-to-expense?from=2021-
 
 ###
 
-GET {{ExpenseExplorer.API_HostAddress}}/api/incomes
+GET {{ExpenseExplorer.API_HostAddress}}/api/incomes?pageNumber=1&pageSize=10&search=dividends&receivedAfter=2021-10-02&
+    receivedBefore=2021-10-22&minAmount=1&maxAmount=200
 
 ###
 
