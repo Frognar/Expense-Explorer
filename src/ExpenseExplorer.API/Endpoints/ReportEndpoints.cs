@@ -10,18 +10,18 @@ public static class ReportEndpoints
   public static IEndpointRouteBuilder MapReportEndpoints(this IEndpointRouteBuilder endpointRouteBuilder)
   {
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/reports");
-    group.MapGet("/", GenerateReportAsync);
+    group.MapGet("/category-based-expense", GenerateCategoryBasedExpenseReportAsync);
     group.MapGet("/income-to-expense", GenerateIncomeToExpenseReportAsync);
     return endpointRouteBuilder;
   }
 
-  private static async Task<IResult> GenerateReportAsync(
+  private static async Task<IResult> GenerateCategoryBasedExpenseReportAsync(
     DateOnly from,
     DateOnly to,
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    GenerateReportQuery query = new(from, to);
+    GenerateCategoryBasedExpenseReportQuery query = new(from, to);
     return (await sender.SendAsync(query, cancellationToken))
       .Map(page => page.MapToResponse())
       .Match(Handle, Results.Ok);

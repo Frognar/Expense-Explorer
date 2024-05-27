@@ -7,13 +7,13 @@ using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
-public sealed class GenerateReportQueryHandler(ExpenseExplorerContext context)
-  : IQueryHandler<GenerateReportQuery, Result<Report>>
+public sealed class GenerateCategoryBasedExpenseReportQueryHandler(ExpenseExplorerContext context)
+  : IQueryHandler<GenerateCategoryBasedExpenseReportQuery, Result<CategoryBasedExpenseReport>>
 {
   private readonly ExpenseExplorerContext _context = context;
 
-  public async Task<Result<Report>> HandleAsync(
-    GenerateReportQuery query,
+  public async Task<Result<CategoryBasedExpenseReport>> HandleAsync(
+    GenerateCategoryBasedExpenseReportQuery query,
     CancellationToken cancellationToken = default)
   {
     try
@@ -30,12 +30,12 @@ public sealed class GenerateReportQueryHandler(ExpenseExplorerContext context)
 
       decimal total = data.Values.Sum();
       List<ReportEntry> reportEntries = data.Select(d => new ReportEntry(d.Key, d.Value)).ToList();
-      Report report = new(total, reportEntries);
+      CategoryBasedExpenseReport report = new(total, reportEntries);
       return Success.From(report);
     }
     catch (DbException ex)
     {
-      return Fail.OfType<Report>(Failure.Fatal(ex));
+      return Fail.OfType<CategoryBasedExpenseReport>(Failure.Fatal(ex));
     }
   }
 }

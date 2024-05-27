@@ -80,7 +80,7 @@ GET {{ExpenseExplorer.API_HostAddress}}/api/categories?pageNumber=1&pageSize=10&
 
 ###
 
-GET {{ExpenseExplorer.API_HostAddress}}/api/reports?from=2021-10-01&to=2021-10-31
+GET {{ExpenseExplorer.API_HostAddress}}/api/reports/category-based-expense?from=2021-10-01&to=2021-10-31
 
 ###
 
