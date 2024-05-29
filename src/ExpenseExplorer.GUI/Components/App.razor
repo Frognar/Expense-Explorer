@@ -7,12 +7,15 @@
     <base href="/"/>
     <link rel="stylesheet" href="app.css"/>
     <link rel="stylesheet" href="ExpenseExplorer.GUI.styles.css"/>
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/dark.css">
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css">
     <HeadOutlet/>
 </head>
 
 <body>
 <Routes/>
 <script src="_framework/blazor.web.js"></script>
+<script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
 </body>
 
 </html>
