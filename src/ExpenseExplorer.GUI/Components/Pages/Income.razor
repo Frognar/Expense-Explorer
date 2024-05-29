@@ -1,0 +1,35 @@
+﻿@page "/income"
+@using ExpenseExplorer.API.Contract.ReadModel
+@inject IHttpClientFactory ClientFactory
+@rendermode InteractiveServer
+
+<PageTitle>Income</PageTitle>
+
+<RadzenDataGrid Data="@_incomes" Count="@_count" TItem="IncomeResponse" LoadData="@LoadData" AllowPaging="true"
+                PageSize="@PageSize">
+    <Columns>
+        <RadzenDataGridColumn TItem="IncomeResponse" Property="Source" Title="Source"/>
+        <RadzenDataGridColumn TItem="IncomeResponse" Property="Amount" Title="Amount"/>
+        <RadzenDataGridColumn TItem="IncomeResponse" Property="Category" Title="Category"/>
+        <RadzenDataGridColumn TItem="IncomeResponse" Property="ReceivedDate" Title="Received date"/>
+        <RadzenDataGridColumn TItem="IncomeResponse" Property="Description" Title="Description"/>
+    </Columns>
+</RadzenDataGrid>
+
+
+@code
+{
+    const int PageSize = 5;
+#pragma warning disable
+    IEnumerable<IncomeResponse> _incomes;
+    int _count;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        using var client = ClientFactory.CreateClient();
+        int pageNumber = args.Skip.Value / PageSize + 1;
+        var response = await client.GetFromJsonAsync<GetIncomesResponse>($"http://localhost:5163/api/incomes?pageNumber={pageNumber}&pageSize={PageSize}");
+        _count = response.TotalCount;
+        _incomes = response.Incomes;
+    }
+}
