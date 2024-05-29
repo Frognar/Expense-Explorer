@@ -10,4 +10,8 @@
       <ProjectReference Include="..\ExpenseExplorer.API.Contract\ExpenseExplorer.API.Contract.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="Radzen.Blazor" Version="4.32.1"/>
+    </ItemGroup>
+
 </Project>
