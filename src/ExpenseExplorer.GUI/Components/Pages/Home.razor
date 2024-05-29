@@ -1,18 +1,7 @@
 ﻿@page "/"
-@using ExpenseExplorer.API.Contract.ReadModel
-@inject IHttpClientFactory ClientFactory
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
-
-@code
-{
-    protected override async Task OnInitializedAsync()
-    {
-        var client = ClientFactory.CreateClient();
-        var response = await client.GetFromJsonAsync<GetIncomesResponse>("http://localhost:5163/api/incomes");
-    }
-}
