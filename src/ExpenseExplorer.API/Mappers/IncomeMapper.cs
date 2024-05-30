@@ -73,6 +73,7 @@ public static class IncomeMapper
           i.ReceivedDate,
           i.Description)),
       page.TotalCount,
+      page.FilteredCount,
       page.PageSize,
       page.PageNumber,
       page.PageCount);

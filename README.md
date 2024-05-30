@@ -316,6 +316,7 @@ API is already implemented and can be used, [documentation](#API) is available b
             }
         ],
         "totalCount": 1,
+        "filteredCount": 1,
         "pageSize": 10,
         "pageNumber": 1,
         "pageCount": 1
