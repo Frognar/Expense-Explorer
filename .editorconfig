@@ -86,6 +86,9 @@ dotnet_diagnostic.sa1314.severity = none
 #SA1600: Elements should be documented
 dotnet_diagnostic.sa1600.severity = none
 
+#SA1602: Enumeration items should be documented
+dotnet_diagnostic.sa1602.severity = none
+
 #SA1633: File should have header
 dotnet_diagnostic.sa1633.severity = none
 

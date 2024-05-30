@@ -22,20 +22,26 @@ public sealed class GetIncomesQueryHandler(ExpenseExplorerContext context)
     try
     {
       ArgumentNullException.ThrowIfNull(query);
-      List<Income> incomes = await _context.Incomes.AsNoTracking()
+      IQueryable<DbIncome> incomeQuery = _context.Incomes.AsNoTracking();
+      int totalCount = await incomeQuery.CountAsync(cancellationToken);
+      incomeQuery = incomeQuery
         .Filter(
           ReceivedBetween(query.ReceivedAfter, query.ReceivedBefore),
           AmountBetween(query.MinAmount, query.MaxAmount),
-          Search(query.Search))
+          SearchSource(query.Source),
+          SearchCategory(query.Category),
+          SearchDescription(query.Description));
+
+      int filteredCount = await incomeQuery.CountAsync(cancellationToken);
+      List<Income> incomes = await incomeQuery
         .OrderByMany(
-          Order.AscendingBy<DbIncome>(i => i.ReceivedDate),
-          Order.DescendingBy<DbIncome>(r => r.Id))
+          Order.By(GetSelector(query.SortBy), Order.GetDirection(query.SortOrder)),
+          Order.AscendingBy<DbIncome>(i => i.Id))
         .GetPage(query.PageNumber, query.PageSize)
         .Select(i => new Income(i.Id, i.Source, i.Amount, i.Category, i.ReceivedDate, i.Description))
         .ToListAsync(cancellationToken);
 
-      int totalCount = await _context.Incomes.CountAsync(cancellationToken);
-      PageOf<Income> response = Page.Of(incomes, totalCount, query.PageSize, query.PageNumber);
+      PageOf<Income> response = Page.Of(incomes, totalCount, filteredCount, query.PageSize, query.PageNumber);
       return Success.From(response);
     }
     catch (DbException ex)
@@ -54,7 +60,7 @@ public sealed class GetIncomesQueryHandler(ExpenseExplorerContext context)
     return r => r.Amount >= min && r.Amount <= max;
   }
 
-  private static Expression<Func<DbIncome, bool>> Search(string search)
+  private static Expression<Func<DbIncome, bool>> SearchSource(string search)
   {
     if (string.IsNullOrWhiteSpace(search))
     {
@@ -67,11 +73,60 @@ public sealed class GetIncomesQueryHandler(ExpenseExplorerContext context)
 #pragma warning disable CA1304
 #pragma warning disable CA1311
 #pragma warning disable CA1862
-    return i => i.Source.ToUpper().Contains(search)
-                || i.Category.ToUpper().Contains(search)
-                || i.Description.ToUpper().Contains(search);
+    return i => i.Source.ToUpper().Contains(search);
 #pragma warning restore CA1862
 #pragma warning restore CA1311
 #pragma warning restore CA1304
+  }
+
+  private static Expression<Func<DbIncome, bool>> SearchCategory(string search)
+  {
+    if (string.IsNullOrWhiteSpace(search))
+    {
+      return r => true;
+    }
+
+    search = search.ToUpperInvariant();
+
+    // EFCore does not support StringComparison and CultureInfo enums in LINQ queries
+#pragma warning disable CA1304
+#pragma warning disable CA1311
+#pragma warning disable CA1862
+    return i => i.Category.ToUpper().Contains(search);
+#pragma warning restore CA1862
+#pragma warning restore CA1311
+#pragma warning restore CA1304
+  }
+
+  private static Expression<Func<DbIncome, bool>> SearchDescription(string search)
+  {
+    if (string.IsNullOrWhiteSpace(search))
+    {
+      return r => true;
+    }
+
+    search = search.ToUpperInvariant();
+
+    // EFCore does not support StringComparison and CultureInfo enums in LINQ queries
+#pragma warning disable CA1304
+#pragma warning disable CA1311
+#pragma warning disable CA1862
+    return i => i.Description.ToUpper().Contains(search);
+#pragma warning restore CA1862
+#pragma warning restore CA1311
+#pragma warning restore CA1304
+  }
+
+  private static Expression<Func<DbIncome, object>> GetSelector(string orderBy)
+  {
+    return orderBy.ToUpperInvariant() switch
+    {
+      "SOURCE" => income => income.Source,
+      "AMOUNT" => income => income.Amount,
+      "CATEGORY" => income => income.Category,
+      "RECEIVEDDATE" => income => income.ReceivedDate,
+      "DESCRIPTION" => income => income.Description,
+      _ => income => income.ReceivedDate,
+    };
   }
 }

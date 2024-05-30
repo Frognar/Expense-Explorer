@@ -5,14 +5,62 @@
 
 <PageTitle>Income</PageTitle>
 
-<RadzenDataGrid Data="@_incomes" Count="@_count" TItem="IncomeResponse" LoadData="@LoadData" AllowPaging="true"
-                PageSize="@PageSize">
+<RadzenDataGrid
+    @ref="_grid"
+    Data="@_incomes"
+    Count="@_count"
+    TItem="IncomeResponse"
+    LoadData="@LoadData"
+    AllowPaging="true"
+    PageSize="@PageSize"
+    AllowSorting="true"
+    AllowFiltering="true">
     <Columns>
-        <RadzenDataGridColumn TItem="IncomeResponse" Property="Source" Title="Source"/>
-        <RadzenDataGridColumn TItem="IncomeResponse" Property="Amount" Title="Amount"/>
-        <RadzenDataGridColumn TItem="IncomeResponse" Property="Category" Title="Category"/>
-        <RadzenDataGridColumn TItem="IncomeResponse" Property="ReceivedDate" Title="Received date"/>
-        <RadzenDataGridColumn TItem="IncomeResponse" Property="Description" Title="Description"/>
+        <RadzenDataGridColumn TItem="IncomeResponse" Property="Source" Title="Source">
+            <FilterTemplate>
+                <RadzenFormField AllowFloatingLabel="false" Text="Source">
+                    <RadzenTextBox @bind-Value=@_source Change="OnSourceChange"/>
+                </RadzenFormField>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="IncomeResponse" Property="Amount" Title="Amount">
+            <FilterTemplate>
+                <RadzenFormField AllowFloatingLabel="false" Text="Min amount">
+                    <RadzenNumeric ShowUpDown="false" TValue="decimal?" @bind-Value=@_minAmount
+                                   Change="OnMinAmountChange"/>
+                </RadzenFormField>
+                <RadzenFormField AllowFloatingLabel="false" Text="Max amount">
+                    <RadzenNumeric ShowUpDown="false" TValue="decimal?" @bind-Value=@_maxAmount
+                                   Change="OnMaxAmountChange"/>
+                </RadzenFormField>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="IncomeResponse" Property="Category" Title="Category">
+            <FilterTemplate>
+                <RadzenFormField AllowFloatingLabel="false" Text="Category">
+                    <RadzenTextBox @bind-Value=@_category Change="OnCategoryChange"/>
+                </RadzenFormField>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="IncomeResponse" Property="ReceivedDate" Title="Received date">
+            <FilterTemplate>
+                <RadzenFormField AllowFloatingLabel="false" Text="Received after">
+                    <RadzenDatePicker @bind-Value=@_receivedAfter DateFormat="dd.MM.yyyy"
+                                      Change="OnReceivedAfterChange"/>
+                </RadzenFormField>
+                <RadzenFormField AllowFloatingLabel="false" Text="Received before">
+                    <RadzenDatePicker @bind-Value=@_receivedBefore DateFormat="dd.MM.yyyy"
+                                      Change="OnReceivedBeforeChange"/>
+                </RadzenFormField>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="IncomeResponse" Property="Description" Title="Description">
+            <FilterTemplate>
+                <RadzenFormField AllowFloatingLabel="false" Text="Description">
+                    <RadzenTextBox @bind-Value=@_description Change="OnDescriptionChange"/>
+                </RadzenFormField>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
@@ -20,16 +68,71 @@
 @code
 {
     const int PageSize = 5;
-#pragma warning disable
-    IEnumerable<IncomeResponse> _incomes;
+    RadzenDataGrid<IncomeResponse> _grid = default!;
+    IEnumerable<IncomeResponse> _incomes = default!;
     int _count;
+    DateTime? _receivedAfter;
+    DateTime? _receivedBefore;
+    decimal? _minAmount;
+    decimal? _maxAmount;
+    string? _source;
+    string? _category;
+    string? _description;
 
     async Task LoadData(LoadDataArgs args)
     {
+        List<string> parameters = [];
+        int pageNumber = args.Skip.HasValue ? args.Skip.Value / PageSize + 1 : 1;
+        parameters.Add($"pageNumber={pageNumber}");
+        parameters.Add($"pageSize={PageSize}");
+        if (_minAmount.HasValue)
+            parameters.Add($"minAmount={_minAmount.Value}");
+
+        if (_maxAmount.HasValue)
+            parameters.Add($"maxAmount={_maxAmount.Value}");
+
+        if (_receivedAfter.HasValue)
+            parameters.Add($"receivedAfter={_receivedAfter:MM/dd/yyyy}");
+
+        if (_receivedBefore.HasValue)
+            parameters.Add($"receivedBefore={_receivedBefore:MM/dd/yyyy}");
+
+        if (!string.IsNullOrWhiteSpace(_source))
+            parameters.Add($"source={_source.Trim()}");
+
+        if (!string.IsNullOrWhiteSpace(_category))
+            parameters.Add($"category={_category.Trim()}");
+
+        if (!string.IsNullOrWhiteSpace(_description))
+            parameters.Add($"description={_description.Trim()}");
+
+        if (!string.IsNullOrWhiteSpace(args.OrderBy))
+        {
+            string[] sort = args.OrderBy.Split(' ');
+            parameters.Add($"sortBy={sort[0]}");
+            parameters.Add($"sortOrder={sort[1]}");
+        }
+
+        string url = "http://localhost:5163/api/incomes";
+        url += $"?{string.Join("&", parameters)}";
+
         using var client = ClientFactory.CreateClient();
-        int pageNumber = args.Skip.Value / PageSize + 1;
-        var response = await client.GetFromJsonAsync<GetIncomesResponse>($"http://localhost:5163/api/incomes?pageNumber={pageNumber}&pageSize={PageSize}");
-        _count = response.TotalCount;
+        var response = await client.GetFromJsonAsync<GetIncomesResponse>(url);
+        _count = response!.FilteredCount;
         _incomes = response.Incomes;
     }
+
+    async Task OnReceivedAfterChange(DateTime? _) => await _grid.Reload();
+
+    async Task OnReceivedBeforeChange(DateTime? _) => await _grid.Reload();
+
+    async Task OnMinAmountChange(decimal? _) => await _grid.Reload();
+
+    async Task OnMaxAmountChange(decimal? _) => await _grid.Reload();
+
+    async Task OnSourceChange(string _) => await _grid.Reload();
+
+    async Task OnCategoryChange(string _) => await _grid.Reload();
+
+    async Task OnDescriptionChange(string _) => await _grid.Reload();
 }

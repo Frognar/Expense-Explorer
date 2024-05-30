@@ -1,7 +1,6 @@
 namespace ExpenseExplorer.ReadModel.Queries;
 
 using System.Data.Common;
-using System.Linq.Expressions;
 using CommandHub.Queries;
 using ExpenseExplorer.ReadModel.Extensions;
 using ExpenseExplorer.ReadModel.Models;
@@ -22,21 +21,22 @@ public sealed class GetStoresQueryHandler(ExpenseExplorerContext context)
     try
     {
       ArgumentNullException.ThrowIfNull(query);
-      IQueryable<string> storeNames = _context.Receipts.AsNoTracking()
+      IQueryable<string> storeQuery = _context.Receipts.AsNoTracking()
         .OrderByMany(
           Order.DescendingBy<DbReceipt>(r => r.PurchaseDate),
           Order.DescendingBy<DbReceipt>(r => r.Id))
         .Select(r => r.Store)
         .Distinct();
 
-      int totalCount = await storeNames.CountAsync(cancellationToken);
-      List<Store> storeList = await storeNames
-        .WhereContains(query.Search)
+      int totalCount = await storeQuery.CountAsync(cancellationToken);
+      storeQuery = storeQuery.WhereContains(query.Search);
+      int filteredCount = await storeQuery.CountAsync(cancellationToken);
+      List<Store> storeList = await storeQuery
         .GetPage(query.PageNumber, query.PageSize)
         .Select(name => new Store(name))
         .ToListAsync(cancellationToken);
 
-      PageOf<Store> page = Page.Of(storeList, totalCount, query.PageSize, query.PageNumber);
+      PageOf<Store> page = Page.Of(storeList, totalCount, filteredCount, query.PageSize, query.PageNumber);
       return Success.From(page);
     }
     catch (DbException ex)

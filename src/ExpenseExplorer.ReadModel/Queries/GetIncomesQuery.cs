@@ -7,11 +7,15 @@ using FunctionalCore.Monads;
 public sealed record GetIncomesQuery(
   int PageSize,
   int PageNumber,
-  string Search,
+  string Source,
+  string Category,
+  string Description,
   DateOnly ReceivedAfter,
   DateOnly ReceivedBefore,
   decimal MinAmount,
-  decimal MaxAmount)
+  decimal MaxAmount,
+  string SortBy,
+  string SortOrder)
   : IQuery<Result<PageOf<Income>>>
 {
   public const int DefaultPageSize = 10;
@@ -20,19 +24,27 @@ public sealed record GetIncomesQuery(
   public GetIncomesQuery(
     int? pageSize,
     int? pageNumber,
-    string? search,
+    string? source,
+    string? category,
+    string? description,
     DateOnly? receivedAfter,
     DateOnly? receivedBefore,
     decimal? minAmount,
-    decimal? maxAmount)
+    decimal? maxAmount,
+    string? sortBy,
+    string? sortOrder)
     : this(
       pageSize ?? DefaultPageSize,
       pageNumber ?? 1,
-      search ?? string.Empty,
+      source ?? string.Empty,
+      category ?? string.Empty,
+      description ?? string.Empty,
       receivedAfter ?? DateOnly.MinValue,
       receivedBefore ?? DateOnly.MaxValue,
       minAmount ?? decimal.MinValue,
-      maxAmount ?? decimal.MaxValue)
+      maxAmount ?? decimal.MaxValue,
+      sortBy ?? string.Empty,
+      sortOrder ?? string.Empty)
   {
   }
 
