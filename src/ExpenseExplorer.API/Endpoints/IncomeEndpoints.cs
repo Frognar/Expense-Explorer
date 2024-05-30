@@ -32,6 +32,8 @@ public static class IncomeEndpoints
     DateOnly? receivedBefore,
     decimal? minAmount,
     decimal? maxAmount,
+    string? sortBy,
+    string? sortOrder,
     ISender sender,
     CancellationToken cancellationToken = default)
   {
@@ -44,7 +46,9 @@ public static class IncomeEndpoints
       receivedAfter,
       receivedBefore,
       minAmount,
-      maxAmount);
+      maxAmount,
+      sortBy,
+      sortOrder);
 
     return (await sender.SendAsync(query, cancellationToken))
       .Map(r => r.MapToResponse())

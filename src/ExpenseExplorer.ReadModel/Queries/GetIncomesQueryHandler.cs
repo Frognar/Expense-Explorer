@@ -30,8 +30,8 @@ public sealed class GetIncomesQueryHandler(ExpenseExplorerContext context)
           SearchCategory(query.Category),
           SearchDescription(query.Description))
         .OrderByMany(
-          Order.AscendingBy<DbIncome>(i => i.ReceivedDate),
-          Order.DescendingBy<DbIncome>(r => r.Id))
+          Order.By(GetSelector(query.SortBy), Order.GetDirection(query.SortOrder)),
+          Order.AscendingBy<DbIncome>(i => i.Id))
         .GetPage(query.PageNumber, query.PageSize)
         .Select(i => new Income(i.Id, i.Source, i.Amount, i.Category, i.ReceivedDate, i.Description))
         .ToListAsync(cancellationToken);
@@ -111,5 +111,18 @@ public sealed class GetIncomesQueryHandler(ExpenseExplorerContext context)
 #pragma warning restore CA1862
 #pragma warning restore CA1311
 #pragma warning restore CA1304
+  }
+
+  private static Expression<Func<DbIncome, object>> GetSelector(string orderBy)
+  {
+    return orderBy.ToUpperInvariant() switch
+    {
+      "SOURCE" => income => income.Source,
+      "AMOUNT" => income => income.Amount,
+      "CATEGORY" => income => income.Category,
+      "RECEIVEDDATE" => income => income.ReceivedDate,
+      "DESCRIPTION" => income => income.Description,
+      _ => income => income.ReceivedDate,
+    };
   }
 }

@@ -13,7 +13,9 @@ public sealed record GetIncomesQuery(
   DateOnly ReceivedAfter,
   DateOnly ReceivedBefore,
   decimal MinAmount,
-  decimal MaxAmount)
+  decimal MaxAmount,
+  string SortBy,
+  string SortOrder)
   : IQuery<Result<PageOf<Income>>>
 {
   public const int DefaultPageSize = 10;
@@ -28,7 +30,9 @@ public sealed record GetIncomesQuery(
     DateOnly? receivedAfter,
     DateOnly? receivedBefore,
     decimal? minAmount,
-    decimal? maxAmount)
+    decimal? maxAmount,
+    string? sortBy,
+    string? sortOrder)
     : this(
       pageSize ?? DefaultPageSize,
       pageNumber ?? 1,
@@ -38,7 +42,9 @@ public sealed record GetIncomesQuery(
       receivedAfter ?? DateOnly.MinValue,
       receivedBefore ?? DateOnly.MaxValue,
       minAmount ?? decimal.MinValue,
-      maxAmount ?? decimal.MaxValue)
+      maxAmount ?? decimal.MaxValue,
+      sortBy ?? string.Empty,
+      sortOrder ?? string.Empty)
   {
   }
 

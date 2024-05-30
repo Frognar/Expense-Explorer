@@ -98,6 +98,8 @@ GET {{ExpenseExplorer.API_HostAddress}}/api/incomes
     &receivedBefore=2021-10-22
     &minAmount=1
     &maxAmount=2000
+    &sortBy=source
+    &sortDirection=desc
 
 ###
 
