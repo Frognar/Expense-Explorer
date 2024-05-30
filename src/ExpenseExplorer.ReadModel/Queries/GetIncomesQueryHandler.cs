@@ -26,7 +26,9 @@ public sealed class GetIncomesQueryHandler(ExpenseExplorerContext context)
         .Filter(
           ReceivedBetween(query.ReceivedAfter, query.ReceivedBefore),
           AmountBetween(query.MinAmount, query.MaxAmount),
-          Search(query.Search))
+          SearchSource(query.Source),
+          SearchCategory(query.Category),
+          SearchDescription(query.Description))
         .OrderByMany(
           Order.AscendingBy<DbIncome>(i => i.ReceivedDate),
           Order.DescendingBy<DbIncome>(r => r.Id))
@@ -54,7 +56,7 @@ public sealed class GetIncomesQueryHandler(ExpenseExplorerContext context)
     return r => r.Amount >= min && r.Amount <= max;
   }
 
-  private static Expression<Func<DbIncome, bool>> Search(string search)
+  private static Expression<Func<DbIncome, bool>> SearchSource(string search)
   {
     if (string.IsNullOrWhiteSpace(search))
     {
@@ -67,9 +69,45 @@ public sealed class GetIncomesQueryHandler(ExpenseExplorerContext context)
 #pragma warning disable CA1304
 #pragma warning disable CA1311
 #pragma warning disable CA1862
-    return i => i.Source.ToUpper().Contains(search)
-                || i.Category.ToUpper().Contains(search)
-                || i.Description.ToUpper().Contains(search);
+    return i => i.Source.ToUpper().Contains(search);
+#pragma warning restore CA1862
+#pragma warning restore CA1311
+#pragma warning restore CA1304
+  }
+
+  private static Expression<Func<DbIncome, bool>> SearchCategory(string search)
+  {
+    if (string.IsNullOrWhiteSpace(search))
+    {
+      return r => true;
+    }
+
+    search = search.ToUpperInvariant();
+
+    // EFCore does not support StringComparison and CultureInfo enums in LINQ queries
+#pragma warning disable CA1304
+#pragma warning disable CA1311
+#pragma warning disable CA1862
+    return i => i.Category.ToUpper().Contains(search);
+#pragma warning restore CA1862
+#pragma warning restore CA1311
+#pragma warning restore CA1304
+  }
+
+  private static Expression<Func<DbIncome, bool>> SearchDescription(string search)
+  {
+    if (string.IsNullOrWhiteSpace(search))
+    {
+      return r => true;
+    }
+
+    search = search.ToUpperInvariant();
+
+    // EFCore does not support StringComparison and CultureInfo enums in LINQ queries
+#pragma warning disable CA1304
+#pragma warning disable CA1311
+#pragma warning disable CA1862
+    return i => i.Description.ToUpper().Contains(search);
 #pragma warning restore CA1862
 #pragma warning restore CA1311
 #pragma warning restore CA1304

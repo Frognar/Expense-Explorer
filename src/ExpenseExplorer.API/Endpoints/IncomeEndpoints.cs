@@ -25,7 +25,9 @@ public static class IncomeEndpoints
   private static async Task<IResult> GetIncomesAsync(
     int? pageSize,
     int? pageNumber,
-    string? search,
+    string? source,
+    string? category,
+    string? description,
     DateOnly? receivedAfter,
     DateOnly? receivedBefore,
     decimal? minAmount,
@@ -33,7 +35,17 @@ public static class IncomeEndpoints
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    GetIncomesQuery query = new(pageSize, pageNumber, search, receivedAfter, receivedBefore, minAmount, maxAmount);
+    GetIncomesQuery query = new(
+      pageSize,
+      pageNumber,
+      source,
+      category,
+      description,
+      receivedAfter,
+      receivedBefore,
+      minAmount,
+      maxAmount);
+
     return (await sender.SendAsync(query, cancellationToken))
       .Map(r => r.MapToResponse())
       .Match(Handle, Results.Ok);

@@ -300,7 +300,7 @@ API is already implemented and can be used, [documentation](#API) is available b
 #### Get Incomes
 
 - **URL:
-  ** `/api/incoems?pageNumber=1&pageSize=10&search=dividends&receivedAfter=2021-10-02&receivedBefore=2021-10-22&minAmount=1&maxAmount=200`
+  ** `/api/incoems?pageNumber=1&pageSize=10&source=Wor&category=lary&description=onth&receivedAfter=2021-10-02&receivedBefore=2021-10-22&minAmount=1&maxAmount=2000`
 - **Method:** `GET`
 - **Response Body:**
     ```json

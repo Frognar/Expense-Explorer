@@ -7,7 +7,9 @@ using FunctionalCore.Monads;
 public sealed record GetIncomesQuery(
   int PageSize,
   int PageNumber,
-  string Search,
+  string Source,
+  string Category,
+  string Description,
   DateOnly ReceivedAfter,
   DateOnly ReceivedBefore,
   decimal MinAmount,
@@ -20,7 +22,9 @@ public sealed record GetIncomesQuery(
   public GetIncomesQuery(
     int? pageSize,
     int? pageNumber,
-    string? search,
+    string? source,
+    string? category,
+    string? description,
     DateOnly? receivedAfter,
     DateOnly? receivedBefore,
     decimal? minAmount,
@@ -28,7 +32,9 @@ public sealed record GetIncomesQuery(
     : this(
       pageSize ?? DefaultPageSize,
       pageNumber ?? 1,
-      search ?? string.Empty,
+      source ?? string.Empty,
+      category ?? string.Empty,
+      description ?? string.Empty,
       receivedAfter ?? DateOnly.MinValue,
       receivedBefore ?? DateOnly.MaxValue,
       minAmount ?? decimal.MinValue,
