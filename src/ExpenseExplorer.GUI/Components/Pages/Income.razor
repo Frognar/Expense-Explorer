@@ -81,7 +81,7 @@
 
         using var client = ClientFactory.CreateClient();
         var response = await client.GetFromJsonAsync<GetIncomesResponse>(url);
-        _count = response!.TotalCount;
+        _count = response!.FilteredCount;
         _incomes = response.Incomes;
     }
 
