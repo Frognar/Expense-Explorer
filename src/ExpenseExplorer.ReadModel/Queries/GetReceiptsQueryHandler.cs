@@ -22,11 +22,16 @@ public sealed class GetReceiptsQueryHandler(ExpenseExplorerContext context)
     try
     {
       ArgumentNullException.ThrowIfNull(query);
-      List<ReceiptHeaders> receipts = await _context.Receipts.AsNoTracking()
+      IQueryable<DbReceipt> receiptQuery = _context.Receipts.AsNoTracking();
+      int totalCount = await receiptQuery.CountAsync(cancellationToken);
+      receiptQuery = receiptQuery
         .Filter(
           PurchaseDateBetween(query.After, query.Before),
           TotalBetween(query.MinTotal, query.MaxTotal),
-          StoreContains(query.Search))
+          StoreContains(query.Search));
+
+      int filteredCount = await receiptQuery.CountAsync(cancellationToken);
+      List<ReceiptHeaders> receipts = await receiptQuery
         .OrderByMany(
           Order.AscendingBy<DbReceipt>(r => r.PurchaseDate),
           Order.DescendingBy<DbReceipt>(r => r.Id))
@@ -34,8 +39,7 @@ public sealed class GetReceiptsQueryHandler(ExpenseExplorerContext context)
         .Select(r => new ReceiptHeaders(r.Id, r.Store, r.PurchaseDate, r.Total))
         .ToListAsync(cancellationToken);
 
-      int totalCount = await _context.Receipts.CountAsync(cancellationToken);
-      PageOf<ReceiptHeaders> response = Page.Of(receipts, totalCount, query.PageSize, query.PageNumber);
+      PageOf<ReceiptHeaders> response = Page.Of(receipts, totalCount, filteredCount, query.PageSize, query.PageNumber);
       return Success.From(response);
     }
     catch (DbException ex)

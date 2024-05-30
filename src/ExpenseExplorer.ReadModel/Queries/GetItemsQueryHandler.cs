@@ -1,7 +1,6 @@
 namespace ExpenseExplorer.ReadModel.Queries;
 
 using System.Data.Common;
-using System.Linq.Expressions;
 using CommandHub.Queries;
 using ExpenseExplorer.ReadModel.Extensions;
 using ExpenseExplorer.ReadModel.Models;
@@ -22,19 +21,20 @@ public sealed class GetItemsQueryHandler(ExpenseExplorerContext context)
     try
     {
       ArgumentNullException.ThrowIfNull(query);
-      IQueryable<string> itemNames = _context.Purchases.AsNoTracking()
+      IQueryable<string> itemQuery = _context.Purchases.AsNoTracking()
         .OrderByMany(Order.DescendingBy<DbPurchase>(p => p.PurchaseId))
         .Select(p => p.Item)
         .Distinct();
 
-      int totalCount = await itemNames.CountAsync(cancellationToken);
-      List<Item> itemList = await itemNames
-        .WhereContains(query.Search)
+      int totalCount = await itemQuery.CountAsync(cancellationToken);
+      itemQuery = itemQuery.WhereContains(query.Search);
+      int filteredCount = await itemQuery.CountAsync(cancellationToken);
+      List<Item> itemList = await itemQuery
         .GetPage(query.PageNumber, query.PageSize)
         .Select(name => new Item(name))
         .ToListAsync(cancellationToken);
 
-      PageOf<Item> page = Page.Of(itemList, totalCount, query.PageSize, query.PageNumber);
+      PageOf<Item> page = Page.Of(itemList, totalCount, filteredCount, query.PageSize, query.PageNumber);
       return Success.From(page);
     }
     catch (DbException ex)

@@ -22,13 +22,18 @@ public sealed class GetIncomesQueryHandler(ExpenseExplorerContext context)
     try
     {
       ArgumentNullException.ThrowIfNull(query);
-      List<Income> incomes = await _context.Incomes.AsNoTracking()
+      IQueryable<DbIncome> incomeQuery = _context.Incomes.AsNoTracking();
+      int totalCount = await incomeQuery.CountAsync(cancellationToken);
+      incomeQuery = incomeQuery
         .Filter(
           ReceivedBetween(query.ReceivedAfter, query.ReceivedBefore),
           AmountBetween(query.MinAmount, query.MaxAmount),
           SearchSource(query.Source),
           SearchCategory(query.Category),
-          SearchDescription(query.Description))
+          SearchDescription(query.Description));
+
+      int filteredCount = await incomeQuery.CountAsync(cancellationToken);
+      List<Income> incomes = await incomeQuery
         .OrderByMany(
           Order.By(GetSelector(query.SortBy), Order.GetDirection(query.SortOrder)),
           Order.AscendingBy<DbIncome>(i => i.Id))
@@ -36,8 +41,7 @@ public sealed class GetIncomesQueryHandler(ExpenseExplorerContext context)
         .Select(i => new Income(i.Id, i.Source, i.Amount, i.Category, i.ReceivedDate, i.Description))
         .ToListAsync(cancellationToken);
 
-      int totalCount = await _context.Incomes.CountAsync(cancellationToken);
-      PageOf<Income> response = Page.Of(incomes, totalCount, query.PageSize, query.PageNumber);
+      PageOf<Income> response = Page.Of(incomes, totalCount, filteredCount, query.PageSize, query.PageNumber);
       return Success.From(response);
     }
     catch (DbException ex)

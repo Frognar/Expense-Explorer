@@ -1,7 +1,6 @@
 namespace ExpenseExplorer.ReadModel.Queries;
 
 using System.Data.Common;
-using System.Linq.Expressions;
 using CommandHub.Queries;
 using ExpenseExplorer.ReadModel.Extensions;
 using ExpenseExplorer.ReadModel.Models;
@@ -22,19 +21,20 @@ public sealed class GetCategoriesQueryHandler(ExpenseExplorerContext context)
     try
     {
       ArgumentNullException.ThrowIfNull(query);
-      IQueryable<string> categoryNames = _context.Purchases.AsNoTracking()
+      IQueryable<string> categoryQuery = _context.Purchases.AsNoTracking()
         .OrderByMany(Order.DescendingBy<DbPurchase>(p => p.PurchaseId))
         .Select(p => p.Category)
         .Distinct();
 
-      int totalCount = await categoryNames.CountAsync(cancellationToken);
-      List<Category> categoryList = await categoryNames
-        .WhereContains(query.Search)
+      int totalCount = await categoryQuery.CountAsync(cancellationToken);
+      categoryQuery = categoryQuery.WhereContains(query.Search);
+      int filteredCount = await categoryQuery.CountAsync(cancellationToken);
+      List<Category> categoryList = await categoryQuery
         .GetPage(query.PageNumber, query.PageSize)
         .Select(name => new Category(name))
         .ToListAsync(cancellationToken);
 
-      PageOf<Category> page = Page.Of(categoryList, totalCount, query.PageSize, query.PageNumber);
+      PageOf<Category> page = Page.Of(categoryList, totalCount, filteredCount, query.PageSize, query.PageNumber);
       return Success.From(page);
     }
     catch (DbException ex)
