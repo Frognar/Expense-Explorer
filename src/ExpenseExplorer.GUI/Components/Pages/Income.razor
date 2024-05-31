@@ -1,5 +1,6 @@
 ﻿@page "/income"
 @using ExpenseExplorer.API.Contract.ReadModel
+@using ExpenseExplorer.GUI.Data
 @using ExpenseExplorer.GUI.Helpers
 @inject IHttpClientFactory ClientFactory
 @rendermode InteractiveServer
@@ -10,7 +11,7 @@
     @ref="_grid"
     Data="@_incomes"
     Count="@_count"
-    TItem="IncomeResponse"
+    TItem="IncomeModel"
     LoadData="@LoadData"
     AllowPaging="true"
     PagerHorizontalAlign="HorizontalAlign.Center"
@@ -23,14 +24,14 @@
     IsLoading=@_isLoading
     Density="Density.Compact">
     <Columns>
-        <RadzenDataGridColumn TItem="IncomeResponse" Property="Source" Title="Source">
+        <RadzenDataGridColumn TItem="IncomeModel" Property="Source" Title="Source">
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Source">
                     <RadzenTextBox @bind-Value=@_source Change="OnSourceChange"/>
                 </RadzenFormField>
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="IncomeResponse" Property="Amount" Title="Amount" FormatString="{0:0.00} zł">
+        <RadzenDataGridColumn TItem="IncomeModel" Property="Amount" Title="Amount" FormatString="{0:0.00} zł">
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Min amount">
                     <RadzenNumeric
@@ -48,7 +49,7 @@
                 </RadzenFormField>
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="IncomeResponse" Property="Category" Title="Category">
+        <RadzenDataGridColumn TItem="IncomeModel" Property="Category" Title="Category">
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Category">
                     <RadzenTextBox @bind-Value=@_category Change="OnCategoryChange"/>
@@ -56,7 +57,7 @@
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn
-            TItem="IncomeResponse"
+            TItem="IncomeModel"
             Property="ReceivedDate"
             Title="Received date"
             FormatString="{0:dd.MM.yyyy}">
@@ -75,7 +76,7 @@
                 </RadzenFormField>
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="IncomeResponse" Property="Description" Title="Description">
+        <RadzenDataGridColumn TItem="IncomeModel" Property="Description" Title="Description">
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Description">
                     <RadzenTextBox @bind-Value=@_description Change="OnDescriptionChange"/>
@@ -89,8 +90,8 @@
 @code
 {
     private readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
-    private RadzenDataGrid<IncomeResponse> _grid = default!;
-    private IEnumerable<IncomeResponse> _incomes = default!;
+    private RadzenDataGrid<IncomeModel> _grid = default!;
+    private IEnumerable<IncomeModel> _incomes = default!;
     private int _count;
     private bool _isLoading;
     private DateTime? _receivedAfter;
@@ -110,7 +111,7 @@
         if (response is not null)
         {
             _count = response.FilteredCount;
-            _incomes = response.Incomes;
+            _incomes = response.Incomes.Select(IncomeModel.FromResponse);
         }
 
         _isLoading = false;
