@@ -1,4 +1,5 @@
 using ExpenseExplorer.GUI.Components;
+using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,8 @@ builder.Services.AddRazorComponents()
   .AddInteractiveServerComponents();
 
 builder.Services.AddHttpClient();
+
+builder.Services.AddRadzenComponents();
 
 var app = builder.Build();
 
