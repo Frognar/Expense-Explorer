@@ -5,7 +5,10 @@
 @using ExpenseExplorer.GUI.Data
 @using ExpenseExplorer.GUI.Helpers
 @inject IHttpClientFactory ClientFactory
+@inject DialogService DialogService
 @rendermode InteractiveServer
+
+<RadzenComponents/>
 
 <PageTitle>Income</PageTitle>
 <RadzenButton
@@ -116,15 +119,24 @@
             TextAlign="TextAlign.Right"
             Frozen="true"
             FrozenPosition="FrozenColumnPosition.Right">
-            <Template Context="order">
+            <Template Context="income">
                 <RadzenButton
                     Icon="edit"
                     ButtonStyle="ButtonStyle.Light"
                     Variant="Variant.Flat"
                     Size="ButtonSize.Medium"
-                    Click="@(_ => EditRow(order))"
+                    Click="@(_ => EditRow(income))"
                     @onclick:stopPropagation="true">
                 </RadzenButton>
+                <RadzenButton
+                    ButtonStyle="ButtonStyle.Danger"
+                    Icon="delete"
+                    Variant="Variant.Flat"
+                    Shade="Shade.Lighter"
+                    Size="ButtonSize.Medium"
+                    class="my-1 ms-1"
+                    Click="@(_ => DeleteRow(income))"
+                    @onclick:stopPropagation="true"/>
             </Template>
             <EditTemplate Context="income">
                 <RadzenButton
@@ -140,6 +152,15 @@
                     Size="ButtonSize.Medium"
                     class="my-1 ms-1"
                     Click="@(_ => CancelEdit(income))"/>
+                <RadzenButton
+                    ButtonStyle="ButtonStyle.Danger"
+                    Icon="delete"
+                    Variant="Variant.Flat"
+                    Shade="Shade.Lighter"
+                    Size="ButtonSize.Medium"
+                    class="my-1 ms-1"
+                    Click="@(_ => DeleteRow(income))"
+                    @onclick:stopPropagation="true"/>
             </EditTemplate>
         </RadzenDataGridColumn>
     </Columns>
@@ -288,5 +309,27 @@
         _editBackup = null;
         _incomesToInsert.Clear();
         _incomesToUpdate.Clear();
+    }
+
+    async Task DeleteRow(IncomeModel income)
+    {
+        bool? youSure = await DialogService.Confirm("Are you sure?", "Delete", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+        if (youSure.HasValue == false || youSure.Value == false)
+        {
+            return;
+        }
+
+        _incomesToInsert.Clear();
+        _incomesToUpdate.Clear();
+        if (string.IsNullOrWhiteSpace(income.Id))
+        {
+            _grid.CancelEditRow(income);
+        }
+        else
+        {
+            using HttpClient client = ClientFactory.CreateClient();
+            await client.DeleteAsync($"http://localhost:5163/api/incomes/{income.Id}");
+            await _grid.Reload();
+        }
     }
 }
