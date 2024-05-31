@@ -6,6 +6,12 @@
 @rendermode InteractiveServer
 
 <PageTitle>Income</PageTitle>
+<RadzenButton
+    ButtonStyle="ButtonStyle.Success"
+    Icon="add_circle_outline"
+    Text="Add New Income"
+    Click="@InsertRow"
+    Disabled="@(_incomesToInsert.Any())"/>
 
 <RadzenDataGrid
     @ref="_grid"
@@ -22,9 +28,14 @@
     AllowFiltering="true"
     FilterMode="FilterMode.Simple"
     IsLoading=@_isLoading
-    Density="Density.Compact">
+    Density="Density.Compact"
+    EditMode="DataGridEditMode.Single"
+    RowCreate="OnCreateRow">
     <Columns>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Source" Title="Source">
+            <EditTemplate Context="income">
+                <RadzenTextBox @bind-Value="income.Source"/>
+            </EditTemplate>
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Source">
                     <RadzenTextBox @bind-Value=@_source Change="OnSourceChange"/>
@@ -32,6 +43,9 @@
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Amount" Title="Amount" FormatString="{0:0.00} zł">
+            <EditTemplate Context="income">
+                <RadzenNumeric TValue="decimal" @bind-Value="income.Amount"/>
+            </EditTemplate>
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Min amount">
                     <RadzenNumeric
@@ -50,6 +64,9 @@
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Category" Title="Category">
+            <EditTemplate Context="income">
+                <RadzenTextBox @bind-Value="income.Category"/>
+            </EditTemplate>
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Category">
                     <RadzenTextBox @bind-Value=@_category Change="OnCategoryChange"/>
@@ -61,6 +78,9 @@
             Property="ReceivedDate"
             Title="Received date"
             FormatString="{0:dd.MM.yyyy}">
+            <EditTemplate Context="income">
+                <RadzenDatePicker @bind-Value="income.ReceivedDate" DateFormat="dd.MM.yyyy"/>
+            </EditTemplate>
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Received after">
                     <RadzenDatePicker
@@ -77,11 +97,37 @@
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Description" Title="Description">
+            <EditTemplate Context="income">
+                <RadzenTextBox @bind-Value="income.Description"/>
+            </EditTemplate>
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Description">
                     <RadzenTextBox @bind-Value=@_description Change="OnDescriptionChange"/>
                 </RadzenFormField>
             </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn
+            Context="income"
+            Filterable="false"
+            Sortable="false"
+            TextAlign="TextAlign.Right"
+            Frozen="true"
+            FrozenPosition="FrozenColumnPosition.Right">
+            <EditTemplate Context="income">
+                <RadzenButton
+                    Icon="check"
+                    ButtonStyle="ButtonStyle.Success"
+                    Variant="Variant.Flat"
+                    Size="ButtonSize.Medium"
+                    Click="@(_ => SaveRow(income))"/>
+                <RadzenButton
+                    Icon="close"
+                    ButtonStyle="ButtonStyle.Light"
+                    Variant="Variant.Flat"
+                    Size="ButtonSize.Medium"
+                    class="my-1 ms-1"
+                    Click="@(_ => CancelEdit(income))"/>
+            </EditTemplate>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
@@ -102,6 +148,8 @@
     private string? _category;
     private string? _description;
 
+    private readonly List<IncomeModel> _incomesToInsert = [];
+
     private async Task LoadData(LoadDataArgs args)
     {
         _isLoading = true;
@@ -111,7 +159,7 @@
         if (response is not null)
         {
             _count = response.FilteredCount;
-            _incomes = response.Incomes.Select(IncomeModel.FromResponse);
+            _incomes = response.Incomes.Select(income => income.ToViewModel());
         }
 
         _isLoading = false;
@@ -149,4 +197,31 @@
     private async Task OnCategoryChange(string _) => await _grid.Reload();
 
     private async Task OnDescriptionChange(string _) => await _grid.Reload();
+
+    async Task SaveRow(IncomeModel income)
+    {
+        await _grid.UpdateRow(income);
+    }
+
+    void CancelEdit(IncomeModel income)
+    {
+        _incomesToInsert.Clear();
+        _grid.CancelEditRow(income);
+    }
+
+    async Task InsertRow()
+    {
+        _incomesToInsert.Clear();
+        IncomeModel income = new();
+        _incomesToInsert.Add(income);
+        await _grid.InsertRow(income);
+    }
+
+    private async Task OnCreateRow(IncomeModel income)
+    {
+        string url = "http://localhost:5163/api/incomes";
+        using HttpClient client = ClientFactory.CreateClient();
+        HttpResponseMessage _ = await client.PostAsJsonAsync(url, income.ToAddRequest());
+        _incomesToInsert.Remove(income);
+    }
 }
