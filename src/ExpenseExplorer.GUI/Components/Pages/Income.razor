@@ -1,5 +1,6 @@
 ﻿@page "/income"
 @using ExpenseExplorer.API.Contract.ReadModel
+@using ExpenseExplorer.GUI.Helpers
 @inject IHttpClientFactory ClientFactory
 @rendermode InteractiveServer
 
@@ -12,9 +13,15 @@
     TItem="IncomeResponse"
     LoadData="@LoadData"
     AllowPaging="true"
-    PageSize="@PageSize"
+    PagerHorizontalAlign="HorizontalAlign.Center"
+    PageSizeOptions="@_pageSizeOptions"
+    ShowPagingSummary="true"
+    PagingSummaryFormat="Displaying page {0} of {1} <b>(total {2} records)</b>"
     AllowSorting="true"
-    AllowFiltering="true">
+    AllowFiltering="true"
+    FilterMode="FilterMode.Simple"
+    IsLoading=@_isLoading
+    Density="Density.Compact">
     <Columns>
         <RadzenDataGridColumn TItem="IncomeResponse" Property="Source" Title="Source">
             <FilterTemplate>
@@ -26,12 +33,18 @@
         <RadzenDataGridColumn TItem="IncomeResponse" Property="Amount" Title="Amount">
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Min amount">
-                    <RadzenNumeric ShowUpDown="false" TValue="decimal?" @bind-Value=@_minAmount
-                                   Change="OnMinAmountChange"/>
+                    <RadzenNumeric
+                        ShowUpDown="false"
+                        TValue="decimal?"
+                        @bind-Value=@_minAmount
+                        Change="OnMinAmountChange"/>
                 </RadzenFormField>
                 <RadzenFormField AllowFloatingLabel="false" Text="Max amount">
-                    <RadzenNumeric ShowUpDown="false" TValue="decimal?" @bind-Value=@_maxAmount
-                                   Change="OnMaxAmountChange"/>
+                    <RadzenNumeric
+                        ShowUpDown="false"
+                        TValue="decimal?"
+                        @bind-Value=@_maxAmount
+                        Change="OnMaxAmountChange"/>
                 </RadzenFormField>
             </FilterTemplate>
         </RadzenDataGridColumn>
@@ -45,12 +58,16 @@
         <RadzenDataGridColumn TItem="IncomeResponse" Property="ReceivedDate" Title="Received date">
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Received after">
-                    <RadzenDatePicker @bind-Value=@_receivedAfter DateFormat="dd.MM.yyyy"
-                                      Change="OnReceivedAfterChange"/>
+                    <RadzenDatePicker
+                        @bind-Value=@_receivedAfter
+                        DateFormat="dd.MM.yyyy"
+                        Change="OnReceivedAfterChange"/>
                 </RadzenFormField>
                 <RadzenFormField AllowFloatingLabel="false" Text="Received before">
-                    <RadzenDatePicker @bind-Value=@_receivedBefore DateFormat="dd.MM.yyyy"
-                                      Change="OnReceivedBeforeChange"/>
+                    <RadzenDatePicker
+                        @bind-Value=@_receivedBefore
+                        DateFormat="dd.MM.yyyy"
+                        Change="OnReceivedBeforeChange"/>
                 </RadzenFormField>
             </FilterTemplate>
         </RadzenDataGridColumn>
@@ -67,72 +84,64 @@
 
 @code
 {
-    const int PageSize = 5;
-    RadzenDataGrid<IncomeResponse> _grid = default!;
-    IEnumerable<IncomeResponse> _incomes = default!;
-    int _count;
-    DateTime? _receivedAfter;
-    DateTime? _receivedBefore;
-    decimal? _minAmount;
-    decimal? _maxAmount;
-    string? _source;
-    string? _category;
-    string? _description;
+    private readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
+    private RadzenDataGrid<IncomeResponse> _grid = default!;
+    private IEnumerable<IncomeResponse> _incomes = default!;
+    private int _count;
+    private bool _isLoading;
+    private DateTime? _receivedAfter;
+    private DateTime? _receivedBefore;
+    private decimal? _minAmount;
+    private decimal? _maxAmount;
+    private string? _source;
+    private string? _category;
+    private string? _description;
 
-    async Task LoadData(LoadDataArgs args)
+    private async Task LoadData(LoadDataArgs args)
     {
-        List<string> parameters = [];
-        int pageNumber = args.Skip.HasValue ? args.Skip.Value / PageSize + 1 : 1;
-        parameters.Add($"pageNumber={pageNumber}");
-        parameters.Add($"pageSize={PageSize}");
-        if (_minAmount.HasValue)
-            parameters.Add($"minAmount={_minAmount.Value}");
-
-        if (_maxAmount.HasValue)
-            parameters.Add($"maxAmount={_maxAmount.Value}");
-
-        if (_receivedAfter.HasValue)
-            parameters.Add($"receivedAfter={_receivedAfter:MM/dd/yyyy}");
-
-        if (_receivedBefore.HasValue)
-            parameters.Add($"receivedBefore={_receivedBefore:MM/dd/yyyy}");
-
-        if (!string.IsNullOrWhiteSpace(_source))
-            parameters.Add($"source={_source.Trim()}");
-
-        if (!string.IsNullOrWhiteSpace(_category))
-            parameters.Add($"category={_category.Trim()}");
-
-        if (!string.IsNullOrWhiteSpace(_description))
-            parameters.Add($"description={_description.Trim()}");
-
-        if (!string.IsNullOrWhiteSpace(args.OrderBy))
+        _isLoading = true;
+        string url = $"http://localhost:5163/api/incomes?{GetParameters(args)}";
+        using HttpClient client = ClientFactory.CreateClient();
+        GetIncomesResponse? response = await client.GetFromJsonAsync<GetIncomesResponse>(url);
+        if (response is not null)
         {
-            string[] sort = args.OrderBy.Split(' ');
-            parameters.Add($"sortBy={sort[0]}");
-            parameters.Add($"sortOrder={sort[1]}");
+            _count = response.FilteredCount;
+            _incomes = response.Incomes;
         }
 
-        string url = "http://localhost:5163/api/incomes";
-        url += $"?{string.Join("&", parameters)}";
-
-        using var client = ClientFactory.CreateClient();
-        var response = await client.GetFromJsonAsync<GetIncomesResponse>(url);
-        _count = response!.FilteredCount;
-        _incomes = response.Incomes;
+        _isLoading = false;
     }
 
-    async Task OnReceivedAfterChange(DateTime? _) => await _grid.Reload();
+    private string GetParameters(LoadDataArgs args)
+    {
+        QueryParameters parameters = new();
+        (int pageNumber, int pageSize) = args.GetPagingParameters();
+        parameters.Add(pageNumber, "pageNumber");
+        parameters.Add(pageSize, "pageSize");
+        (string? sortBy, string? sortOrder) = args.GetOrderByParameters();
+        parameters.Add(sortBy, "sortBy");
+        parameters.Add(sortOrder, "sortOrder");
+        parameters.Add(_minAmount, "minAmount");
+        parameters.Add(_maxAmount, "maxAmount");
+        parameters.Add(_receivedAfter, "receivedAfter");
+        parameters.Add(_receivedBefore, "receivedBefore");
+        parameters.Add(_source, "source");
+        parameters.Add(_category, "category");
+        parameters.Add(_description, "description");
+        return parameters.ToString();
+    }
 
-    async Task OnReceivedBeforeChange(DateTime? _) => await _grid.Reload();
+    private async Task OnReceivedAfterChange(DateTime? _) => await _grid.Reload();
 
-    async Task OnMinAmountChange(decimal? _) => await _grid.Reload();
+    private async Task OnReceivedBeforeChange(DateTime? _) => await _grid.Reload();
 
-    async Task OnMaxAmountChange(decimal? _) => await _grid.Reload();
+    private async Task OnMinAmountChange(decimal? _) => await _grid.Reload();
 
-    async Task OnSourceChange(string _) => await _grid.Reload();
+    private async Task OnMaxAmountChange(decimal? _) => await _grid.Reload();
 
-    async Task OnCategoryChange(string _) => await _grid.Reload();
+    private async Task OnSourceChange(string _) => await _grid.Reload();
 
-    async Task OnDescriptionChange(string _) => await _grid.Reload();
+    private async Task OnCategoryChange(string _) => await _grid.Reload();
+
+    private async Task OnDescriptionChange(string _) => await _grid.Reload();
 }
