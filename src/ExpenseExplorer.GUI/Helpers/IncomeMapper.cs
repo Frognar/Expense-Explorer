@@ -25,4 +25,15 @@ public static class IncomeMapper
     ArgumentNullException.ThrowIfNull(income);
     return new AddIncomeRequest(income.Source, income.Amount, income.Category, income.ReceivedDate, income.Description);
   }
+
+  public static UpdateIncomeDetailsRequest ToEditRequest(this IncomeModel income)
+  {
+    ArgumentNullException.ThrowIfNull(income);
+    return new UpdateIncomeDetailsRequest(
+      income.Source,
+      income.Amount,
+      income.Category,
+      income.ReceivedDate,
+      income.Description);
+  }
 }
