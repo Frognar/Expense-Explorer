@@ -30,7 +30,7 @@
                 </RadzenFormField>
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="IncomeResponse" Property="Amount" Title="Amount">
+        <RadzenDataGridColumn TItem="IncomeResponse" Property="Amount" Title="Amount" FormatString="{0:0.00} zł">
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Min amount">
                     <RadzenNumeric
@@ -55,7 +55,11 @@
                 </RadzenFormField>
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="IncomeResponse" Property="ReceivedDate" Title="Received date">
+        <RadzenDataGridColumn
+            TItem="IncomeResponse"
+            Property="ReceivedDate"
+            Title="Received date"
+            FormatString="{0:dd.MM.yyyy}">
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Received after">
                     <RadzenDatePicker
