@@ -1,4 +1,6 @@
 ﻿@page "/income"
+@using System.Text.Json
+@using ExpenseExplorer.API.Contract
 @using ExpenseExplorer.API.Contract.ReadModel
 @using ExpenseExplorer.GUI.Data
 @using ExpenseExplorer.GUI.Helpers
@@ -11,7 +13,7 @@
     Icon="add_circle_outline"
     Text="Add New Income"
     Click="@InsertRow"
-    Disabled="@(_incomesToInsert.Any())"/>
+    Disabled="@(_incomesToInsert.Any() || _incomesToUpdate.Any() || _isLoading)"/>
 
 <RadzenDataGrid
     @ref="_grid"
@@ -30,7 +32,8 @@
     IsLoading=@_isLoading
     Density="Density.Compact"
     EditMode="DataGridEditMode.Single"
-    RowCreate="OnCreateRow">
+    RowCreate="@OnCreateRow"
+    RowUpdate="@OnUpdateRow">
     <Columns>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Source" Title="Source">
             <EditTemplate Context="income">
@@ -113,6 +116,16 @@
             TextAlign="TextAlign.Right"
             Frozen="true"
             FrozenPosition="FrozenColumnPosition.Right">
+            <Template Context="order">
+                <RadzenButton
+                    Icon="edit"
+                    ButtonStyle="ButtonStyle.Light"
+                    Variant="Variant.Flat"
+                    Size="ButtonSize.Medium"
+                    Click="@(_ => EditRow(order))"
+                    @onclick:stopPropagation="true">
+                </RadzenButton>
+            </Template>
             <EditTemplate Context="income">
                 <RadzenButton
                     Icon="check"
@@ -139,7 +152,7 @@
     private RadzenDataGrid<IncomeModel> _grid = default!;
     private IEnumerable<IncomeModel> _incomes = default!;
     private int _count;
-    private bool _isLoading;
+    private bool _isLoading = true;
     private DateTime? _receivedAfter;
     private DateTime? _receivedBefore;
     private decimal? _minAmount;
@@ -149,6 +162,8 @@
     private string? _description;
 
     private readonly List<IncomeModel> _incomesToInsert = [];
+    private readonly List<IncomeModel> _incomesToUpdate = [];
+    private IncomeModel? _editBackup;
 
     private async Task LoadData(LoadDataArgs args)
     {
@@ -206,12 +221,23 @@
     void CancelEdit(IncomeModel income)
     {
         _incomesToInsert.Clear();
+        _incomesToUpdate.Clear();
+        if (_editBackup is not null)
+        {
+            income.Source = _editBackup.Source;
+            income.Amount = _editBackup.Amount;
+            income.Category = _editBackup.Category;
+            income.ReceivedDate = _editBackup.ReceivedDate;
+            income.Description = _editBackup.Description;
+        }
+
         _grid.CancelEditRow(income);
     }
 
     async Task InsertRow()
     {
         _incomesToInsert.Clear();
+        _incomesToUpdate.Clear();
         IncomeModel income = new();
         _incomesToInsert.Add(income);
         await _grid.InsertRow(income);
@@ -221,7 +247,46 @@
     {
         string url = "http://localhost:5163/api/incomes";
         using HttpClient client = ClientFactory.CreateClient();
-        HttpResponseMessage _ = await client.PostAsJsonAsync(url, income.ToAddRequest());
-        _incomesToInsert.Remove(income);
+        HttpResponseMessage responseMessage = await client.PostAsJsonAsync(url, income.ToAddRequest());
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            string content = await responseMessage.Content.ReadAsStringAsync();
+            AddIncomeResponse response = JsonSerializer
+                .Deserialize<AddIncomeResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+
+            income.Id = response.Id;
+        }
+        else
+        {
+            _grid.CancelEditRow(income);
+        }
+
+        _incomesToInsert.Clear();
+        _incomesToUpdate.Clear();
+    }
+
+    private async Task EditRow(IncomeModel income)
+    {
+        _incomesToInsert.Clear();
+        _incomesToUpdate.Clear();
+        _incomesToUpdate.Add(income);
+        await _grid.EditRow(income);
+        _editBackup = income.MakeCopy();
+    }
+
+    private async Task OnUpdateRow(IncomeModel income)
+    {
+        string url = $"http://localhost:5163/api/incomes/{income.Id}";
+        using HttpClient client = ClientFactory.CreateClient();
+        HttpResponseMessage responseMessage = await client.PatchAsJsonAsync(url, income.ToEditRequest());
+        if (!responseMessage.IsSuccessStatusCode)
+        {
+            income.CopyFrom(_editBackup!);
+            _grid.CancelEditRow(income);
+        }
+
+        _editBackup = null;
+        _incomesToInsert.Clear();
+        _incomesToUpdate.Clear();
     }
 }
