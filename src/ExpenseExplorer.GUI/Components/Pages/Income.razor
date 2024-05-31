@@ -110,22 +110,15 @@
         _isLoading = false;
     }
 
-    private (int pageNumber, int PageSize) GetPagingParameters(LoadDataArgs args)
-    {
-        return args switch
-        {
-            { Skip: not null, Top: not null } => (args.Skip.Value / args.Top.Value + 1, args.Top.Value),
-            { Top: not null } => (1, args.Top.Value),
-            _ => (1, 10),
-        };
-    }
-
     private string GetParameters(LoadDataArgs args)
     {
         QueryParameters parameters = new();
-        (int pageNumber, int pageSize) = GetPagingParameters(args);
+        (int pageNumber, int pageSize) = args.GetPagingParameters();
         parameters.Add(pageNumber, "pageNumber");
         parameters.Add(pageSize, "pageSize");
+        (string? sortBy, string? sortOrder) = args.GetOrderByParameters();
+        parameters.Add(sortBy, "sortBy");
+        parameters.Add(sortOrder, "sortOrder");
         parameters.Add(_minAmount, "minAmount");
         parameters.Add(_maxAmount, "maxAmount");
         parameters.Add(_receivedAfter, "receivedAfter");
@@ -133,13 +126,6 @@
         parameters.Add(_source, "source");
         parameters.Add(_category, "category");
         parameters.Add(_description, "description");
-        if (!string.IsNullOrWhiteSpace(args.OrderBy))
-        {
-            string[] sort = args.OrderBy.Split(' ');
-            parameters.Add(sort[0], "sortBy");
-            parameters.Add(sort[1], "sortOrder");
-        }
-
         return parameters.ToString();
     }
 
