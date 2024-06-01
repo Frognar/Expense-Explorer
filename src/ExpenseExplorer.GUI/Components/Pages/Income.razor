@@ -128,7 +128,7 @@
                     Icon="edit"
                     ButtonStyle="ButtonStyle.Light"
                     Variant="Variant.Flat"
-                    Size="ButtonSize.Medium"
+                    Size="ButtonSize.Small"
                     Click="@(_ => EditRow(income))"
                     @onclick:stopPropagation="true">
                 </RadzenButton>
@@ -137,7 +137,7 @@
                     Icon="delete"
                     Variant="Variant.Flat"
                     Shade="Shade.Lighter"
-                    Size="ButtonSize.Medium"
+                    Size="ButtonSize.Small"
                     class="my-1 ms-1"
                     Click="@(_ => DeleteRow(income))"
                     @onclick:stopPropagation="true"/>
@@ -147,13 +147,13 @@
                     Icon="check"
                     ButtonStyle="ButtonStyle.Success"
                     Variant="Variant.Flat"
-                    Size="ButtonSize.Medium"
+                    Size="ButtonSize.Small"
                     Click="@(_ => SaveRow(income))"/>
                 <RadzenButton
                     Icon="close"
                     ButtonStyle="ButtonStyle.Light"
                     Variant="Variant.Flat"
-                    Size="ButtonSize.Medium"
+                    Size="ButtonSize.Small"
                     class="my-1 ms-1"
                     Click="@(_ => CancelEdit(income))"/>
                 <RadzenButton
@@ -161,7 +161,7 @@
                     Icon="delete"
                     Variant="Variant.Flat"
                     Shade="Shade.Lighter"
-                    Size="ButtonSize.Medium"
+                    Size="ButtonSize.Small"
                     class="my-1 ms-1"
                     Click="@(_ => DeleteRow(income))"
                     @onclick:stopPropagation="true"/>
