@@ -31,6 +31,7 @@
     PagingSummaryFormat="Displaying page {0} of {1} <b>(total {2} records)</b>"
     AllowSorting="true"
     AllowFiltering="true"
+    AllowAlternatingRows="false"
     FilterMode="FilterMode.Simple"
     IsLoading=@_isLoading
     Density="Density.Compact"
@@ -261,6 +262,7 @@
         _incomesToUpdate.Clear();
         IncomeModel income = new();
         _incomesToInsert.Add(income);
+        _count++;
         await _grid.InsertRow(income);
     }
 
