@@ -37,7 +37,9 @@
     Density="Density.Compact"
     EditMode="DataGridEditMode.Single"
     RowCreate="@OnCreateRow"
-    RowUpdate="@OnUpdateRow">
+    RowUpdate="@OnUpdateRow"
+    Sort="@Reset"
+    Page="@Reset">
     <Columns>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Source" Title="Source">
             <EditTemplate Context="income">
@@ -221,19 +223,31 @@
         return parameters.ToString();
     }
 
-    private async Task OnReceivedAfterChange(DateTime? _) => await _grid.Reload();
+    private async Task OnReceivedAfterChange(DateTime? _) => await ResetAndReload();
 
-    private async Task OnReceivedBeforeChange(DateTime? _) => await _grid.Reload();
+    private async Task OnReceivedBeforeChange(DateTime? _) => await ResetAndReload();
 
-    private async Task OnMinAmountChange(decimal? _) => await _grid.Reload();
+    private async Task OnMinAmountChange(decimal? _) => await ResetAndReload();
 
-    private async Task OnMaxAmountChange(decimal? _) => await _grid.Reload();
+    private async Task OnMaxAmountChange(decimal? _) => await ResetAndReload();
 
-    private async Task OnSourceChange(string _) => await _grid.Reload();
+    private async Task OnSourceChange(string _) => await ResetAndReload();
 
-    private async Task OnCategoryChange(string _) => await _grid.Reload();
+    private async Task OnCategoryChange(string _) => await ResetAndReload();
 
-    private async Task OnDescriptionChange(string _) => await _grid.Reload();
+    private async Task OnDescriptionChange(string _) => await ResetAndReload();
+
+    private async Task ResetAndReload()
+    {
+        Reset();
+        await _grid.Reload();
+    }
+
+    private void Reset()
+    {
+        _incomesToInsert.Clear();
+        _incomesToUpdate.Clear();
+    }
 
     async Task SaveRow(IncomeModel income)
     {
@@ -242,8 +256,7 @@
 
     void CancelEdit(IncomeModel income)
     {
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
         if (_editBackup is not null)
         {
             income.Source = _editBackup.Source;
@@ -258,8 +271,7 @@
 
     async Task InsertRow()
     {
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
         IncomeModel income = new();
         _incomesToInsert.Add(income);
         _count++;
@@ -284,14 +296,12 @@
             _grid.CancelEditRow(income);
         }
 
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
     }
 
     private async Task EditRow(IncomeModel income)
     {
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
         _incomesToUpdate.Add(income);
         await _grid.EditRow(income);
         _editBackup = income.MakeCopy();
@@ -309,8 +319,7 @@
         }
 
         _editBackup = null;
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
     }
 
     async Task DeleteRow(IncomeModel income)
@@ -321,8 +330,7 @@
             return;
         }
 
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
         if (string.IsNullOrWhiteSpace(income.Id))
         {
             _grid.CancelEditRow(income);
