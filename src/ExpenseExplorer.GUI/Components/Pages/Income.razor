@@ -11,12 +11,6 @@
 <RadzenComponents/>
 
 <PageTitle>Income</PageTitle>
-<RadzenButton
-    ButtonStyle="ButtonStyle.Success"
-    Icon="add_circle_outline"
-    Text="Add New Income"
-    Click="@InsertRow"
-    Disabled="@(_incomesToInsert.Any() || _incomesToUpdate.Any() || _isLoading)"/>
 
 <RadzenDataGrid
     @ref="_grid"
@@ -29,14 +23,29 @@
     PageSizeOptions="@_pageSizeOptions"
     ShowPagingSummary="true"
     PagingSummaryFormat="Displaying page {0} of {1} <b>(total {2} records)</b>"
+    GridLines="DataGridGridLines.Both"
     AllowSorting="true"
     AllowFiltering="true"
+    AllowAlternatingRows="false"
     FilterMode="FilterMode.Simple"
+    @bind-Value=@_selected
     IsLoading=@_isLoading
     Density="Density.Compact"
     EditMode="DataGridEditMode.Single"
     RowCreate="@OnCreateRow"
-    RowUpdate="@OnUpdateRow">
+    RowUpdate="@OnUpdateRow"
+    Sort="@Reset"
+    Page="@Reset">
+    <HeaderTemplate>
+        <RadzenButton
+            ButtonStyle="ButtonStyle.Success"
+            Icon="add_circle_outline"
+            Text="Add New Income"
+            Click="@InsertRow"
+            Disabled="@(_incomesToInsert.Any() || _incomesToUpdate.Any() || _isLoading)"/>
+        <RadzenButton Click="() => { _selected = null; }" Text="Clear Selection"
+                      Disabled="@(_selected?.Any() != true)"/>
+    </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Source" Title="Source">
             <EditTemplate Context="income">
@@ -124,7 +133,7 @@
                     Icon="edit"
                     ButtonStyle="ButtonStyle.Light"
                     Variant="Variant.Flat"
-                    Size="ButtonSize.Medium"
+                    Size="ButtonSize.Small"
                     Click="@(_ => EditRow(income))"
                     @onclick:stopPropagation="true">
                 </RadzenButton>
@@ -133,7 +142,7 @@
                     Icon="delete"
                     Variant="Variant.Flat"
                     Shade="Shade.Lighter"
-                    Size="ButtonSize.Medium"
+                    Size="ButtonSize.Small"
                     class="my-1 ms-1"
                     Click="@(_ => DeleteRow(income))"
                     @onclick:stopPropagation="true"/>
@@ -143,13 +152,13 @@
                     Icon="check"
                     ButtonStyle="ButtonStyle.Success"
                     Variant="Variant.Flat"
-                    Size="ButtonSize.Medium"
+                    Size="ButtonSize.Small"
                     Click="@(_ => SaveRow(income))"/>
                 <RadzenButton
                     Icon="close"
                     ButtonStyle="ButtonStyle.Light"
                     Variant="Variant.Flat"
-                    Size="ButtonSize.Medium"
+                    Size="ButtonSize.Small"
                     class="my-1 ms-1"
                     Click="@(_ => CancelEdit(income))"/>
                 <RadzenButton
@@ -157,7 +166,7 @@
                     Icon="delete"
                     Variant="Variant.Flat"
                     Shade="Shade.Lighter"
-                    Size="ButtonSize.Medium"
+                    Size="ButtonSize.Small"
                     class="my-1 ms-1"
                     Click="@(_ => DeleteRow(income))"
                     @onclick:stopPropagation="true"/>
@@ -185,6 +194,7 @@
     private readonly List<IncomeModel> _incomesToInsert = [];
     private readonly List<IncomeModel> _incomesToUpdate = [];
     private IncomeModel? _editBackup;
+    private IList<IncomeModel>? _selected;
 
     private async Task LoadData(LoadDataArgs args)
     {
@@ -220,19 +230,31 @@
         return parameters.ToString();
     }
 
-    private async Task OnReceivedAfterChange(DateTime? _) => await _grid.Reload();
+    private async Task OnReceivedAfterChange(DateTime? _) => await ResetAndReload();
 
-    private async Task OnReceivedBeforeChange(DateTime? _) => await _grid.Reload();
+    private async Task OnReceivedBeforeChange(DateTime? _) => await ResetAndReload();
 
-    private async Task OnMinAmountChange(decimal? _) => await _grid.Reload();
+    private async Task OnMinAmountChange(decimal? _) => await ResetAndReload();
 
-    private async Task OnMaxAmountChange(decimal? _) => await _grid.Reload();
+    private async Task OnMaxAmountChange(decimal? _) => await ResetAndReload();
 
-    private async Task OnSourceChange(string _) => await _grid.Reload();
+    private async Task OnSourceChange(string _) => await ResetAndReload();
 
-    private async Task OnCategoryChange(string _) => await _grid.Reload();
+    private async Task OnCategoryChange(string _) => await ResetAndReload();
 
-    private async Task OnDescriptionChange(string _) => await _grid.Reload();
+    private async Task OnDescriptionChange(string _) => await ResetAndReload();
+
+    private async Task ResetAndReload()
+    {
+        Reset();
+        await _grid.Reload();
+    }
+
+    private void Reset()
+    {
+        _incomesToInsert.Clear();
+        _incomesToUpdate.Clear();
+    }
 
     async Task SaveRow(IncomeModel income)
     {
@@ -241,8 +263,7 @@
 
     void CancelEdit(IncomeModel income)
     {
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
         if (_editBackup is not null)
         {
             income.Source = _editBackup.Source;
@@ -257,10 +278,10 @@
 
     async Task InsertRow()
     {
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
         IncomeModel income = new();
         _incomesToInsert.Add(income);
+        _count++;
         await _grid.InsertRow(income);
     }
 
@@ -282,14 +303,12 @@
             _grid.CancelEditRow(income);
         }
 
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
     }
 
     private async Task EditRow(IncomeModel income)
     {
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
         _incomesToUpdate.Add(income);
         await _grid.EditRow(income);
         _editBackup = income.MakeCopy();
@@ -307,8 +326,7 @@
         }
 
         _editBackup = null;
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
     }
 
     async Task DeleteRow(IncomeModel income)
@@ -319,8 +337,7 @@
             return;
         }
 
-        _incomesToInsert.Clear();
-        _incomesToUpdate.Clear();
+        Reset();
         if (string.IsNullOrWhiteSpace(income.Id))
         {
             _grid.CancelEditRow(income);
