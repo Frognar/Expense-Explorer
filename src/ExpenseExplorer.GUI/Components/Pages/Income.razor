@@ -17,6 +17,7 @@
     Text="Add New Income"
     Click="@InsertRow"
     Disabled="@(_incomesToInsert.Any() || _incomesToUpdate.Any() || _isLoading)"/>
+<RadzenButton Click="() => { _selected = null; }" Text="Clear Selection" Disabled="@(_selected?.Any() != true)"/>
 
 <RadzenDataGrid
     @ref="_grid"
@@ -34,6 +35,7 @@
     AllowFiltering="true"
     AllowAlternatingRows="false"
     FilterMode="FilterMode.Simple"
+    @bind-Value=@_selected
     IsLoading=@_isLoading
     Density="Density.Compact"
     EditMode="DataGridEditMode.Single"
@@ -189,6 +191,7 @@
     private readonly List<IncomeModel> _incomesToInsert = [];
     private readonly List<IncomeModel> _incomesToUpdate = [];
     private IncomeModel? _editBackup;
+    private IList<IncomeModel>? _selected;
 
     private async Task LoadData(LoadDataArgs args)
     {
