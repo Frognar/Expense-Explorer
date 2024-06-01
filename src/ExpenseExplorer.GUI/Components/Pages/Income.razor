@@ -11,13 +11,6 @@
 <RadzenComponents/>
 
 <PageTitle>Income</PageTitle>
-<RadzenButton
-    ButtonStyle="ButtonStyle.Success"
-    Icon="add_circle_outline"
-    Text="Add New Income"
-    Click="@InsertRow"
-    Disabled="@(_incomesToInsert.Any() || _incomesToUpdate.Any() || _isLoading)"/>
-<RadzenButton Click="() => { _selected = null; }" Text="Clear Selection" Disabled="@(_selected?.Any() != true)"/>
 
 <RadzenDataGrid
     @ref="_grid"
@@ -43,6 +36,16 @@
     RowUpdate="@OnUpdateRow"
     Sort="@Reset"
     Page="@Reset">
+    <HeaderTemplate>
+        <RadzenButton
+            ButtonStyle="ButtonStyle.Success"
+            Icon="add_circle_outline"
+            Text="Add New Income"
+            Click="@InsertRow"
+            Disabled="@(_incomesToInsert.Any() || _incomesToUpdate.Any() || _isLoading)"/>
+        <RadzenButton Click="() => { _selected = null; }" Text="Clear Selection"
+                      Disabled="@(_selected?.Any() != true)"/>
+    </HeaderTemplate>
     <Columns>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Source" Title="Source">
             <EditTemplate Context="income">
