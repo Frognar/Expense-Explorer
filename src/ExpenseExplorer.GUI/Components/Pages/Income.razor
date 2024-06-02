@@ -266,11 +266,8 @@
         Reset();
         if (_editBackup is not null)
         {
-            income.Source = _editBackup.Source;
-            income.Amount = _editBackup.Amount;
-            income.Category = _editBackup.Category;
-            income.ReceivedDate = _editBackup.ReceivedDate;
-            income.Description = _editBackup.Description;
+            income.CopyFrom(_editBackup);
+            _editBackup = null;
         }
 
         _grid.CancelEditRow(income);
