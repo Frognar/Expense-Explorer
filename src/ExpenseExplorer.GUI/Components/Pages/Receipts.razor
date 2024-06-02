@@ -39,173 +39,228 @@
     RowUpdate="@OnReceiptUpdateRow"
     Sort="@ResetReceipts"
     Page="@ResetReceipts">
-    <HeaderTemplate>
-        <RadzenButton
-            ButtonStyle="ButtonStyle.Success"
-            Icon="add_circle_outline"
-            Text="Add New Receipt"
-            Click="@InsertReceipt"
-            Disabled="@(_receiptsToInsert.Any() || _receiptsToUpdate.Any() || _isLoading)"/>
-        <RadzenButton Click="() => { _selected = null; }" Text="Clear Selection"
-                      Disabled="@(_selected?.Any() != true)"/>
-    </HeaderTemplate>
-    <Template>
-        <RadzenDataGrid
-            @ref="_detailGrid"
-            AllowFiltering="true"
-            AllowSorting="true"
-            TItem="PurchaseModel"
-            IsLoading="@_isLoadingDetail"
-            Data="@_purchases">
-            <HeaderTemplate>
-                <RadzenButton
-                    ButtonStyle="ButtonStyle.Success"
-                    Icon="add_circle_outline"
-                    Text="Add New Purchase"
-                    Click="@AddPurchase"/>
-            </HeaderTemplate>
-            <Columns>
-                <RadzenDataGridColumn TItem="PurchaseModel" Property="Item" Title="Item"/>
-                <RadzenDataGridColumn TItem="PurchaseModel" Property="Category" Title="Category"/>
-                <RadzenDataGridColumn TItem="PurchaseModel" Property="Quantity" Title="Quantity"/>
-                <RadzenDataGridColumn TItem="PurchaseModel" Property="UnitPrice" Title="Unit price"/>
-                <RadzenDataGridColumn TItem="PurchaseModel" Property="TotalDiscount" Title="Total discount"/>
-                <RadzenDataGridColumn TItem="PurchaseModel" Property="TotalCost" Title="Total cost"/>
-                <RadzenDataGridColumn TItem="PurchaseModel" Property="Description" Title="Description"/>
-                <RadzenDataGridColumn
-                    Context="purchase"
-                    Filterable="false"
-                    Sortable="false"
-                    TextAlign="TextAlign.Right"
-                    Frozen="true"
-                    FrozenPosition="FrozenColumnPosition.Right">
-                    <Template Context="purchase">
-                        <RadzenButton
-                            Icon="edit"
-                            ButtonStyle="ButtonStyle.Light"
-                            Variant="Variant.Flat"
-                            Size="ButtonSize.Small"
-                            Click="@(_ => EditPurchase(purchase.Id))"
-                            @onclick:stopPropagation="true">
-                        </RadzenButton>
-                        <RadzenButton
-                            ButtonStyle="ButtonStyle.Danger"
-                            Icon="delete"
-                            Variant="Variant.Flat"
-                            Shade="Shade.Lighter"
-                            Size="ButtonSize.Small"
-                            class="my-1 ms-1"
-                            Click="@(_ => DeletePurchase(purchase))"
-                            @onclick:stopPropagation="true"/>
-                    </Template>
-                </RadzenDataGridColumn>
-            </Columns>
-        </RadzenDataGrid>
-    </Template>
-    <Columns>
-        <RadzenDataGridColumn TItem="ReceiptModel" Property="Store" Title="Store">
-            <EditTemplate Context="receipt">
-                <RadzenTextBox @bind-Value="receipt.Store"/>
-            </EditTemplate>
-            <FilterTemplate>
-                <RadzenFormField AllowFloatingLabel="false" Text="Store">
-                    <RadzenTextBox @bind-Value=@_store Change="OnStoreChange"/>
-                </RadzenFormField>
-            </FilterTemplate>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn
-            TItem="ReceiptModel"
-            Property="PurchaseDate"
-            Title="Purchase date"
-            FormatString="{0:dd.MM.yyyy}">
-            <EditTemplate Context="receipt">
-                <RadzenDatePicker @bind-Value="receipt.PurchaseDate" DateFormat="dd.MM.yyyy"/>
-            </EditTemplate>
-            <FilterTemplate>
-                <RadzenFormField AllowFloatingLabel="false" Text="Purchased after">
-                    <RadzenDatePicker
-                        @bind-Value=@_purchasedAfter
-                        DateFormat="dd.MM.yyyy"
-                        Change="OnPurchasedAfterChange"/>
-                </RadzenFormField>
-                <RadzenFormField AllowFloatingLabel="false" Text="Purchased before">
-                    <RadzenDatePicker
-                        @bind-Value=@_purchasedBefore
-                        DateFormat="dd.MM.yyyy"
-                        Change="OnPurchasedBeforeChange"/>
-                </RadzenFormField>
-            </FilterTemplate>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ReceiptModel" Property="Total" Title="Total" FormatString="{0:0.00} zł">
-            <FilterTemplate>
-                <RadzenFormField AllowFloatingLabel="false" Text="Min total">
-                    <RadzenNumeric
-                        ShowUpDown="false"
-                        TValue="decimal?"
-                        @bind-Value=@_minTotal
-                        Change="OnMinTotalChange"/>
-                </RadzenFormField>
-                <RadzenFormField AllowFloatingLabel="false" Text="Max total">
-                    <RadzenNumeric
-                        ShowUpDown="false"
-                        TValue="decimal?"
-                        @bind-Value=@_maxTotal
-                        Change="OnMaxTotalChange"/>
-                </RadzenFormField>
-            </FilterTemplate>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn
-            Context="receipt"
-            Filterable="false"
-            Sortable="false"
-            TextAlign="TextAlign.Right"
-            Frozen="true"
-            FrozenPosition="FrozenColumnPosition.Right">
-            <Template Context="receipt">
-                <RadzenButton
-                    Icon="edit"
-                    ButtonStyle="ButtonStyle.Light"
-                    Variant="Variant.Flat"
-                    Size="ButtonSize.Small"
-                    Click="@(_ => EditReceiptRow(receipt))"
-                    @onclick:stopPropagation="true">
-                </RadzenButton>
-                <RadzenButton
-                    ButtonStyle="ButtonStyle.Danger"
-                    Icon="delete"
-                    Variant="Variant.Flat"
-                    Shade="Shade.Lighter"
-                    Size="ButtonSize.Small"
-                    class="my-1 ms-1"
-                    Click="@(_ => DeleteReceipt(receipt))"
-                    @onclick:stopPropagation="true"/>
-            </Template>
-            <EditTemplate Context="receipt">
-                <RadzenButton
-                    Icon="check"
-                    ButtonStyle="ButtonStyle.Success"
-                    Variant="Variant.Flat"
-                    Size="ButtonSize.Small"
-                    Click="@(_ => SaveReceiptRow(receipt))"/>
-                <RadzenButton
-                    Icon="close"
-                    ButtonStyle="ButtonStyle.Light"
-                    Variant="Variant.Flat"
-                    Size="ButtonSize.Small"
-                    class="my-1 ms-1"
-                    Click="@(_ => CancelReceiptEdit(receipt))"/>
-                <RadzenButton
-                    ButtonStyle="ButtonStyle.Danger"
-                    Icon="delete"
-                    Variant="Variant.Flat"
-                    Shade="Shade.Lighter"
-                    Size="ButtonSize.Small"
-                    class="my-1 ms-1"
-                    Click="@(_ => DeleteReceipt(receipt))"
-                    @onclick:stopPropagation="true"/>
-            </EditTemplate>
-        </RadzenDataGridColumn>
-    </Columns>
+<HeaderTemplate>
+    <RadzenButton
+        ButtonStyle="ButtonStyle.Success"
+        Icon="add_circle_outline"
+        Text="Add New Receipt"
+        Click="@InsertReceipt"
+        Disabled="@(_receiptsToInsert.Any() || _receiptsToUpdate.Any() || _isLoading)"/>
+    <RadzenButton Click="() => { _selected = null; }" Text="Clear Selection"
+                  Disabled="@(_selected?.Any() != true)"/>
+</HeaderTemplate>
+<Template>
+    <RadzenDataGrid
+        @ref="_detailGrid"
+        AllowFiltering="true"
+        AllowSorting="true"
+        TItem="PurchaseModel"
+        IsLoading="@_isLoadingDetail"
+        Data="@_purchases"
+        RowCreate="@OnPurchaseCreateRow"
+        RowUpdate="@OnPurchaseUpdateRow"
+        Sort="@ResetPurchases">
+        <HeaderTemplate>
+            <RadzenButton
+                ButtonStyle="ButtonStyle.Success"
+                Icon="add_circle_outline"
+                Text="Add New Purchase"
+                Click="@InsertPurchase"
+                Disabled="@(_purchasesToInsert.Any() || _purchasesToUpdate.Any() || _isLoadingDetail)"/>
+        </HeaderTemplate>
+        <Columns>
+            <RadzenDataGridColumn TItem="PurchaseModel" Property="Item" Title="Item">
+                <EditTemplate Context="purchase">
+                    <RadzenTextBox @bind-Value="purchase.Item"/>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="PurchaseModel" Property="Category" Title="Category">
+                <EditTemplate Context="purchase">
+                    <RadzenTextBox @bind-Value="purchase.Category"/>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="PurchaseModel" Property="Quantity" Title="Quantity">
+                <EditTemplate Context="purchase">
+                    <RadzenNumeric TValue="decimal" @bind-Value="purchase.Quantity"/>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="PurchaseModel" Property="UnitPrice" Title="Unit price"
+                                  FormatString="{0:0.00} zł">
+                <EditTemplate Context="purchase">
+                    <RadzenNumeric TValue="decimal" @bind-Value="purchase.UnitPrice"/>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="PurchaseModel" Property="TotalDiscount" Title="Total discount"
+                                  FormatString="{0:0.00} zł">
+                <EditTemplate Context="purchase">
+                    <RadzenNumeric TValue="decimal" @bind-Value="purchase.TotalDiscount"/>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="PurchaseModel" Property="TotalCost" Title="Total cost"
+                                  FormatString="{0:0.00} zł"/>
+            <RadzenDataGridColumn TItem="PurchaseModel" Property="Description" Title="Description">
+                <EditTemplate Context="purchase">
+                    <RadzenTextBox @bind-Value="purchase.Description"/>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn
+                Context="purchase"
+                Filterable="false"
+                Sortable="false"
+                TextAlign="TextAlign.Right"
+                Frozen="true"
+                FrozenPosition="FrozenColumnPosition.Right">
+                <Template Context="purchase">
+                    <RadzenButton
+                        Icon="edit"
+                        ButtonStyle="ButtonStyle.Light"
+                        Variant="Variant.Flat"
+                        Size="ButtonSize.Small"
+                        Click="@(_ => EditPurchaseRow(purchase))"
+                        @onclick:stopPropagation="true">
+                    </RadzenButton>
+                    <RadzenButton
+                        ButtonStyle="ButtonStyle.Danger"
+                        Icon="delete"
+                        Variant="Variant.Flat"
+                        Shade="Shade.Lighter"
+                        Size="ButtonSize.Small"
+                        class="my-1 ms-1"
+                        Click="@(_ => DeletePurchase(purchase))"
+                        @onclick:stopPropagation="true"/>
+                </Template>
+                <EditTemplate Context="purchase">
+                    <RadzenButton
+                        Icon="check"
+                        ButtonStyle="ButtonStyle.Success"
+                        Variant="Variant.Flat"
+                        Size="ButtonSize.Small"
+                        Click="@(_ => SavePurchaseRow(purchase))"/>
+                    <RadzenButton
+                        Icon="close"
+                        ButtonStyle="ButtonStyle.Light"
+                        Variant="Variant.Flat"
+                        Size="ButtonSize.Small"
+                        class="my-1 ms-1"
+                        Click="@(_ => CancelPurchaseEdit(purchase))"/>
+                    <RadzenButton
+                        ButtonStyle="ButtonStyle.Danger"
+                        Icon="delete"
+                        Variant="Variant.Flat"
+                        Shade="Shade.Lighter"
+                        Size="ButtonSize.Small"
+                        class="my-1 ms-1"
+                        Click="@(_ => DeletePurchase(purchase))"
+                        @onclick:stopPropagation="true"/>
+                </EditTemplate>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</Template>
+<Columns>
+    <RadzenDataGridColumn TItem="ReceiptModel" Property="Store" Title="Store">
+        <EditTemplate Context="receipt">
+            <RadzenTextBox @bind-Value="receipt.Store"/>
+        </EditTemplate>
+        <FilterTemplate>
+            <RadzenFormField AllowFloatingLabel="false" Text="Store">
+                <RadzenTextBox @bind-Value=@_store Change="OnStoreChange"/>
+            </RadzenFormField>
+        </FilterTemplate>
+    </RadzenDataGridColumn>
+    <RadzenDataGridColumn
+        TItem="ReceiptModel"
+        Property="PurchaseDate"
+        Title="Purchase date"
+        FormatString="{0:dd.MM.yyyy}">
+        <EditTemplate Context="receipt">
+            <RadzenDatePicker @bind-Value="receipt.PurchaseDate" DateFormat="dd.MM.yyyy"/>
+        </EditTemplate>
+        <FilterTemplate>
+            <RadzenFormField AllowFloatingLabel="false" Text="Purchased after">
+                <RadzenDatePicker
+                    @bind-Value=@_purchasedAfter
+                    DateFormat="dd.MM.yyyy"
+                    Change="OnPurchasedAfterChange"/>
+            </RadzenFormField>
+            <RadzenFormField AllowFloatingLabel="false" Text="Purchased before">
+                <RadzenDatePicker
+                    @bind-Value=@_purchasedBefore
+                    DateFormat="dd.MM.yyyy"
+                    Change="OnPurchasedBeforeChange"/>
+            </RadzenFormField>
+        </FilterTemplate>
+    </RadzenDataGridColumn>
+    <RadzenDataGridColumn TItem="ReceiptModel" Property="Total" Title="Total" FormatString="{0:0.00} zł">
+        <FilterTemplate>
+            <RadzenFormField AllowFloatingLabel="false" Text="Min total">
+                <RadzenNumeric
+                    ShowUpDown="false"
+                    TValue="decimal?"
+                    @bind-Value=@_minTotal
+                    Change="OnMinTotalChange"/>
+            </RadzenFormField>
+            <RadzenFormField AllowFloatingLabel="false" Text="Max total">
+                <RadzenNumeric
+                    ShowUpDown="false"
+                    TValue="decimal?"
+                    @bind-Value=@_maxTotal
+                    Change="OnMaxTotalChange"/>
+            </RadzenFormField>
+        </FilterTemplate>
+    </RadzenDataGridColumn>
+    <RadzenDataGridColumn
+        Context="receipt"
+        Filterable="false"
+        Sortable="false"
+        TextAlign="TextAlign.Right"
+        Frozen="true"
+        FrozenPosition="FrozenColumnPosition.Right">
+        <Template Context="receipt">
+            <RadzenButton
+                Icon="edit"
+                ButtonStyle="ButtonStyle.Light"
+                Variant="Variant.Flat"
+                Size="ButtonSize.Small"
+                Click="@(_ => EditReceiptRow(receipt))"
+                @onclick:stopPropagation="true">
+            </RadzenButton>
+            <RadzenButton
+                ButtonStyle="ButtonStyle.Danger"
+                Icon="delete"
+                Variant="Variant.Flat"
+                Shade="Shade.Lighter"
+                Size="ButtonSize.Small"
+                class="my-1 ms-1"
+                Click="@(_ => DeleteReceipt(receipt))"
+                @onclick:stopPropagation="true"/>
+        </Template>
+        <EditTemplate Context="receipt">
+            <RadzenButton
+                Icon="check"
+                ButtonStyle="ButtonStyle.Success"
+                Variant="Variant.Flat"
+                Size="ButtonSize.Small"
+                Click="@(_ => SaveReceiptRow(receipt))"/>
+            <RadzenButton
+                Icon="close"
+                ButtonStyle="ButtonStyle.Light"
+                Variant="Variant.Flat"
+                Size="ButtonSize.Small"
+                class="my-1 ms-1"
+                Click="@(_ => CancelReceiptEdit(receipt))"/>
+            <RadzenButton
+                ButtonStyle="ButtonStyle.Danger"
+                Icon="delete"
+                Variant="Variant.Flat"
+                Shade="Shade.Lighter"
+                Size="ButtonSize.Small"
+                class="my-1 ms-1"
+                Click="@(_ => DeleteReceipt(receipt))"
+                @onclick:stopPropagation="true"/>
+        </EditTemplate>
+    </RadzenDataGridColumn>
+</Columns>
 </RadzenDataGrid>
 
 
@@ -228,6 +283,10 @@
     private readonly List<ReceiptModel> _receiptsToInsert = [];
     private readonly List<ReceiptModel> _receiptsToUpdate = [];
     private ReceiptModel? _receiptEditBackup;
+
+    private readonly List<PurchaseModel> _purchasesToInsert = [];
+    private readonly List<PurchaseModel> _purchasesToUpdate = [];
+    private PurchaseModel? _purchaseEditBackup;
     private IList<ReceiptModel>? _selected;
     private ReceiptModel? _expanded;
 
@@ -355,6 +414,29 @@
         ResetReceipts();
     }
 
+    private async Task DeleteReceipt(ReceiptModel receipt)
+    {
+        bool? youSure = await DialogService.Confirm("Are you sure?", "Delete", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+        if (youSure.HasValue == false || youSure.Value == false)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(receipt.Id))
+        {
+            _grid.CancelEditRow(receipt);
+        }
+        else
+        {
+            using HttpClient client = ClientFactory.CreateClient();
+            HttpResponseMessage responseMessage = await client.DeleteAsync($"http://localhost:5163/api/receipts/{receipt.Id}");
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                await _grid.Reload();
+            }
+        }
+    }
+
     private async Task RowExpand(ReceiptModel receipt)
     {
         _isLoadingDetail = true;
@@ -375,34 +457,92 @@
         _expanded = null;
     }
 
-    private async Task DeleteReceipt(ReceiptModel receipt)
+    private void ResetPurchases()
     {
-        bool? youSure = await DialogService.Confirm("Are you sure?", "Delete", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
-        if (youSure.HasValue == false || youSure.Value == false)
+        _purchasesToInsert.Clear();
+        _purchasesToUpdate.Clear();
+    }
+
+    private async Task SavePurchaseRow(PurchaseModel purchase)
+    {
+        await _detailGrid.UpdateRow(purchase);
+    }
+
+    private void CancelPurchaseEdit(PurchaseModel purchase)
+    {
+        ResetPurchases();
+        if (_purchaseEditBackup is not null)
+        {
+            purchase.CopyFrom(_purchaseEditBackup);
+            _receiptEditBackup = null;
+        }
+
+        _detailGrid.CancelEditRow(purchase);
+    }
+
+    private async Task InsertPurchase()
+    {
+        ResetPurchases();
+        PurchaseModel purchase = new();
+        _purchasesToInsert.Add(purchase);
+        await _detailGrid.InsertRow(purchase);
+    }
+
+    private async Task OnPurchaseCreateRow(PurchaseModel purchase)
+    {
+        if (_expanded is null)
         {
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(receipt.Id))
+        string url = $"http://localhost:5163/api/receipts/{_expanded.Id}/purchases";
+        using HttpClient client = ClientFactory.CreateClient();
+        HttpResponseMessage responseMessage = await client.PostAsJsonAsync(url, purchase.ToAddRequest());
+        if (responseMessage.IsSuccessStatusCode)
         {
-            _grid.CancelEditRow(receipt);
+            string content = await responseMessage.Content.ReadAsStringAsync();
+            AddPurchaseResponse response = JsonSerializer
+                .Deserialize<AddPurchaseResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+
+            purchase.Id = response.Purchases.Last().Id;
+            _expanded.Total += purchase.TotalCost;
         }
         else
         {
-            using HttpClient client = ClientFactory.CreateClient();
-            await client.DeleteAsync($"http://localhost:5163/api/receipts/{receipt.Id}");
-            await _grid.Reload();
+            _detailGrid.CancelEditRow(purchase);
         }
+
+        ResetPurchases();
     }
 
-    private async Task AddPurchase()
+    private async Task EditPurchaseRow(PurchaseModel purchase)
     {
-        await Task.Delay(1);
+        ResetPurchases();
+        _purchasesToUpdate.Add(purchase);
+        await _detailGrid.EditRow(purchase);
+        _purchaseEditBackup = purchase.MakeCopy();
     }
 
-    private async Task EditPurchase(string purchaseId)
+    private async Task OnPurchaseUpdateRow(PurchaseModel purchase)
     {
-        await Task.Delay(1);
+        if (_expanded is null)
+        {
+            return;
+        }
+
+        string url = $"http://localhost:5163/api/receipts/{_expanded.Id}/purchases/{purchase.Id}";
+        using HttpClient client = ClientFactory.CreateClient();
+        HttpResponseMessage responseMessage = await client.PatchAsJsonAsync(url, purchase.ToEditRequest());
+        if (!responseMessage.IsSuccessStatusCode)
+        {
+            purchase.CopyFrom(_purchaseEditBackup!);
+            _detailGrid.CancelEditRow(purchase);
+        }
+
+        _expanded.Total -= _purchaseEditBackup!.TotalCost;
+        _expanded.Total += purchase.TotalCost;
+        _purchaseEditBackup = null;
+        ResetPurchases();
     }
 
     private async Task DeletePurchase(PurchaseModel purchase)
