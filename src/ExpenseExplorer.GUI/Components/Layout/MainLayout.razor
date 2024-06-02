@@ -1,6 +1,16 @@
 ﻿@inherits LayoutComponentBase
 
-@Body
+<RadzenLayout>
+    <RadzenSidebar Style="width: max-content">
+        <RadzenPanelMenu DisplayStyle="MenuItemDisplayStyle.IconAndText" ShowArrow="false">
+            <RadzenPanelMenuItem Text="Home" Icon="home" Path=""/>
+            <RadzenPanelMenuItem Text="Income" Icon="account_balance" Path="income"/>
+        </RadzenPanelMenu>
+    </RadzenSidebar>
+    <RadzenBody>
+        @Body
+    </RadzenBody>
+</RadzenLayout>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
