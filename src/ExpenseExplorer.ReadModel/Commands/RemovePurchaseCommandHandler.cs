@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.ReadModel.Commands;
 
 using CommandHub.Commands;
+using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,10 +13,21 @@ public sealed class RemovePurchaseCommandHandler(ExpenseExplorerContext context)
   public async Task<Unit> HandleAsync(RemovePurchaseCommand command, CancellationToken cancellationToken = default)
   {
     ArgumentNullException.ThrowIfNull(command);
-    await _context.Purchases
-      .Where(p => p.ReceiptId == command.ReceiptId && p.PurchaseId == command.PurchaseId)
-      .ExecuteDeleteAsync(cancellationToken);
+    DbReceipt? dbReceipt = _context.Receipts.FirstOrDefault(r => r.Id == command.ReceiptId);
+    if (dbReceipt is null)
+    {
+      throw new InvalidOperationException($"Receipt with id {command.ReceiptId} not found.");
+    }
 
+    DbPurchase? dbPurchase = _context.Purchases.FirstOrDefault(r => r.PurchaseId == command.PurchaseId);
+    if (dbPurchase is null)
+    {
+      throw new InvalidOperationException($"Purchase with id {command.PurchaseId} not found.");
+    }
+
+    dbReceipt.Total -= (dbPurchase.Quantity * dbPurchase.UnitPrice) - dbPurchase.TotalDiscount;
+    _context.Purchases.Remove(dbPurchase);
+    await _context.SaveChangesAsync(cancellationToken);
     return Unit.Instance;
   }
 }

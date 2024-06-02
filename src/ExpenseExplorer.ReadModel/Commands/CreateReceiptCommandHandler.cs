@@ -19,7 +19,6 @@ public sealed class CreateReceiptCommandHandler(ExpenseExplorerContext context)
     ArgumentNullException.ThrowIfNull(command);
     _context.Receipts.Add(new DbReceipt(command.Id, command.Store, command.PurchaseDate, 0));
     await _context.SaveChangesAsync(cancellationToken);
-    Console.WriteLine(command);
     return Unit.Instance;
   }
 }
