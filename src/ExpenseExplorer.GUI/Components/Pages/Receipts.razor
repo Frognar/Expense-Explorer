@@ -28,7 +28,10 @@
     @bind-Value=@_selected
     IsLoading=@_isLoading
     Density="Density.Compact"
-    EditMode="DataGridEditMode.Single">
+    EditMode="DataGridEditMode.Single"
+    ExpandMode="DataGridExpandMode.Single"
+    RowExpand="RowExpand"
+    RowCollapse="RowCollapse">
     <HeaderTemplate>
         <RadzenButton
             ButtonStyle="ButtonStyle.Success"
@@ -38,6 +41,64 @@
         <RadzenButton Click="() => { _selected = null; }" Text="Clear Selection"
                       Disabled="@(_selected?.Any() != true)"/>
     </HeaderTemplate>
+    <Template>
+        <RadzenDataGrid
+            @ref="_detailGrid"
+            AllowFiltering="true"
+            AllowSorting="true"
+            TItem="GetReceiptPurchaseResponse"
+            IsLoading="@_isLoadingDetail"
+            Data="@_purchases">
+            <HeaderTemplate>
+                <RadzenButton
+                    ButtonStyle="ButtonStyle.Success"
+                    Icon="add_circle_outline"
+                    Text="Add New Purchase"
+                    Click="@AddPurchase"/>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="Item" Title="Item"/>
+                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="Category" Title="Category"/>
+                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="Quantity" Title="Quantity"/>
+                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="UnitPrice" Title="Unit price"/>
+                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="TotalDiscount"
+                                      Title="Total discount"/>
+                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Title="Total cost">
+                    <Template Context="purchase">
+                        <RadzenText>@(purchase.UnitPrice * purchase.Quantity - purchase.TotalDiscount)</RadzenText>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="Description" Title="Description"/>
+                <RadzenDataGridColumn
+                    Context="purchase"
+                    Filterable="false"
+                    Sortable="false"
+                    TextAlign="TextAlign.Right"
+                    Frozen="true"
+                    FrozenPosition="FrozenColumnPosition.Right">
+                    <Template Context="purchase">
+                        <RadzenButton
+                            Icon="edit"
+                            ButtonStyle="ButtonStyle.Light"
+                            Variant="Variant.Flat"
+                            Size="ButtonSize.Small"
+                            Click="@(_ => EditPurchase(purchase.Id))"
+                            @onclick:stopPropagation="true">
+                        </RadzenButton>
+                        <RadzenButton
+                            ButtonStyle="ButtonStyle.Danger"
+                            Icon="delete"
+                            Variant="Variant.Flat"
+                            Shade="Shade.Lighter"
+                            Size="ButtonSize.Small"
+                            class="my-1 ms-1"
+                            Click="@(_ => DeletePurchase(purchase))"
+                            @onclick:stopPropagation="true"/>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </Template>
     <Columns>
         <RadzenDataGridColumn TItem="ReceiptHeaderResponse" Property="Store" Title="Store">
             <FilterTemplate>
@@ -107,7 +168,7 @@
                     Shade="Shade.Lighter"
                     Size="ButtonSize.Small"
                     class="my-1 ms-1"
-                    Click="@(_ => DeleteRow(receipt))"
+                    Click="@(_ => DeleteReceipt(receipt))"
                     @onclick:stopPropagation="true"/>
             </Template>
         </RadzenDataGridColumn>
@@ -119,9 +180,12 @@
 {
     private readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
     private RadzenDataGrid<ReceiptHeaderResponse> _grid = default!;
+    private RadzenDataGrid<GetReceiptPurchaseResponse> _detailGrid = default!;
     private IEnumerable<ReceiptHeaderResponse> _receipts = default!;
+    private IEnumerable<GetReceiptPurchaseResponse> _purchases = default!;
     private int _count;
     private bool _isLoading = true;
+    private bool _isLoadingDetail = true;
     private DateTime? _purchasedAfter;
     private DateTime? _purchasedBefore;
     private decimal? _minTotal;
@@ -129,6 +193,7 @@
     private string? _store;
 
     private IList<ReceiptHeaderResponse>? _selected;
+    private ReceiptHeaderResponse? _expanded;
 
     private async Task LoadData(LoadDataArgs args)
     {
@@ -172,6 +237,26 @@
 
     private async Task OnStoreChange(string _) => await _grid.Reload();
 
+    private async Task RowExpand(ReceiptHeaderResponse receipt)
+    {
+        _isLoadingDetail = true;
+        _expanded = receipt;
+        string url = $"http://localhost:5163/api/receipts/{receipt.Id}";
+        using HttpClient client = ClientFactory.CreateClient();
+        GetReceiptResponse? response = await client.GetFromJsonAsync<GetReceiptResponse>(url);
+        if (response is not null)
+        {
+            _purchases = response.Purchases;
+        }
+
+        _isLoadingDetail = false;
+    }
+
+    private void RowCollapse()
+    {
+        _expanded = null;
+    }
+
     private async Task AddReceipt()
     {
         await Task.Delay(1);
@@ -182,7 +267,7 @@
         await Task.Delay(1);
     }
 
-    private async Task DeleteRow(ReceiptHeaderResponse receipt)
+    private async Task DeleteReceipt(ReceiptHeaderResponse receipt)
     {
         bool? youSure = await DialogService.Confirm("Are you sure?", "Delete", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
         if (youSure.HasValue == false || youSure.Value == false)
@@ -198,6 +283,41 @@
         {
             using HttpClient client = ClientFactory.CreateClient();
             await client.DeleteAsync($"http://localhost:5163/api/receipts/{receipt.Id}");
+            await _grid.Reload();
+        }
+    }
+
+    private async Task AddPurchase()
+    {
+        await Task.Delay(1);
+    }
+
+    private async Task EditPurchase(string purchaseId)
+    {
+        await Task.Delay(1);
+    }
+
+    private async Task DeletePurchase(GetReceiptPurchaseResponse purchase)
+    {
+        if (_expanded is null)
+        {
+            return;
+        }
+
+        bool? youSure = await DialogService.Confirm("Are you sure?", "Delete", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
+        if (youSure.HasValue == false || youSure.Value == false)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(purchase.Id))
+        {
+            _detailGrid.CancelEditRow(purchase);
+        }
+        else
+        {
+            using HttpClient client = ClientFactory.CreateClient();
+            await client.DeleteAsync($"http://localhost:5163/api/receipts/{_expanded.Id}/purchases/{purchase.Id}");
             await _grid.Reload();
         }
     }
