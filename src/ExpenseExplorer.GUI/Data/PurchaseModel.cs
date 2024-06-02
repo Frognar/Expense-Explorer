@@ -14,6 +14,8 @@ public sealed class PurchaseModel
 
   public decimal TotalDiscount { get; set; }
 
+  public decimal TotalCost => (UnitPrice * Quantity) - TotalDiscount;
+
   public string Description { get; set; } = string.Empty;
 
   public PurchaseModel MakeCopy()
