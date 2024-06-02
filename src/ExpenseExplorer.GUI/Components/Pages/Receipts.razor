@@ -1,5 +1,8 @@
 ﻿@page "/receipts"
+@using System.Text.Json
+@using ExpenseExplorer.API.Contract
 @using ExpenseExplorer.API.Contract.ReadModel
+@using ExpenseExplorer.GUI.Data
 @using ExpenseExplorer.GUI.Helpers
 @inject IHttpClientFactory ClientFactory
 @inject DialogService DialogService
@@ -13,7 +16,7 @@
     @ref="_grid"
     Data="@_receipts"
     Count="@_count"
-    TItem="ReceiptHeaderResponse"
+    TItem="ReceiptModel"
     LoadData="@LoadData"
     AllowPaging="true"
     PagerHorizontalAlign="HorizontalAlign.Center"
@@ -31,13 +34,18 @@
     EditMode="DataGridEditMode.Single"
     ExpandMode="DataGridExpandMode.Single"
     RowExpand="RowExpand"
-    RowCollapse="RowCollapse">
+    RowCollapse="RowCollapse"
+    RowCreate="@OnReceiptCreateRow"
+    RowUpdate="@OnReceiptUpdateRow"
+    Sort="@ResetReceipts"
+    Page="@ResetReceipts">
     <HeaderTemplate>
         <RadzenButton
             ButtonStyle="ButtonStyle.Success"
             Icon="add_circle_outline"
             Text="Add New Receipt"
-            Click="@AddReceipt"/>
+            Click="@InsertReceipt"
+            Disabled="@(_receiptsToInsert.Any() || _receiptsToUpdate.Any() || _isLoading)"/>
         <RadzenButton Click="() => { _selected = null; }" Text="Clear Selection"
                       Disabled="@(_selected?.Any() != true)"/>
     </HeaderTemplate>
@@ -46,7 +54,7 @@
             @ref="_detailGrid"
             AllowFiltering="true"
             AllowSorting="true"
-            TItem="GetReceiptPurchaseResponse"
+            TItem="PurchaseModel"
             IsLoading="@_isLoadingDetail"
             Data="@_purchases">
             <HeaderTemplate>
@@ -57,18 +65,13 @@
                     Click="@AddPurchase"/>
             </HeaderTemplate>
             <Columns>
-                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="Item" Title="Item"/>
-                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="Category" Title="Category"/>
-                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="Quantity" Title="Quantity"/>
-                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="UnitPrice" Title="Unit price"/>
-                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="TotalDiscount"
-                                      Title="Total discount"/>
-                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Title="Total cost">
-                    <Template Context="purchase">
-                        <RadzenText>@(purchase.UnitPrice * purchase.Quantity - purchase.TotalDiscount)</RadzenText>
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="GetReceiptPurchaseResponse" Property="Description" Title="Description"/>
+                <RadzenDataGridColumn TItem="PurchaseModel" Property="Item" Title="Item"/>
+                <RadzenDataGridColumn TItem="PurchaseModel" Property="Category" Title="Category"/>
+                <RadzenDataGridColumn TItem="PurchaseModel" Property="Quantity" Title="Quantity"/>
+                <RadzenDataGridColumn TItem="PurchaseModel" Property="UnitPrice" Title="Unit price"/>
+                <RadzenDataGridColumn TItem="PurchaseModel" Property="TotalDiscount" Title="Total discount"/>
+                <RadzenDataGridColumn TItem="PurchaseModel" Property="TotalCost" Title="Total cost"/>
+                <RadzenDataGridColumn TItem="PurchaseModel" Property="Description" Title="Description"/>
                 <RadzenDataGridColumn
                     Context="purchase"
                     Filterable="false"
@@ -100,7 +103,10 @@
         </RadzenDataGrid>
     </Template>
     <Columns>
-        <RadzenDataGridColumn TItem="ReceiptHeaderResponse" Property="Store" Title="Store">
+        <RadzenDataGridColumn TItem="ReceiptModel" Property="Store" Title="Store">
+            <EditTemplate Context="receipt">
+                <RadzenTextBox @bind-Value="receipt.Store"/>
+            </EditTemplate>
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Store">
                     <RadzenTextBox @bind-Value=@_store Change="OnStoreChange"/>
@@ -108,10 +114,13 @@
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn
-            TItem="ReceiptHeaderResponse"
+            TItem="ReceiptModel"
             Property="PurchaseDate"
             Title="Purchase date"
             FormatString="{0:dd.MM.yyyy}">
+            <EditTemplate Context="receipt">
+                <RadzenDatePicker @bind-Value="receipt.PurchaseDate" DateFormat="dd.MM.yyyy"/>
+            </EditTemplate>
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Purchased after">
                     <RadzenDatePicker
@@ -127,7 +136,7 @@
                 </RadzenFormField>
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="ReceiptHeaderResponse" Property="Total" Title="Total" FormatString="{0:0.00} zł">
+        <RadzenDataGridColumn TItem="ReceiptModel" Property="Total" Title="Total" FormatString="{0:0.00} zł">
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Min total">
                     <RadzenNumeric
@@ -158,7 +167,7 @@
                     ButtonStyle="ButtonStyle.Light"
                     Variant="Variant.Flat"
                     Size="ButtonSize.Small"
-                    Click="@(_ => EditReceipt(receipt.Id))"
+                    Click="@(_ => EditReceiptRow(receipt))"
                     @onclick:stopPropagation="true">
                 </RadzenButton>
                 <RadzenButton
@@ -171,6 +180,30 @@
                     Click="@(_ => DeleteReceipt(receipt))"
                     @onclick:stopPropagation="true"/>
             </Template>
+            <EditTemplate Context="receipt">
+                <RadzenButton
+                    Icon="check"
+                    ButtonStyle="ButtonStyle.Success"
+                    Variant="Variant.Flat"
+                    Size="ButtonSize.Small"
+                    Click="@(_ => SaveReceiptRow(receipt))"/>
+                <RadzenButton
+                    Icon="close"
+                    ButtonStyle="ButtonStyle.Light"
+                    Variant="Variant.Flat"
+                    Size="ButtonSize.Small"
+                    class="my-1 ms-1"
+                    Click="@(_ => CancelReceiptEdit(receipt))"/>
+                <RadzenButton
+                    ButtonStyle="ButtonStyle.Danger"
+                    Icon="delete"
+                    Variant="Variant.Flat"
+                    Shade="Shade.Lighter"
+                    Size="ButtonSize.Small"
+                    class="my-1 ms-1"
+                    Click="@(_ => DeleteReceipt(receipt))"
+                    @onclick:stopPropagation="true"/>
+            </EditTemplate>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
@@ -179,10 +212,10 @@
 @code
 {
     private readonly IEnumerable<int> _pageSizeOptions = [10, 20, 30];
-    private RadzenDataGrid<ReceiptHeaderResponse> _grid = default!;
-    private RadzenDataGrid<GetReceiptPurchaseResponse> _detailGrid = default!;
-    private IEnumerable<ReceiptHeaderResponse> _receipts = default!;
-    private IEnumerable<GetReceiptPurchaseResponse> _purchases = default!;
+    private RadzenDataGrid<ReceiptModel> _grid = default!;
+    private IEnumerable<ReceiptModel> _receipts = default!;
+    private RadzenDataGrid<PurchaseModel> _detailGrid = default!;
+    private IEnumerable<PurchaseModel> _purchases = default!;
     private int _count;
     private bool _isLoading = true;
     private bool _isLoadingDetail = true;
@@ -192,8 +225,11 @@
     private decimal? _maxTotal;
     private string? _store;
 
-    private IList<ReceiptHeaderResponse>? _selected;
-    private ReceiptHeaderResponse? _expanded;
+    private readonly List<ReceiptModel> _receiptsToInsert = [];
+    private readonly List<ReceiptModel> _receiptsToUpdate = [];
+    private ReceiptModel? _receiptEditBackup;
+    private IList<ReceiptModel>? _selected;
+    private ReceiptModel? _expanded;
 
     private async Task LoadData(LoadDataArgs args)
     {
@@ -204,7 +240,7 @@
         if (response is not null)
         {
             _count = response.FilteredCount;
-            _receipts = response.Receipts;
+            _receipts = response.Receipts.Select(r => r.ToViewModel());
         }
 
         _isLoading = false;
@@ -227,17 +263,99 @@
         return parameters.ToString();
     }
 
-    private async Task OnPurchasedAfterChange(DateTime? _) => await _grid.Reload();
+    private async Task OnPurchasedAfterChange(DateTime? _) => await ResetAndReloadReceipts();
 
-    private async Task OnPurchasedBeforeChange(DateTime? _) => await _grid.Reload();
+    private async Task OnPurchasedBeforeChange(DateTime? _) => await ResetAndReloadReceipts();
 
-    private async Task OnMinTotalChange(decimal? _) => await _grid.Reload();
+    private async Task OnMinTotalChange(decimal? _) => await ResetAndReloadReceipts();
 
-    private async Task OnMaxTotalChange(decimal? _) => await _grid.Reload();
+    private async Task OnMaxTotalChange(decimal? _) => await ResetAndReloadReceipts();
 
-    private async Task OnStoreChange(string _) => await _grid.Reload();
+    private async Task OnStoreChange(string _) => await ResetAndReloadReceipts();
 
-    private async Task RowExpand(ReceiptHeaderResponse receipt)
+    private async Task ResetAndReloadReceipts()
+    {
+        ResetReceipts();
+        await _grid.Reload();
+    }
+
+    private void ResetReceipts()
+    {
+        _receiptsToInsert.Clear();
+        _receiptsToUpdate.Clear();
+    }
+
+    async Task SaveReceiptRow(ReceiptModel receipt)
+    {
+        await _grid.UpdateRow(receipt);
+    }
+
+    void CancelReceiptEdit(ReceiptModel receipt)
+    {
+        ResetReceipts();
+        if (_receiptEditBackup is not null)
+        {
+            receipt.CopyFrom(_receiptEditBackup);
+            _receiptEditBackup = null;
+        }
+
+        _grid.CancelEditRow(receipt);
+    }
+
+    async Task InsertReceipt()
+    {
+        ResetReceipts();
+        ReceiptModel receipt = new();
+        _receiptsToInsert.Add(receipt);
+        _count++;
+        await _grid.InsertRow(receipt);
+    }
+
+    private async Task OnReceiptCreateRow(ReceiptModel receipt)
+    {
+        string url = "http://localhost:5163/api/receipts";
+        using HttpClient client = ClientFactory.CreateClient();
+        HttpResponseMessage responseMessage = await client.PostAsJsonAsync(url, receipt.ToAddRequest());
+        if (responseMessage.IsSuccessStatusCode)
+        {
+            string content = await responseMessage.Content.ReadAsStringAsync();
+            OpenNewReceiptResponse response = JsonSerializer
+                .Deserialize<OpenNewReceiptResponse>(content, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+
+            receipt.Id = response.Id;
+        }
+        else
+        {
+            _grid.CancelEditRow(receipt);
+        }
+
+        ResetReceipts();
+    }
+
+    private async Task EditReceiptRow(ReceiptModel receipt)
+    {
+        ResetReceipts();
+        _receiptsToUpdate.Add(receipt);
+        await _grid.EditRow(receipt);
+        _receiptEditBackup = receipt.MakeCopy();
+    }
+
+    private async Task OnReceiptUpdateRow(ReceiptModel receipt)
+    {
+        string url = $"http://localhost:5163/api/receipts/{receipt.Id}";
+        using HttpClient client = ClientFactory.CreateClient();
+        HttpResponseMessage responseMessage = await client.PatchAsJsonAsync(url, receipt.ToEditRequest());
+        if (!responseMessage.IsSuccessStatusCode)
+        {
+            receipt.CopyFrom(_receiptEditBackup!);
+            _grid.CancelEditRow(receipt);
+        }
+
+        _receiptEditBackup = null;
+        ResetReceipts();
+    }
+
+    private async Task RowExpand(ReceiptModel receipt)
     {
         _isLoadingDetail = true;
         _expanded = receipt;
@@ -246,7 +364,7 @@
         GetReceiptResponse? response = await client.GetFromJsonAsync<GetReceiptResponse>(url);
         if (response is not null)
         {
-            _purchases = response.Purchases;
+            _purchases = response.Purchases.Select(p => p.ToViewModel());
         }
 
         _isLoadingDetail = false;
@@ -257,17 +375,7 @@
         _expanded = null;
     }
 
-    private async Task AddReceipt()
-    {
-        await Task.Delay(1);
-    }
-
-    private async Task EditReceipt(string receiptId)
-    {
-        await Task.Delay(1);
-    }
-
-    private async Task DeleteReceipt(ReceiptHeaderResponse receipt)
+    private async Task DeleteReceipt(ReceiptModel receipt)
     {
         bool? youSure = await DialogService.Confirm("Are you sure?", "Delete", new ConfirmOptions { OkButtonText = "Yes", CancelButtonText = "No" });
         if (youSure.HasValue == false || youSure.Value == false)
@@ -297,7 +405,7 @@
         await Task.Delay(1);
     }
 
-    private async Task DeletePurchase(GetReceiptPurchaseResponse purchase)
+    private async Task DeletePurchase(PurchaseModel purchase)
     {
         if (_expanded is null)
         {
@@ -317,8 +425,12 @@
         else
         {
             using HttpClient client = ClientFactory.CreateClient();
-            await client.DeleteAsync($"http://localhost:5163/api/receipts/{_expanded.Id}/purchases/{purchase.Id}");
-            await _grid.Reload();
+            HttpResponseMessage responseMessage = await client.DeleteAsync($"http://localhost:5163/api/receipts/{_expanded.Id}/purchases/{purchase.Id}");
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                _expanded.Total -= purchase.TotalCost;
+                await RowExpand(_expanded);
+            }
         }
     }
 }
