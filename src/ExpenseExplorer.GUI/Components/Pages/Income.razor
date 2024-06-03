@@ -92,7 +92,8 @@
             TItem="IncomeModel"
             Property="ReceivedDate"
             Title="Received date"
-            FormatString="{0:dd.MM.yyyy}">
+            FormatString="{0:dd.MM.yyyy}"
+            SortOrder="SortOrder.Descending">
             <EditTemplate Context="income">
                 <RadzenDatePicker @bind-Value="income.ReceivedDate" DateFormat="dd.MM.yyyy"/>
             </EditTemplate>
