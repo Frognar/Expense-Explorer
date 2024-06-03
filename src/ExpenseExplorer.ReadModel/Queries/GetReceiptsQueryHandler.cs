@@ -33,7 +33,7 @@ public sealed class GetReceiptsQueryHandler(ExpenseExplorerContext context)
       int filteredCount = await receiptQuery.CountAsync(cancellationToken);
       List<ReceiptHeaders> receipts = await receiptQuery
         .OrderByMany(
-          Order.AscendingBy<DbReceipt>(r => r.PurchaseDate),
+          Order.By(GetSelector(query.SortBy), Order.GetDirection(query.SortOrder)),
           Order.DescendingBy<DbReceipt>(r => r.Id))
         .GetPage(query.PageNumber, query.PageSize)
         .Select(r => new ReceiptHeaders(r.Id, r.Store, r.PurchaseDate, r.Total))
@@ -75,5 +75,16 @@ public sealed class GetReceiptsQueryHandler(ExpenseExplorerContext context)
 #pragma warning restore CA1862
 #pragma warning restore CA1311
 #pragma warning restore CA1304
+  }
+
+  private static Expression<Func<DbReceipt, object>> GetSelector(string orderBy)
+  {
+    return orderBy.ToUpperInvariant() switch
+    {
+      "STORE" => receipt => receipt.Store,
+      "PURCHASEDATE" => receipt => receipt.PurchaseDate,
+      "TOTAL" => receipt => receipt.Total,
+      _ => receipt => receipt.PurchaseDate,
+    };
   }
 }

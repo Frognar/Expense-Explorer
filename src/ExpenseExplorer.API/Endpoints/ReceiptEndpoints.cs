@@ -35,10 +35,12 @@ public static class ReceiptEndpoints
     DateOnly? before,
     decimal? minTotal,
     decimal? maxTotal,
+    string? sortBy,
+    string? sortOrder,
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    GetReceiptsQuery query = new(pageSize, pageNumber, search, after, before, minTotal, maxTotal);
+    GetReceiptsQuery query = new(pageSize, pageNumber, search, after, before, minTotal, maxTotal, sortBy, sortOrder);
     return (await sender.SendAsync(query, cancellationToken))
       .Map(r => r.MapToResponse())
       .Match(Handle, Results.Ok);
