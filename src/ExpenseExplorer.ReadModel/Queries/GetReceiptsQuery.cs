@@ -11,7 +11,9 @@ public sealed record GetReceiptsQuery(
   DateOnly After,
   DateOnly Before,
   decimal MinTotal,
-  decimal MaxTotal)
+  decimal MaxTotal,
+  string SortBy,
+  string SortOrder)
   : IQuery<Result<PageOf<ReceiptHeaders>>>
 {
   public const int DefaultPageSize = 10;
@@ -24,7 +26,9 @@ public sealed record GetReceiptsQuery(
     DateOnly? after,
     DateOnly? before,
     decimal? minTotal,
-    decimal? maxTotal)
+    decimal? maxTotal,
+    string? sortBy,
+    string? sortOrder)
     : this(
       pageSize ?? DefaultPageSize,
       pageNumber ?? 1,
@@ -32,7 +36,9 @@ public sealed record GetReceiptsQuery(
       after ?? DateOnly.MinValue,
       before ?? DateOnly.MaxValue,
       minTotal ?? decimal.MinValue,
-      maxTotal ?? decimal.MaxValue)
+      maxTotal ?? decimal.MaxValue,
+      sortBy ?? string.Empty,
+      sortOrder ?? string.Empty)
   {
   }
 
