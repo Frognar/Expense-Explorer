@@ -26,8 +26,8 @@
 
 @code
 {
-    private readonly RenderFragment<CategoryBasedEntryResponse> _tooltipTemplate = cc => @
-        <div><span>@cc.Category</span>: <strong>@($"{cc.Total:0.00} zł")</strong></div>;
+    private readonly RenderFragment<CategoryBasedEntryResponse> _tooltipTemplate = cc
+            => @<div><span>@cc.Category</span>: <strong>@($"{cc.Total:0.00} zł")</strong></div>;
     private IEnumerable<CategoryBasedEntryResponse> _categoryBasedEntries = [];
 
     protected override async Task OnInitializedAsync()
