@@ -1,0 +1,47 @@
+﻿@page "/reports"
+@using ExpenseExplorer.API.Contract.ReadModel
+@inject IHttpClientFactory ClientFactory
+@rendermode InteractiveServer
+
+<PageTitle>Reports</PageTitle>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 col-lg-8 offset-lg-3 my-5">
+            <RadzenChart>
+                <RadzenPieSeries
+                    Data="@_categoryBasedEntries"
+                    Title="Category"
+                    CategoryProperty="Category"
+                    ValueProperty="Total"
+                    TooltipTemplate="@_tooltipTemplate">
+                    <ChildContent>
+                        <RadzenSeriesDataLabels Visible="true"/>
+                        <RadzenValueAxis FormatString="{0:0.00} zł"/>
+                    </ChildContent>
+                </RadzenPieSeries>
+            </RadzenChart>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    private readonly RenderFragment<CategoryBasedEntryResponse> _tooltipTemplate = cc => @
+        <div><span>@cc.Category</span>: <strong>@($"{cc.Total:0.00} zł")</strong></div>;
+    private IEnumerable<CategoryBasedEntryResponse> _categoryBasedEntries = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        DateOnly lastDayFromLastMonth = new DateOnly(today.Year, today.Month, 1).AddDays(-1);
+        DateOnly firstDayFromLastMonth = new DateOnly(lastDayFromLastMonth.Year, lastDayFromLastMonth.Month, 1);
+        string url = $"http://localhost:5163/api/reports/category-based-expense?from={firstDayFromLastMonth}&to={lastDayFromLastMonth}";
+        using HttpClient client = ClientFactory.CreateClient();
+        GenerateCategoryBasedExpenseReportResponse? response = await client.GetFromJsonAsync<GenerateCategoryBasedExpenseReportResponse>(url);
+        if (response is not null)
+        {
+            _categoryBasedEntries = response.Categories;
+        }
+    }
+
+}
