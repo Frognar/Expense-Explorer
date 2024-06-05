@@ -22,25 +22,62 @@
             </RadzenChart>
         </div>
     </div>
+    <div class="row">
+        <div class="col-sm-12 col-lg-8 offset-lg-3 my-5">
+            <RadzenChart>
+                <RadzenStackedColumnSeries
+                    Data="@_income"
+                    Title="Income"
+                    CategoryProperty="Name"
+                    ValueProperty="Value">
+                    <RadzenSeriesDataLabels Visible="true"/>
+                </RadzenStackedColumnSeries>
+                <RadzenStackedColumnSeries
+                    Data="@_expense"
+                    Title="Expense"
+                    CategoryProperty="Name"
+                    ValueProperty="Value">
+                    <RadzenSeriesDataLabels Visible="true"/>
+                </RadzenStackedColumnSeries>
+            </RadzenChart>
+        </div>
+    </div>
 </div>
 
 @code
 {
     private readonly RenderFragment<CategoryBasedEntryResponse> _tooltipTemplate = cc
-            => @<div><span>@cc.Category</span>: <strong>@($"{cc.Total:0.00} zł")</strong></div>;
+        => @<div><span>@cc.Category</span>: <strong>@($"{cc.Total:0.00} zł")</strong></div>;
+
     private IEnumerable<CategoryBasedEntryResponse> _categoryBasedEntries = [];
+    private IEnumerable<Entry> _income = [];
+    private IEnumerable<Entry> _expense = [];
+
+    private readonly record struct Entry(decimal Value, string Name);
 
     protected override async Task OnInitializedAsync()
     {
         DateOnly today = DateOnly.FromDateTime(DateTime.Today);
         DateOnly lastDayFromLastMonth = new DateOnly(today.Year, today.Month, 1).AddDays(-1);
         DateOnly firstDayFromLastMonth = new DateOnly(lastDayFromLastMonth.Year, lastDayFromLastMonth.Month, 1);
-        string url = $"http://localhost:5163/api/reports/category-based-expense?from={firstDayFromLastMonth}&to={lastDayFromLastMonth}";
+        const string baseUrl = "http://localhost:5163/api/reports";
+        string parameters = $"from={firstDayFromLastMonth}&to={lastDayFromLastMonth}";
         using HttpClient client = ClientFactory.CreateClient();
-        GenerateCategoryBasedExpenseReportResponse? response = await client.GetFromJsonAsync<GenerateCategoryBasedExpenseReportResponse>(url);
-        if (response is not null)
+        GenerateCategoryBasedExpenseReportResponse? categoryBasedExpenseReport =
+            await client.GetFromJsonAsync<GenerateCategoryBasedExpenseReportResponse>($"{baseUrl}/category-based-expense?{parameters}");
+
+        if (categoryBasedExpenseReport is not null)
         {
-            _categoryBasedEntries = response.Categories;
+            _categoryBasedEntries = categoryBasedExpenseReport.Categories;
+        }
+
+        GenerateIncomeToExpenseReportResponse? incomeToExpenseReport =
+            await client.GetFromJsonAsync<GenerateIncomeToExpenseReportResponse>($"{baseUrl}/income-to-expense?{parameters}");
+
+        if (incomeToExpenseReport is not null)
+        {
+            _income = [new Entry(incomeToExpenseReport.TotalIncome, "Income")];
+            _expense = [new Entry(incomeToExpenseReport.TotalExpense, "Expense")];
         }
     }
 
