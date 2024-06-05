@@ -77,7 +77,7 @@ Expense Explorer is built on a modern and robust technology stack:
 - **CQRS (Command Query Responsibility Segregation):** This architectural pattern separates read and write operations, leading to improved scalability and performance.
 
 
-### Command Size
+### Commands
 The command side of Expense Explorer heavily leverages functional programming concepts:
 
 - **Monads:** Monads like Maybe (for nullable values) and Result (for error handling) are used extensively to model computations and manage side effects.
