@@ -4,45 +4,57 @@
 @rendermode InteractiveServer
 
 <PageTitle>Reports</PageTitle>
-<div class="container">
-    <div class="row">
-        <div class="col-sm-12 col-lg-8 offset-lg-3 my-5">
-            <RadzenChart>
-                <RadzenPieSeries
-                    Data="@_categoryBasedEntries"
-                    Title="Category"
-                    CategoryProperty="Category"
-                    ValueProperty="Total"
-                    TooltipTemplate="@_tooltipTemplate">
-                    <ChildContent>
-                        <RadzenSeriesDataLabels Visible="true"/>
-                        <RadzenValueAxis FormatString="{0:0.00} zł"/>
-                    </ChildContent>
-                </RadzenPieSeries>
-            </RadzenChart>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12 col-lg-8 offset-lg-3 my-5">
-            <RadzenChart>
-                <RadzenStackedColumnSeries
-                    Data="@_income"
-                    Title="Income"
-                    CategoryProperty="Name"
-                    ValueProperty="Value">
-                    <RadzenSeriesDataLabels Visible="true"/>
-                </RadzenStackedColumnSeries>
-                <RadzenStackedColumnSeries
-                    Data="@_expense"
-                    Title="Expense"
-                    CategoryProperty="Name"
-                    ValueProperty="Value">
-                    <RadzenSeriesDataLabels Visible="true"/>
-                </RadzenStackedColumnSeries>
-            </RadzenChart>
-        </div>
-    </div>
-</div>
+<RadzenCard class="rz-my-1 p-2 w-100">
+    <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" class="w-100">
+        <RadzenColumn Size="8" SizeMD="4" SizeLG="4" >
+            <RadzenFormField AllowFloatingLabel="false" Text="From" class="w-100">
+                <RadzenDatePicker @bind-Value="_from" DateFormat="dd.MM.yyyy"/>
+            </RadzenFormField>
+        </RadzenColumn>
+        <RadzenColumn Size="8" SizeMD="4" SizeLG="4">
+            <RadzenFormField AllowFloatingLabel="false" Text="To" class="w-100">
+                <RadzenDatePicker @bind-Value="_to" DateFormat="dd.MM.yyyy"/>
+            </RadzenFormField>
+        </RadzenColumn>
+        <RadzenColumn Size="8" SizeMD="4" SizeLG="4">
+            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Dark" Variant="Variant.Flat" Click="@LoadData" Text="Load"/>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenCard>
+
+<RadzenCard class="rz-my-1 p-2 w-100">
+<RadzenChart>
+    <RadzenPieSeries
+        Data="@_categoryBasedEntries"
+        Title="Category"
+        CategoryProperty="Category"
+        ValueProperty="Total"
+        TooltipTemplate="@_tooltipTemplate">
+        <ChildContent>
+            <RadzenSeriesDataLabels Visible="true"/>
+            <RadzenValueAxis FormatString="{0:0.00} zł"/>
+        </ChildContent>
+    </RadzenPieSeries>
+</RadzenChart>
+</RadzenCard>
+<RadzenCard class="rz-my-1 p-2 w-100">
+<RadzenChart>
+    <RadzenStackedColumnSeries
+        Data="@_income"
+        Title="Income"
+        CategoryProperty="Name"
+        ValueProperty="Value">
+        <RadzenSeriesDataLabels Visible="true"/>
+    </RadzenStackedColumnSeries>
+    <RadzenStackedColumnSeries
+        Data="@_expense"
+        Title="Expense"
+        CategoryProperty="Name"
+        ValueProperty="Value">
+        <RadzenSeriesDataLabels Visible="true"/>
+    </RadzenStackedColumnSeries>
+</RadzenChart>
+</RadzenCard>
 
 @code
 {
@@ -52,16 +64,18 @@
     private IEnumerable<CategoryBasedEntryResponse> _categoryBasedEntries = [];
     private IEnumerable<Entry> _income = [];
     private IEnumerable<Entry> _expense = [];
-
-    private readonly record struct Entry(decimal Value, string Name);
+    private DateOnly _from = DateOnly.FromDateTime(DateTime.Today).AddDays(-DateTime.Today.Day).AddMonths(-1).AddDays(1);
+    private DateOnly _to = DateOnly.FromDateTime(DateTime.Today).AddDays(-DateTime.Today.Day);
 
     protected override async Task OnInitializedAsync()
     {
-        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
-        DateOnly lastDayFromLastMonth = new DateOnly(today.Year, today.Month, 1).AddDays(-1);
-        DateOnly firstDayFromLastMonth = new DateOnly(lastDayFromLastMonth.Year, lastDayFromLastMonth.Month, 1);
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
         const string baseUrl = "http://localhost:5163/api/reports";
-        string parameters = $"from={firstDayFromLastMonth}&to={lastDayFromLastMonth}";
+        string parameters = $"from={_from}&to={_to}";
         using HttpClient client = ClientFactory.CreateClient();
         GenerateCategoryBasedExpenseReportResponse? categoryBasedExpenseReport =
             await client.GetFromJsonAsync<GenerateCategoryBasedExpenseReportResponse>($"{baseUrl}/category-based-expense?{parameters}");
@@ -81,4 +95,7 @@
         }
     }
 
+    private readonly record struct Entry(decimal Value, string Name);
+
 }
+
