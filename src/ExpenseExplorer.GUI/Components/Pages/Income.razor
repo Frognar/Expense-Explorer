@@ -6,6 +6,7 @@
 @using ExpenseExplorer.GUI.Helpers
 @inject IHttpClientFactory ClientFactory
 @inject DialogService DialogService
+@inject IConfiguration Configuration
 @rendermode InteractiveServer
 
 <RadzenComponents/>
@@ -197,10 +198,16 @@
     private IncomeModel? _editBackup;
     private IList<IncomeModel>? _selected;
 
+    private string _apiUrl = string.Empty;
+    protected override void OnInitialized()
+    {
+        _apiUrl = Configuration.GetConnectionString("API") ?? throw new ArgumentNullException();
+    }
+
     private async Task LoadData(LoadDataArgs args)
     {
         _isLoading = true;
-        string url = $"http://localhost:5163/api/incomes?{GetParameters(args)}";
+        string url = $"{_apiUrl}/api/incomes?{GetParameters(args)}";
         using HttpClient client = ClientFactory.CreateClient();
         GetIncomesResponse? response = await client.GetFromJsonAsync<GetIncomesResponse>(url);
         if (response is not null)
@@ -285,7 +292,7 @@
 
     private async Task OnCreateRow(IncomeModel income)
     {
-        string url = "http://localhost:5163/api/incomes";
+        string url = $"{_apiUrl}/api/incomes";
         using HttpClient client = ClientFactory.CreateClient();
         HttpResponseMessage responseMessage = await client.PostAsJsonAsync(url, income.ToAddRequest());
         if (responseMessage.IsSuccessStatusCode)
@@ -314,7 +321,7 @@
 
     private async Task OnUpdateRow(IncomeModel income)
     {
-        string url = $"http://localhost:5163/api/incomes/{income.Id}";
+        string url = $"{_apiUrl}/api/incomes/{income.Id}";
         using HttpClient client = ClientFactory.CreateClient();
         HttpResponseMessage responseMessage = await client.PatchAsJsonAsync(url, income.ToEditRequest());
         if (!responseMessage.IsSuccessStatusCode)
@@ -343,7 +350,7 @@
         else
         {
             using HttpClient client = ClientFactory.CreateClient();
-            await client.DeleteAsync($"http://localhost:5163/api/incomes/{income.Id}");
+            await client.DeleteAsync($"{_apiUrl}/api/incomes/{income.Id}");
             await _grid.Reload();
         }
     }

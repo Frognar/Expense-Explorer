@@ -1,6 +1,7 @@
 ﻿@page "/reports"
 @using ExpenseExplorer.API.Contract.ReadModel
 @inject IHttpClientFactory ClientFactory
+@inject IConfiguration Configuration
 @rendermode InteractiveServer
 
 <PageTitle>Reports</PageTitle>
@@ -67,14 +68,17 @@
     private DateOnly _from = DateOnly.FromDateTime(DateTime.Today).AddDays(-DateTime.Today.Day).AddMonths(-1).AddDays(1);
     private DateOnly _to = DateOnly.FromDateTime(DateTime.Today).AddDays(-DateTime.Today.Day);
 
+    private string _apiUrl = string.Empty;
+
     protected override async Task OnInitializedAsync()
     {
+        _apiUrl = Configuration.GetConnectionString("API") ?? throw new ArgumentNullException();
         await LoadData();
     }
 
     private async Task LoadData()
     {
-        const string baseUrl = "http://localhost:5163/api/reports";
+        string baseUrl = $"{_apiUrl}/api/reports";
         string parameters = $"from={_from}&to={_to}";
         using HttpClient client = ClientFactory.CreateClient();
         GenerateCategoryBasedExpenseReportResponse? categoryBasedExpenseReport =

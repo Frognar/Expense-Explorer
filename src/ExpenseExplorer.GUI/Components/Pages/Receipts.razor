@@ -6,6 +6,7 @@
 @using ExpenseExplorer.GUI.Helpers
 @inject IHttpClientFactory ClientFactory
 @inject DialogService DialogService
+@inject IConfiguration Configuration
 @rendermode InteractiveServer
 
 <RadzenComponents/>
@@ -290,10 +291,16 @@
     private IList<ReceiptModel>? _selected;
     private ReceiptModel? _expanded;
 
+    private string _apiUrl = string.Empty;
+    protected override void OnInitialized()
+    {
+        _apiUrl = Configuration.GetConnectionString("API") ?? throw new ArgumentNullException();
+    }
+
     private async Task LoadData(LoadDataArgs args)
     {
         _isLoading = true;
-        string url = $"http://localhost:5163/api/receipts?{GetParameters(args)}";
+        string url = $"{_apiUrl}/api/receipts?{GetParameters(args)}";
         using HttpClient client = ClientFactory.CreateClient();
         GetReceiptsResponse? response = await client.GetFromJsonAsync<GetReceiptsResponse>(url);
         if (response is not null)
@@ -372,7 +379,7 @@
 
     private async Task OnReceiptCreateRow(ReceiptModel receipt)
     {
-        string url = "http://localhost:5163/api/receipts";
+        string url = $"{_apiUrl}/api/receipts";
         using HttpClient client = ClientFactory.CreateClient();
         HttpResponseMessage responseMessage = await client.PostAsJsonAsync(url, receipt.ToAddRequest());
         if (responseMessage.IsSuccessStatusCode)
@@ -401,7 +408,7 @@
 
     private async Task OnReceiptUpdateRow(ReceiptModel receipt)
     {
-        string url = $"http://localhost:5163/api/receipts/{receipt.Id}";
+        string url = $"{_apiUrl}/api/receipts/{receipt.Id}";
         using HttpClient client = ClientFactory.CreateClient();
         HttpResponseMessage responseMessage = await client.PatchAsJsonAsync(url, receipt.ToEditRequest());
         if (!responseMessage.IsSuccessStatusCode)
@@ -429,7 +436,7 @@
         else
         {
             using HttpClient client = ClientFactory.CreateClient();
-            HttpResponseMessage responseMessage = await client.DeleteAsync($"http://localhost:5163/api/receipts/{receipt.Id}");
+            HttpResponseMessage responseMessage = await client.DeleteAsync($"{_apiUrl}/api/receipts/{receipt.Id}");
             if (responseMessage.IsSuccessStatusCode)
             {
                 await _grid.Reload();
@@ -441,7 +448,7 @@
     {
         _isLoadingDetail = true;
         _expanded = receipt;
-        string url = $"http://localhost:5163/api/receipts/{receipt.Id}";
+        string url = $"{_apiUrl}/api/receipts/{receipt.Id}";
         using HttpClient client = ClientFactory.CreateClient();
         GetReceiptResponse? response = await client.GetFromJsonAsync<GetReceiptResponse>(url);
         if (response is not null)
@@ -495,7 +502,7 @@
             return;
         }
 
-        string url = $"http://localhost:5163/api/receipts/{_expanded.Id}/purchases";
+        string url = $"{_apiUrl}/api/receipts/{_expanded.Id}/purchases";
         using HttpClient client = ClientFactory.CreateClient();
         HttpResponseMessage responseMessage = await client.PostAsJsonAsync(url, purchase.ToAddRequest());
         if (responseMessage.IsSuccessStatusCode)
@@ -530,7 +537,7 @@
             return;
         }
 
-        string url = $"http://localhost:5163/api/receipts/{_expanded.Id}/purchases/{purchase.Id}";
+        string url = $"{_apiUrl}/api/receipts/{_expanded.Id}/purchases/{purchase.Id}";
         using HttpClient client = ClientFactory.CreateClient();
         HttpResponseMessage responseMessage = await client.PatchAsJsonAsync(url, purchase.ToEditRequest());
         if (!responseMessage.IsSuccessStatusCode)
@@ -565,7 +572,7 @@
         else
         {
             using HttpClient client = ClientFactory.CreateClient();
-            HttpResponseMessage responseMessage = await client.DeleteAsync($"http://localhost:5163/api/receipts/{_expanded.Id}/purchases/{purchase.Id}");
+            HttpResponseMessage responseMessage = await client.DeleteAsync($"{_apiUrl}/api/receipts/{_expanded.Id}/purchases/{purchase.Id}");
             if (responseMessage.IsSuccessStatusCode)
             {
                 _expanded.Total -= purchase.TotalCost;
