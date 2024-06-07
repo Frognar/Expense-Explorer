@@ -39,7 +39,7 @@ services:
 
   api:
     build:
-      context: ../../src/ExpenseExplorer.API/.
+      context: ../../.
       dockerfile: Dockerfile
     ports:
       - "5163:8080"
