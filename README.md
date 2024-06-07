@@ -58,7 +58,7 @@ The API is already implemented and can be used; [documentation](#API) is availab
     ./run.sh
     ```
 
-   The API should now be running and accessible at `http://localhost:5000`.
+   The API should now be running and accessible at `http://localhost:5163`.
 4. **Explore API Endpoints:** With the application running, you can explore the API endpoints provided. For example, you
    can interact with the receipt endpoints by sending HTTP requests to `/api/receipts`. You can use tools like Postman
    or curl to make requests.
