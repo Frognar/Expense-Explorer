@@ -42,9 +42,10 @@ services:
       context: ../../.
       dockerfile: src/ExpenseExplorer.API/Dockerfile
     ports:
-      - "5163:8080"
+      - "5163:5163"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTP_PORTS=5163
     depends_on:
       eventstore:
         condition: service_healthy
