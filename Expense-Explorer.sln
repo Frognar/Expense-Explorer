@@ -45,7 +45,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution", "solution", "{E2
 		run.sh = run.sh
 		.gitignore = .gitignore
 		API.md = API.md
-		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseExplorer.Infrastructure", "src\ExpenseExplorer.Infrastructure\ExpenseExplorer.Infrastructure.csproj", "{25FC5C57-0753-419C-97C4-A57D626010B3}"
