@@ -15,6 +15,8 @@ builder.Configuration.AddConfiguration(
 
 builder.Services.AddEndpointsApiExplorer();
 
+builder.Services.AddHealthChecks();
+
 builder.Services.AddScoped<TimeProvider>(_ => TimeProvider.System);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddReadModel(builder.Configuration);
