@@ -32,6 +32,8 @@ WebApplication app = builder.Build();
 
 app.UseHttpsRedirection();
 
+app.MapHealthChecks("/api/health");
+
 app.UseExceptionHandler();
 
 app.ConfigureReadModel();
