@@ -59,6 +59,22 @@ services:
       timeout: 3s
       retries: 5
 
+  gui:
+    build:
+      context: ../../.
+      dockerfile: src/ExpenseExplorer.GUI/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTP_PORTS=8080
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - app-network
+
+
 volumes:
   eventstore-data:
   eventstore-logs:

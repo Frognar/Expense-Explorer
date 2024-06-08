@@ -2,6 +2,12 @@ using ExpenseExplorer.GUI.Components;
 using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddConfiguration(
+  new ConfigurationBuilder()
+    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json")
+    .Build());
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
