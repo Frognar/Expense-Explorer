@@ -53,6 +53,11 @@ services:
         condition: service_healthy
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:5163/api/health || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
 
 volumes:
   eventstore-data:
