@@ -7,6 +7,7 @@
 [![100 - commitów](https://img.shields.io/badge/100-commitów-2ea44f?logo=csharp)](https://100commitow.pl/)
 [![.net workflow](https://github.com/Frognar/Expense-Explorer/actions/workflows/dotnet.yml/badge.svg?branch=main)](https://github.com/Frognar/Expense-Explorer/actions/workflows/dotnet.yml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![GitHub Repo stars](https://img.shields.io/github/stars/frognar/expense-explorer?style=flat)
 
 Expense Explorer is a simple expense tracking application designed to run on a home server, allowing users to manage their receipts and track expenses conveniently. This project is written in C# and serves as a learning opportunity, particularly for exploring concepts like Event Sourcing.
 
@@ -24,7 +25,7 @@ Expense Explorer is a simple expense tracking application designed to run on a h
 - [ ] **GUI:** A simple web-based GUI to interact with the application.
 - - [x] ***Income Page***
 - - [x] ***Expense Page***
-- - [ ] ***Reports Page***
+- - [x] ***Reports Page***
 - [ ] **OCR Integration:** Automatically extract receipt details using OCR.
 - [x] **Income Tracking:** Track income and compare with expenses.
 
@@ -44,21 +45,25 @@ The API is already implemented and can be used; [documentation](#API) is availab
     ```bash
     git clone https://github.com/Frognar/Expense-Explorer.git
     ```
+
 2. **Set Up Environment:** Ensure you have the necessary environment set up to run the project.
-    - [.NET SDK ](https://dotnet.microsoft.com/download)
+    - [.NET SDK ](https://dotnet.microsoft.com/download) *`can be omitted for docker only use`*
     - [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
-3. **Build and Run:** Navigate to the solution directory and run *build.sh* script to build the project:
-    ```bash
-    ./build.sh
-    ```
 
-   Once the build process is complete, you can execute *run.sh* script to start the application:
+3. **Build and Run:** Navigate to the solution directory and run *run.sh* script to start a docker containers:
     ```bash
     ./run.sh
     ```
+   or you can just run this command:
+    ```bash
+    docker compose -f res/fullapi/docker-compose.yml up -d
+    ```
 
-   The API should now be running and accessible at `http://localhost:5163`.
+   The API should now be running and accessible at `http://localhost:5163`.\
+   The GUI should now be running and accessible at `http://localhost:8080`.
+
+
 4. **Explore API Endpoints:** With the application running, you can explore the API endpoints provided. For example, you
    can interact with the receipt endpoints by sending HTTP requests to `/api/receipts`. You can use tools like Postman
    or curl to make requests.
