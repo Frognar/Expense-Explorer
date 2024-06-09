@@ -365,3 +365,22 @@
         "pageCount": 1
     }
     ```
+
+### Sources
+
+#### Get Sources
+
+- **URL:** `/api/sources?pageNumber=1&pageSize=10&search=inv`
+- **Method:** `GET`
+- **Response Body:**
+    ```json
+    {
+        "sources": [
+          "Investments"
+        ],
+        "totalCount": 1,
+        "pageSize": 10,
+        "pageNumber": 1,
+        "pageCount": 1
+    }
+    ```

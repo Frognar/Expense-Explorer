@@ -9,6 +9,7 @@ public static class EndpointExtensions
       .MapStoreEndpoints()
       .MapItemEndpoints()
       .MapCategoryEndpoints()
+      .MapSourceEndpoints()
       .MapReportEndpoints()
       .MapIncomeEndpoints();
   }
