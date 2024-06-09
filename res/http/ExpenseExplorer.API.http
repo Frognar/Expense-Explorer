@@ -1,7 +1,7 @@
-@ExpenseExplorer.API_HostAddress = https://localhost:7163
+@ExpenseExplorer.API_HostAddress = http://localhost:5163
 @receiptId = 14b3b065aed2471e9e08be8b739ab6e2
 @purchaseId = 52b0d17ad9924caeb76d20c49e198087
-@incomeId = da5da2ff8d7545f1b7f2b7da7647ea51
+@incomeId = c36e9597b9044048a04bf4b2ad74be32
 
 GET {{ExpenseExplorer.API_HostAddress}}/api/receipts?pageNumber=1&pageSize=10&search=stc&after=2021-10-02&
     before=2021-10-02&minTotal=1&maxTotal=10
@@ -134,3 +134,7 @@ Content-Type: application/json
 ###
 
 DELETE {{ExpenseExplorer.API_HostAddress}}/api/incomes/{{incomeId}}
+
+###
+
+GET {{ExpenseExplorer.API_HostAddress}}/api/sources?pageNumber=1&pageSize=10&search=inv
