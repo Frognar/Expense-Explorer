@@ -21,6 +21,7 @@ public static class ReadModelReceiptMapper
     return new GetItemsResponse(
       page.Items.Select(item => item.Name),
       page.TotalCount,
+      page.FilteredCount,
       page.PageSize,
       page.PageNumber,
       page.PageCount);
