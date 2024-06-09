@@ -32,6 +32,7 @@ public static class ReadModelReceiptMapper
     return new GetCategoriesResponse(
       page.Items.Select(category => category.Name),
       page.TotalCount,
+      page.FilteredCount,
       page.PageSize,
       page.PageNumber,
       page.PageCount);
