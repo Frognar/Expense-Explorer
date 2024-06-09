@@ -46,6 +46,7 @@ public static class ReadModelReceiptMapper
     return new GetSourcesResponse(
       page.Items.Select(source => source.Name),
       page.TotalCount,
+      page.FilteredCount,
       page.PageSize,
       page.PageNumber,
       page.PageCount);
