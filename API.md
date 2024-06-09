@@ -142,6 +142,7 @@
             }
         ],
         "totalCount": 1,
+        "filteredCount": 1,
         "pageSize": 10,
         "pageNumber": 1,
         "pageCount": 1
@@ -322,6 +323,7 @@
           "Costco"
         ],
         "totalCount": 1,
+        "filteredCount": 1,
         "pageSize": 10,
         "pageNumber": 1,
         "pageCount": 1
@@ -341,6 +343,7 @@
           "Coca Cola"
         ],
         "totalCount": 1,
+        "filteredCount": 1,
         "pageSize": 10,
         "pageNumber": 1,
         "pageCount": 1
@@ -360,6 +363,7 @@
           "Treats"
         ],
         "totalCount": 1,
+        "filteredCount": 1,
         "pageSize": 10,
         "pageNumber": 1,
         "pageCount": 1
@@ -379,6 +383,7 @@
           "Investments"
         ],
         "totalCount": 1,
+        "filteredCount": 1,
         "pageSize": 10,
         "pageNumber": 1,
         "pageCount": 1

@@ -10,6 +10,7 @@ public static class ReadModelReceiptMapper
     return new GetStoresResponse(
       page.Items.Select(store => store.Name),
       page.TotalCount,
+      page.FilteredCount,
       page.PageSize,
       page.PageNumber,
       page.PageCount);
@@ -21,6 +22,7 @@ public static class ReadModelReceiptMapper
     return new GetItemsResponse(
       page.Items.Select(item => item.Name),
       page.TotalCount,
+      page.FilteredCount,
       page.PageSize,
       page.PageNumber,
       page.PageCount);
@@ -32,6 +34,7 @@ public static class ReadModelReceiptMapper
     return new GetCategoriesResponse(
       page.Items.Select(category => category.Name),
       page.TotalCount,
+      page.FilteredCount,
       page.PageSize,
       page.PageNumber,
       page.PageCount);
@@ -43,6 +46,7 @@ public static class ReadModelReceiptMapper
     return new GetSourcesResponse(
       page.Items.Select(source => source.Name),
       page.TotalCount,
+      page.FilteredCount,
       page.PageSize,
       page.PageNumber,
       page.PageCount);
