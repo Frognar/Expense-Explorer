@@ -142,6 +142,7 @@
             }
         ],
         "totalCount": 1,
+        "filteredCount": 1,
         "pageSize": 10,
         "pageNumber": 1,
         "pageCount": 1
