@@ -37,6 +37,17 @@ public static class ReadModelReceiptMapper
       page.PageCount);
   }
 
+  public static GetSourcesResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.Source> page)
+  {
+    ArgumentNullException.ThrowIfNull(page);
+    return new GetSourcesResponse(
+      page.Items.Select(source => source.Name),
+      page.TotalCount,
+      page.PageSize,
+      page.PageNumber,
+      page.PageCount);
+  }
+
   public static GetReceiptsResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.ReceiptHeaders> page)
   {
     ArgumentNullException.ThrowIfNull(page);
