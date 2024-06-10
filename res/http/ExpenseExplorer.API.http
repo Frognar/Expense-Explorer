@@ -76,7 +76,7 @@ GET {{ExpenseExplorer.API_HostAddress}}/api/items?pageNumber=1&pageSize=10&searc
 
 ###
 
-GET {{ExpenseExplorer.API_HostAddress}}/api/categories?pageNumber=1&pageSize=10&search=tre
+GET {{ExpenseExplorer.API_HostAddress}}/api/categories/expenses?pageNumber=1&pageSize=10&search=tre
 
 ###
 
