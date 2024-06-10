@@ -10,7 +10,7 @@ public static class CategoryEndpoints
   public static IEndpointRouteBuilder MapCategoryEndpoints(this IEndpointRouteBuilder endpointRouteBuilder)
   {
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/categories");
-    group.MapGet("/", GetCategoriesAsync);
+    group.MapGet("/expenses", GetCategoriesAsync);
     return endpointRouteBuilder;
   }
 

@@ -354,7 +354,7 @@
 
 #### Get Categories
 
-- **URL:** `/api/categories?pageNumber=1&pageSize=10&search=tre`
+- **URL:** `/api/categories/expenses?pageNumber=1&pageSize=10&search=tre`
 - **Method:** `GET`
 - **Response Body:**
     ```json
