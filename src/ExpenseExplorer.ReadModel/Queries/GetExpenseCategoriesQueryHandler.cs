@@ -9,13 +9,13 @@ using FunctionalCore.Failures;
 using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
-public sealed class GetCategoriesQueryHandler(ExpenseExplorerContext context)
-  : IQueryHandler<GetCategoriesQuery, Result<PageOf<Category>>>
+public sealed class GetExpenseCategoriesQueryHandler(ExpenseExplorerContext context)
+  : IQueryHandler<GetExpenseCategoriesQuery, Result<PageOf<Category>>>
 {
   private readonly ExpenseExplorerContext _context = context;
 
   public async Task<Result<PageOf<Category>>> HandleAsync(
-    GetCategoriesQuery query,
+    GetExpenseCategoriesQuery query,
     CancellationToken cancellationToken = default)
   {
     try

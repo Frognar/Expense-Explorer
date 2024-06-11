@@ -10,18 +10,18 @@ public static class CategoryEndpoints
   public static IEndpointRouteBuilder MapCategoryEndpoints(this IEndpointRouteBuilder endpointRouteBuilder)
   {
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/categories");
-    group.MapGet("/expenses", GetCategoriesAsync);
+    group.MapGet("/expenses", GetExpenseCategoriesAsync);
     return endpointRouteBuilder;
   }
 
-  private static async Task<IResult> GetCategoriesAsync(
+  private static async Task<IResult> GetExpenseCategoriesAsync(
     int? pageSize,
     int? pageNumber,
     string? search,
     ISender sender,
     CancellationToken cancellationToken = default)
   {
-    GetCategoriesQuery query = new(pageSize, pageNumber, search);
+    GetExpenseCategoriesQuery query = new(pageSize, pageNumber, search);
     return (await sender.SendAsync(query, cancellationToken))
       .Map(page => page.MapToResponse())
       .Match(Handle, Results.Ok);
