@@ -11,6 +11,7 @@ public static class CategoryEndpoints
   {
     RouteGroupBuilder group = endpointRouteBuilder.MapGroup("/api/categories");
     group.MapGet("/expenses", GetExpenseCategoriesAsync);
+    group.MapGet("/incomes", GetIncomeCategoriesAsync);
     return endpointRouteBuilder;
   }
 
@@ -22,6 +23,19 @@ public static class CategoryEndpoints
     CancellationToken cancellationToken = default)
   {
     GetExpenseCategoriesQuery query = new(pageSize, pageNumber, search);
+    return (await sender.SendAsync(query, cancellationToken))
+      .Map(page => page.MapToResponse())
+      .Match(Handle, Results.Ok);
+  }
+
+  private static async Task<IResult> GetIncomeCategoriesAsync(
+    int? pageSize,
+    int? pageNumber,
+    string? search,
+    ISender sender,
+    CancellationToken cancellationToken = default)
+  {
+    GetIncomeCategoriesQuery query = new(pageSize, pageNumber, search);
     return (await sender.SendAsync(query, cancellationToken))
       .Map(page => page.MapToResponse())
       .Match(Handle, Results.Ok);

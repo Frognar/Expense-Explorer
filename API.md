@@ -352,7 +352,7 @@
 
 ### Categories
 
-#### Get Categories
+#### Get Expense Categories
 
 - **URL:** `/api/categories/expenses?pageNumber=1&pageSize=10&search=tre`
 - **Method:** `GET`
@@ -361,6 +361,24 @@
     {
         "categories": [
           "Treats"
+        ],
+        "totalCount": 1,
+        "filteredCount": 1,
+        "pageSize": 10,
+        "pageNumber": 1,
+        "pageCount": 1
+    }
+    ```
+
+#### Get Income Categories
+
+- **URL:** `/api/categories/incomes?pageNumber=1&pageSize=10&search=div`
+- **Method:** `GET`
+- **Response Body:**
+    ```json
+    {
+        "categories": [
+          "Dividends"
         ],
         "totalCount": 1,
         "filteredCount": 1,
