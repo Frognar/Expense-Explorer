@@ -4,7 +4,7 @@ using CommandHub.Queries;
 using ExpenseExplorer.ReadModel.Models;
 using FunctionalCore.Monads;
 
-public record GetCategoriesQuery(
+public record GetExpenseCategoriesQuery(
   int PageSize,
   int PageNumber,
   string Search)
@@ -13,7 +13,7 @@ public record GetCategoriesQuery(
   public const int DefaultPageSize = 25;
   public const int MaxPageSize = 100;
 
-  public GetCategoriesQuery(int? pageSize, int? pageNumber, string? search)
+  public GetExpenseCategoriesQuery(int? pageSize, int? pageNumber, string? search)
     : this(
       pageSize ?? DefaultPageSize,
       pageNumber ?? 1,
