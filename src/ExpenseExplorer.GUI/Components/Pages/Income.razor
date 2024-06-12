@@ -81,7 +81,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Category" Title="Category">
             <EditTemplate Context="income">
-                <RadzenTextBox @bind-Value="income.Category"/>
+                <RadzenAutoComplete @bind-Value="income.Category" Data="_categories" LoadData="@OnLoadCategories"></RadzenAutoComplete>
             </EditTemplate>
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Category">
@@ -193,6 +193,8 @@
     private string? _category;
     private string? _description;
 
+    private IEnumerable<string> _categories = [];
+
     private readonly List<IncomeModel> _incomesToInsert = [];
     private readonly List<IncomeModel> _incomesToUpdate = [];
     private IncomeModel? _editBackup;
@@ -236,6 +238,17 @@
         parameters.Add(_category, "category");
         parameters.Add(_description, "description");
         return parameters.ToString();
+    }
+
+    private async Task OnLoadCategories(LoadDataArgs args)
+    {
+        string url = $"{_apiUrl}/api/categories/incomes?pageSize=50&search={args.Filter}";
+        using HttpClient client = ClientFactory.CreateClient();
+        GetCategoriesResponse? response = await client.GetFromJsonAsync<GetCategoriesResponse>(url);
+        if (response is not null)
+        {
+            _categories = response.Categories;
+        }
     }
 
     private async Task OnReceivedAfterChange(DateTime? _) => await ResetAndReload();
