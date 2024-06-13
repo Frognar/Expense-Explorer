@@ -50,7 +50,7 @@
     <Columns>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Source" Title="Source">
             <EditTemplate Context="income">
-                <RadzenTextBox @bind-Value="income.Source"/>
+                <RadzenAutoComplete @bind-Value="income.Source" Data="_sources" LoadData="@OnLoadSources"/>
             </EditTemplate>
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Source">
@@ -81,7 +81,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Category" Title="Category">
             <EditTemplate Context="income">
-                <RadzenAutoComplete @bind-Value="income.Category" Data="_categories" LoadData="@OnLoadCategories"></RadzenAutoComplete>
+                <RadzenAutoComplete @bind-Value="income.Category" Data="_categories" LoadData="@OnLoadCategories"/>
             </EditTemplate>
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Category">
@@ -194,6 +194,7 @@
     private string? _description;
 
     private IEnumerable<string> _categories = [];
+    private IEnumerable<string> _sources = [];
 
     private readonly List<IncomeModel> _incomesToInsert = [];
     private readonly List<IncomeModel> _incomesToUpdate = [];
@@ -238,6 +239,17 @@
         parameters.Add(_category, "category");
         parameters.Add(_description, "description");
         return parameters.ToString();
+    }
+
+    private async Task OnLoadSources(LoadDataArgs args)
+    {
+        string url = $"{_apiUrl}/api/sources?pageSize=50&search={args.Filter}";
+        using HttpClient client = ClientFactory.CreateClient();
+        GetSourcesResponse? response = await client.GetFromJsonAsync<GetSourcesResponse>(url);
+        if (response is not null)
+        {
+            _sources = response.Sources;
+        }
     }
 
     private async Task OnLoadCategories(LoadDataArgs args)
