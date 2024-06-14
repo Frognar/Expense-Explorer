@@ -161,7 +161,7 @@
 <Columns>
     <RadzenDataGridColumn TItem="ReceiptModel" Property="Store" Title="Store">
         <EditTemplate Context="receipt">
-            <RadzenTextBox @bind-Value="receipt.Store"/>
+            <RadzenAutoComplete @bind-Value="receipt.Store" Data="_stores" LoadData="@OnLoadStores"/>
         </EditTemplate>
         <FilterTemplate>
             <RadzenFormField AllowFloatingLabel="false" Text="Store">
@@ -281,6 +281,8 @@
     private decimal? _maxTotal;
     private string? _store;
 
+    private IEnumerable<string> _stores = [];
+
     private readonly List<ReceiptModel> _receiptsToInsert = [];
     private readonly List<ReceiptModel> _receiptsToUpdate = [];
     private ReceiptModel? _receiptEditBackup;
@@ -327,6 +329,17 @@
         parameters.Add(_purchasedBefore, "before");
         parameters.Add(_store, "search");
         return parameters.ToString();
+    }
+
+    private async Task OnLoadStores(LoadDataArgs args)
+    {
+        string url = $"{_apiUrl}/api/stores?pageSize=50&search={args.Filter}";
+        using HttpClient client = ClientFactory.CreateClient();
+        GetStoresResponse? response = await client.GetFromJsonAsync<GetStoresResponse>(url);
+        if (response is not null)
+        {
+            _stores = response.Stores;
+        }
     }
 
     private async Task OnPurchasedAfterChange(DateTime? _) => await ResetAndReloadReceipts();
