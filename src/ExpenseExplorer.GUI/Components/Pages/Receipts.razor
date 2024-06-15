@@ -72,7 +72,7 @@
         <Columns>
             <RadzenDataGridColumn TItem="PurchaseModel" Property="Item" Title="Item">
                 <EditTemplate Context="purchase">
-                    <RadzenTextBox @bind-Value="purchase.Item"/>
+                    <RadzenAutoComplete @bind-Value="purchase.Item" Data="_items" LoadData="@OnLoadItems"/>
                 </EditTemplate>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="PurchaseModel" Property="Category" Title="Category">
@@ -282,6 +282,7 @@
     private string? _store;
 
     private IEnumerable<string> _stores = [];
+    private IEnumerable<string> _items = [];
 
     private readonly List<ReceiptModel> _receiptsToInsert = [];
     private readonly List<ReceiptModel> _receiptsToUpdate = [];
@@ -339,6 +340,17 @@
         if (response is not null)
         {
             _stores = response.Stores;
+        }
+    }
+
+    private async Task OnLoadItems(LoadDataArgs args)
+    {
+        string url = $"{_apiUrl}/api/items?pageSize=50&search={args.Filter}";
+        using HttpClient client = ClientFactory.CreateClient();
+        GetItemsResponse? response = await client.GetFromJsonAsync<GetItemsResponse>(url);
+        if (response is not null)
+        {
+            _items = response.Items;
         }
     }
 
