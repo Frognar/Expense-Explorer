@@ -65,13 +65,16 @@
     private IEnumerable<CategoryBasedEntryResponse> _categoryBasedEntries = [];
     private IEnumerable<Entry> _income = [];
     private IEnumerable<Entry> _expense = [];
-    private DateOnly _from = DateOnly.FromDateTime(DateTime.Today).AddDays(-DateTime.Today.Day).AddMonths(-1).AddDays(1);
-    private DateOnly _to = DateOnly.FromDateTime(DateTime.Today).AddDays(-DateTime.Today.Day);
+    private DateOnly _from = DateOnly.MinValue;
+    private DateOnly _to = DateOnly.MaxValue;
 
     private string _apiUrl = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        DateTime today = DateTime.Today;
+        _from = new(today.Year, today.Month, 1);
+        _to = new DateOnly(today.Year, today.Month, 1).AddMonths(1).AddDays(-1);
         _apiUrl = Configuration.GetConnectionString("API") ?? throw new ArgumentNullException();
         await LoadData();
     }
