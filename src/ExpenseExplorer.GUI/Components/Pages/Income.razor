@@ -1,5 +1,6 @@
 ﻿@page "/income"
 @using System.Text.Json
+@using System.Globalization
 @using ExpenseExplorer.API.Contract
 @using ExpenseExplorer.API.Contract.ReadModel
 @using ExpenseExplorer.GUI.Data
@@ -60,11 +61,12 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="IncomeModel" Property="Amount" Title="Amount" FormatString="{0:0.00} zł">
             <EditTemplate Context="income">
-                <RadzenNumeric TValue="decimal" @bind-Value="income.Amount"/>
+                <RadzenNumeric ConvertValue="ConvertDecimal" TValue="decimal" @bind-Value="income.Amount"/>
             </EditTemplate>
             <FilterTemplate>
                 <RadzenFormField AllowFloatingLabel="false" Text="Min amount">
                     <RadzenNumeric
+                        ConvertValue="ConvertOptionalDecimal"
                         ShowUpDown="false"
                         TValue="decimal?"
                         @bind-Value=@_minAmount
@@ -72,6 +74,7 @@
                 </RadzenFormField>
                 <RadzenFormField AllowFloatingLabel="false" Text="Max amount">
                     <RadzenNumeric
+                        ConvertValue="ConvertOptionalDecimal"
                         ShowUpDown="false"
                         TValue="decimal?"
                         @bind-Value=@_maxAmount
@@ -378,5 +381,17 @@
             await client.DeleteAsync($"{_apiUrl}/api/incomes/{income.Id}");
             await _grid.Reload();
         }
+    }
+
+    private static decimal ConvertDecimal(string arg)
+    {
+        return decimal.TryParse(arg.Replace(",", "."), CultureInfo.InvariantCulture, out var result)
+            ? result
+            : default;
+    }
+
+    private static decimal? ConvertOptionalDecimal(string? arg)
+    {
+        return arg is null ? null : ConvertDecimal(arg);
     }
 }
