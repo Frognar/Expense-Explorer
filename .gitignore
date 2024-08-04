@@ -491,3 +491,5 @@ $RECYCLE.BIN/
 # PostgreSql data
 /res/postgresql/data/*
 /res/fullapi/postgresql-data/*
+
+**/.obsidian
