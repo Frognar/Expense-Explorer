@@ -1,5 +1,8 @@
 namespace FunctionalCore.Tests;
 
+using DotResult;
+using ExpenseExplorer.Tests.Common;
+
 public class ValidatedTests
 {
   [Property]
@@ -59,23 +62,11 @@ public class ValidatedTests
   }
 
   [Property]
-  public void ChangeToEither(int value)
-  {
-    Validated<int> validated = Validate(value);
-
-    Either<Failure, int> either = validated.ToEither();
-
-    either.Match(AggregateErrors, v => v.ToString(CultureInfo.InvariantCulture))
-      .Should()
-      .Be(GetExpectedString(value));
-  }
-
-  [Property]
   public void ChangeToResult(int value)
   {
     Validated<int> validated = Validate(value);
 
-    Result<int> result = validated.ToResult();
+    Result<int> result = Validation.ToResult(validated);
 
     result.Match(AggregateErrors, v => v.ToString(CultureInfo.InvariantCulture))
       .Should()

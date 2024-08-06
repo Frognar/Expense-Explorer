@@ -84,7 +84,7 @@ public class UpdateReceiptTests(ReceiptApiFactory factory) : BaseIntegrationTest
 
   private async Task<HttpResponseMessage> Patch(string receiptId, object request)
   {
-    Uri uri = new($"/api/receipts/{receiptId}");
+    Uri uri = new($"/api/receipts/{receiptId}", UriKind.Relative);
     return await Client.PatchAsJsonAsync(uri, request);
   }
 }

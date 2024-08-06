@@ -1,7 +1,8 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
+using DotMaybe;
+using DotResult;
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
 internal static class UpdateReceiptValidator
@@ -9,8 +10,7 @@ internal static class UpdateReceiptValidator
   public static Result<ReceiptPatchModel> Validate(UpdateReceiptCommand command)
   {
     ArgumentNullException.ThrowIfNull(command);
-    Func<Maybe<Store>, Maybe<NonFutureDate>, DateOnly, ReceiptPatchModel> createPatchModel
-      = ReceiptPatchModel.Create;
+    Func<Maybe<Store>, Maybe<NonFutureDate>, DateOnly, ReceiptPatchModel> createPatchModel = ReceiptPatchModel.Create;
 
     return createPatchModel
       .Apply(Validate(command.StoreName))
@@ -29,7 +29,7 @@ internal static class UpdateReceiptValidator
     return Store.TryCreate(storeName)
       .Match(
         () => Validation.Failed<Maybe<Store>>(CommonFailures.EmptyStoreName),
-        store => Validation.Succeeded(Some.From(store)));
+        store => Validation.Succeeded(Some.With(store)));
   }
 
   private static Validated<Maybe<NonFutureDate>> Validate(DateOnly? date, DateOnly today)
@@ -42,6 +42,6 @@ internal static class UpdateReceiptValidator
     return NonFutureDate.TryCreate(date.Value, today)
       .Match(
         () => Validation.Failed<Maybe<NonFutureDate>>(CommonFailures.FuturePurchaseDate),
-        purchaseDate => Validation.Succeeded(Some.From(purchaseDate)));
+        purchaseDate => Validation.Succeeded(Some.With(purchaseDate)));
   }
 }

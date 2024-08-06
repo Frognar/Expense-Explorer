@@ -1,9 +1,9 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using CommandHub.Commands;
+using DotResult;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
-using FunctionalCore.Monads;
 
 public sealed class OpenNewReceiptCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<OpenNewReceiptCommand, Result<Receipt>>

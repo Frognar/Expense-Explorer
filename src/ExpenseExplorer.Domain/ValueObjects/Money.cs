@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-using FunctionalCore.Monads;
+using DotMaybe;
 
 public readonly record struct Money
 {
@@ -17,7 +17,7 @@ public readonly record struct Money
   public static Maybe<Money> TryCreate(decimal value)
   {
     return value >= decimal.Zero
-      ? Some.From(new Money(value))
+      ? Some.With(new Money(value))
       : None.OfType<Money>();
   }
 }

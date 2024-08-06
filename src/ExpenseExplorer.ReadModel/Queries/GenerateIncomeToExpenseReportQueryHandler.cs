@@ -2,9 +2,9 @@ namespace ExpenseExplorer.ReadModel.Queries;
 
 using System.Data.Common;
 using CommandHub.Queries;
+using DotResult;
 using ExpenseExplorer.ReadModel.Models;
 using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class GenerateIncomeToExpenseReportQueryHandler(ExpenseExplorerContext context)
@@ -33,7 +33,7 @@ public sealed class GenerateIncomeToExpenseReportQueryHandler(ExpenseExplorerCon
     }
     catch (DbException ex)
     {
-      return Fail.OfType<IncomeToExportReport>(Failure.Fatal(ex));
+      return Fail.OfType<IncomeToExportReport>(FailureFactory.Fatal(ex));
     }
   }
 }

@@ -3,11 +3,11 @@ namespace ExpenseExplorer.ReadModel.Queries;
 using System.Data.Common;
 using System.Linq.Expressions;
 using CommandHub.Queries;
+using DotResult;
 using ExpenseExplorer.ReadModel.Extensions;
 using ExpenseExplorer.ReadModel.Models;
 using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class GetReceiptsQueryHandler(ExpenseExplorerContext context)
@@ -44,7 +44,7 @@ public sealed class GetReceiptsQueryHandler(ExpenseExplorerContext context)
     }
     catch (DbException ex)
     {
-      return Fail.OfType<PageOf<ReceiptHeaders>>(Failure.Fatal(ex));
+      return Fail.OfType<PageOf<ReceiptHeaders>>(FailureFactory.Fatal(ex));
     }
   }
 

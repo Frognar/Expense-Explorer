@@ -2,6 +2,7 @@ namespace ExpenseExplorer.Application.Tests;
 
 using System.Collections.ObjectModel;
 using ExpenseExplorer.Application.Incomes.Persistence;
+using FunctionalCore.Failures;
 
 internal sealed class FakeIncomeRepository : Collection<Income>, IIncomeRepository
 {
@@ -24,7 +25,7 @@ internal sealed class FakeIncomeRepository : Collection<Income>, IIncomeReposito
   {
     Income? income = this.SingleOrDefault(r => r.Id == id);
     return income is null
-      ? Task.FromResult(Fail.OfType<Income>(Failure.NotFound("Income not found", id.Value)))
+      ? Task.FromResult(Fail.OfType<Income>(FailureFactory.NotFound("Income not found", id.Value)))
       : Task.FromResult(Success.From(income));
   }
 }

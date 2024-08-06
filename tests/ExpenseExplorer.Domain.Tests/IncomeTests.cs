@@ -1,10 +1,10 @@
 namespace ExpenseExplorer.Domain.Tests;
 
+using DotResult;
 using ExpenseExplorer.Domain.Incomes;
 using ExpenseExplorer.Domain.Incomes.Facts;
 using ExpenseExplorer.Domain.Tests.TestData;
-using FunctionalCore.Failures;
-using FunctionalCore.Monads;
+using ExpenseExplorer.Tests.Common;
 
 public class IncomeTests
 {

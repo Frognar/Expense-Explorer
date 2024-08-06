@@ -1,5 +1,7 @@
 global using System.Collections;
 global using System.Diagnostics;
+global using DotMaybe;
+global using DotResult;
 global using ExpenseExplorer.Application.Incomes.Commands;
 global using ExpenseExplorer.Application.Receipts.Commands;
 global using ExpenseExplorer.Application.Tests.TestData;
@@ -10,6 +12,4 @@ global using ExpenseExplorer.Domain.ValueObjects;
 global using ExpenseExplorer.Tests.Common.Generators.Commands;
 global using FluentAssertions;
 global using FsCheck.Xunit;
-global using FunctionalCore.Failures;
-global using FunctionalCore.Monads;
 global using Version = ExpenseExplorer.Domain.ValueObjects.Version;

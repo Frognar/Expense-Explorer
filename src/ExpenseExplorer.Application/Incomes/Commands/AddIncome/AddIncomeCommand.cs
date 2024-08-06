@@ -1,8 +1,8 @@
 namespace ExpenseExplorer.Application.Incomes.Commands;
 
 using CommandHub.Commands;
+using DotResult;
 using ExpenseExplorer.Domain.Incomes;
-using FunctionalCore.Monads;
 
 public sealed record AddIncomeCommand(
   string Source,

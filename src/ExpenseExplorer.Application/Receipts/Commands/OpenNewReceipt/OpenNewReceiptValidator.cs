@@ -1,8 +1,8 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
+using DotResult;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
 internal static class OpenNewReceiptValidator

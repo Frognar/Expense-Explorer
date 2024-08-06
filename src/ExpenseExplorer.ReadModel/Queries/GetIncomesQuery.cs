@@ -1,8 +1,8 @@
 namespace ExpenseExplorer.ReadModel.Queries;
 
 using CommandHub.Queries;
+using DotResult;
 using ExpenseExplorer.ReadModel.Models;
-using FunctionalCore.Monads;
 
 public sealed record GetIncomesQuery(
   int PageSize,

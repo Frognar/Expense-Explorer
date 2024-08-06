@@ -1,3 +1,5 @@
+global using DotMaybe;
+global using DotResult;
 global using ExpenseExplorer.Application.Incomes.Commands;
 global using ExpenseExplorer.Application.Receipts.Commands;
 global using ExpenseExplorer.Domain.ValueObjects;
@@ -6,4 +8,3 @@ global using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Decimals;
 global using ExpenseExplorer.Tests.Common.Generators.SimpleTypes.Strings;
 global using FsCheck;
 global using FsCheck.Fluent;
-global using FunctionalCore.Monads;

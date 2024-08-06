@@ -1,7 +1,7 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
+using DotMaybe;
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Monads;
 
 internal readonly record struct PurchasePatchModel
 {

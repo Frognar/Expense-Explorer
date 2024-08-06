@@ -2,10 +2,10 @@ namespace ExpenseExplorer.ReadModel.Queries;
 
 using System.Linq.Expressions;
 using CommandHub.Queries;
+using DotResult;
 using ExpenseExplorer.ReadModel.Models;
 using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class GetReceiptQueryHandler(ExpenseExplorerContext context)
@@ -35,6 +35,6 @@ public sealed class GetReceiptQueryHandler(ExpenseExplorerContext context)
 
     return receipt is not null
       ? Success.From(receipt)
-      : Fail.OfType<Receipt>(Failure.NotFound("Receipt not found.", query.ReceiptId));
+      : Fail.OfType<Receipt>(FailureFactory.NotFound("Receipt not found.", query.ReceiptId));
   }
 }

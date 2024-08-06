@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.API.Endpoints;
 
 using System.Net;
+using DotResult;
 using FunctionalCore.Failures;
 
 internal static class FailureHandler
@@ -8,10 +9,16 @@ internal static class FailureHandler
   public static IResult Handle(Failure failure)
   {
     ArgumentNullException.ThrowIfNull(failure);
-    return failure.Match(HandleFatal, HandleNotFound, HandleValidation);
+    return failure.Code switch
+    {
+      "General.Fatal" => HandleFatal(failure.Message),
+      "General.NotFound" => HandleNotFound(failure.Message, (string)failure.Metadata.GetValueOrDefault("Id", string.Empty)),
+      "General.Validation" => HandleValidation(failure.Message, (IEnumerable<ValidationError>)failure.Metadata.GetValueOrDefault("Errors", Enumerable.Empty<ValidationError>())),
+      _ => Results.Problem(),
+    };
   }
 
-  private static IResult HandleFatal(string message, Exception ex)
+  private static IResult HandleFatal(string message)
   {
     return Results.Problem(detail: message, statusCode: (int)HttpStatusCode.InternalServerError);
   }

@@ -1,5 +1,7 @@
 namespace ExpenseExplorer.Application.Tests;
 
+using ExpenseExplorer.Tests.Common;
+
 public class UpdatePurchaseDetailsCommandHandlerTests
 {
   private const string _originalItem = "item";

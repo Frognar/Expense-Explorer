@@ -1,10 +1,11 @@
 namespace ExpenseExplorer.Domain.Receipts;
 
+using DotResult;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore;
 using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 
 public sealed record Receipt
 {
@@ -49,11 +50,12 @@ public sealed record Receipt
     if (facts.FirstOrDefault() is ReceiptCreated receiptCreated)
     {
       return facts.Skip(1)
-        .Aggregate(Apply(receiptCreated), (receipt, fact) => receipt.FlatMap(r => r.ApplyFact(fact)))
+        .Aggregate(Apply(receiptCreated), (receipt, fact) => receipt.Bind(r => r.ApplyFact(fact)))
         .Map(r => r with { Version = version });
     }
 
-    return Fail.OfType<Receipt>(Failure.Fatal(new ArgumentException("First fact must be a ReceiptCreated fact.", nameof(facts))));
+    return Fail.OfType<Receipt>(
+      FailureFactory.Fatal(new ArgumentException("First fact must be a ReceiptCreated fact.", nameof(facts))));
   }
 
   public Receipt ClearChanges()
@@ -115,8 +117,9 @@ public sealed record Receipt
       PurchaseDateChanged purchaseDateChanged => Apply(purchaseDateChanged),
       PurchaseDetailsChanged purchaseDetailsChanged => Apply(purchaseDetailsChanged),
       PurchaseRemoved purchaseRemoved => Apply(purchaseRemoved),
-      ReceiptDeleted _ => Fail.OfType<Receipt>(Failure.NotFound("Receipt has been deleted.", Id.Value)),
-      _ => Fail.OfType<Receipt>(Failure.Fatal(new ArgumentException($"Unknown fact type: {fact.GetType()}", nameof(fact)))),
+      ReceiptDeleted _ => Fail.OfType<Receipt>(FailureFactory.NotFound("Receipt has been deleted.", Id.Value)),
+      _ => Fail.OfType<Receipt>(
+        FailureFactory.Fatal(new ArgumentException($"Unknown fact type: {fact.GetType()}", nameof(fact)))),
     };
   }
 
@@ -127,7 +130,7 @@ public sealed record Receipt
         from store in Store.TryCreate(receiptCreated.Store)
         from purchaseDate in NonFutureDate.TryCreate(receiptCreated.PurchaseDate, receiptCreated.CreatedDate)
         select new Receipt(id, store, purchaseDate, [], [], Version.New()))
-      .ToResult(() => Failure.Fatal(new ArgumentException($"Failed to create receipt from {receiptCreated}.")));
+      .ToResult(() => FailureFactory.Fatal(new ArgumentException($"Failed to create receipt from {receiptCreated}.")));
   }
 
   private Result<Receipt> Apply(StoreCorrected fact)
@@ -135,7 +138,7 @@ public sealed record Receipt
     return (
         from store in Store.TryCreate(fact.Store)
         select this with { Store = store })
-      .ToResult(() => Failure.Fatal(new AggregateException($"Failed to recreate receipt from {fact}.")));
+      .ToResult(() => FailureFactory.Fatal(new AggregateException($"Failed to recreate receipt from {fact}.")));
   }
 
   private Result<Receipt> Apply(PurchaseAdded fact)
@@ -150,7 +153,7 @@ public sealed record Receipt
           Money.TryCreate(fact.TotalDiscount),
           Description.TryCreate(fact.Description))
         select this with { Purchases = Purchases.Append(purchase).ToList() })
-      .ToResult(() => Failure.Fatal(new AggregateException($"Failed to recreate receipt from {fact}.")));
+      .ToResult(() => FailureFactory.Fatal(new AggregateException($"Failed to recreate receipt from {fact}.")));
   }
 
   private Result<Receipt> Apply(PurchaseDetailsChanged fact)
@@ -165,7 +168,7 @@ public sealed record Receipt
           Money.TryCreate(fact.TotalDiscount),
           Description.TryCreate(fact.Description))
         select this with { Purchases = Purchases.Select(p => p.Id == purchase.Id ? purchase : p).ToList() })
-      .ToResult(() => Failure.Fatal(new AggregateException($"Failed to recreate receipt from {fact}.")));
+      .ToResult(() => FailureFactory.Fatal(new AggregateException($"Failed to recreate receipt from {fact}.")));
   }
 
   private Result<Receipt> Apply(PurchaseRemoved fact)
@@ -173,7 +176,7 @@ public sealed record Receipt
     return (
         from purchaseId in Id.TryCreate(fact.PurchaseId)
         select this with { Purchases = Purchases.Where(p => p.Id != purchaseId).ToList() })
-      .ToResult(() => Failure.Fatal(new AggregateException($"Failed to recreate receipt from {fact}.")));
+      .ToResult(() => FailureFactory.Fatal(new AggregateException($"Failed to recreate receipt from {fact}.")));
   }
 
   private Result<Receipt> Apply(PurchaseDateChanged fact)
@@ -181,6 +184,6 @@ public sealed record Receipt
     return (
         from purchaseDate in NonFutureDate.TryCreate(fact.PurchaseDate, fact.RequestedDate)
         select this with { PurchaseDate = purchaseDate })
-      .ToResult(() => Failure.Fatal(new ArgumentException($"Failed to recreate receipt from {fact}.")));
+      .ToResult(() => FailureFactory.Fatal(new ArgumentException($"Failed to recreate receipt from {fact}.")));
   }
 }

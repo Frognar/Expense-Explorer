@@ -1,11 +1,12 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using CommandHub.Commands;
+using DotResult;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore;
 using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 
 public sealed class UpdatePurchaseDetailsCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<UpdatePurchaseDetailsCommand, Result<Receipt>>
@@ -33,19 +34,19 @@ public sealed class UpdatePurchaseDetailsCommandHandler(IReceiptRepository recei
     Purchase purchase = receipt.Purchases.SingleOrDefault(p => p.Id == purchaseId);
     return purchase != default
       ? Success.From(purchase)
-      : Fail.OfType<Purchase>(Failure.NotFound("Purchase not found.", purchaseId.Value));
+      : Fail.OfType<Purchase>(FailureFactory.NotFound("Purchase not found.", purchaseId.Value));
   }
 
   private static Purchase Update(Purchase purchase, PurchasePatchModel patchModel)
   {
     return purchase with
     {
-      Item = patchModel.Item.OrElse(() => purchase.Item),
-      Category = patchModel.Category.OrElse(() => purchase.Category),
-      Quantity = patchModel.Quantity.OrElse(() => purchase.Quantity),
-      UnitPrice = patchModel.UnitPrice.OrElse(() => purchase.UnitPrice),
-      TotalDiscount = patchModel.TotalDiscount.OrElse(() => purchase.TotalDiscount),
-      Description = patchModel.Description.OrElse(() => purchase.Description),
+      Item = patchModel.Item.OrDefault(() => purchase.Item),
+      Category = patchModel.Category.OrDefault(() => purchase.Category),
+      Quantity = patchModel.Quantity.OrDefault(() => purchase.Quantity),
+      UnitPrice = patchModel.UnitPrice.OrDefault(() => purchase.UnitPrice),
+      TotalDiscount = patchModel.TotalDiscount.OrDefault(() => purchase.TotalDiscount),
+      Description = patchModel.Description.OrDefault(() => purchase.Description),
     };
   }
 }

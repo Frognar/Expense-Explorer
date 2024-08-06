@@ -1,5 +1,7 @@
 namespace ExpenseExplorer.Application.Tests;
 
+using ExpenseExplorer.Tests.Common;
+
 public class RemovePurchaseCommandHandlerTests
 {
   private readonly FakeReceiptRepository _receiptRepository =

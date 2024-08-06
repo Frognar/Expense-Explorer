@@ -1,11 +1,11 @@
 namespace ExpenseExplorer.Application.Incomes.Commands;
 
 using CommandHub.Commands;
+using DotResult;
 using ExpenseExplorer.Application.Incomes.Persistence;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore;
-using FunctionalCore.Monads;
 
 public sealed class DeleteIncomeCommandHandler(IIncomeRepository incomeRepository)
   : ICommandHandler<DeleteIncomeCommand, Result<Unit>>

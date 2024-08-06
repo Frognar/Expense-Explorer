@@ -1,9 +1,9 @@
 namespace ExpenseExplorer.Application.Incomes.Commands;
 
 using CommandHub.Commands;
+using DotResult;
 using ExpenseExplorer.Application.Incomes.Persistence;
 using ExpenseExplorer.Domain.Incomes;
-using FunctionalCore.Monads;
 
 public sealed class AddIncomeCommandHandler(IIncomeRepository incomeRepository)
   : ICommandHandler<AddIncomeCommand, Result<Income>>

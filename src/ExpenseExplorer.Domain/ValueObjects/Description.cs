@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-using FunctionalCore.Monads;
+using DotMaybe;
 
 public readonly record struct Description
 {
@@ -15,6 +15,6 @@ public readonly record struct Description
 
   public static Maybe<Description> TryCreate(string? value)
   {
-    return Some.From(string.IsNullOrWhiteSpace(value) ? Empty : new Description(value));
+    return Some.With(string.IsNullOrWhiteSpace(value) ? Empty : new Description(value));
   }
 }

@@ -2,9 +2,9 @@ namespace ExpenseExplorer.ReadModel.Queries;
 
 using System.Data.Common;
 using CommandHub.Queries;
+using DotResult;
 using ExpenseExplorer.ReadModel.Models;
 using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class GenerateCategoryBasedExpenseReportQueryHandler(ExpenseExplorerContext context)
@@ -36,7 +36,7 @@ public sealed class GenerateCategoryBasedExpenseReportQueryHandler(ExpenseExplor
     }
     catch (DbException ex)
     {
-      return Fail.OfType<CategoryBasedExpenseReport>(Failure.Fatal(ex));
+      return Fail.OfType<CategoryBasedExpenseReport>(FailureFactory.Fatal(ex));
     }
   }
 }

@@ -1,6 +1,7 @@
 namespace ExpenseExplorer.Application.Tests;
 
 using ExpenseExplorer.Domain.Incomes.Facts;
+using ExpenseExplorer.Tests.Common;
 
 public class UpdateIncomeDetailsCommandHandlerTests
 {

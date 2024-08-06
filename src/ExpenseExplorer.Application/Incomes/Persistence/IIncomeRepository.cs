@@ -1,8 +1,8 @@
 namespace ExpenseExplorer.Application.Incomes.Persistence;
 
+using DotResult;
 using ExpenseExplorer.Domain.Incomes;
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Monads;
 
 public interface IIncomeRepository
 {

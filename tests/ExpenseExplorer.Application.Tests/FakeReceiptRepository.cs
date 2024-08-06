@@ -2,6 +2,7 @@ namespace ExpenseExplorer.Application.Tests;
 
 using System.Collections.ObjectModel;
 using ExpenseExplorer.Application.Receipts.Persistence;
+using FunctionalCore.Failures;
 
 internal sealed class FakeReceiptRepository : Collection<Receipt>, IReceiptRepository
 {
@@ -24,7 +25,7 @@ internal sealed class FakeReceiptRepository : Collection<Receipt>, IReceiptRepos
   {
     Receipt? receipt = this.SingleOrDefault(r => r.Id == id);
     return receipt is null
-      ? Task.FromResult(Fail.OfType<Receipt>(Failure.NotFound("Receipt not found", id.Value)))
+      ? Task.FromResult(Fail.OfType<Receipt>(FailureFactory.NotFound("Receipt not found", id.Value)))
       : Task.FromResult(Success.From(receipt));
   }
 }

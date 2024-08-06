@@ -1,10 +1,11 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using CommandHub.Commands;
+using DotResult;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Monads;
+using FunctionalCore;
 
 public sealed class AddPurchaseCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<AddPurchaseCommand, Result<Receipt>>

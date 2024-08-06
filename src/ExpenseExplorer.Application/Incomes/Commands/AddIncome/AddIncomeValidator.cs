@@ -1,9 +1,9 @@
 namespace ExpenseExplorer.Application.Incomes.Commands;
 
+using DotResult;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Domain.Incomes;
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
 internal static class AddIncomeValidator

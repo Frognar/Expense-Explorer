@@ -1,8 +1,8 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using CommandHub.Commands;
+using DotResult;
 using ExpenseExplorer.Domain.Receipts;
-using FunctionalCore.Monads;
 
 public sealed record UpdatePurchaseDetailsCommand(
   string ReceiptId,

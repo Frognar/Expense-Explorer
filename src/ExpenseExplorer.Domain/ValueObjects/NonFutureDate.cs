@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-using FunctionalCore.Monads;
+using DotMaybe;
 
 public readonly record struct NonFutureDate
 {
@@ -16,7 +16,7 @@ public readonly record struct NonFutureDate
   public static Maybe<NonFutureDate> TryCreate(DateOnly date, DateOnly today)
   {
     return date <= today
-      ? Some.From(new NonFutureDate(date))
+      ? Some.With(new NonFutureDate(date))
       : None.OfType<NonFutureDate>();
   }
 }

@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-using FunctionalCore.Monads;
+using DotMaybe;
 
 public readonly record struct Item
 {
@@ -15,6 +15,6 @@ public readonly record struct Item
   {
     return string.IsNullOrWhiteSpace(name)
       ? None.OfType<Item>()
-      : Some.From(new Item(name));
+      : Some.With(new Item(name));
   }
 }

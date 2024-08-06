@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-using FunctionalCore.Monads;
+using DotMaybe;
 
 public readonly record struct Category
 {
@@ -14,7 +14,7 @@ public readonly record struct Category
   public static Maybe<Category> TryCreate(string name)
   {
     return !string.IsNullOrWhiteSpace(name)
-      ? Some.From(new Category(name))
+      ? Some.With(new Category(name))
       : None.OfType<Category>();
   }
 }

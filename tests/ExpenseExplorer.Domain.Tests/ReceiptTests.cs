@@ -1,10 +1,9 @@
 namespace ExpenseExplorer.Domain.Tests;
 
+using DotResult;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Tests.TestData;
 using ExpenseExplorer.Tests.Common;
-using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 
 public class ReceiptTests
 {

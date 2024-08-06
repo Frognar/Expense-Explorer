@@ -1,5 +1,7 @@
 namespace ExpenseExplorer.Application.Tests;
 
+using ExpenseExplorer.Tests.Common;
+
 public class UpdateReceiptCommandHandlerTests
 {
   private const string _originalStoreName = "store";

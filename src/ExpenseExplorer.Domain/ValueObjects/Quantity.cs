@@ -1,6 +1,6 @@
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-using FunctionalCore.Monads;
+using DotMaybe;
 
 public readonly record struct Quantity
 {
@@ -17,6 +17,6 @@ public readonly record struct Quantity
   {
     return value <= 0
       ? None.OfType<Quantity>()
-      : Some.From(new Quantity(value));
+      : Some.With(new Quantity(value));
   }
 }

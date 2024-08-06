@@ -1,8 +1,8 @@
 namespace ExpenseExplorer.Application.Receipts.Persistence;
 
+using DotResult;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Monads;
 
 public interface IReceiptRepository
 {

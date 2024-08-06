@@ -1,10 +1,10 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
 using CommandHub.Commands;
+using DotResult;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore;
-using FunctionalCore.Monads;
 
 public sealed class DeleteReceiptCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<DeleteReceiptCommand, Result<Unit>>

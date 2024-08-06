@@ -1,10 +1,10 @@
 namespace ExpenseExplorer.Infrastructure.Tests.Integration;
 
+using DotResult;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 using ExpenseExplorer.Tests.Common;
 using FluentAssertions;
-using FunctionalCore.Monads;
 
 public class EventStoreTests : BaseIntegrationTest
 {

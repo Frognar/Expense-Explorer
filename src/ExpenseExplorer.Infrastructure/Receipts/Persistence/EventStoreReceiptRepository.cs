@@ -1,12 +1,12 @@
 namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
+using DotResult;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 using ExpenseExplorer.Infrastructure.Exceptions;
 using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 
 public sealed class EventStoreReceiptRepository(string connectionString) : IReceiptRepository, IDisposable
 {
@@ -32,7 +32,7 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     }
     catch (FactSaveException ex)
     {
-      return Fail.OfType<Version>(Failure.Fatal(ex));
+      return Fail.OfType<Version>(FailureFactory.Fatal(ex));
     }
   }
 
@@ -42,12 +42,12 @@ public sealed class EventStoreReceiptRepository(string connectionString) : IRece
     {
       (List<Fact> facts, Version version) = await _eventStore.GetEventsAsync(id, cancellationToken);
       return facts.Count == 0
-        ? Fail.OfType<Receipt>(Failure.NotFound("Receipt not found", id.Value))
+        ? Fail.OfType<Receipt>(FailureFactory.NotFound("Receipt not found", id.Value))
         : Receipt.Recreate(facts, version);
     }
     catch (FactReadException ex)
     {
-      return Fail.OfType<Receipt>(Failure.Fatal(ex));
+      return Fail.OfType<Receipt>(FailureFactory.Fatal(ex));
     }
   }
 }

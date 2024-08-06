@@ -1,7 +1,7 @@
 namespace FunctionalCore.Validations;
 
+using DotResult;
 using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 
 public static class Validation
 {
@@ -9,16 +9,17 @@ public static class Validation
 
   public static Validated<S> Failed<S>(IEnumerable<ValidationError> errors) => Validated<S>.Fail(errors);
 
-  public static Either<Failure, S> ToEither<S>(this Validated<S> validated)
-  {
-    ArgumentNullException.ThrowIfNull(validated);
-    return validated.Match(errors => Left.From<Failure, S>(Failure.Validation(errors)), Right.From<Failure, S>);
-  }
-
   public static Result<S> ToResult<S>(this Validated<S> validated)
   {
     ArgumentNullException.ThrowIfNull(validated);
-    return validated.Match(errors => Fail.OfType<S>(Failure.Validation(errors)), Success.From);
+    return validated.Match(
+      errors => Fail.OfType<S>(
+        Failure.Validation(
+          metadata: new Dictionary<string, object>
+          {
+            { "Errors", errors },
+          })),
+      Success.From);
   }
 
   public static Validated<S> Apply<T, S>(this Func<T, S> map, Validated<T> source)

@@ -1,7 +1,8 @@
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
+using DotMaybe;
+using DotResult;
 using ExpenseExplorer.Domain.ValueObjects;
-using FunctionalCore.Monads;
 using FunctionalCore.Validations;
 
 internal static class UpdatePurchaseDetailsValidator
@@ -32,7 +33,7 @@ internal static class UpdatePurchaseDetailsValidator
     return Item.TryCreate(item)
       .Match(
         () => Validation.Failed<Maybe<Item>>(CommonFailures.EmptyItemName),
-        i => Validation.Succeeded(Some.From(i)));
+        i => Validation.Succeeded(Some.With(i)));
   }
 
   private static Validated<Maybe<Category>> ValidateCategory(string? category)
@@ -45,7 +46,7 @@ internal static class UpdatePurchaseDetailsValidator
     return Category.TryCreate(category)
       .Match(
         () => Validation.Failed<Maybe<Category>>(CommonFailures.EmptyCategory),
-        c => Validation.Succeeded(Some.From(c)));
+        c => Validation.Succeeded(Some.With(c)));
   }
 
   private static Validated<Maybe<Quantity>> ValidateQuantity(decimal? quantity)
@@ -58,7 +59,7 @@ internal static class UpdatePurchaseDetailsValidator
     return Quantity.TryCreate(quantity.Value)
       .Match(
         () => Validation.Failed<Maybe<Quantity>>(CommonFailures.NonPositiveQuantity),
-        q => Validation.Succeeded(Some.From(q)));
+        q => Validation.Succeeded(Some.With(q)));
   }
 
   private static Validated<Maybe<Money>> ValidateUnitPrice(decimal? unitPrice)
@@ -71,7 +72,7 @@ internal static class UpdatePurchaseDetailsValidator
     return Money.TryCreate(unitPrice.Value)
       .Match(
         () => Validation.Failed<Maybe<Money>>(CommonFailures.NegativeUnitPrice),
-        up => Validation.Succeeded(Some.From(up)));
+        up => Validation.Succeeded(Some.With(up)));
   }
 
   private static Validated<Maybe<Money>> ValidateTotalDiscount(decimal? totalDiscount)
@@ -84,7 +85,7 @@ internal static class UpdatePurchaseDetailsValidator
     return Money.TryCreate(totalDiscount.Value)
       .Match(
         () => Validation.Failed<Maybe<Money>>(CommonFailures.NegativeTotalDiscount),
-        td => Validation.Succeeded(Some.From(td)));
+        td => Validation.Succeeded(Some.With(td)));
   }
 
   private static Validated<Maybe<Description>> ValidateDescription(string? description)
@@ -97,6 +98,6 @@ internal static class UpdatePurchaseDetailsValidator
     return Description.TryCreate(description)
       .Match(
         () => Validation.Failed<Maybe<Description>>(CommonFailures.InvalidDescription),
-        d => Validation.Succeeded(Some.From(d)));
+        d => Validation.Succeeded(Some.With(d)));
   }
 }

@@ -2,11 +2,11 @@ namespace ExpenseExplorer.ReadModel.Queries;
 
 using System.Data.Common;
 using CommandHub.Queries;
+using DotResult;
 using ExpenseExplorer.ReadModel.Extensions;
 using ExpenseExplorer.ReadModel.Models;
 using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class GetSourcesQueryHandler(ExpenseExplorerContext context)
@@ -41,7 +41,7 @@ public sealed class GetSourcesQueryHandler(ExpenseExplorerContext context)
     }
     catch (DbException ex)
     {
-      return Fail.OfType<PageOf<Source>>(Failure.Fatal(ex));
+      return Fail.OfType<PageOf<Source>>(FailureFactory.Fatal(ex));
     }
   }
 }

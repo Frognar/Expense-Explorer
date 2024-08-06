@@ -1,17 +1,18 @@
 namespace ExpenseExplorer.Application.Receipts;
 
+using DotResult;
 using FunctionalCore.Failures;
 
 internal static class CommonFailures
 {
   public static readonly Failure InvalidReceiptId
-    = Failure.Validation("ReceiptId", "INVALID_RECEIPT_ID");
+    = FailureFactory.Validation(ValidationError.Create("ReceiptId", "INVALID_RECEIPT_ID"));
 
   public static readonly Failure InvalidIncomeId
-    = Failure.Validation("IncomeId", "INVALID_Income_ID");
+    = FailureFactory.Validation(ValidationError.Create("IncomeId", "INVALID_INCOME_ID"));
 
   public static readonly Failure InvalidPurchaseId
-    = Failure.Validation("PurchaseId", "INVALID_PURCHASE_ID");
+    = FailureFactory.Validation(ValidationError.Create("PurchaseId", "INVALID_PURCHASE_ID"));
 
   public static readonly IEnumerable<ValidationError> EmptyStoreName
     = [ValidationError.Create("StoreName", "EMPTY_STORE_NAME")];

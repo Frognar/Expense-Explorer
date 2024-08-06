@@ -1,10 +1,11 @@
 namespace ExpenseExplorer.Domain.Incomes;
 
+using DotResult;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Incomes.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using FunctionalCore;
 using FunctionalCore.Failures;
-using FunctionalCore.Monads;
 
 public sealed record Income
 {
@@ -57,11 +58,11 @@ public sealed record Income
     if (facts.FirstOrDefault() is IncomeCreated incomeCreated)
     {
       return facts.Skip(1)
-        .Aggregate(Apply(incomeCreated), (income, fact) => income.FlatMap(i => i.ApplyFact(fact)))
+        .Aggregate(Apply(incomeCreated), (income, fact) => income.Bind(i => i.ApplyFact(fact)))
         .Map(i => i with { Version = version });
     }
 
-    return Fail.OfType<Income>(Failure.Fatal(new ArgumentException("First fact must be an IncomeCreated fact.", nameof(facts))));
+    return Fail.OfType<Income>(FailureFactory.Fatal(new ArgumentException("First fact must be an IncomeCreated fact.", nameof(facts))));
   }
 
   public Income CorrectSource(Source newSource)
@@ -118,8 +119,8 @@ public sealed record Income
       CategoryCorrected categoryCorrected => Apply(categoryCorrected),
       ReceivedDateCorrected receivedDateCorrected => Apply(receivedDateCorrected),
       DescriptionCorrected descriptionCorrected => Apply(descriptionCorrected),
-      IncomeDeleted _ => Fail.OfType<Income>(Failure.NotFound("Income has been deleted.", Id.Value)),
-      _ => Fail.OfType<Income>(Failure.Fatal(new ArgumentException($"Failed to apply fact {fact} to income {this}"))),
+      IncomeDeleted _ => Fail.OfType<Income>(FailureFactory.NotFound("Income has been deleted.", Id.Value)),
+      _ => Fail.OfType<Income>(FailureFactory.Fatal(new ArgumentException($"Failed to apply fact {fact} to income {this}"))),
     };
   }
 
@@ -133,7 +134,7 @@ public sealed record Income
         from receivedDate in NonFutureDate.TryCreate(incomeCreated.ReceivedDate, incomeCreated.CreatedDate)
         from description in Description.TryCreate(incomeCreated.Description)
         select new Income(id, source, amount, category, receivedDate, description, [], Version.New()))
-      .ToResult(() => Failure.Fatal(new ArgumentException($"Failed to create income from {incomeCreated}")));
+      .ToResult(() => FailureFactory.Fatal(new ArgumentException($"Failed to create income from {incomeCreated}")));
   }
 
   private Result<Income> Apply(SourceCorrected sourceCorrected)
@@ -141,7 +142,7 @@ public sealed record Income
     return (
         from source in Source.TryCreate(sourceCorrected.Source)
         select this with { Source = source })
-      .ToResult(() => Failure.Fatal(new AggregateException($"Failed to apply fact {sourceCorrected} to income {this}")));
+      .ToResult(() => FailureFactory.Fatal(new AggregateException($"Failed to apply fact {sourceCorrected} to income {this}")));
   }
 
   private Result<Income> Apply(AmountCorrected amountCorrected)
@@ -149,7 +150,7 @@ public sealed record Income
     return (
         from amount in Money.TryCreate(amountCorrected.Amount)
         select this with { Amount = amount })
-      .ToResult(() => Failure.Fatal(new AggregateException($"Failed to apply fact {amountCorrected} to income {this}")));
+      .ToResult(() => FailureFactory.Fatal(new AggregateException($"Failed to apply fact {amountCorrected} to income {this}")));
   }
 
   private Result<Income> Apply(CategoryCorrected categoryCorrected)
@@ -157,7 +158,7 @@ public sealed record Income
     return (
         from category in Category.TryCreate(categoryCorrected.Category)
         select this with { Category = category })
-      .ToResult(() => Failure.Fatal(new AggregateException($"Failed to apply fact {categoryCorrected} to income {this}")));
+      .ToResult(() => FailureFactory.Fatal(new AggregateException($"Failed to apply fact {categoryCorrected} to income {this}")));
   }
 
   private Result<Income> Apply(ReceivedDateCorrected receivedDateCorrected)
@@ -165,7 +166,7 @@ public sealed record Income
     return (
         from receivedDate in NonFutureDate.TryCreate(receivedDateCorrected.ReceivedDate, receivedDateCorrected.RequestedDate)
         select this with { ReceivedDate = receivedDate })
-      .ToResult(() => Failure.Fatal(new AggregateException($"Failed to apply fact {receivedDateCorrected} to income {this}")));
+      .ToResult(() => FailureFactory.Fatal(new AggregateException($"Failed to apply fact {receivedDateCorrected} to income {this}")));
   }
 
   private Result<Income> Apply(DescriptionCorrected descriptionCorrected)
@@ -173,6 +174,6 @@ public sealed record Income
     return (
         from description in Description.TryCreate(descriptionCorrected.Description)
         select this with { Description = description })
-      .ToResult(() => Failure.Fatal(new AggregateException($"Failed to apply fact {descriptionCorrected} to income {this}")));
+      .ToResult(() => FailureFactory.Fatal(new AggregateException($"Failed to apply fact {descriptionCorrected} to income {this}")));
   }
 }
