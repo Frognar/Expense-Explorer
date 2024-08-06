@@ -91,6 +91,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "imgs", "imgs", "{296A0A1C-4
 		res\imgs\receipts-page.png = res\imgs\receipts-page.png
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docks", "docks", "{BED9E7CD-E30F-4518-9F4D-F4D136C6BD54}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Categories.md = docs\Categories.md
+		docs\Main category.md = docs\Main category.md
+		docs\Sub category.md = docs\Sub category.md
+		docs\Use cases.md = docs\Use cases.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -192,5 +200,6 @@ Global
 		{A2A3F5B4-6029-4D24-A783-1458A79B1EAE} = {6AF97930-820B-407C-824D-C1DE857832EE}
 		{06AFC684-838E-4914-8B7D-87BCD95DF9DE} = {5DBCD355-1A12-4923-9EA3-BBD32B53AF4B}
 		{296A0A1C-469D-4663-A126-D68CB089ED7B} = {E2227429-4E8C-4B1A-8E99-E59392779B0A}
+		{BED9E7CD-E30F-4518-9F4D-F4D136C6BD54} = {E2227429-4E8C-4B1A-8E99-E59392779B0A}
 	EndGlobalSection
 EndGlobal
