@@ -42,4 +42,10 @@ public sealed record Category
     Fact categoryRenamed = CategoryRenamed.Create(Id, name);
     return this with { Name = name, UnsavedChanges = UnsavedChanges.Append(categoryRenamed).ToList() };
   }
+
+  public Category ChangeDescription(Description description)
+  {
+    Fact categoryDescriptionChanged = CategoryDescriptionChanged.Create(Id, description);
+    return this with { Description = description, UnsavedChanges = UnsavedChanges.Append(categoryDescriptionChanged).ToList() };
+  }
 }
