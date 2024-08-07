@@ -36,4 +36,10 @@ public sealed record Category
     Fact categoryCreated = CategoryCreated.Create(id, name, description);
     return new Category(id, name, description, [categoryCreated], Version.New());
   }
+
+  public Category Rename(ValueObjects.Category name)
+  {
+    Fact categoryRenamed = CategoryRenamed.Create(Id, name);
+    return this with { Name = name, UnsavedChanges = UnsavedChanges.Append(categoryRenamed).ToList() };
+  }
 }
