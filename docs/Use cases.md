@@ -1,5 +1,5 @@
 Where categories will be used:
-- Generate report by category
+- Generate a report by category
 - Create budget by category
 - Assign category to purchase
 
@@ -9,15 +9,15 @@ Where categories will be used:
 
 What can do with categories:
 - Create Main category (Name, Description)
-- Rename in main category (Id, Name)
-- Change description in main category (Id, Description)
-- Add sub category (Id, Sub category Id)
-- Remove sub category (Id, Sub category Id)
+- Rename in the main category (ID, Name)
+- Change description in the main category (ID, Description)
+- Add subcategory (ID, Subcategory ID)
+- Remove subcategory (ID, Subcategory ID)
 - Delete main category
 
-- Create sub category (Name, Description, Main category Id)
-- Rename in sub category (Id, Name)
-- Change description in sub category (Id, Description)
-- Switch main category (Id, Main category Id)  
+- Create subcategory (Name, Description, Main category ID)
+- Rename subcategory (ID, Name)
+- Change description in subcategory (ID, Description)
+- Switch main category (Id, Main category Id)
 - Delete sub category
 - Use with purchase
