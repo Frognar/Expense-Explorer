@@ -2,12 +2,12 @@ using DotMaybe;
 
 namespace ExpenseExplorer.Domain.ValueObjects;
 
-public readonly record struct NonFutureDateType(DateOnly Value);
+public readonly record struct NonFutureDateType(DateOnly Value, DateOnly CreationDate);
 
 public static class NonFutureDate
 {
   public static Maybe<NonFutureDateType> Create(DateOnly value, DateOnly today)
     => value > today
       ? None.OfType<NonFutureDateType>()
-      : Some.With(new NonFutureDateType(value));
+      : Some.With(new NonFutureDateType(value, today));
 }

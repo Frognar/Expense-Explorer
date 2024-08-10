@@ -2,6 +2,7 @@ using System.Diagnostics;
 using ExpenseExplorer.Domain.ExpenseCategories.Facts;
 using ExpenseExplorer.Domain.ExpenseCategoryGroups.Facts;
 using ExpenseExplorer.Domain.Purchases.Facts;
+using ExpenseExplorer.Domain.Receipts.Facts;
 
 namespace ExpenseExplorer.Domain.Facts;
 
@@ -19,6 +20,12 @@ public static class FactTypes
   public const string ExpenseCategoryDeletedFactType = nameof(ExpenseCategoryDeleted);
   public const string ExpenseCategoryUsageIncreasedFactType = nameof(ExpenseCategoryUsageIncreased);
   public const string ExpenseCategoryUsageDecreasedFactType = nameof(ExpenseCategoryUsageDecreased);
+  public const string ReceiptCreatedFactType = nameof(ReceiptCreated);
+  public const string ReceiptStoreChangedFactType = nameof(ReceiptStoreChanged);
+  public const string ReceiptPurchaseDateChangedFactType = nameof(ReceiptPurchaseDateChanged);
+  public const string ReceiptDeletedFactType = nameof(ReceiptDeleted);
+  public const string ReceiptPurchaseAddedFactType = nameof(ReceiptPurchaseAdded);
+  public const string ReceiptPurchaseRemovedFactType = nameof(ReceiptPurchaseRemoved);
   public const string PurchaseCreatedFactType = nameof(PurchaseCreated);
   public const string PurchaseItemChangedFactType = nameof(PurchaseItemChanged);
   public const string PurchaseCategoryIdChangedFactType = nameof(PurchaseCategoryIdChanged);
@@ -44,6 +51,12 @@ public static class FactTypes
       ExpenseCategoryDeleted => ExpenseCategoryDeletedFactType,
       ExpenseCategoryUsageIncreased => ExpenseCategoryUsageIncreasedFactType,
       ExpenseCategoryUsageDecreased => ExpenseCategoryUsageDecreasedFactType,
+      ReceiptCreated => ReceiptCreatedFactType,
+      ReceiptStoreChanged => ReceiptStoreChangedFactType,
+      ReceiptPurchaseDateChanged => ReceiptPurchaseDateChangedFactType,
+      ReceiptDeleted => ReceiptDeletedFactType,
+      ReceiptPurchaseAdded => ReceiptPurchaseAddedFactType,
+      ReceiptPurchaseRemoved => ReceiptPurchaseRemovedFactType,
       PurchaseCreated => PurchaseCreatedFactType,
       PurchaseItemChanged => PurchaseItemChangedFactType,
       PurchaseCategoryIdChanged => PurchaseItemChangedFactType,
