@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using ExpenseExplorer.Domain.ExpenseCategoryGroups.Facts;
 using ExpenseExplorer.Domain.Purchases.Facts;
 
 namespace ExpenseExplorer.Domain.Facts;
@@ -10,6 +11,12 @@ public static class FactSerializer
   {
     return fact switch
     {
+      ExpenseCategoryGroupCreated expenseCategoryGroupCreated => Serialize(expenseCategoryGroupCreated),
+      ExpenseCategoryGroupRenamed expenseCategoryGroupRenamed => Serialize(expenseCategoryGroupRenamed),
+      ExpenseCategoryGroupDescriptionChanged expenseCategoryGroupDescriptionChanged => Serialize(expenseCategoryGroupDescriptionChanged),
+      ExpenseCategoryGroupDeleted expenseCategoryGroupDeleted => Serialize(expenseCategoryGroupDeleted),
+      ExpenseCategoryGroupExpenseCategoryAdded expenseCategoryGroupExpenseCategoryAdded => Serialize(expenseCategoryGroupExpenseCategoryAdded),
+      ExpenseCategoryGroupExpenseCategoryRemoved expenseCategoryGroupExpenseCategoryRemoved => Serialize(expenseCategoryGroupExpenseCategoryRemoved),
       PurchaseCreated purchaseCreated => Serialize(purchaseCreated),
       PurchaseItemChanged itemChanged => Serialize(itemChanged),
       PurchaseCategoryIdChanged categoryIdChanged => Serialize(categoryIdChanged),
@@ -26,6 +33,12 @@ public static class FactSerializer
   {
     return type switch
     {
+      FactTypes.ExpenseCategoryGroupCreatedFactType => Deserialize<ExpenseCategoryGroupCreated>(data),
+      FactTypes.ExpenseCategoryGroupRenamedFactType => Deserialize<ExpenseCategoryGroupRenamed>(data),
+      FactTypes.ExpenseCategoryGroupDescriptionChangedFactType => Deserialize<ExpenseCategoryGroupDescriptionChanged>(data),
+      FactTypes.ExpenseCategoryGroupDeletedFactType => Deserialize<ExpenseCategoryGroupDeleted>(data),
+      FactTypes.ExpenseCategoryGroupExpenseCategoryAddedFactType => Deserialize<ExpenseCategoryGroupExpenseCategoryAdded>(data),
+      FactTypes.ExpenseCategoryGroupExpenseCategoryRemovedFactType => Deserialize<ExpenseCategoryGroupExpenseCategoryRemoved>(data),
       FactTypes.PurchaseCreatedFactType => Deserialize<PurchaseCreated>(data),
       FactTypes.PurchaseItemChangedFactType => Deserialize<PurchaseItemChanged>(data),
       FactTypes.PurchaseCategoryIdChangedFactType => Deserialize<PurchaseCategoryIdChanged>(data),
