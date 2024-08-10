@@ -1,4 +1,6 @@
+using DotMaybe;
 using DotResult;
+using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
@@ -105,5 +107,92 @@ public static class Receipt
     }
 
     return receipt with { UnsavedChanges = UnsavedChanges.Empty() };
+  }
+
+  public static Result<ReceiptType> Recreate(IEnumerable<Fact> facts)
+  {
+    facts = facts.ToList();
+    if (facts.FirstOrDefault() is ReceiptCreated receiptCreated)
+    {
+      return facts.Skip(1)
+        .Aggregate(
+          Apply(receiptCreated),
+          (receipt, fact) => receipt.Bind(r => r.ApplyFact(fact)));
+    }
+
+    return Failure.Validation(message: "Invalid receipt facts");
+  }
+
+  private static Result<ReceiptType> ApplyFact(this ReceiptType receipt, Fact fact)
+  {
+    return fact switch
+    {
+      ReceiptCreated receiptCreated => Apply(receiptCreated),
+      ReceiptStoreChanged receiptStoreChanged => receipt.Apply(receiptStoreChanged),
+      ReceiptPurchaseDateChanged receiptPurchaseDateChanged => receipt.Apply(receiptPurchaseDateChanged),
+      ReceiptPurchaseAdded receiptPurchaseAdded => receipt.Apply(receiptPurchaseAdded),
+      ReceiptPurchaseRemoved receiptPurchaseRemoved => receipt.Apply(receiptPurchaseRemoved),
+      ReceiptDeleted => Failure.Validation(message: "Receipt has been deleted"),
+      _ => Failure.Validation(message: "Invalid receipt fact"),
+    };
+  }
+
+  private static Result<ReceiptType> Apply(ReceiptCreated fact)
+  {
+    Maybe<ReceiptType> receipt =
+      from id in ReceiptId.Create(fact.ReceiptId)
+      from store in Store.Create(fact.Store)
+      from purchaseDate in NonFutureDate.Create(fact.PurchaseDate, fact.CreatedDate)
+      select new ReceiptType(
+        id,
+        store,
+        purchaseDate,
+        PurchaseIds.New(),
+        false,
+        UnsavedChanges.Empty());
+
+    return receipt.Match(
+      () => Failure.Validation(message: "Failed to create receipt"),
+      Success.From);
+  }
+
+  private static Result<ReceiptType> Apply(this ReceiptType receipt, ReceiptStoreChanged fact)
+  {
+    return (
+        from store in Store.Create(fact.Store)
+        select receipt with { Store = store })
+      .Match(
+        () => Failure.Validation(message: "Failed to change store"),
+        Success.From);
+  }
+
+  private static Result<ReceiptType> Apply(this ReceiptType receipt, ReceiptPurchaseDateChanged fact)
+  {
+    return (
+        from purchaseDate in NonFutureDate.Create(fact.PurchaseDate, fact.CreatedDate)
+        select receipt with { PurchaseDate = purchaseDate })
+      .Match(
+        () => Failure.Validation(message: "Failed to change purchase date"),
+        Success.From);
+  }
+
+  private static Result<ReceiptType> Apply(this ReceiptType receipt, ReceiptPurchaseAdded fact)
+  {
+    return (
+        from purchaseId in PurchaseId.Create(fact.PurchaseId)
+        select receipt with { PurchaseIds = receipt.PurchaseIds.Append(purchaseId) })
+      .Match(
+        () => Failure.Validation(message: "Failed to add purchase"),
+        Success.From);
+  }
+
+  private static Result<ReceiptType> Apply(this ReceiptType receipt, ReceiptPurchaseRemoved fact)
+  {
+    return (
+        from purchaseId in PurchaseId.Create(fact.PurchaseId)
+        select receipt with { PurchaseIds = receipt.PurchaseIds.Without(purchaseId) })
+      .Match(
+        () => Failure.Validation(message: "Failed to remove purchase"),
+        Success.From);
   }
 }
