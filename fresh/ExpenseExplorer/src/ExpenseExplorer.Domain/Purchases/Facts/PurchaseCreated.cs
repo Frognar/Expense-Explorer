@@ -3,7 +3,7 @@ using ExpenseExplorer.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Domain.Purchases.Facts;
 
-public record PurchaseCreated(
+public sealed record PurchaseCreated(
   string PurchaseId,
   string ReceiptId,
   string Item,
