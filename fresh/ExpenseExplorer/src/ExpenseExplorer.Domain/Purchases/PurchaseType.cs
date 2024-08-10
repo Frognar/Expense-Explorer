@@ -131,4 +131,14 @@ public static class Purchase
 
     return purchase with { Deleted = true, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseDeleted.Create(purchase.Id)) };
   }
+
+  public static Result<PurchaseType> ClearChanges(this PurchaseType purchase)
+  {
+    if (purchase.Deleted)
+    {
+      return Failure.Validation(message: "Cannot clear changes of deleted purchase");
+    }
+
+    return purchase with { UnsavedChanges = UnsavedChanges.Empty() };
+  }
 }

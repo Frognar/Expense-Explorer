@@ -99,4 +99,15 @@ public static class ExpenseCategoryGroup
       ? group with { ExpenseCategoryIds = group.ExpenseCategoryIds.Without(expenseCategoryId), UnsavedChanges = group.UnsavedChanges.Append(ExpenseCategoryGroupExpenseCategoryRemoved.Create(group.Id, expenseCategoryId)) }
       : group;
   }
+
+  public static Result<ExpenseCategoryGroupType> ClearChanges(
+    this ExpenseCategoryGroupType group)
+  {
+    if (group.Deleted)
+    {
+      return Failure.Validation(message: "Cannot clear changes of deleted group");
+    }
+
+    return group with { UnsavedChanges = UnsavedChanges.Empty() };
+  }
 }

@@ -95,4 +95,15 @@ public static class Receipt
       ? receipt with { PurchaseIds = receipt.PurchaseIds.Without(purchaseId), UnsavedChanges = receipt.UnsavedChanges.Append(ReceiptPurchaseRemoved.Create(receipt.Id, purchaseId)) }
       : receipt;
   }
+
+  public static Result<ReceiptType> ClearChanges(
+    this ReceiptType receipt)
+  {
+    if (receipt.Deleted)
+    {
+      return Failure.Validation(message: "Cannot clear changes of deleted receipt");
+    }
+
+    return receipt with { UnsavedChanges = UnsavedChanges.Empty() };
+  }
 }

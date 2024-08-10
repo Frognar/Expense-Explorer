@@ -99,4 +99,15 @@ public static class ExpenseCategory
 
     return category with { NumberOfUses = category.NumberOfUses - 1, UnsavedChanges = category.UnsavedChanges.Append(ExpenseCategoryUsageDecreased.Create(category.Id)) };
   }
+
+  public static Result<ExpenseCategoryType> ClearChanges(
+    this ExpenseCategoryType category)
+  {
+    if (category.Deleted)
+    {
+      return Failure.Validation(message: "Cannot clear changes of deleted category");
+    }
+
+    return category with { UnsavedChanges = UnsavedChanges.Empty() };
+  }
 }
