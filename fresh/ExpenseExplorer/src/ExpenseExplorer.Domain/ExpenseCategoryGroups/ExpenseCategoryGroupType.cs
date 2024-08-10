@@ -1,6 +1,6 @@
 using ExpenseExplorer.Domain.ValueObjects;
 
-namespace ExpenseExplorer.Domain.Entities;
+namespace ExpenseExplorer.Domain.ExpenseCategoryGroups;
 
 public readonly record struct ExpenseCategoryGroupType(
   ExpenseCategoryGroupIdType Id,

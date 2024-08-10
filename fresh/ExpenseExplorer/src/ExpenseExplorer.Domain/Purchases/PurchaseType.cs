@@ -1,6 +1,6 @@
 using ExpenseExplorer.Domain.ValueObjects;
 
-namespace ExpenseExplorer.Domain.Entities;
+namespace ExpenseExplorer.Domain.Purchases;
 
 public readonly record struct PurchaseType(
   PurchaseIdType Id,

@@ -1,6 +1,6 @@
 using ExpenseExplorer.Domain.ValueObjects;
 
-namespace ExpenseExplorer.Domain.Entities;
+namespace ExpenseExplorer.Domain.Receipts;
 
 public readonly record struct ReceiptType(
   ReceiptIdType Id,
