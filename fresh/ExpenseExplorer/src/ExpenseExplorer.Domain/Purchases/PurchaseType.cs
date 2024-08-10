@@ -1,3 +1,4 @@
+using ExpenseExplorer.Domain.Purchases.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Domain.Purchases;
@@ -11,7 +12,8 @@ public readonly record struct PurchaseType(
   MoneyType UnitPrice,
   MoneyType TotalDiscount,
   DescriptionType Description,
-  bool Deleted);
+  bool Deleted,
+  UnsavedChangesType UnsavedChanges);
 
 public static class Purchase
 {
@@ -24,8 +26,9 @@ public static class Purchase
     MoneyType totalDiscount,
     DescriptionType description)
   {
+    PurchaseIdType purchaseId = PurchaseId.Unique();
     return new PurchaseType(
-      PurchaseId.Unique(),
+      purchaseId,
       receiptId,
       item,
       categoryId,
@@ -33,7 +36,17 @@ public static class Purchase
       unitPrice,
       totalDiscount,
       description,
-      false);
+      false,
+      UnsavedChanges.New(
+        PurchaseCreated.Create(
+          purchaseId,
+          receiptId,
+          item,
+          categoryId,
+          quantity,
+          unitPrice,
+          totalDiscount,
+          description)));
   }
 
   public static PurchaseType ChangeItem(
@@ -42,7 +55,7 @@ public static class Purchase
   {
     return purchase.Item == newItem
       ? purchase
-      : purchase with { Item = newItem };
+      : purchase with { Item = newItem, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseItemChanged.Create(purchase.Id, newItem)) };
   }
 
   public static PurchaseType ChangeCategoryId(
@@ -51,7 +64,7 @@ public static class Purchase
   {
     return purchase.CategoryId == newCategoryId
       ? purchase
-      : purchase with { CategoryId = newCategoryId };
+      : purchase with { CategoryId = newCategoryId, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseCategoryIdChanged.Create(purchase.Id, newCategoryId)) };
   }
 
   public static PurchaseType ChangeQuantity(
@@ -60,7 +73,7 @@ public static class Purchase
   {
     return purchase.Quantity == newQuantity
       ? purchase
-      : purchase with { Quantity = newQuantity };
+      : purchase with { Quantity = newQuantity, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseQuantityChanged.Create(purchase.Id, newQuantity)) };
   }
 
   public static PurchaseType ChangeUnitPrice(
@@ -69,7 +82,7 @@ public static class Purchase
   {
     return purchase.UnitPrice == newUnitPrice
       ? purchase
-      : purchase with { UnitPrice = newUnitPrice };
+      : purchase with { UnitPrice = newUnitPrice, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseUnitPriceChanged.Create(purchase.Id, newUnitPrice)) };
   }
 
   public static PurchaseType ChangeTotalDiscount(
@@ -78,7 +91,7 @@ public static class Purchase
   {
     return purchase.TotalDiscount == newTotalDiscount
       ? purchase
-      : purchase with { TotalDiscount = newTotalDiscount };
+      : purchase with { TotalDiscount = newTotalDiscount, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseTotalDiscountChanged.Create(purchase.Id, newTotalDiscount)) };
   }
 
   public static PurchaseType ChangeDescription(
@@ -87,12 +100,12 @@ public static class Purchase
   {
     return purchase.Description == newDescription
       ? purchase
-      : purchase with { Description = newDescription };
+      : purchase with { Description = newDescription, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseDescriptionChanged.Create(purchase.Id, newDescription)) };
   }
 
   public static PurchaseType Delete(
     this PurchaseType purchase)
   {
-    return purchase with { Deleted = true };
+    return purchase with { Deleted = true, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseDeleted.Create(purchase.Id)) };
   }
 }
