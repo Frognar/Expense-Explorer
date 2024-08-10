@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using ExpenseExplorer.Domain.ExpenseCategories.Facts;
 using ExpenseExplorer.Domain.ExpenseCategoryGroups.Facts;
 using ExpenseExplorer.Domain.Purchases.Facts;
 
@@ -17,6 +18,12 @@ public static class FactSerializer
       ExpenseCategoryGroupDeleted expenseCategoryGroupDeleted => Serialize(expenseCategoryGroupDeleted),
       ExpenseCategoryGroupExpenseCategoryAdded expenseCategoryGroupExpenseCategoryAdded => Serialize(expenseCategoryGroupExpenseCategoryAdded),
       ExpenseCategoryGroupExpenseCategoryRemoved expenseCategoryGroupExpenseCategoryRemoved => Serialize(expenseCategoryGroupExpenseCategoryRemoved),
+      ExpenseCategoryCreated expenseCategoryCreated => Serialize(expenseCategoryCreated),
+      ExpenseCategoryRenamed expenseCategoryRenamed => Serialize(expenseCategoryRenamed),
+      ExpenseCategoryDescriptionChanged expenseCategoryDescriptionChanged => Serialize(expenseCategoryDescriptionChanged),
+      ExpenseCategoryDeleted expenseCategoryDeleted => Serialize(expenseCategoryDeleted),
+      ExpenseCategoryUsageIncreased expenseCategoryUsageIncreased => Serialize(expenseCategoryUsageIncreased),
+      ExpenseCategoryUsageDecreased expenseCategoryUsageDecreased => Serialize(expenseCategoryUsageDecreased),
       PurchaseCreated purchaseCreated => Serialize(purchaseCreated),
       PurchaseItemChanged itemChanged => Serialize(itemChanged),
       PurchaseCategoryIdChanged categoryIdChanged => Serialize(categoryIdChanged),
@@ -39,6 +46,12 @@ public static class FactSerializer
       FactTypes.ExpenseCategoryGroupDeletedFactType => Deserialize<ExpenseCategoryGroupDeleted>(data),
       FactTypes.ExpenseCategoryGroupExpenseCategoryAddedFactType => Deserialize<ExpenseCategoryGroupExpenseCategoryAdded>(data),
       FactTypes.ExpenseCategoryGroupExpenseCategoryRemovedFactType => Deserialize<ExpenseCategoryGroupExpenseCategoryRemoved>(data),
+      FactTypes.ExpenseCategoryCreatedFactType => Deserialize<ExpenseCategoryCreated>(data),
+      FactTypes.ExpenseCategoryRenamedFactType => Deserialize<ExpenseCategoryRenamed>(data),
+      FactTypes.ExpenseCategoryDescriptionChangedFactType => Deserialize<ExpenseCategoryDescriptionChanged>(data),
+      FactTypes.ExpenseCategoryDeletedFactType => Deserialize<ExpenseCategoryDeleted>(data),
+      FactTypes.ExpenseCategoryUsageIncreasedFactType => Deserialize<ExpenseCategoryUsageIncreased>(data),
+      FactTypes.ExpenseCategoryUsageDecreasedFactType => Deserialize<ExpenseCategoryUsageDecreased>(data),
       FactTypes.PurchaseCreatedFactType => Deserialize<PurchaseCreated>(data),
       FactTypes.PurchaseItemChangedFactType => Deserialize<PurchaseItemChanged>(data),
       FactTypes.PurchaseCategoryIdChangedFactType => Deserialize<PurchaseCategoryIdChanged>(data),
