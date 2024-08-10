@@ -1,2 +1,0 @@
-[[Main category]]
-[[Sub category]]

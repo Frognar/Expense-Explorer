@@ -93,11 +93,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "imgs", "imgs", "{296A0A1C-4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docks", "docks", "{BED9E7CD-E30F-4518-9F4D-F4D136C6BD54}"
 	ProjectSection(SolutionItems) = preProject
-		docs\Categories.md = docs\Categories.md
-		docs\Main category.md = docs\Main category.md
-		docs\Sub category.md = docs\Sub category.md
-		docs\Use cases.md = docs\Use cases.md
+		docs\Expense-Explorer.md = docs\Expense-Explorer.md
+		docs\Expense Category.md = docs\Expense Category.md
+		docs\Expense Category Group.md = docs\Expense Category Group.md
+		docs\Expense management.md = docs\Expense management.md
+		docs\Purchase.md = docs\Purchase.md
+		docs\Receipt.md = docs\Receipt.md
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5A4E42A6-1917-473B-ADF0-0BA10502EFAC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
