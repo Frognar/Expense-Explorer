@@ -24,6 +24,6 @@ public sealed class CreateExpenseCategoryGroupHandler(IFactStore<ExpenseCategory
       Success.From);
 
     return await groupResult
-      .MapAsync(c => _factStore.SaveAsync(c.Id.Value, c));
+      .BindAsync(c => _factStore.SaveAsync(c, cancellationToken));
   }
 }

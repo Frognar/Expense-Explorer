@@ -1,8 +1,14 @@
+using DotResult;
+
 namespace ExpenseExplorer.Application;
 
 public interface IFactStore<T>
 {
-  public Task<T> ReadAsync(string streamId);
+  public Task<Result<T>> ReadAsync(
+    string streamId,
+    CancellationToken cancellationToken);
 
-  public Task<T> SaveAsync(string streamId, T value);
+  public Task<Result<T>> SaveAsync(
+    T value,
+    CancellationToken cancellationToken);
 }
