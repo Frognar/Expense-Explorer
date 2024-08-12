@@ -9,7 +9,8 @@ public static class UnsavedChanges
 {
   public static UnsavedChangesType Empty() => new([]);
 
-  public static UnsavedChangesType New(params Fact[] facts) => new(facts);
+  public static UnsavedChangesType New(Fact fact, params Fact[] facts)
+    => new(facts.Prepend(fact).ToList());
 
   public static UnsavedChangesType Append(this UnsavedChangesType changes, Fact fact)
     => new(new ReadOnlyCollection<Fact>(changes.Facts.Append(fact).ToList()));
