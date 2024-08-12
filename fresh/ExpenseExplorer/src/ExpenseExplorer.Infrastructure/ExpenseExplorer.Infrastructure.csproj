@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\ExpenseExplorer.Application\ExpenseExplorer.Application.csproj" />
       <ProjectReference Include="..\ExpenseExplorer.Domain\ExpenseExplorer.Domain.csproj" />
     </ItemGroup>
 
