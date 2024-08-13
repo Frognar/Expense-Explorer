@@ -119,7 +119,6 @@ public static class Receipt
   {
     return fact switch
     {
-      ReceiptCreated receiptCreated => Apply(receiptCreated),
       ReceiptStoreChanged receiptStoreChanged => receipt.Apply(receiptStoreChanged),
       ReceiptPurchaseDateChanged receiptPurchaseDateChanged => receipt.Apply(receiptPurchaseDateChanged),
       ReceiptPurchaseAdded receiptPurchaseAdded => receipt.Apply(receiptPurchaseAdded),
