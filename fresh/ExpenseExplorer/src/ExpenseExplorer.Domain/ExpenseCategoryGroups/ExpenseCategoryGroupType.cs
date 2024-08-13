@@ -105,17 +105,6 @@ public static class ExpenseCategoryGroup
       : group;
   }
 
-  public static Result<ExpenseCategoryGroupType> ClearChanges(
-    this ExpenseCategoryGroupType group)
-  {
-    if (group.Deleted)
-    {
-      return Failure.Validation(message: "Cannot clear changes of deleted group");
-    }
-
-    return group with { UnsavedChanges = UnsavedChanges.Empty() };
-  }
-
   public static Result<ExpenseCategoryGroupType> Recreate(IEnumerable<Fact> facts)
   {
     facts = facts.ToList();
