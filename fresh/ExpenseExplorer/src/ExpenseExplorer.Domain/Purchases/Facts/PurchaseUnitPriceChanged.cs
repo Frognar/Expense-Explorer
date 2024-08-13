@@ -5,7 +5,7 @@ namespace ExpenseExplorer.Domain.Purchases.Facts;
 
 public sealed record PurchaseUnitPriceChanged(
   string PurchaseId,
-  decimal Quantity,
+  decimal Amount,
   string Currency)
   : Fact
 {
