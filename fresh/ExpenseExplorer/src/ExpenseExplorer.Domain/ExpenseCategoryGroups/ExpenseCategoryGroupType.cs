@@ -108,18 +108,20 @@ public static class ExpenseCategoryGroup
   public static Result<ExpenseCategoryGroupType> Recreate(IEnumerable<Fact> facts)
   {
     facts = facts.ToList();
-    if (facts.FirstOrDefault() is ExpenseCategoryGroupCreated receiptCreated)
+    if (facts.FirstOrDefault() is ExpenseCategoryGroupCreated expenseCategoryGroupCreated)
     {
       return facts.Skip(1)
         .Aggregate(
-          Apply(receiptCreated),
+          Apply(expenseCategoryGroupCreated),
           (expenseCategoryGroup, fact) => expenseCategoryGroup.Bind(r => r.ApplyFact(fact)));
     }
 
     return Failure.Validation(message: "Invalid expenseCategoryGroup facts");
   }
 
-  private static Result<ExpenseCategoryGroupType> ApplyFact(this ExpenseCategoryGroupType expenseCategoryGroup, Fact fact)
+  private static Result<ExpenseCategoryGroupType> ApplyFact(
+    this ExpenseCategoryGroupType expenseCategoryGroup,
+    Fact fact)
   {
     return fact switch
     {
@@ -136,7 +138,8 @@ public static class ExpenseCategoryGroup
     };
   }
 
-  private static Result<ExpenseCategoryGroupType> Apply(ExpenseCategoryGroupCreated fact)
+  private static Result<ExpenseCategoryGroupType> Apply(
+    ExpenseCategoryGroupCreated fact)
   {
     Maybe<ExpenseCategoryGroupType> expenseCategoryGroup =
       from id in ExpenseCategoryGroupId.Create(fact.ExpenseCategoryGroupId)
@@ -156,7 +159,9 @@ public static class ExpenseCategoryGroup
       Success.From);
   }
 
-  private static Result<ExpenseCategoryGroupType> Apply(this ExpenseCategoryGroupType expenseCategoryGroup, ExpenseCategoryGroupRenamed fact)
+  private static Result<ExpenseCategoryGroupType> Apply(
+    this ExpenseCategoryGroupType expenseCategoryGroup,
+    ExpenseCategoryGroupRenamed fact)
   {
     return (
         from name in Name.Create(fact.Name)
@@ -166,12 +171,16 @@ public static class ExpenseCategoryGroup
         Success.From);
   }
 
-  private static Result<ExpenseCategoryGroupType> Apply(this ExpenseCategoryGroupType expenseCategoryGroup, ExpenseCategoryGroupDescriptionChanged fact)
+  private static Result<ExpenseCategoryGroupType> Apply(
+    this ExpenseCategoryGroupType expenseCategoryGroup,
+    ExpenseCategoryGroupDescriptionChanged fact)
   {
     return expenseCategoryGroup with { Description = Description.Create(fact.Description) };
   }
 
-  private static Result<ExpenseCategoryGroupType> Apply(this ExpenseCategoryGroupType expenseCategoryGroup, ExpenseCategoryGroupExpenseCategoryAdded fact)
+  private static Result<ExpenseCategoryGroupType> Apply(
+    this ExpenseCategoryGroupType expenseCategoryGroup,
+    ExpenseCategoryGroupExpenseCategoryAdded fact)
   {
     return (
         from expenseCategoryId in ExpenseCategoryId.Create(fact.ExpenseCategoryId)
@@ -181,7 +190,9 @@ public static class ExpenseCategoryGroup
         Success.From);
   }
 
-  private static Result<ExpenseCategoryGroupType> Apply(this ExpenseCategoryGroupType expenseCategoryGroup, ExpenseCategoryGroupExpenseCategoryRemoved fact)
+  private static Result<ExpenseCategoryGroupType> Apply(
+    this ExpenseCategoryGroupType expenseCategoryGroup,
+    ExpenseCategoryGroupExpenseCategoryRemoved fact)
   {
     return (
         from expenseCategoryId in ExpenseCategoryId.Create(fact.ExpenseCategoryId)
