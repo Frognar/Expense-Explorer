@@ -4,7 +4,7 @@ using ExpenseExplorer.Domain.ExpenseCategoryGroups;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 
-namespace ExpenseExplorer.Infrastructure;
+namespace ExpenseExplorer.Infrastructure.ExpenseCategoryGroups;
 
 public sealed class ExpenseCategoryGroupsFactStore(string connectionString)
   : IFactStore<ExpenseCategoryGroupType>, IDisposable
