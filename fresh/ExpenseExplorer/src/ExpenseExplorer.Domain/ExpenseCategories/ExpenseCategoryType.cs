@@ -1,6 +1,7 @@
 using DotResult;
 using ExpenseExplorer.Domain.ExpenseCategories.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using Version = ExpenseExplorer.Domain.ValueObjects.Version;
 
 namespace ExpenseExplorer.Domain.ExpenseCategories;
 
@@ -10,7 +11,8 @@ public readonly record struct ExpenseCategoryType(
   DescriptionType Description,
   uint NumberOfUses,
   bool Deleted,
-  UnsavedChangesType UnsavedChanges);
+  UnsavedChangesType UnsavedChanges,
+  VersionType Version);
 
 public static class ExpenseCategory
 {
@@ -26,7 +28,8 @@ public static class ExpenseCategory
       0,
       false,
       UnsavedChanges.New(
-        ExpenseCategoryCreated.Create(expenseCategoryId, name, description)));
+        ExpenseCategoryCreated.Create(expenseCategoryId, name, description)),
+      Version.New());
   }
 
   public static Result<ExpenseCategoryType> Rename(

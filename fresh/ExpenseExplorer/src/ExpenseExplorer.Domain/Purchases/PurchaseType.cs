@@ -1,6 +1,7 @@
 using DotResult;
 using ExpenseExplorer.Domain.Purchases.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using Version = ExpenseExplorer.Domain.ValueObjects.Version;
 
 namespace ExpenseExplorer.Domain.Purchases;
 
@@ -14,7 +15,8 @@ public readonly record struct PurchaseType(
   MoneyType TotalDiscount,
   DescriptionType Description,
   bool Deleted,
-  UnsavedChangesType UnsavedChanges);
+  UnsavedChangesType UnsavedChanges,
+  VersionType Version);
 
 public static class Purchase
 {
@@ -47,7 +49,8 @@ public static class Purchase
           quantity,
           unitPrice,
           totalDiscount,
-          description)));
+          description)),
+      Version.New());
   }
 
   public static Result<PurchaseType> ChangeItem(this PurchaseType purchase, ItemType newItem)

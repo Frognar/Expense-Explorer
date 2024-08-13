@@ -3,6 +3,7 @@ using DotResult;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using Version = ExpenseExplorer.Domain.ValueObjects.Version;
 
 namespace ExpenseExplorer.Domain.Receipts;
 
@@ -12,7 +13,8 @@ public readonly record struct ReceiptType(
   NonFutureDateType PurchaseDate,
   PurchaseIdsType PurchaseIds,
   bool Deleted,
-  UnsavedChangesType UnsavedChanges);
+  UnsavedChangesType UnsavedChanges,
+  VersionType Version);
 
 public static class Receipt
 {
@@ -28,7 +30,8 @@ public static class Receipt
       purchaseDate,
       purchaseIds,
       false,
-      UnsavedChanges.New(ReceiptCreated.Create(receiptId, store, purchaseDate)));
+      UnsavedChanges.New(ReceiptCreated.Create(receiptId, store, purchaseDate)),
+      Version.New());
   }
 
   public static Result<ReceiptType> ChangeStore(
@@ -149,7 +152,8 @@ public static class Receipt
         purchaseDate,
         PurchaseIds.New(),
         false,
-        UnsavedChanges.Empty());
+        UnsavedChanges.Empty(),
+        Version.New());
 
     return receipt.Match(
       () => Failure.Validation(message: "Failed to create receipt"),
