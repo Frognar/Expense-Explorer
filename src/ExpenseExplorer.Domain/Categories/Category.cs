@@ -1,8 +1,9 @@
-namespace ExpenseExplorer.Domain.Categories;
-
 using ExpenseExplorer.Domain.Categories.Facts;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+using Version = ExpenseExplorer.Domain.ValueObjects.Version;
+
+namespace ExpenseExplorer.Domain.Categories;
 
 public sealed record Category
 {

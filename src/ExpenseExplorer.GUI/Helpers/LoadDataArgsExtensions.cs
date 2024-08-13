@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.GUI.Helpers;
-
 using Radzen;
+
+namespace ExpenseExplorer.GUI.Helpers;
 
 public static class LoadDataArgsExtensions
 {

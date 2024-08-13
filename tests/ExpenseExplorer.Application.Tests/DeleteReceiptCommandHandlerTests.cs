@@ -1,7 +1,7 @@
-namespace ExpenseExplorer.Application.Tests;
-
 using ExpenseExplorer.Tests.Common;
 using FunctionalCore;
+
+namespace ExpenseExplorer.Application.Tests;
 
 public class DeleteReceiptCommandHandlerTests
 {

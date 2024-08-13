@@ -1,10 +1,11 @@
-namespace ExpenseExplorer.API.Mappers;
-
 using ExpenseExplorer.API.Contract.ReadModel;
+using ExpenseExplorer.ReadModel.Models;
+
+namespace ExpenseExplorer.API.Mappers;
 
 public static class ReadModelReceiptMapper
 {
-  public static GetStoresResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.Store> page)
+  public static GetStoresResponse MapToResponse(this PageOf<Store> page)
   {
     ArgumentNullException.ThrowIfNull(page);
     return new GetStoresResponse(
@@ -16,7 +17,7 @@ public static class ReadModelReceiptMapper
       page.PageCount);
   }
 
-  public static GetItemsResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.Item> page)
+  public static GetItemsResponse MapToResponse(this PageOf<Item> page)
   {
     ArgumentNullException.ThrowIfNull(page);
     return new GetItemsResponse(
@@ -28,7 +29,7 @@ public static class ReadModelReceiptMapper
       page.PageCount);
   }
 
-  public static GetCategoriesResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.Category> page)
+  public static GetCategoriesResponse MapToResponse(this PageOf<Category> page)
   {
     ArgumentNullException.ThrowIfNull(page);
     return new GetCategoriesResponse(
@@ -40,7 +41,7 @@ public static class ReadModelReceiptMapper
       page.PageCount);
   }
 
-  public static GetSourcesResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.Source> page)
+  public static GetSourcesResponse MapToResponse(this PageOf<Source> page)
   {
     ArgumentNullException.ThrowIfNull(page);
     return new GetSourcesResponse(
@@ -52,7 +53,7 @@ public static class ReadModelReceiptMapper
       page.PageCount);
   }
 
-  public static GetReceiptsResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.ReceiptHeaders> page)
+  public static GetReceiptsResponse MapToResponse(this PageOf<ReceiptHeaders> page)
   {
     ArgumentNullException.ThrowIfNull(page);
     return new GetReceiptsResponse(
@@ -64,7 +65,7 @@ public static class ReadModelReceiptMapper
       page.PageCount);
   }
 
-  public static GetReceiptResponse MapToResponse(this ReadModel.Models.Receipt receipt)
+  public static GetReceiptResponse MapToResponse(this Receipt receipt)
   {
     ArgumentNullException.ThrowIfNull(receipt);
     return new GetReceiptResponse(
@@ -75,7 +76,7 @@ public static class ReadModelReceiptMapper
       receipt.Purchases.Select(MapToResponse));
   }
 
-  private static GetReceiptPurchaseResponse MapToResponse(this ReadModel.Models.Purchase purchase)
+  private static GetReceiptPurchaseResponse MapToResponse(this Purchase purchase)
   {
     ArgumentNullException.ThrowIfNull(purchase);
     return new GetReceiptPurchaseResponse(

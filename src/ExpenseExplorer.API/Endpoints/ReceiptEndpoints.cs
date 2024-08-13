@@ -1,11 +1,11 @@
-namespace ExpenseExplorer.API.Endpoints;
-
 using CommandHub;
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Mappers;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.ReadModel.Queries;
 using static ExpenseExplorer.API.Endpoints.FailureHandler;
+
+namespace ExpenseExplorer.API.Endpoints;
 
 public static class ReceiptEndpoints
 {

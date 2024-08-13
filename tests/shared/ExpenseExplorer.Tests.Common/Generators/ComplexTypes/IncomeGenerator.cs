@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
-
 using ExpenseExplorer.Domain.Incomes;
+
+namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 
 public static class IncomeGenerator
 {

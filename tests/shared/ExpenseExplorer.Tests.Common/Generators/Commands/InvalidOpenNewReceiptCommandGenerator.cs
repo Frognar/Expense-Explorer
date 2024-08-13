@@ -19,7 +19,7 @@ public static class InvalidOpenNewReceiptCommandGenerator
       from purchaseDate in DateOnlyGenerator.Gen()
       select new OpenNewReceiptCommand(storeName, purchaseDate.AddDays(1), purchaseDate);
 
-    return FsCheck.Fluent.Gen.OneOf(
+    return Gen.OneOf(
         invalidStoreName,
         invalidPurchaseDate,
         invalidStoreNameAndPurchaseDate)

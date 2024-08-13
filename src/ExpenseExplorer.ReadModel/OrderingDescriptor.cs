@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.ReadModel;
-
 using System.Linq.Expressions;
+
+namespace ExpenseExplorer.ReadModel;
 
 public readonly record struct OrderingDescriptor<T>(Expression<Func<T, object>> Selector, bool IsDescending = false)
 {

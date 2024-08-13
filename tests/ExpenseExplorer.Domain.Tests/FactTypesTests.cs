@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Domain.Tests;
-
 using ExpenseExplorer.Domain.Incomes.Facts;
+
+namespace ExpenseExplorer.Domain.Tests;
 
 public class FactTypesTests
 {

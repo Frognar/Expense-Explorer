@@ -1,9 +1,9 @@
-namespace ExpenseExplorer.API.Mappers;
-
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.Application.Receipts.Commands;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
+
+namespace ExpenseExplorer.API.Mappers;
 
 public static class ReceiptMapper
 {

@@ -1,12 +1,11 @@
-namespace ExpenseExplorer.API.Tests.Integration;
-
-using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Infrastructure.Receipts.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Testcontainers.EventStoreDb;
 using Testcontainers.PostgreSql;
+
+namespace ExpenseExplorer.API.Tests.Integration;
 
 public class ReceiptApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {

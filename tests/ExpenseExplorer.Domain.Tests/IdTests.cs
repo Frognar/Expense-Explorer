@@ -1,6 +1,6 @@
-﻿namespace ExpenseExplorer.Domain.Tests;
+﻿using ExpenseExplorer.Tests.Common;
 
-using ExpenseExplorer.Tests.Common;
+namespace ExpenseExplorer.Domain.Tests;
 
 public class IdTests
 {

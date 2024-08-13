@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Infrastructure.Exceptions;
-
 using System.Diagnostics.CodeAnalysis;
+
+namespace ExpenseExplorer.Infrastructure.Exceptions;
 
 [SuppressMessage("Design", "CA1032:Implement standard exception constructors", Justification = "Not needed")]
 public class FactReadException(string message, Exception innerException) : Exception(message, innerException)

@@ -1,6 +1,6 @@
-namespace FunctionalCore.Failures;
-
 using DotResult;
+
+namespace FunctionalCore.Failures;
 
 public static class FailureFactory
 {

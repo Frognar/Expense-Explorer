@@ -1,8 +1,8 @@
-namespace CommandHub;
-
 using CommandHub.Commands;
 using CommandHub.Queries;
 using CommandHub.Wrappers;
+
+namespace CommandHub;
 
 internal sealed class Sender(
   Func<Type, object> serviceProvider,

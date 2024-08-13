@@ -1,11 +1,11 @@
-namespace ExpenseExplorer.ReadModel.Queries;
-
 using System.Data.Common;
 using CommandHub.Queries;
 using DotResult;
 using ExpenseExplorer.ReadModel.Models;
 using FunctionalCore.Failures;
 using Microsoft.EntityFrameworkCore;
+
+namespace ExpenseExplorer.ReadModel.Queries;
 
 public sealed class GenerateCategoryBasedExpenseReportQueryHandler(ExpenseExplorerContext context)
   : IQueryHandler<GenerateCategoryBasedExpenseReportQuery, Result<CategoryBasedExpenseReport>>

@@ -1,7 +1,7 @@
-namespace ExpenseExplorer.Domain.Receipts.Facts;
-
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+
+namespace ExpenseExplorer.Domain.Receipts.Facts;
 
 public sealed record PurchaseDateChanged(string ReceiptId, DateOnly PurchaseDate, DateOnly RequestedDate) : Fact
 {

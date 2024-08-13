@@ -1,7 +1,7 @@
-namespace FunctionalCore.Tests;
-
 using DotResult;
 using ExpenseExplorer.Tests.Common;
+
+namespace FunctionalCore.Tests;
 
 public class ValidatedTests
 {

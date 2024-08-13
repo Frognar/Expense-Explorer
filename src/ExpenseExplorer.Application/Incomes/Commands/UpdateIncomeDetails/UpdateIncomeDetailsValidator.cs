@@ -1,10 +1,10 @@
-namespace ExpenseExplorer.Application.Incomes.Commands;
-
 using DotMaybe;
 using DotResult;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Validations;
+
+namespace ExpenseExplorer.Application.Incomes.Commands;
 
 internal static class UpdateIncomeDetailsValidator
 {

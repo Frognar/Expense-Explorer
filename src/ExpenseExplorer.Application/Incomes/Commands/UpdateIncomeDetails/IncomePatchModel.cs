@@ -1,7 +1,7 @@
-namespace ExpenseExplorer.Application.Incomes.Commands;
-
 using DotMaybe;
 using ExpenseExplorer.Domain.ValueObjects;
+
+namespace ExpenseExplorer.Application.Incomes.Commands;
 
 internal readonly record struct IncomePatchModel
 {

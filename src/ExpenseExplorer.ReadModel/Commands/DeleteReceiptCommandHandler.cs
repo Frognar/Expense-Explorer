@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.ReadModel.Commands;
-
 using CommandHub.Commands;
 using FunctionalCore;
 using Microsoft.EntityFrameworkCore;
+
+namespace ExpenseExplorer.ReadModel.Commands;
 
 public sealed class DeleteReceiptCommandHandler(ExpenseExplorerContext context)
   : ICommandHandler<DeleteReceiptCommand, Unit>

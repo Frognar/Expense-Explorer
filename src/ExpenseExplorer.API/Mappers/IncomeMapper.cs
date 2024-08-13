@@ -1,9 +1,10 @@
-namespace ExpenseExplorer.API.Mappers;
-
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Contract.ReadModel;
 using ExpenseExplorer.Application.Incomes.Commands;
-using ExpenseExplorer.Domain.Incomes;
+using ExpenseExplorer.ReadModel.Models;
+using Income = ExpenseExplorer.Domain.Incomes.Income;
+
+namespace ExpenseExplorer.API.Mappers;
 
 public static class IncomeMapper
 {
@@ -60,7 +61,7 @@ public static class IncomeMapper
       income.Version.Value);
   }
 
-  public static GetIncomesResponse MapToResponse(this ReadModel.Models.PageOf<ReadModel.Models.Income> page)
+  public static GetIncomesResponse MapToResponse(this PageOf<ReadModel.Models.Income> page)
   {
     ArgumentNullException.ThrowIfNull(page);
     return new GetIncomesResponse(

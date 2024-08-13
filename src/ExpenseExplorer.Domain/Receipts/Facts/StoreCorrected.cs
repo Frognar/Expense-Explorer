@@ -1,7 +1,7 @@
-namespace ExpenseExplorer.Domain.Receipts.Facts;
-
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+
+namespace ExpenseExplorer.Domain.Receipts.Facts;
 
 public sealed record StoreCorrected(string ReceiptId, string Store) : Fact
 {

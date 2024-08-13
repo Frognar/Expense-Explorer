@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.ReadModel;
-
 using System.Linq.Expressions;
+
+namespace ExpenseExplorer.ReadModel;
 
 public static class QueryableExtensions
 {

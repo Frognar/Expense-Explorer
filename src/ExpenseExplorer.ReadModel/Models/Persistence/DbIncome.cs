@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.ReadModel.Models.Persistence;
-
 using System.ComponentModel.DataAnnotations;
+
+namespace ExpenseExplorer.ReadModel.Models.Persistence;
 
 public sealed class DbIncome(
   string id,

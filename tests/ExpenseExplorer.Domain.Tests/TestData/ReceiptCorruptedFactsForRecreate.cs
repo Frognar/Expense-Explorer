@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Domain.Tests.TestData;
-
 using System.Collections;
+
+namespace ExpenseExplorer.Domain.Tests.TestData;
 
 public sealed class ReceiptCorruptedFactsForRecreate : IEnumerable<object[]>
 {

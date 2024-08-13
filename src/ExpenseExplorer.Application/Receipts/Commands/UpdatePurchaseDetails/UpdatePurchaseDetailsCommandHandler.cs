@@ -1,5 +1,3 @@
-namespace ExpenseExplorer.Application.Receipts.Commands;
-
 using CommandHub.Commands;
 using DotResult;
 using ExpenseExplorer.Application.Receipts.Persistence;
@@ -7,6 +5,8 @@ using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore;
 using FunctionalCore.Failures;
+
+namespace ExpenseExplorer.Application.Receipts.Commands;
 
 public sealed class UpdatePurchaseDetailsCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<UpdatePurchaseDetailsCommand, Result<Receipt>>

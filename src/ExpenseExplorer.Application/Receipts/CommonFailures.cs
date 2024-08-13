@@ -1,7 +1,7 @@
-namespace ExpenseExplorer.Application.Receipts;
-
 using DotResult;
 using FunctionalCore.Failures;
+
+namespace ExpenseExplorer.Application.Receipts;
 
 internal static class CommonFailures
 {

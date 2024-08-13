@@ -1,9 +1,9 @@
-namespace ExpenseExplorer.API.Endpoints;
-
 using CommandHub;
 using ExpenseExplorer.API.Mappers;
 using ExpenseExplorer.ReadModel.Queries;
 using static ExpenseExplorer.API.Endpoints.FailureHandler;
+
+namespace ExpenseExplorer.API.Endpoints;
 
 public static class ItemEndpoints
 {

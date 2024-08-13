@@ -1,5 +1,3 @@
-namespace ExpenseExplorer.ReadModel.Queries;
-
 using System.Linq.Expressions;
 using CommandHub.Queries;
 using DotResult;
@@ -7,6 +5,8 @@ using ExpenseExplorer.ReadModel.Models;
 using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore.Failures;
 using Microsoft.EntityFrameworkCore;
+
+namespace ExpenseExplorer.ReadModel.Queries;
 
 public sealed class GetReceiptQueryHandler(ExpenseExplorerContext context)
   : IQueryHandler<GetReceiptQuery, Result<Receipt>>

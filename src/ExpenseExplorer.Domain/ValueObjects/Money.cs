@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Domain.ValueObjects;
-
 using DotMaybe;
+
+namespace ExpenseExplorer.Domain.ValueObjects;
 
 public readonly record struct Money
 {

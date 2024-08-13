@@ -1,5 +1,3 @@
-namespace ExpenseExplorer.Application.Incomes.Commands;
-
 using CommandHub.Commands;
 using DotResult;
 using ExpenseExplorer.Application.Incomes.Persistence;
@@ -7,6 +5,8 @@ using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Domain.Incomes;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore;
+
+namespace ExpenseExplorer.Application.Incomes.Commands;
 
 public sealed class UpdateIncomeDetailsCommandHandler(IIncomeRepository incomeRepository)
   : ICommandHandler<UpdateIncomeDetailsCommand, Result<Income>>

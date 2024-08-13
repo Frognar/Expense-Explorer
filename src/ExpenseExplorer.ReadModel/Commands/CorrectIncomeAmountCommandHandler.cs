@@ -1,8 +1,8 @@
-﻿namespace ExpenseExplorer.ReadModel.Commands;
-
-using CommandHub.Commands;
+﻿using CommandHub.Commands;
 using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore;
+
+namespace ExpenseExplorer.ReadModel.Commands;
 
 public sealed class CorrectIncomeAmountCommandHandler(ExpenseExplorerContext context)
   : ICommandHandler<CorrectIncomeAmountCommand, Unit>

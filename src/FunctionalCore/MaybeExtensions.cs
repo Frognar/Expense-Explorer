@@ -1,7 +1,7 @@
-namespace FunctionalCore;
-
 using DotMaybe;
 using DotResult;
+
+namespace FunctionalCore;
 
 public static class MaybeExtensions
 {

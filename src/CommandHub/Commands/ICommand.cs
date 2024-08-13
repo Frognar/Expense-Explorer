@@ -1,6 +1,6 @@
-namespace CommandHub.Commands;
-
 using System.Diagnostics.CodeAnalysis;
+
+namespace CommandHub.Commands;
 
 [SuppressMessage(
   "Design",

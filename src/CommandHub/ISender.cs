@@ -1,7 +1,7 @@
-namespace CommandHub;
-
 using CommandHub.Commands;
 using CommandHub.Queries;
+
+namespace CommandHub;
 
 public interface ISender
 {

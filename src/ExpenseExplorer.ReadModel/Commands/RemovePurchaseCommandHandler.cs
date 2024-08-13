@@ -1,9 +1,8 @@
-namespace ExpenseExplorer.ReadModel.Commands;
-
 using CommandHub.Commands;
 using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore;
-using Microsoft.EntityFrameworkCore;
+
+namespace ExpenseExplorer.ReadModel.Commands;
 
 public sealed class RemovePurchaseCommandHandler(ExpenseExplorerContext context)
   : ICommandHandler<RemovePurchaseCommand, Unit>

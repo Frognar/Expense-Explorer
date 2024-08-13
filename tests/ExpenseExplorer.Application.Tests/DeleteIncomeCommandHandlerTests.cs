@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.Application.Tests;
-
 using ExpenseExplorer.Domain.Incomes.Facts;
 using ExpenseExplorer.Tests.Common;
 using FunctionalCore;
+
+namespace ExpenseExplorer.Application.Tests;
 
 public class DeleteIncomeCommandHandlerTests
 {

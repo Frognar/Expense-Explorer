@@ -1,7 +1,7 @@
-namespace ExpenseExplorer.Tests.Common;
-
 using System.Diagnostics;
 using FunctionalCore.Failures;
+
+namespace ExpenseExplorer.Tests.Common;
 
 public static class FailureExtensions
 {

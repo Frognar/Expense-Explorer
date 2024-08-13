@@ -1,10 +1,11 @@
-namespace ExpenseExplorer.API.Mappers;
-
 using ExpenseExplorer.API.Contract.ReadModel;
+using ExpenseExplorer.ReadModel.Models;
+
+namespace ExpenseExplorer.API.Mappers;
 
 public static class ReportMapper
 {
-  public static GenerateIncomeToExpenseReportResponse MapToResponse(this ReadModel.Models.IncomeToExportReport report)
+  public static GenerateIncomeToExpenseReportResponse MapToResponse(this IncomeToExportReport report)
   {
     ArgumentNullException.ThrowIfNull(report);
     return new GenerateIncomeToExpenseReportResponse(
@@ -15,7 +16,7 @@ public static class ReportMapper
   }
 
   public static GenerateCategoryBasedExpenseReportResponse MapToResponse(
-    this ReadModel.Models.CategoryBasedExpenseReport report)
+    this CategoryBasedExpenseReport report)
   {
     ArgumentNullException.ThrowIfNull(report);
     return new GenerateCategoryBasedExpenseReportResponse(
@@ -25,7 +26,7 @@ public static class ReportMapper
       report.Categories.Select(MapToResponse));
   }
 
-  private static CategoryBasedEntryResponse MapToResponse(this ReadModel.Models.ReportEntry entry)
+  private static CategoryBasedEntryResponse MapToResponse(this ReportEntry entry)
   {
     ArgumentNullException.ThrowIfNull(entry);
     return new CategoryBasedEntryResponse(entry.Category, entry.Total);

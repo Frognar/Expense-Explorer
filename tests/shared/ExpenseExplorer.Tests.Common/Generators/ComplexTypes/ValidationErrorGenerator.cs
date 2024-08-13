@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
-
 using FunctionalCore.Failures;
+
+namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 
 public static class ValidationErrorGenerator
 {

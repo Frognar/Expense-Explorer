@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.ReadModel.Commands;
-
 using CommandHub.Commands;
 using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore;
+
+namespace ExpenseExplorer.ReadModel.Commands;
 
 public sealed class CorrectIncomeDescriptionCommandHandler(ExpenseExplorerContext context)
   : ICommandHandler<CorrectIncomeDescriptionCommand, Unit>

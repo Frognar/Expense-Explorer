@@ -1,9 +1,9 @@
-namespace ExpenseExplorer.Domain.Tests;
-
 using DotResult;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.Tests.TestData;
 using ExpenseExplorer.Tests.Common;
+
+namespace ExpenseExplorer.Domain.Tests;
 
 public class ReceiptTests
 {

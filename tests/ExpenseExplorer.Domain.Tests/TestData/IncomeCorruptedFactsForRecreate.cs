@@ -1,7 +1,7 @@
-namespace ExpenseExplorer.Domain.Tests.TestData;
-
 using System.Collections;
 using ExpenseExplorer.Domain.Incomes.Facts;
+
+namespace ExpenseExplorer.Domain.Tests.TestData;
 
 public sealed class IncomeCorruptedFactsForRecreate : IEnumerable<object[]>
 {

@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.API.Endpoints;
-
 using System.Net;
 using DotResult;
 using FunctionalCore.Failures;
+
+namespace ExpenseExplorer.API.Endpoints;
 
 internal static class FailureHandler
 {

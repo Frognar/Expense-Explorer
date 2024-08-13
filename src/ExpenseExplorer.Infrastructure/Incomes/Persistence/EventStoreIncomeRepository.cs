@@ -1,5 +1,3 @@
-namespace ExpenseExplorer.Infrastructure.Incomes.Persistence;
-
 using DotResult;
 using ExpenseExplorer.Application.Incomes.Persistence;
 using ExpenseExplorer.Domain.Facts;
@@ -7,6 +5,9 @@ using ExpenseExplorer.Domain.Incomes;
 using ExpenseExplorer.Domain.ValueObjects;
 using ExpenseExplorer.Infrastructure.Exceptions;
 using FunctionalCore.Failures;
+using Version = ExpenseExplorer.Domain.ValueObjects.Version;
+
+namespace ExpenseExplorer.Infrastructure.Incomes.Persistence;
 
 public sealed class EventStoreIncomeRepository(string connectionString) : IIncomeRepository, IDisposable
 {

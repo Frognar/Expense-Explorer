@@ -1,7 +1,7 @@
-namespace ExpenseExplorer.Domain.Categories.Facts;
-
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+
+namespace ExpenseExplorer.Domain.Categories.Facts;
 
 public sealed record CategoryRenamed(string Id, string Name) : Fact
 {

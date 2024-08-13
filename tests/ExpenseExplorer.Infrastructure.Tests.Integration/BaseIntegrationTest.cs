@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.Infrastructure.Tests.Integration;
-
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Infrastructure.Receipts.Persistence;
 using Testcontainers.EventStoreDb;
+
+namespace ExpenseExplorer.Infrastructure.Tests.Integration;
 
 public class BaseIntegrationTest : IAsyncLifetime
 {

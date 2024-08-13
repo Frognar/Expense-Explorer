@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Application.Tests;
-
 using ExpenseExplorer.Tests.Common;
+
+namespace ExpenseExplorer.Application.Tests;
 
 public class UpdateReceiptCommandHandlerTests
 {

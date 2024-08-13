@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.ReadModel.Extensions;
-
 using ExpenseExplorer.ReadModel.Models;
+
+namespace ExpenseExplorer.ReadModel.Extensions;
 
 public static class Page
 {

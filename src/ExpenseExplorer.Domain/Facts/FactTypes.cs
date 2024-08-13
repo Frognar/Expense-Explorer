@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.Domain.Facts;
-
 using System.Diagnostics;
 using ExpenseExplorer.Domain.Incomes.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
+
+namespace ExpenseExplorer.Domain.Facts;
 
 public static class FactTypes
 {

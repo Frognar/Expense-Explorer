@@ -1,8 +1,10 @@
-namespace ExpenseExplorer.Domain.Facts;
-
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
+using ExpenseExplorer.Domain.Incomes.Facts;
+using ExpenseExplorer.Domain.Receipts.Facts;
+
+namespace ExpenseExplorer.Domain.Facts;
 
 public static class FactSerializer
 {
@@ -10,20 +12,20 @@ public static class FactSerializer
   {
     return fact switch
     {
-      Receipts.Facts.ReceiptCreated receiptCreated => Serialize(receiptCreated),
-      Receipts.Facts.StoreCorrected storeCorrected => Serialize(storeCorrected),
-      Receipts.Facts.PurchaseDateChanged purchaseDateChanged => Serialize(purchaseDateChanged),
-      Receipts.Facts.PurchaseAdded purchaseAdded => Serialize(purchaseAdded),
-      Receipts.Facts.PurchaseDetailsChanged purchaseDetailsChanged => Serialize(purchaseDetailsChanged),
-      Receipts.Facts.PurchaseRemoved purchaseRemoved => Serialize(purchaseRemoved),
-      Receipts.Facts.ReceiptDeleted receiptDeleted => Serialize(receiptDeleted),
-      Incomes.Facts.IncomeCreated incomeCreated => Serialize(incomeCreated),
-      Incomes.Facts.SourceCorrected sourceCorrected => Serialize(sourceCorrected),
-      Incomes.Facts.AmountCorrected amountCorrected => Serialize(amountCorrected),
-      Incomes.Facts.CategoryCorrected categoryCorrected => Serialize(categoryCorrected),
-      Incomes.Facts.ReceivedDateCorrected receivedDateCorrected => Serialize(receivedDateCorrected),
-      Incomes.Facts.DescriptionCorrected descriptionCorrected => Serialize(descriptionCorrected),
-      Incomes.Facts.IncomeDeleted incomeDeleted => Serialize(incomeDeleted),
+      ReceiptCreated receiptCreated => Serialize(receiptCreated),
+      StoreCorrected storeCorrected => Serialize(storeCorrected),
+      PurchaseDateChanged purchaseDateChanged => Serialize(purchaseDateChanged),
+      PurchaseAdded purchaseAdded => Serialize(purchaseAdded),
+      PurchaseDetailsChanged purchaseDetailsChanged => Serialize(purchaseDetailsChanged),
+      PurchaseRemoved purchaseRemoved => Serialize(purchaseRemoved),
+      ReceiptDeleted receiptDeleted => Serialize(receiptDeleted),
+      IncomeCreated incomeCreated => Serialize(incomeCreated),
+      SourceCorrected sourceCorrected => Serialize(sourceCorrected),
+      AmountCorrected amountCorrected => Serialize(amountCorrected),
+      CategoryCorrected categoryCorrected => Serialize(categoryCorrected),
+      ReceivedDateCorrected receivedDateCorrected => Serialize(receivedDateCorrected),
+      DescriptionCorrected descriptionCorrected => Serialize(descriptionCorrected),
+      IncomeDeleted incomeDeleted => Serialize(incomeDeleted),
       _ => throw new UnreachableException(),
     };
   }
@@ -32,20 +34,20 @@ public static class FactSerializer
   {
     return type switch
     {
-      FactTypes.ReceiptCreatedFactType => Deserialize<Receipts.Facts.ReceiptCreated>(data),
-      FactTypes.StoreCorrectedFactType => Deserialize<Receipts.Facts.StoreCorrected>(data),
-      FactTypes.PurchaseDateChangedFactType => Deserialize<Receipts.Facts.PurchaseDateChanged>(data),
-      FactTypes.PurchaseAddedFactType => Deserialize<Receipts.Facts.PurchaseAdded>(data),
-      FactTypes.PurchaseDetailsChangedFactType => Deserialize<Receipts.Facts.PurchaseDetailsChanged>(data),
-      FactTypes.PurchaseRemovedFactType => Deserialize<Receipts.Facts.PurchaseRemoved>(data),
-      FactTypes.ReceiptDeletedFactType => Deserialize<Receipts.Facts.ReceiptDeleted>(data),
-      FactTypes.IncomeCreatedFactType => Deserialize<Incomes.Facts.IncomeCreated>(data),
-      FactTypes.IncomeSourceCorrectedFactType => Deserialize<Incomes.Facts.SourceCorrected>(data),
-      FactTypes.IncomeAmountCorrectedFactType => Deserialize<Incomes.Facts.AmountCorrected>(data),
-      FactTypes.IncomeCategoryCorrectedFactType => Deserialize<Incomes.Facts.CategoryCorrected>(data),
-      FactTypes.IncomeReceivedDateCorrectedFactType => Deserialize<Incomes.Facts.ReceivedDateCorrected>(data),
-      FactTypes.IncomeDescriptionCorrectedFactType => Deserialize<Incomes.Facts.DescriptionCorrected>(data),
-      FactTypes.IncomeDeletedFactType => Deserialize<Incomes.Facts.IncomeDeleted>(data),
+      FactTypes.ReceiptCreatedFactType => Deserialize<ReceiptCreated>(data),
+      FactTypes.StoreCorrectedFactType => Deserialize<StoreCorrected>(data),
+      FactTypes.PurchaseDateChangedFactType => Deserialize<PurchaseDateChanged>(data),
+      FactTypes.PurchaseAddedFactType => Deserialize<PurchaseAdded>(data),
+      FactTypes.PurchaseDetailsChangedFactType => Deserialize<PurchaseDetailsChanged>(data),
+      FactTypes.PurchaseRemovedFactType => Deserialize<PurchaseRemoved>(data),
+      FactTypes.ReceiptDeletedFactType => Deserialize<ReceiptDeleted>(data),
+      FactTypes.IncomeCreatedFactType => Deserialize<IncomeCreated>(data),
+      FactTypes.IncomeSourceCorrectedFactType => Deserialize<SourceCorrected>(data),
+      FactTypes.IncomeAmountCorrectedFactType => Deserialize<AmountCorrected>(data),
+      FactTypes.IncomeCategoryCorrectedFactType => Deserialize<CategoryCorrected>(data),
+      FactTypes.IncomeReceivedDateCorrectedFactType => Deserialize<ReceivedDateCorrected>(data),
+      FactTypes.IncomeDescriptionCorrectedFactType => Deserialize<DescriptionCorrected>(data),
+      FactTypes.IncomeDeletedFactType => Deserialize<IncomeDeleted>(data),
       _ => throw new UnreachableException(),
     };
   }

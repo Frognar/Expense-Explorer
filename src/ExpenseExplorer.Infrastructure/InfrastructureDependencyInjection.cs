@@ -1,11 +1,11 @@
-namespace ExpenseExplorer.Infrastructure;
-
 using ExpenseExplorer.Application.Incomes.Persistence;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Infrastructure.Incomes.Persistence;
 using ExpenseExplorer.Infrastructure.Receipts.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
+namespace ExpenseExplorer.Infrastructure;
 
 public static class InfrastructureDependencyInjection
 {

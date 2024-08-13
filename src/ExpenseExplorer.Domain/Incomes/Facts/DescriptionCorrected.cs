@@ -1,7 +1,7 @@
-namespace ExpenseExplorer.Domain.Incomes.Facts;
-
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+
+namespace ExpenseExplorer.Domain.Incomes.Facts;
 
 public record DescriptionCorrected(string IncomeId, string Description) : Fact
 {

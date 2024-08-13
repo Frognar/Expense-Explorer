@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.API.Middlewares;
-
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+
+namespace ExpenseExplorer.API.Middlewares;
 
 [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by DI.")]
 internal sealed class GlobalExceptionHandler : IExceptionHandler

@@ -1,8 +1,8 @@
-﻿namespace CommandHub.DependencyInjection;
-
-using System.Reflection;
+﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+
+namespace CommandHub.DependencyInjection;
 
 public static class CommandHubDependencyInjection
 {

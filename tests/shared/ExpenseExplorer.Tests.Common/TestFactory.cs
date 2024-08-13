@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Tests.Common;
-
 using ExpenseExplorer.Domain.Receipts;
+
+namespace ExpenseExplorer.Tests.Common;
 
 public static class TestFactory
 {
@@ -16,6 +16,6 @@ public static class TestFactory
 
   public static NonFutureDate PurchaseDate(DateOnly date)
   {
-    return Domain.ValueObjects.NonFutureDate.TryCreate(date, date).ForceValue();
+    return NonFutureDate.TryCreate(date, date).ForceValue();
   }
 }

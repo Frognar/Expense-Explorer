@@ -1,11 +1,12 @@
-namespace ExpenseExplorer.Domain.Receipts;
-
 using DotResult;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore;
 using FunctionalCore.Failures;
+using Version = ExpenseExplorer.Domain.ValueObjects.Version;
+
+namespace ExpenseExplorer.Domain.Receipts;
 
 public sealed record Receipt
 {

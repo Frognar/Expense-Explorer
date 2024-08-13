@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.Application.Tests;
-
 using System.Collections.ObjectModel;
 using ExpenseExplorer.Application.Incomes.Persistence;
 using FunctionalCore.Failures;
+
+namespace ExpenseExplorer.Application.Tests;
 
 internal sealed class FakeIncomeRepository : Collection<Income>, IIncomeRepository
 {

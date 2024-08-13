@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
-
 using ExpenseExplorer.Domain.Receipts;
+
+namespace ExpenseExplorer.Tests.Common.Generators.ComplexTypes;
 
 public static class ReceiptGenerator
 {

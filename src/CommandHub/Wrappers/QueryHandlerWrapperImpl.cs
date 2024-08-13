@@ -1,7 +1,7 @@
-namespace CommandHub.Wrappers;
-
 using System.Diagnostics.CodeAnalysis;
 using CommandHub.Queries;
+
+namespace CommandHub.Wrappers;
 
 [SuppressMessage(
   "Performance",

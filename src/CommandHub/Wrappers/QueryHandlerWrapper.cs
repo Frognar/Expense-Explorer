@@ -1,6 +1,6 @@
-namespace CommandHub.Wrappers;
-
 using CommandHub.Queries;
+
+namespace CommandHub.Wrappers;
 
 internal abstract class QueryHandlerWrapper<TResponse> : BaseHandlerWrapper
 {

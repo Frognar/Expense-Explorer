@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.GUI.Helpers;
-
 using System.Collections;
+
+namespace ExpenseExplorer.GUI.Helpers;
 
 public sealed class QueryParameters : IEnumerable<string>
 {

@@ -1,7 +1,7 @@
-namespace FunctionalCore.Validations;
-
 using DotResult;
 using FunctionalCore.Failures;
+
+namespace FunctionalCore.Validations;
 
 public static class Validation
 {

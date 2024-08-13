@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.Application.Receipts.Commands;
-
 using CommandHub.Commands;
 using DotResult;
 using ExpenseExplorer.Domain.Receipts;
+
+namespace ExpenseExplorer.Application.Receipts.Commands;
 
 public sealed record AddPurchaseCommand(
   string ReceiptId,

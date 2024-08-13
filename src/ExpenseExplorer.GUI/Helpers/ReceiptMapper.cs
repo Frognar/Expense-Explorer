@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.GUI.Helpers;
-
 using ExpenseExplorer.API.Contract;
 using ExpenseExplorer.API.Contract.ReadModel;
 using ExpenseExplorer.GUI.Data;
+
+namespace ExpenseExplorer.GUI.Helpers;
 
 public static class ReceiptMapper
 {

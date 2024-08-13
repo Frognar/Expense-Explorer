@@ -1,7 +1,5 @@
 namespace ExpenseExplorer.Domain.Tests;
 
-using ExpenseExplorer.Domain.ValueObjects;
-
 public class VersionTests
 {
   [Fact]

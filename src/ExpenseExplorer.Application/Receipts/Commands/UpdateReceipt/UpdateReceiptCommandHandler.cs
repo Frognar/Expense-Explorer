@@ -1,11 +1,11 @@
-namespace ExpenseExplorer.Application.Receipts.Commands;
-
 using CommandHub.Commands;
 using DotResult;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore;
+
+namespace ExpenseExplorer.Application.Receipts.Commands;
 
 public sealed class UpdateReceiptCommandHandler(IReceiptRepository receiptRepository)
   : ICommandHandler<UpdateReceiptCommand, Result<Receipt>>

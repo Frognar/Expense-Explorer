@@ -1,5 +1,3 @@
-namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
-
 using DotResult;
 using ExpenseExplorer.Application.Receipts.Persistence;
 using ExpenseExplorer.Domain.Facts;
@@ -7,6 +5,9 @@ using ExpenseExplorer.Domain.Receipts;
 using ExpenseExplorer.Domain.ValueObjects;
 using ExpenseExplorer.Infrastructure.Exceptions;
 using FunctionalCore.Failures;
+using Version = ExpenseExplorer.Domain.ValueObjects.Version;
+
+namespace ExpenseExplorer.Infrastructure.Receipts.Persistence;
 
 public sealed class EventStoreReceiptRepository(string connectionString) : IReceiptRepository, IDisposable
 {

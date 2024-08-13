@@ -1,7 +1,7 @@
-namespace ExpenseExplorer.Domain.Incomes.Facts;
-
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
+
+namespace ExpenseExplorer.Domain.Incomes.Facts;
 
 public record AmountCorrected(string IncomeId, decimal Amount) : Fact
 {

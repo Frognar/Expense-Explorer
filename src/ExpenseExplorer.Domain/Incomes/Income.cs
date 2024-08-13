@@ -1,11 +1,12 @@
-namespace ExpenseExplorer.Domain.Incomes;
-
 using DotResult;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Incomes.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore;
 using FunctionalCore.Failures;
+using Version = ExpenseExplorer.Domain.ValueObjects.Version;
+
+namespace ExpenseExplorer.Domain.Incomes;
 
 public sealed record Income
 {

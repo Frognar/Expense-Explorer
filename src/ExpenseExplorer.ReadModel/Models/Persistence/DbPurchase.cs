@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.ReadModel.Models.Persistence;
-
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+
+namespace ExpenseExplorer.ReadModel.Models.Persistence;
 
 [SuppressMessage(
   "Performance",

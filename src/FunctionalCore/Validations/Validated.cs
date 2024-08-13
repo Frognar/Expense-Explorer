@@ -1,6 +1,6 @@
-namespace FunctionalCore.Validations;
-
 using FunctionalCore.Failures;
+
+namespace FunctionalCore.Validations;
 
 public class Validated<S>
 {

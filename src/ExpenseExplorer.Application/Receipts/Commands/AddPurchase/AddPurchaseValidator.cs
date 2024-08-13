@@ -1,8 +1,8 @@
-namespace ExpenseExplorer.Application.Receipts.Commands;
-
 using DotResult;
 using ExpenseExplorer.Domain.ValueObjects;
 using FunctionalCore.Validations;
+
+namespace ExpenseExplorer.Application.Receipts.Commands;
 
 internal static class AddPurchaseValidator
 {

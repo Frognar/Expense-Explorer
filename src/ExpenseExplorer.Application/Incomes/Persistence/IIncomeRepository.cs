@@ -1,8 +1,9 @@
-namespace ExpenseExplorer.Application.Incomes.Persistence;
-
 using DotResult;
 using ExpenseExplorer.Domain.Incomes;
 using ExpenseExplorer.Domain.ValueObjects;
+using Version = ExpenseExplorer.Domain.ValueObjects.Version;
+
+namespace ExpenseExplorer.Application.Incomes.Persistence;
 
 public interface IIncomeRepository
 {

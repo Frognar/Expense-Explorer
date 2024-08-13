@@ -1,6 +1,5 @@
-﻿namespace ExpenseExplorer.ReadModel;
-
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.Json;
 using CommandHub;
 using CommandHub.Commands;
@@ -11,6 +10,8 @@ using ExpenseExplorer.ReadModel.Models.Persistence;
 using FunctionalCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+
+namespace ExpenseExplorer.ReadModel;
 
 [SuppressMessage(
   "Performance",
@@ -91,7 +92,7 @@ internal sealed class FactProcessor(
   private async Task HandleAsync<TCommand>(ResolvedEvent resolvedEvent, CancellationToken cancellationToken)
     where TCommand : ICommand<Unit>
   {
-    string jsonFact = System.Text.Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
+    string jsonFact = Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
     TCommand command = JsonSerializer.Deserialize<TCommand>(jsonFact)!;
     await _sender.SendAsync(command, cancellationToken);
   }

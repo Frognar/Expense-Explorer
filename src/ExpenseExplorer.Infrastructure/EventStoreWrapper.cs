@@ -1,11 +1,12 @@
-namespace ExpenseExplorer.Infrastructure;
-
 using EventStore.Client;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 using ExpenseExplorer.Infrastructure.Exceptions;
 using static ExpenseExplorer.Domain.Facts.FactSerializer;
 using static ExpenseExplorer.Domain.Facts.FactTypes;
+using Version = ExpenseExplorer.Domain.ValueObjects.Version;
+
+namespace ExpenseExplorer.Infrastructure;
 
 public sealed class EventStoreWrapper(string connectionString) : IDisposable
 {

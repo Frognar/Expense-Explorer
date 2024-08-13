@@ -1,10 +1,10 @@
-namespace ExpenseExplorer.ReadModel;
-
 using CommandHub;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
+namespace ExpenseExplorer.ReadModel;
 
 public static class ReadModelDependencyInjection
 {
