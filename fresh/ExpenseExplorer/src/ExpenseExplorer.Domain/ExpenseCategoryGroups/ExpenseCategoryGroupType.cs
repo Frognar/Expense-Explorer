@@ -1,5 +1,6 @@
 using DotResult;
 using ExpenseExplorer.Domain.ExpenseCategoryGroups.Facts;
+using ExpenseExplorer.Domain.Extensions;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 using Version = ExpenseExplorer.Domain.ValueObjects.Version;
@@ -155,44 +156,36 @@ public static class ExpenseCategoryGroup
           false,
           UnsavedChanges.Empty(),
           Version.New()))
-      .Match(
-        () => Failure.Validation(message: "Failed to create expense category group"),
-        Success.From);
+      .ToResult(() => Failure.Validation(message: "Failed to create expense category group"));
 
   private static Result<ExpenseCategoryGroupType> Apply(
-    this ExpenseCategoryGroupType expenseCategoryGroup,
+    this ExpenseCategoryGroupType categoryGroup,
     ExpenseCategoryGroupRenamed fact)
     => (
         from name in Name.Create(fact.Name)
-        select expenseCategoryGroup with { Name = name })
-      .Match(
-        () => Failure.Validation(message: "Failed to change name"),
-        Success.From);
+        select categoryGroup with { Name = name })
+      .ToResult(() => Failure.Validation(message: "Failed to change name"));
 
   private static Result<ExpenseCategoryGroupType> Apply(
-    this ExpenseCategoryGroupType expenseCategoryGroup,
+    this ExpenseCategoryGroupType categoryGroup,
     ExpenseCategoryGroupDescriptionChanged fact)
-    => expenseCategoryGroup with { Description = Description.Create(fact.Description) };
+    => categoryGroup with { Description = Description.Create(fact.Description) };
 
   private static Result<ExpenseCategoryGroupType> Apply(
-    this ExpenseCategoryGroupType expenseCategoryGroup,
+    this ExpenseCategoryGroupType categoryGroup,
     ExpenseCategoryGroupExpenseCategoryAdded fact)
     => (
         from expenseCategoryId in ExpenseCategoryId.Create(fact.ExpenseCategoryId)
-        let expenseCategoryIds = expenseCategoryGroup.ExpenseCategoryIds.Append(expenseCategoryId)
-        select expenseCategoryGroup with { ExpenseCategoryIds = expenseCategoryIds })
-      .Match(
-        () => Failure.Validation(message: "Failed to add expense category"),
-        Success.From);
+        let expenseCategoryIds = categoryGroup.ExpenseCategoryIds.Append(expenseCategoryId)
+        select categoryGroup with { ExpenseCategoryIds = expenseCategoryIds })
+      .ToResult(() => Failure.Validation(message: "Failed to add expense category"));
 
   private static Result<ExpenseCategoryGroupType> Apply(
-    this ExpenseCategoryGroupType expenseCategoryGroup,
+    this ExpenseCategoryGroupType categoryGroup,
     ExpenseCategoryGroupExpenseCategoryRemoved fact)
     => (
         from expenseCategoryId in ExpenseCategoryId.Create(fact.ExpenseCategoryId)
-        let expenseCategoryIds = expenseCategoryGroup.ExpenseCategoryIds.Without(expenseCategoryId)
-        select expenseCategoryGroup with { ExpenseCategoryIds = expenseCategoryIds })
-      .Match(
-        () => Failure.Validation(message: "Failed to remove expense category"),
-        Success.From);
+        let expenseCategoryIds = categoryGroup.ExpenseCategoryIds.Without(expenseCategoryId)
+        select categoryGroup with { ExpenseCategoryIds = expenseCategoryIds })
+      .ToResult(() => Failure.Validation(message: "Failed to remove expense category"));
 }
