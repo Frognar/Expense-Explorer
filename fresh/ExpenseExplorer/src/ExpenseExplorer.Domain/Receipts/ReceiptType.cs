@@ -1,5 +1,5 @@
-using DotMaybe;
 using DotResult;
+using ExpenseExplorer.Domain.Extensions;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Receipts.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
@@ -101,6 +101,17 @@ public static class Receipt
       : receipt;
   }
 
+  public static Result<ReceiptType> ClearChanges(
+    this ReceiptType receipt)
+  {
+    if (receipt.Deleted)
+    {
+      return Failure.Validation(message: "Cannot clear changes of deleted receipt");
+    }
+
+    return receipt with { UnsavedChanges = UnsavedChanges.Empty() };
+  }
+
   public static Result<ReceiptType> Recreate(IEnumerable<Fact> facts)
   {
     facts = facts.ToList();
@@ -119,6 +130,7 @@ public static class Receipt
   {
     return fact switch
     {
+      ReceiptCreated receiptCreated => Apply(receiptCreated),
       ReceiptStoreChanged receiptStoreChanged => receipt.Apply(receiptStoreChanged),
       ReceiptPurchaseDateChanged receiptPurchaseDateChanged => receipt.Apply(receiptPurchaseDateChanged),
       ReceiptPurchaseAdded receiptPurchaseAdded => receipt.Apply(receiptPurchaseAdded),
@@ -128,9 +140,9 @@ public static class Receipt
     };
   }
 
-  private static Result<ReceiptType> Apply(ReceiptCreated fact)
-  {
-    Maybe<ReceiptType> receipt =
+  private static Result<ReceiptType> Apply(
+    ReceiptCreated fact)
+    => (
       from id in ReceiptId.Create(fact.ReceiptId)
       from store in Store.Create(fact.Store)
       from purchaseDate in NonFutureDate.Create(fact.PurchaseDate, fact.CreatedDate)
@@ -141,50 +153,38 @@ public static class Receipt
         PurchaseIds.New(),
         false,
         UnsavedChanges.Empty(),
-        Version.New());
+        Version.New()))
+      .ToResult(() => Failure.Validation(message: "Failed to create receipt"));
 
-    return receipt.Match(
-      () => Failure.Validation(message: "Failed to create receipt"),
-      Success.From);
-  }
-
-  private static Result<ReceiptType> Apply(this ReceiptType receipt, ReceiptStoreChanged fact)
-  {
-    return (
+  private static Result<ReceiptType> Apply(
+    this ReceiptType receipt,
+    ReceiptStoreChanged fact)
+    => (
         from store in Store.Create(fact.Store)
         select receipt with { Store = store })
-      .Match(
-        () => Failure.Validation(message: "Failed to change store"),
-        Success.From);
-  }
+      .ToResult(() => Failure.Validation(message: "Failed to change store"));
 
-  private static Result<ReceiptType> Apply(this ReceiptType receipt, ReceiptPurchaseDateChanged fact)
-  {
-    return (
+  private static Result<ReceiptType> Apply(
+    this ReceiptType receipt,
+    ReceiptPurchaseDateChanged fact)
+    => (
         from purchaseDate in NonFutureDate.Create(fact.PurchaseDate, fact.CreatedDate)
         select receipt with { PurchaseDate = purchaseDate })
-      .Match(
-        () => Failure.Validation(message: "Failed to change purchase date"),
-        Success.From);
-  }
+      .ToResult(() => Failure.Validation(message: "Failed to change purchase date"));
 
-  private static Result<ReceiptType> Apply(this ReceiptType receipt, ReceiptPurchaseAdded fact)
-  {
-    return (
+  private static Result<ReceiptType> Apply(
+    this ReceiptType receipt,
+    ReceiptPurchaseAdded fact)
+    => (
         from purchaseId in PurchaseId.Create(fact.PurchaseId)
         select receipt with { PurchaseIds = receipt.PurchaseIds.Append(purchaseId) })
-      .Match(
-        () => Failure.Validation(message: "Failed to add purchase"),
-        Success.From);
-  }
+      .ToResult(() => Failure.Validation(message: "Failed to add purchase"));
 
-  private static Result<ReceiptType> Apply(this ReceiptType receipt, ReceiptPurchaseRemoved fact)
-  {
-    return (
+  private static Result<ReceiptType> Apply(
+    this ReceiptType receipt,
+    ReceiptPurchaseRemoved fact)
+    => (
         from purchaseId in PurchaseId.Create(fact.PurchaseId)
         select receipt with { PurchaseIds = receipt.PurchaseIds.Without(purchaseId) })
-      .Match(
-        () => Failure.Validation(message: "Failed to remove purchase"),
-        Success.From);
-  }
+      .ToResult(() => Failure.Validation(message: "Failed to remove purchase"));
 }
