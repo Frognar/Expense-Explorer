@@ -20,15 +20,14 @@ public static class ExpenseCategoryGroup
 {
   public static ExpenseCategoryGroupType Create(
     NameType name,
-    DescriptionType description,
-    ExpenseCategoryIdsType expenseCategoryIds)
+    DescriptionType description)
   {
     ExpenseCategoryGroupIdType expenseCategoryGroupId = ExpenseCategoryGroupId.Unique();
     return new ExpenseCategoryGroupType(
       expenseCategoryGroupId,
       name,
       description,
-      expenseCategoryIds,
+      ExpenseCategoryIds.New(),
       false,
       UnsavedChanges.New(
         ExpenseCategoryGroupCreated.Create(

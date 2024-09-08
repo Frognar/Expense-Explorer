@@ -31,7 +31,7 @@ public static class CreateExpenseCategoryGroup
       Maybe<ExpenseCategoryGroupType> group =
         from name in Name.Create(command.Name)
         let description = Description.Create(command.Description)
-        select ExpenseCategoryGroup.Create(name, description, ExpenseCategoryIds.New());
+        select ExpenseCategoryGroup.Create(name, description);
 
       return group.Match(
         () => Fail.OfType<ExpenseCategoryGroupType>(Failure.Validation(message: "Cannot create group")),
