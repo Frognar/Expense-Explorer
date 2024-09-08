@@ -24,121 +24,122 @@ public static class Receipt
     PurchaseIdsType purchaseIds)
   {
     ReceiptIdType receiptId = ReceiptId.Unique();
+    Fact fact = ReceiptCreated.Create(receiptId, store, purchaseDate);
     return new ReceiptType(
       receiptId,
       store,
       purchaseDate,
       purchaseIds,
       false,
-      UnsavedChanges.New(ReceiptCreated.Create(receiptId, store, purchaseDate)),
+      UnsavedChanges.New(fact),
       Version.New());
   }
 
   public static Result<ReceiptType> ChangeStore(
     this ReceiptType receipt,
-    StoreType newStore)
-  {
-    if (receipt.Deleted)
+    StoreType store)
+    => receipt switch
     {
-      return Failure.Validation(message: "Cannot change store of deleted receipt");
-    }
-
-    return receipt.Store == newStore
-      ? receipt
-      : receipt with { Store = newStore, UnsavedChanges = receipt.UnsavedChanges.Append(ReceiptStoreChanged.Create(receipt.Id, newStore)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot change store of deleted receipt"),
+      { } when receipt.Store == store => receipt,
+      _ => receipt with
+      {
+        Store = store, UnsavedChanges = receipt.UnsavedChanges.Append(ReceiptStoreChanged.Create(receipt.Id, store)),
+      },
+    };
 
   public static Result<ReceiptType> ChangePurchaseDate(
     this ReceiptType receipt,
-    NonFutureDateType newPurchaseDate)
-  {
-    if (receipt.Deleted)
+    NonFutureDateType purchaseDate)
+    => receipt switch
     {
-      return Failure.Validation(message: "Cannot change purchase date of deleted receipt");
-    }
-
-    return receipt.PurchaseDate == newPurchaseDate
-      ? receipt
-      : receipt with { PurchaseDate = newPurchaseDate, UnsavedChanges = receipt.UnsavedChanges.Append(ReceiptPurchaseDateChanged.Create(receipt.Id, newPurchaseDate)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot change purchase date of deleted receipt"),
+      { } when receipt.PurchaseDate == purchaseDate => receipt,
+      _ => receipt with
+      {
+        PurchaseDate = purchaseDate,
+        UnsavedChanges = receipt.UnsavedChanges
+          .Append(ReceiptPurchaseDateChanged.Create(receipt.Id, purchaseDate)),
+      },
+    };
 
   public static Result<ReceiptType> Delete(
     this ReceiptType receipt)
-  {
-    if (receipt.Deleted)
+    => receipt switch
     {
-      return Failure.Validation(message: "Cannot delete already deleted receipt");
-    }
-
-    return receipt with { Deleted = true, UnsavedChanges = receipt.UnsavedChanges.Append(ReceiptDeleted.Create(receipt.Id)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot delete already deleted receipt"),
+      _ => receipt with
+      {
+        Deleted = true,
+        UnsavedChanges = receipt.UnsavedChanges
+          .Append(ReceiptDeleted.Create(receipt.Id)),
+      },
+    };
 
   public static Result<ReceiptType> AddPurchase(
     this ReceiptType receipt,
     PurchaseIdType purchaseId)
-  {
-    if (receipt.Deleted)
+    => receipt switch
     {
-      return Failure.Validation(message: "Cannot add purchase to deleted receipt");
-    }
-
-    return receipt.PurchaseIds.Contains(purchaseId)
-      ? receipt
-      : receipt with { PurchaseIds = receipt.PurchaseIds.Append(purchaseId), UnsavedChanges = receipt.UnsavedChanges.Append(ReceiptPurchaseAdded.Create(receipt.Id, purchaseId)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot add purchase to deleted receipt"),
+      { } when receipt.PurchaseIds.Contains(purchaseId) => receipt,
+      _ => receipt with
+      {
+        PurchaseIds = receipt.PurchaseIds.Append(purchaseId),
+        UnsavedChanges = receipt.UnsavedChanges
+          .Append(ReceiptPurchaseAdded.Create(receipt.Id, purchaseId)),
+      },
+    };
 
   public static Result<ReceiptType> RemovePurchase(
     this ReceiptType receipt,
     PurchaseIdType purchaseId)
-  {
-    if (receipt.Deleted)
+    => receipt switch
     {
-      return Failure.Validation(message: "Cannot remove purchase from deleted receipt");
-    }
-
-    return receipt.PurchaseIds.Contains(purchaseId)
-      ? receipt with { PurchaseIds = receipt.PurchaseIds.Without(purchaseId), UnsavedChanges = receipt.UnsavedChanges.Append(ReceiptPurchaseRemoved.Create(receipt.Id, purchaseId)) }
-      : receipt;
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot remove purchase from deleted receipt"),
+      { } when !receipt.PurchaseIds.Contains(purchaseId) => receipt,
+      _ => receipt with
+      {
+        PurchaseIds = receipt.PurchaseIds.Without(purchaseId),
+        UnsavedChanges = receipt.UnsavedChanges
+          .Append(ReceiptPurchaseRemoved.Create(receipt.Id, purchaseId)),
+      },
+    };
 
   public static Result<ReceiptType> ClearChanges(
     this ReceiptType receipt)
-  {
-    if (receipt.Deleted)
+    => receipt.Deleted switch
     {
-      return Failure.Validation(message: "Cannot clear changes of deleted receipt");
-    }
+      true => Failure.Validation(message: "Cannot clear changes of deleted receipt"),
+      _ => receipt with { UnsavedChanges = UnsavedChanges.Empty() },
+    };
 
-    return receipt with { UnsavedChanges = UnsavedChanges.Empty() };
-  }
-
-  public static Result<ReceiptType> Recreate(IEnumerable<Fact> facts)
-  {
-    facts = facts.ToList();
-    if (facts.FirstOrDefault() is ReceiptCreated receiptCreated)
+  public static Result<ReceiptType> Recreate(
+    IEnumerable<Fact> facts)
+    => facts.ToList() switch
     {
-      return facts.Skip(1)
-        .Aggregate(
-          Apply(receiptCreated),
-          (receipt, fact) => receipt.Bind(r => r.ApplyFact(fact)));
-    }
+      [ReceiptCreated created] => Apply(created),
+      [ReceiptCreated created, .. var rest] => rest.Aggregate(Apply(created), ApplyFact),
+      _ => Failure.Validation(message: "Invalid receipt facts"),
+    };
 
-    return Failure.Validation(message: "Invalid receipt facts");
-  }
+  private static Result<ReceiptType> ApplyFact(
+    this Result<ReceiptType> receipt,
+    Fact fact)
+    => receipt.Bind(r => r.ApplyFact(fact));
 
-  private static Result<ReceiptType> ApplyFact(this ReceiptType receipt, Fact fact)
-  {
-    return fact switch
+  private static Result<ReceiptType> ApplyFact(
+    this ReceiptType receipt,
+    Fact fact)
+    => fact switch
     {
-      ReceiptCreated receiptCreated => Apply(receiptCreated),
-      ReceiptStoreChanged receiptStoreChanged => receipt.Apply(receiptStoreChanged),
-      ReceiptPurchaseDateChanged receiptPurchaseDateChanged => receipt.Apply(receiptPurchaseDateChanged),
-      ReceiptPurchaseAdded receiptPurchaseAdded => receipt.Apply(receiptPurchaseAdded),
-      ReceiptPurchaseRemoved receiptPurchaseRemoved => receipt.Apply(receiptPurchaseRemoved),
+      ReceiptStoreChanged storeChanged => receipt.Apply(storeChanged),
+      ReceiptPurchaseDateChanged purchaseDateChanged => receipt.Apply(purchaseDateChanged),
+      ReceiptPurchaseAdded purchaseAdded => receipt.Apply(purchaseAdded),
+      ReceiptPurchaseRemoved purchaseRemoved => receipt.Apply(purchaseRemoved),
       ReceiptDeleted => Failure.Validation(message: "Receipt has been deleted"),
       _ => Failure.Validation(message: "Invalid receipt fact"),
     };
-  }
 
   private static Result<ReceiptType> Apply(
     ReceiptCreated fact)
