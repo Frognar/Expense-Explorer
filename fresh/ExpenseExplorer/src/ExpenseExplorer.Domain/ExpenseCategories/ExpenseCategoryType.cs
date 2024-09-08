@@ -1,6 +1,6 @@
-using DotMaybe;
 using DotResult;
 using ExpenseExplorer.Domain.ExpenseCategories.Facts;
+using ExpenseExplorer.Domain.Extensions;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
 using Version = ExpenseExplorer.Domain.ValueObjects.Version;
@@ -23,157 +23,147 @@ public static class ExpenseCategory
     DescriptionType description)
   {
     ExpenseCategoryIdType expenseCategoryId = ExpenseCategoryId.Unique();
+    Fact fact = ExpenseCategoryCreated.Create(expenseCategoryId, name, description);
     return new ExpenseCategoryType(
       expenseCategoryId,
       name,
       description,
       0,
       false,
-      UnsavedChanges.New(
-        ExpenseCategoryCreated.Create(expenseCategoryId, name, description)),
+      UnsavedChanges.New(fact),
       Version.New());
   }
 
   public static Result<ExpenseCategoryType> Rename(
     this ExpenseCategoryType category,
-    NameType newName)
-  {
-    if (category.Deleted)
+    NameType name)
+    => category switch
     {
-      return Failure.Validation(message: "Cannot rename deleted category");
-    }
-
-    return category.Name == newName
-      ? category
-      : category with { Name = newName, UnsavedChanges = category.UnsavedChanges.Append(ExpenseCategoryRenamed.Create(category.Id, newName)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot rename deleted category"),
+      { } when category.Name == name => category,
+      _ => category with
+      {
+        Name = name,
+        UnsavedChanges = category.UnsavedChanges
+          .Append(ExpenseCategoryRenamed.Create(category.Id, name)),
+      },
+    };
 
   public static Result<ExpenseCategoryType> ChangeDescription(
     this ExpenseCategoryType category,
-    DescriptionType newDescription)
-  {
-    if (category.Deleted)
+    DescriptionType description)
+    => category switch
     {
-      return Failure.Validation(message: "Cannot change description of deleted category");
-    }
-
-    return category.Description == newDescription
-      ? category
-      : category with { Description = newDescription, UnsavedChanges = category.UnsavedChanges.Append(ExpenseCategoryDescriptionChanged.Create(category.Id, newDescription)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot change description of deleted category"),
+      { } when category.Description == description => category,
+      _ => category with
+      {
+        Description = description,
+        UnsavedChanges = category.UnsavedChanges
+          .Append(ExpenseCategoryDescriptionChanged.Create(category.Id, description)),
+      },
+    };
 
   public static Result<ExpenseCategoryType> Delete(
     this ExpenseCategoryType category)
-  {
-    if (category.Deleted)
+    => category switch
     {
-      return Failure.Validation(message: "Cannot delete already deleted category");
-    }
-
-    if (category.NumberOfUses > 0)
-    {
-      return Failure.Validation(message: "Cannot delete used category");
-    }
-
-    return category with { Deleted = true, UnsavedChanges = category.UnsavedChanges.Append(ExpenseCategoryDeleted.Create(category.Id)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot delete already deleted category"),
+      { NumberOfUses: > 0 } => Failure.Validation(message: "Cannot delete used category"),
+      _ => category with
+      {
+        Deleted = true,
+        UnsavedChanges = category.UnsavedChanges
+          .Append(ExpenseCategoryDeleted.Create(category.Id)),
+      },
+    };
 
   public static Result<ExpenseCategoryType> IncreaseUse(
     this ExpenseCategoryType category)
-  {
-    if (category.Deleted)
+    => category switch
     {
-      return Failure.Validation(message: "Cannot increase usage of deleted category");
-    }
-
-    return category with { NumberOfUses = category.NumberOfUses + 1, UnsavedChanges = category.UnsavedChanges.Append(ExpenseCategoryUsageIncreased.Create(category.Id)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot increase usage of deleted category"),
+      _ => category with
+      {
+        NumberOfUses = category.NumberOfUses + 1,
+        UnsavedChanges = category.UnsavedChanges
+          .Append(ExpenseCategoryUsageIncreased.Create(category.Id)),
+      },
+    };
 
   public static Result<ExpenseCategoryType> DecreaseUse(
     this ExpenseCategoryType category)
-  {
-    if (category.Deleted)
+    => category switch
     {
-      return Failure.Validation(message: "Cannot decrease usage of deleted category");
-    }
+      { Deleted: true } => Failure.Validation(message: "Cannot decrease usage of deleted category"),
+      { NumberOfUses: <= 0 } => Failure.Validation(message: "Cannot decrease usage below zero"),
+      _ => category with
+      {
+        NumberOfUses = category.NumberOfUses - 1,
+        UnsavedChanges = category.UnsavedChanges
+          .Append(ExpenseCategoryUsageDecreased.Create(category.Id)),
+      },
+    };
 
-    if (category.NumberOfUses <= 0)
+  public static Result<ExpenseCategoryType> ClearChanges(
+    this ExpenseCategoryType category)
+    => category switch
     {
-      return Failure.Validation(message: "Cannot decrease usage below zero");
-    }
-
-    return category with { NumberOfUses = category.NumberOfUses - 1, UnsavedChanges = category.UnsavedChanges.Append(ExpenseCategoryUsageDecreased.Create(category.Id)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot clear changes of deleted category"),
+      _ => category with { UnsavedChanges = UnsavedChanges.Empty(), },
+    };
 
   public static Result<ExpenseCategoryType> Recreate(IEnumerable<Fact> facts)
-  {
-    facts = facts.ToList();
-    if (facts.FirstOrDefault() is ExpenseCategoryCreated expenseCategoryCreated)
+    => facts.ToList() switch
     {
-      return facts.Skip(1)
-        .Aggregate(
-          Apply(expenseCategoryCreated),
-          (expenseCategoryGroup, fact) => expenseCategoryGroup.Bind(r => r.ApplyFact(fact)));
-    }
-
-    return Failure.Validation(message: "Invalid expenseCategory facts");
-  }
+      [ExpenseCategoryCreated created] => Apply(created),
+      [ExpenseCategoryCreated created, .. var rest] => rest.Aggregate(Apply(created), ApplyFact),
+      _ => Failure.Validation(message: "Invalid expenseCategory facts"),
+    };
 
   private static Result<ExpenseCategoryType> ApplyFact(
-    this ExpenseCategoryType expenseCategory,
+    this Result<ExpenseCategoryType> category,
     Fact fact)
-  {
-    return fact switch
+    => category.Bind(c => c.ApplyFact(fact));
+
+  private static Result<ExpenseCategoryType> ApplyFact(
+    this ExpenseCategoryType category,
+    Fact fact)
+    => fact switch
     {
-      ExpenseCategoryRenamed expenseCategoryRenamed
-        => expenseCategory.Apply(expenseCategoryRenamed),
-      ExpenseCategoryDescriptionChanged expenseCategoryDescriptionChanged
-        => expenseCategory.Apply(expenseCategoryDescriptionChanged),
-      ExpenseCategoryUsageIncreased
-        => expenseCategory with { NumberOfUses = expenseCategory.NumberOfUses + 1 },
-      ExpenseCategoryUsageDecreased
-        => expenseCategory with { NumberOfUses = expenseCategory.NumberOfUses - 1 },
+      ExpenseCategoryRenamed renamed => category.Apply(renamed),
+      ExpenseCategoryDescriptionChanged descriptionChanged => category.Apply(descriptionChanged),
+      ExpenseCategoryUsageIncreased => category with { NumberOfUses = category.NumberOfUses + 1 },
+      ExpenseCategoryUsageDecreased => category with { NumberOfUses = category.NumberOfUses - 1 },
       ExpenseCategoryDeleted => Failure.Validation(message: "Expense category has been deleted"),
       _ => Failure.Validation(message: "Invalid expense category fact"),
     };
-  }
 
   private static Result<ExpenseCategoryType> Apply(ExpenseCategoryCreated fact)
-  {
-    Maybe<ExpenseCategoryType> expenseCategory =
-      from id in ExpenseCategoryId.Create(fact.ExpenseCategoryId)
-      from name in Name.Create(fact.Name)
-      let description = Description.Create(fact.Description)
-      select new ExpenseCategoryType(
-        id,
-        name,
-        description,
-        0,
-        false,
-        UnsavedChanges.Empty(),
-        Version.New());
-
-    return expenseCategory.Match(
-      () => Failure.Validation(message: "Failed to create expense category"),
-      Success.From);
-  }
+    => (
+        from id in ExpenseCategoryId.Create(fact.ExpenseCategoryId)
+        from name in Name.Create(fact.Name)
+        let description = Description.Create(fact.Description)
+        select new ExpenseCategoryType(
+          id,
+          name,
+          description,
+          0,
+          false,
+          UnsavedChanges.Empty(),
+          Version.New()))
+      .ToResult(() => Failure.Validation(message: "Failed to create expense category"));
 
   private static Result<ExpenseCategoryType> Apply(
     this ExpenseCategoryType expenseCategory,
     ExpenseCategoryRenamed fact)
-  {
-    return (
+    => (
         from name in Name.Create(fact.Name)
         select expenseCategory with { Name = name })
-      .Match(
-        () => Failure.Validation(message: "Failed to change name"),
-        Success.From);
-  }
+      .ToResult(() => Failure.Validation(message: "Failed to change name"));
 
   private static Result<ExpenseCategoryType> Apply(
     this ExpenseCategoryType expenseCategory,
     ExpenseCategoryDescriptionChanged fact)
-  {
-    return expenseCategory with { Description = Description.Create(fact.Description) };
-  }
+    => expenseCategory with { Description = Description.Create(fact.Description) };
 }
