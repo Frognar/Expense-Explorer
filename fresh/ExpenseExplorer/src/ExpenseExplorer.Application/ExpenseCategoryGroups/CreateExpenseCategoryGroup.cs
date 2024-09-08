@@ -19,16 +19,23 @@ public static class CreateExpenseCategoryGroup
       CancellationToken cancellationToken)
     {
       ArgumentNullException.ThrowIfNull(command);
+      return await Validator.Validate(command)
+        .BindAsync(c => factStore.SaveAsync(c, cancellationToken));
+    }
+  }
+
+  private static class Validator
+  {
+    public static Result<ExpenseCategoryGroupType> Validate(Command command)
+    {
       Maybe<ExpenseCategoryGroupType> group =
         from name in Name.Create(command.Name)
         let description = Description.Create(command.Description)
         select ExpenseCategoryGroup.Create(name, description, ExpenseCategoryIds.New());
 
-      Result<ExpenseCategoryGroupType> groupResult = group.Match(
+      return group.Match(
         () => Fail.OfType<ExpenseCategoryGroupType>(Failure.Validation(message: "Cannot create group")),
         Success.From);
-
-      return await groupResult.BindAsync(c => factStore.SaveAsync(c, cancellationToken));
     }
   }
 }
