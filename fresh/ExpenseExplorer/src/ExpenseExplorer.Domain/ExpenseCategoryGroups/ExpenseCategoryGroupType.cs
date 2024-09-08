@@ -23,17 +23,14 @@ public static class ExpenseCategoryGroup
     DescriptionType description)
   {
     ExpenseCategoryGroupIdType expenseCategoryGroupId = ExpenseCategoryGroupId.Unique();
+    Fact fact = ExpenseCategoryGroupCreated.Create(expenseCategoryGroupId, name, description);
     return new ExpenseCategoryGroupType(
       expenseCategoryGroupId,
       name,
       description,
       ExpenseCategoryIds.New(),
       false,
-      UnsavedChanges.New(
-        ExpenseCategoryGroupCreated.Create(
-          expenseCategoryGroupId,
-          name,
-          description)),
+      UnsavedChanges.New(fact),
       Version.New());
   }
 
@@ -46,9 +43,13 @@ public static class ExpenseCategoryGroup
       return Failure.Validation(message: "Cannot rename deleted group");
     }
 
-    return group.Name == newName
-      ? group
-      : group with { Name = newName, UnsavedChanges = group.UnsavedChanges.Append(ExpenseCategoryGroupRenamed.Create(group.Id, newName)) };
+    if (group.Name == newName)
+    {
+      return group;
+    }
+
+    Fact fact = ExpenseCategoryGroupRenamed.Create(group.Id, newName);
+    return group with { Name = newName, UnsavedChanges = group.UnsavedChanges.Append(fact) };
   }
 
   public static Result<ExpenseCategoryGroupType> ChangeDescription(
@@ -60,9 +61,13 @@ public static class ExpenseCategoryGroup
       return Failure.Validation(message: "Cannot change description of deleted group");
     }
 
-    return group.Description == newDescription
-      ? group
-      : group with { Description = newDescription, UnsavedChanges = group.UnsavedChanges.Append(ExpenseCategoryGroupDescriptionChanged.Create(group.Id, newDescription)) };
+    if (group.Description == newDescription)
+    {
+      return group;
+    }
+
+    Fact fact = ExpenseCategoryGroupDescriptionChanged.Create(group.Id, newDescription);
+    return group with { Description = newDescription, UnsavedChanges = group.UnsavedChanges.Append(fact) };
   }
 
   public static Result<ExpenseCategoryGroupType> Delete(
@@ -73,7 +78,8 @@ public static class ExpenseCategoryGroup
       return Failure.Validation(message: "Cannot delete already deleted group");
     }
 
-    return group with { Deleted = true, UnsavedChanges = group.UnsavedChanges.Append(ExpenseCategoryGroupDeleted.Create(group.Id)) };
+    Fact fact = ExpenseCategoryGroupDeleted.Create(group.Id);
+    return group with { Deleted = true, UnsavedChanges = group.UnsavedChanges.Append(fact) };
   }
 
   public static Result<ExpenseCategoryGroupType> AddExpenseCategory(
@@ -85,9 +91,14 @@ public static class ExpenseCategoryGroup
       return Failure.Validation(message: "Cannot add expense category to deleted group");
     }
 
-    return group.ExpenseCategoryIds.Contains(expenseCategoryId)
-      ? group
-      : group with { ExpenseCategoryIds = group.ExpenseCategoryIds.Append(expenseCategoryId), UnsavedChanges = group.UnsavedChanges.Append(ExpenseCategoryGroupExpenseCategoryAdded.Create(group.Id, expenseCategoryId)) };
+    if (group.ExpenseCategoryIds.Contains(expenseCategoryId))
+    {
+      return group;
+    }
+
+    ExpenseCategoryIdsType expenseCategoryIds = group.ExpenseCategoryIds.Append(expenseCategoryId);
+    Fact fact = ExpenseCategoryGroupExpenseCategoryAdded.Create(group.Id, expenseCategoryId);
+    return group with { ExpenseCategoryIds = expenseCategoryIds, UnsavedChanges = group.UnsavedChanges.Append(fact) };
   }
 
   public static Result<ExpenseCategoryGroupType> RemoveExpenseCategory(
@@ -99,46 +110,56 @@ public static class ExpenseCategoryGroup
       return Failure.Validation(message: "Cannot remove expense category from deleted group");
     }
 
-    return group.ExpenseCategoryIds.Contains(expenseCategoryId)
-      ? group with { ExpenseCategoryIds = group.ExpenseCategoryIds.Without(expenseCategoryId), UnsavedChanges = group.UnsavedChanges.Append(ExpenseCategoryGroupExpenseCategoryRemoved.Create(group.Id, expenseCategoryId)) }
-      : group;
+    if (!group.ExpenseCategoryIds.Contains(expenseCategoryId))
+    {
+      return group;
+    }
+
+    ExpenseCategoryIdsType expenseCategoryIds = group.ExpenseCategoryIds.Without(expenseCategoryId);
+    Fact fact = ExpenseCategoryGroupExpenseCategoryRemoved.Create(group.Id, expenseCategoryId);
+    return group with { ExpenseCategoryIds = expenseCategoryIds, UnsavedChanges = group.UnsavedChanges.Append(fact) };
+  }
+
+  public static Result<ExpenseCategoryGroupType> ClearChanges(
+    this ExpenseCategoryGroupType group)
+  {
+    if (group.Deleted)
+    {
+      return Failure.Validation(message: "Cannot clear changes of deleted group");
+    }
+
+    return group with { UnsavedChanges = UnsavedChanges.Empty() };
   }
 
   public static Result<ExpenseCategoryGroupType> Recreate(IEnumerable<Fact> facts)
   {
-    facts = facts.ToList();
-    if (facts.FirstOrDefault() is ExpenseCategoryGroupCreated expenseCategoryGroupCreated)
+    return facts.ToList() switch
     {
-      return facts.Skip(1)
-        .Aggregate(
-          Apply(expenseCategoryGroupCreated),
-          (expenseCategoryGroup, fact) => expenseCategoryGroup.Bind(r => r.ApplyFact(fact)));
-    }
-
-    return Failure.Validation(message: "Invalid expenseCategoryGroup facts");
+      [ExpenseCategoryGroupCreated created] => Apply(created),
+      [ExpenseCategoryGroupCreated created, .. { } rest] => rest.Aggregate(Apply(created), ApplyFact),
+      _ => Failure.Validation(message: "Invalid expenseCategoryGroup facts"),
+    };
   }
 
-  private static Result<ExpenseCategoryGroupType> ApplyFact(
-    this ExpenseCategoryGroupType expenseCategoryGroup,
-    Fact fact)
+  private static Result<ExpenseCategoryGroupType> ApplyFact(Result<ExpenseCategoryGroupType> categoryGroup, Fact fact)
+  {
+    return categoryGroup.Bind(c => c.ApplyFact(fact));
+  }
+
+  private static Result<ExpenseCategoryGroupType> ApplyFact(this ExpenseCategoryGroupType categoryGroup, Fact fact)
   {
     return fact switch
     {
-      ExpenseCategoryGroupRenamed expenseCategoryGroupRenamed
-        => expenseCategoryGroup.Apply(expenseCategoryGroupRenamed),
-      ExpenseCategoryGroupDescriptionChanged expenseCategoryGroupDescriptionChanged
-        => expenseCategoryGroup.Apply(expenseCategoryGroupDescriptionChanged),
-      ExpenseCategoryGroupExpenseCategoryAdded expenseCategoryGroupExpenseCategoryAdded
-        => expenseCategoryGroup.Apply(expenseCategoryGroupExpenseCategoryAdded),
-      ExpenseCategoryGroupExpenseCategoryRemoved expenseCategoryGroupExpenseCategoryRemoved
-        => expenseCategoryGroup.Apply(expenseCategoryGroupExpenseCategoryRemoved),
+      ExpenseCategoryGroupRenamed renamed => categoryGroup.Apply(renamed),
+      ExpenseCategoryGroupDescriptionChanged descriptionChanged => categoryGroup.Apply(descriptionChanged),
+      ExpenseCategoryGroupExpenseCategoryAdded categoryAdded => categoryGroup.Apply(categoryAdded),
+      ExpenseCategoryGroupExpenseCategoryRemoved categoryRemoved => categoryGroup.Apply(categoryRemoved),
       ExpenseCategoryGroupDeleted => Failure.Validation(message: "Expense category group has been deleted"),
       _ => Failure.Validation(message: "Invalid expense category group fact"),
     };
   }
 
-  private static Result<ExpenseCategoryGroupType> Apply(
-    ExpenseCategoryGroupCreated fact)
+  private static Result<ExpenseCategoryGroupType> Apply(ExpenseCategoryGroupCreated fact)
   {
     Maybe<ExpenseCategoryGroupType> expenseCategoryGroup =
       from id in ExpenseCategoryGroupId.Create(fact.ExpenseCategoryGroupId)
@@ -183,7 +204,8 @@ public static class ExpenseCategoryGroup
   {
     return (
         from expenseCategoryId in ExpenseCategoryId.Create(fact.ExpenseCategoryId)
-        select expenseCategoryGroup with { ExpenseCategoryIds = expenseCategoryGroup.ExpenseCategoryIds.Append(expenseCategoryId) })
+        let expenseCategoryIds = expenseCategoryGroup.ExpenseCategoryIds.Append(expenseCategoryId)
+        select expenseCategoryGroup with { ExpenseCategoryIds = expenseCategoryIds })
       .Match(
         () => Failure.Validation(message: "Failed to add expense category"),
         Success.From);
@@ -195,7 +217,8 @@ public static class ExpenseCategoryGroup
   {
     return (
         from expenseCategoryId in ExpenseCategoryId.Create(fact.ExpenseCategoryId)
-        select expenseCategoryGroup with { ExpenseCategoryIds = expenseCategoryGroup.ExpenseCategoryIds.Without(expenseCategoryId) })
+        let expenseCategoryIds = expenseCategoryGroup.ExpenseCategoryIds.Without(expenseCategoryId)
+        select expenseCategoryGroup with { ExpenseCategoryIds = expenseCategoryIds })
       .Match(
         () => Failure.Validation(message: "Failed to remove expense category"),
         Success.From);
