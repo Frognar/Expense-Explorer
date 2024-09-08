@@ -1,5 +1,6 @@
 using DotMaybe;
 using DotResult;
+using ExpenseExplorer.Domain.Extensions;
 using ExpenseExplorer.Domain.Facts;
 using ExpenseExplorer.Domain.Purchases.Facts;
 using ExpenseExplorer.Domain.ValueObjects;
@@ -7,7 +8,8 @@ using Version = ExpenseExplorer.Domain.ValueObjects.Version;
 
 namespace ExpenseExplorer.Domain.Purchases;
 
-public readonly record struct PurchaseType(PurchaseIdType Id,
+public readonly record struct PurchaseType(
+  PurchaseIdType Id,
   ReceiptIdType ReceiptId,
   ItemType Item,
   ExpenseCategoryIdType CategoryId,
@@ -31,6 +33,16 @@ public static class Purchase
     DescriptionType description)
   {
     PurchaseIdType purchaseId = PurchaseId.Unique();
+    Fact fact = PurchaseCreated.Create(
+      purchaseId,
+      receiptId,
+      item,
+      categoryId,
+      quantity,
+      unitPrice,
+      totalDiscount,
+      description);
+
     return new PurchaseType(
       purchaseId,
       receiptId,
@@ -41,245 +53,224 @@ public static class Purchase
       totalDiscount,
       description,
       false,
-      UnsavedChanges.New(
-        PurchaseCreated.Create(
-          purchaseId,
-          receiptId,
-          item,
-          categoryId,
-          quantity,
-          unitPrice,
-          totalDiscount,
-          description)),
+      UnsavedChanges.New(fact),
       Version.New());
   }
 
   public static Result<PurchaseType> ChangeItem(
     this PurchaseType purchase,
-    ItemType newItem)
-  {
-    if (purchase.Deleted)
+    ItemType item)
+    => purchase switch
     {
-      return Failure.Validation(message: "Cannot change item of deleted purchase");
-    }
-
-    return purchase.Item == newItem
-      ? purchase
-      : purchase with { Item = newItem, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseItemChanged.Create(purchase.Id, newItem)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot change item of deleted purchase"),
+      { } when purchase.Item == item => purchase,
+      _ => purchase with
+      {
+        Item = item,
+        UnsavedChanges = purchase.UnsavedChanges
+          .Append(PurchaseItemChanged.Create(purchase.Id, item)),
+      },
+    };
 
   public static Result<PurchaseType> ChangeCategoryId(
     this PurchaseType purchase,
-    ExpenseCategoryIdType newCategoryId)
-  {
-    if (purchase.Deleted)
+    ExpenseCategoryIdType categoryId)
+    => purchase switch
     {
-      return Failure.Validation(message: "Cannot change category of deleted purchase");
-    }
-
-    return purchase.CategoryId == newCategoryId
-      ? purchase
-      : purchase with { CategoryId = newCategoryId, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseCategoryIdChanged.Create(purchase.Id, newCategoryId)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot change category of deleted purchase"),
+      { } when purchase.CategoryId == categoryId => purchase,
+      _ => purchase with
+      {
+        CategoryId = categoryId,
+        UnsavedChanges = purchase.UnsavedChanges
+          .Append(PurchaseCategoryIdChanged.Create(purchase.Id, categoryId)),
+      },
+    };
 
   public static Result<PurchaseType> ChangeQuantity(
     this PurchaseType purchase,
-    QuantityType newQuantity)
-  {
-    if (purchase.Deleted)
+    QuantityType quantity)
+    => purchase switch
     {
-      return Failure.Validation(message: "Cannot change quantity of deleted purchase");
-    }
-
-    return purchase.Quantity == newQuantity
-      ? purchase
-      : purchase with { Quantity = newQuantity, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseQuantityChanged.Create(purchase.Id, newQuantity)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot change quantity of deleted purchase"),
+      { } when purchase.Quantity == quantity => purchase,
+      _ => purchase with
+      {
+        Quantity = quantity,
+        UnsavedChanges = purchase.UnsavedChanges
+          .Append(PurchaseQuantityChanged.Create(purchase.Id, quantity)),
+      },
+    };
 
   public static Result<PurchaseType> ChangeUnitPrice(
     this PurchaseType purchase,
-    MoneyType newUnitPrice)
-  {
-    if (purchase.Deleted)
+    MoneyType unitPrice)
+    => purchase switch
     {
-      return Failure.Validation(message: "Cannot change unit price of deleted purchase");
-    }
-
-    return purchase.UnitPrice == newUnitPrice
-      ? purchase
-      : purchase with { UnitPrice = newUnitPrice, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseUnitPriceChanged.Create(purchase.Id, newUnitPrice)) };
-  }
+      { Deleted: true } => Failure.Validation(message: "Cannot change unit price of deleted purchase"),
+      { } when purchase.UnitPrice == unitPrice => purchase,
+      _ => purchase with
+      {
+        UnitPrice = unitPrice,
+        UnsavedChanges = purchase.UnsavedChanges
+          .Append(PurchaseUnitPriceChanged.Create(purchase.Id, unitPrice)),
+      },
+    };
 
   public static Result<PurchaseType> ChangeTotalDiscount(
     this PurchaseType purchase,
-    MoneyType newTotalDiscount)
+    MoneyType totalDiscount)
   {
     if (purchase.Deleted)
     {
       return Failure.Validation(message: "Cannot change total discount of deleted purchase");
     }
 
-    return purchase.TotalDiscount == newTotalDiscount
-      ? purchase
-      : purchase with { TotalDiscount = newTotalDiscount, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseTotalDiscountChanged.Create(purchase.Id, newTotalDiscount)) };
+    if (purchase.TotalDiscount == totalDiscount)
+    {
+      return purchase;
+    }
+
+    return purchase with
+    {
+      TotalDiscount = totalDiscount,
+      UnsavedChanges = purchase.UnsavedChanges
+        .Append(PurchaseTotalDiscountChanged.Create(purchase.Id, totalDiscount)),
+    };
   }
 
   public static Result<PurchaseType> ChangeDescription(
     this PurchaseType purchase,
-    DescriptionType newDescription)
-  {
-    if (purchase.Deleted)
+    DescriptionType description)
+    => purchase switch
     {
-      return Failure.Validation(message: "Cannot change description of deleted purchase");
-    }
+      { Deleted: true } => Failure.Validation(message: "Cannot change description of deleted purchase"),
+      { } when purchase.Description == description => purchase,
+      _ => purchase with
+      {
+        Description = description,
+        UnsavedChanges = purchase.UnsavedChanges
+          .Append(PurchaseDescriptionChanged.Create(purchase.Id, description)),
+      },
+    };
 
-    return purchase.Description == newDescription
-      ? purchase
-      : purchase with { Description = newDescription, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseDescriptionChanged.Create(purchase.Id, newDescription)) };
-  }
-
-  public static Result<PurchaseType> Delete(this PurchaseType purchase)
-  {
-    if (purchase.Deleted)
+  public static Result<PurchaseType> Delete(
+    this PurchaseType purchase)
+    => purchase switch
     {
-      return Failure.Validation(message: "Cannot delete already deleted purchase");
-    }
+      { Deleted: true } => Failure.Validation(message: "Cannot delete already deleted purchase"),
+      _ => purchase with
+      {
+        Deleted = true,
+        UnsavedChanges = purchase.UnsavedChanges
+          .Append(PurchaseDeleted.Create(purchase.Id)),
+      },
+    };
 
-    return purchase with { Deleted = true, UnsavedChanges = purchase.UnsavedChanges.Append(PurchaseDeleted.Create(purchase.Id)) };
-  }
-
-  public static Result<PurchaseType> Recreate(IEnumerable<Fact> facts)
-  {
-    facts = facts.ToList();
-    if (facts.FirstOrDefault() is PurchaseCreated purchaseCreated)
+  public static Result<PurchaseType> ClearChanges(
+    this PurchaseType purchase)
+    => purchase switch
     {
-      return facts.Skip(1)
-        .Aggregate(
-          Apply(purchaseCreated),
-          (purchase, fact)
-            => purchase.Bind(r => r.ApplyFact(fact)));
-    }
+      { Deleted: true } => Failure.Validation(message: "Cannot clear changes of deleted purchase"),
+      _ => purchase with { UnsavedChanges = UnsavedChanges.Empty() },
+    };
 
-    return Failure.Validation(message: "Invalid purchase facts");
-  }
+  public static Result<PurchaseType> Recreate(
+    IEnumerable<Fact> facts)
+    => facts.ToList() switch
+    {
+      [PurchaseCreated created] => Apply(created),
+      [PurchaseCreated created, .. var rest] => rest.Aggregate(Apply(created), ApplyFact),
+      _ => Failure.Validation(message: "Invalid purchase facts"),
+    };
+
+  private static Result<PurchaseType> ApplyFact(
+    this Result<PurchaseType> purchase,
+    Fact fact)
+    => purchase.Bind(r => r.ApplyFact(fact));
 
   private static Result<PurchaseType> ApplyFact(
     this PurchaseType purchase,
     Fact fact)
-  {
-    return fact switch
+    => fact switch
     {
-      PurchaseItemChanged purchaseItemChanged
-        => purchase.Apply(purchaseItemChanged),
-      PurchaseCategoryIdChanged purchaseCategoryIdChanged
-        => purchase.Apply(purchaseCategoryIdChanged),
-      PurchaseQuantityChanged purchaseQuantityChanged
-        => purchase.Apply(purchaseQuantityChanged),
-      PurchaseUnitPriceChanged purchaseUnitPriceChanged
-        => purchase.Apply(purchaseUnitPriceChanged),
-      PurchaseTotalDiscountChanged purchaseTotalDiscountChanged
-        => purchase.Apply(purchaseTotalDiscountChanged),
-      PurchaseDescriptionChanged purchaseDescriptionChanged
-        => purchase.Apply(purchaseDescriptionChanged),
-      PurchaseDeleted
-        => Failure.Validation(message: "Purchase has been deleted"),
+      PurchaseItemChanged itemChanged => purchase.Apply(itemChanged),
+      PurchaseCategoryIdChanged categoryIdChanged => purchase.Apply(categoryIdChanged),
+      PurchaseQuantityChanged quantityChanged => purchase.Apply(quantityChanged),
+      PurchaseUnitPriceChanged unitPriceChanged => purchase.Apply(unitPriceChanged),
+      PurchaseTotalDiscountChanged totalDiscountChanged => purchase.Apply(totalDiscountChanged),
+      PurchaseDescriptionChanged descriptionChanged => purchase.Apply(descriptionChanged),
+      PurchaseDeleted => Failure.Validation(message: "Purchase has been deleted"),
       _ => Failure.Validation(message: "Invalid purchase fact"),
     };
-  }
 
-  private static Result<PurchaseType> Apply(PurchaseCreated fact)
-  {
-    Maybe<PurchaseType> purchase =
-      from id in PurchaseId.Create(fact.PurchaseId)
-      from receiptId in ReceiptId.Create(fact.ReceiptId)
-      from item in Item.Create(fact.Item)
-      from categoryId in ExpenseCategoryId.Create(fact.CategoryId)
-      from quantity in Quantity.Create(fact.Quantity)
-      from unitPrice in Money.Create(fact.UnitPriceAmount, fact.UnitPriceCurrency)
-      from totalDiscount in Money.Create(fact.TotalDiscountAmount, fact.TotalDiscountCurrency)
-      let description = Description.Create(fact.Description)
-      select new PurchaseType(
-        id,
-        receiptId,
-        item,
-        categoryId,
-        quantity,
-        unitPrice,
-        totalDiscount,
-        description,
-        false,
-        UnsavedChanges.Empty(),
-        Version.New());
-
-    return purchase.Match(
-      () => Failure.Validation(message: "Failed to create purchase"),
-      Success.From);
-  }
+  private static Result<PurchaseType> Apply(
+    PurchaseCreated fact)
+    => (
+        from id in PurchaseId.Create(fact.PurchaseId)
+        from receiptId in ReceiptId.Create(fact.ReceiptId)
+        from item in Item.Create(fact.Item)
+        from categoryId in ExpenseCategoryId.Create(fact.CategoryId)
+        from quantity in Quantity.Create(fact.Quantity)
+        from unitPrice in Money.Create(fact.UnitPriceAmount, fact.UnitPriceCurrency)
+        from totalDiscount in Money.Create(fact.TotalDiscountAmount, fact.TotalDiscountCurrency)
+        let description = Description.Create(fact.Description)
+        select new PurchaseType(
+          id,
+          receiptId,
+          item,
+          categoryId,
+          quantity,
+          unitPrice,
+          totalDiscount,
+          description,
+          false,
+          UnsavedChanges.Empty(),
+          Version.New()))
+      .ToResult(() => Failure.Validation(message: "Failed to create purchase"));
 
   private static Result<PurchaseType> Apply(
     this PurchaseType purchase,
     PurchaseItemChanged fact)
-  {
-    return (
+    => (
         from item in Item.Create(fact.Item)
         select purchase with { Item = item })
-      .Match(
-        () => Failure.Validation(message: "Failed to change item"),
-        Success.From);
-  }
+      .ToResult(() => Failure.Validation(message: "Failed to change item"));
 
   private static Result<PurchaseType> Apply(
     this PurchaseType purchase,
     PurchaseCategoryIdChanged fact)
-  {
-    return (
+    => (
         from categoryId in ExpenseCategoryId.Create(fact.CategoryId)
         select purchase with { CategoryId = categoryId })
-      .Match(
-        () => Failure.Validation(message: "Failed to change category id"),
-        Success.From);
-  }
+      .ToResult(() => Failure.Validation(message: "Failed to change category id"));
 
   private static Result<PurchaseType> Apply(
     this PurchaseType purchase,
     PurchaseQuantityChanged fact)
-  {
-    return (
+    => (
         from quantity in Quantity.Create(fact.Quantity)
         select purchase with { Quantity = quantity })
-      .Match(
-        () => Failure.Validation(message: "Failed to change quantity"),
-        Success.From);
-  }
+      .ToResult(() => Failure.Validation(message: "Failed to change quantity"));
 
   private static Result<PurchaseType> Apply(
     this PurchaseType purchase,
     PurchaseUnitPriceChanged fact)
-  {
-    return (
+    => (
         from unitPrice in Money.Create(fact.Amount, fact.Currency)
         select purchase with { UnitPrice = unitPrice })
-      .Match(
-        () => Failure.Validation(message: "Failed to change unit price"),
-        Success.From);
-  }
+      .ToResult(() => Failure.Validation(message: "Failed to change unit price"));
 
   private static Result<PurchaseType> Apply(
     this PurchaseType purchase,
     PurchaseTotalDiscountChanged fact)
-  {
-    return (
+    => (
         from totalDiscount in Money.Create(fact.Amount, fact.Currency)
         select purchase with { TotalDiscount = totalDiscount })
-      .Match(
-        () => Failure.Validation(message: "Failed to change total discount"),
-        Success.From);
-  }
+      .ToResult(() => Failure.Validation(message: "Failed to change total discount"));
 
   private static Result<PurchaseType> Apply(
     this PurchaseType purchase,
     PurchaseDescriptionChanged fact)
-  {
-    return purchase with { Description = Description.Create(fact.Description) };
-  }
+    => purchase with { Description = Description.Create(fact.Description) };
 }
