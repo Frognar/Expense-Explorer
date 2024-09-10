@@ -1,6 +1,7 @@
 using DotMaybe;
 using DotResult;
 using ExpenseExplorer.Domain.ExpenseCategoryGroups;
+using ExpenseExplorer.Domain.Extensions;
 using ExpenseExplorer.Domain.ValueObjects;
 using Mediator;
 
@@ -33,9 +34,7 @@ public static class CreateExpenseCategoryGroup
         let description = Description.Create(command.Description)
         select ExpenseCategoryGroup.Create(name, description);
 
-      return group.Match(
-        () => Fail.OfType<ExpenseCategoryGroupType>(Failure.Validation(message: "Cannot create group")),
-        Success.From);
+      return group.ToResult(() => Failure.Validation(message: "Cannot create group"));
     }
   }
 }
