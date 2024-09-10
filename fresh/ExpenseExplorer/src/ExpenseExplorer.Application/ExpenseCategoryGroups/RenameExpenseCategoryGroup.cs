@@ -21,7 +21,7 @@ public static class RenameExpenseCategoryGroup
       ArgumentNullException.ThrowIfNull(command);
       Result<ExpenseCategoryGroupType> loadedGroup = await factStore.ReadAsync(command.Id, cancellationToken);
       return await Rename(loadedGroup, command)
-        .BindAsync(g => factStore.SaveAsync(g, cancellationToken));
+        .BindAsync(g => factStore.SaveAsync(g.Id.Value, g, cancellationToken));
     }
 
     private static Result<ExpenseCategoryGroupType> Rename(

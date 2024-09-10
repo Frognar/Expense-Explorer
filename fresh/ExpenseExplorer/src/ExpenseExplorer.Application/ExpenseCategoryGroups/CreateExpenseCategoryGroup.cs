@@ -21,7 +21,7 @@ public static class CreateExpenseCategoryGroup
     {
       ArgumentNullException.ThrowIfNull(command);
       return await Validator.Validate(command)
-        .BindAsync(c => factStore.SaveAsync(c, cancellationToken));
+        .BindAsync(g => factStore.SaveAsync(g.Id.Value, g, cancellationToken));
     }
   }
 

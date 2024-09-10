@@ -29,11 +29,12 @@ public sealed class ExpenseCategoryGroupsFactStore(string connectionString)
   }
 
   public async Task<Result<ExpenseCategoryGroupType>> SaveAsync(
+    string streamId,
     ExpenseCategoryGroupType value,
     CancellationToken cancellationToken)
   {
     Result<VersionType> version = await _eventStore.SaveEventsAsync(
-      value.Id.Value,
+      streamId,
       value.Version,
       value.UnsavedChanges.Facts,
       cancellationToken);

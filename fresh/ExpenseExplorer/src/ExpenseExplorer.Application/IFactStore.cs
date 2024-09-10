@@ -9,6 +9,7 @@ public interface IFactStore<T>
     CancellationToken cancellationToken);
 
   public Task<Result<T>> SaveAsync(
+    string streamId,
     T value,
     CancellationToken cancellationToken);
 }
