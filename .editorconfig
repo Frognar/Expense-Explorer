@@ -100,6 +100,9 @@ dotnet_diagnostic.sa1402.severity = none
 dotnet_diagnostic.s2094.severity = none
 
 # NET.CodeAnalyzers
+#CA1032:Implement standard exception constructors
+dotnet_diagnostic.ca1032.severity = none
+
 #CA1034: Nested types should not be visible
 dotnet_diagnostic.ca1034.severity = none
 
