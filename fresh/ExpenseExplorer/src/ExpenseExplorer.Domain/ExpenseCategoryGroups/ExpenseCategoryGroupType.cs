@@ -7,15 +7,17 @@ using Version = ExpenseExplorer.Domain.ValueObjects.Version;
 
 namespace ExpenseExplorer.Domain.ExpenseCategoryGroups;
 
-public readonly record struct ExpenseCategoryGroupType(
+public sealed record ExpenseCategoryGroupType(
   ExpenseCategoryGroupIdType Id,
   NameType Name,
   DescriptionType Description,
   ExpenseCategoryIdsType ExpenseCategoryIds,
   bool Deleted,
   UnsavedChangesType UnsavedChanges,
-  VersionType Version);
+  VersionType Version)
+  : EntityType(UnsavedChanges, Version);
 
+#pragma warning disable SA1402
 public static class ExpenseCategoryGroup
 {
   public static ExpenseCategoryGroupType Create(
@@ -41,12 +43,13 @@ public static class ExpenseCategoryGroup
     {
       { Deleted: true } => Failure.Validation(message: "Cannot rename deleted group"),
       { } when categoryGroup.Name == name => categoryGroup,
-      _ => categoryGroup with
+      { } => categoryGroup with
       {
         Name = name,
         UnsavedChanges = categoryGroup.UnsavedChanges
           .Append(ExpenseCategoryGroupRenamed.Create(categoryGroup.Id, name)),
       },
+      _ => Failure.Fatal(message: "Category group is null"),
     };
 
   public static Result<ExpenseCategoryGroupType> ChangeDescription(
@@ -56,12 +59,13 @@ public static class ExpenseCategoryGroup
     {
       { Deleted: true } => Failure.Validation(message: "Cannot change description of deleted group"),
       { } when categoryGroup.Description == description => categoryGroup,
-      _ => categoryGroup with
+      { } => categoryGroup with
       {
         Description = description,
         UnsavedChanges = categoryGroup.UnsavedChanges
           .Append(ExpenseCategoryGroupDescriptionChanged.Create(categoryGroup.Id, description)),
       },
+      _ => Failure.Fatal(message: "Category group is null"),
     };
 
   public static Result<ExpenseCategoryGroupType> Delete(
@@ -69,12 +73,13 @@ public static class ExpenseCategoryGroup
     => categoryGroup switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot delete already deleted group"),
-      _ => categoryGroup with
+      { } => categoryGroup with
       {
         Deleted = true,
         UnsavedChanges = categoryGroup.UnsavedChanges
           .Append(ExpenseCategoryGroupDeleted.Create(categoryGroup.Id)),
       },
+      _ => Failure.Fatal(message: "Category group is null"),
     };
 
   public static Result<ExpenseCategoryGroupType> AddExpenseCategory(
@@ -84,12 +89,13 @@ public static class ExpenseCategoryGroup
     {
       { Deleted: true } => Failure.Validation(message: "Cannot add expense category to deleted group"),
       { } when categoryGroup.ExpenseCategoryIds.Contains(categoryId) => categoryGroup,
-      _ => categoryGroup with
+      { } => categoryGroup with
       {
         ExpenseCategoryIds = categoryGroup.ExpenseCategoryIds.Append(categoryId),
         UnsavedChanges = categoryGroup.UnsavedChanges
           .Append(ExpenseCategoryGroupExpenseCategoryAdded.Create(categoryGroup.Id, categoryId)),
       },
+      _ => Failure.Fatal(message: "Category group is null"),
     };
 
   public static Result<ExpenseCategoryGroupType> RemoveExpenseCategory(
@@ -99,12 +105,13 @@ public static class ExpenseCategoryGroup
     {
       { Deleted: true } => Failure.Validation(message: "Cannot remove expense category from deleted group"),
       { } when !categoryGroup.ExpenseCategoryIds.Contains(categoryId) => categoryGroup,
-      _ => categoryGroup with
+      { } => categoryGroup with
       {
         ExpenseCategoryIds = categoryGroup.ExpenseCategoryIds.Without(categoryId),
         UnsavedChanges = categoryGroup.UnsavedChanges
           .Append(ExpenseCategoryGroupExpenseCategoryRemoved.Create(categoryGroup.Id, categoryId)),
       },
+      _ => Failure.Fatal(message: "Category group is null"),
     };
 
   public static Result<ExpenseCategoryGroupType> ClearChanges(
@@ -112,7 +119,8 @@ public static class ExpenseCategoryGroup
     => categoryGroup switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot clear changes of deleted group"),
-      _ => categoryGroup with { UnsavedChanges = UnsavedChanges.Empty() },
+      { } => categoryGroup with { UnsavedChanges = UnsavedChanges.Empty() },
+      _ => Failure.Fatal(message: "Category group is null"),
     };
 
   public static Result<ExpenseCategoryGroupType> Recreate(

@@ -34,6 +34,7 @@ public sealed class ExpenseCategoryGroupsFactStore(string connectionString)
     ExpenseCategoryGroupType value,
     CancellationToken cancellationToken)
   {
+    ArgumentNullException.ThrowIfNull(value);
     Result<VersionType> version = await _eventStore.SaveEventsAsync(
       streamId,
       value.Version,
