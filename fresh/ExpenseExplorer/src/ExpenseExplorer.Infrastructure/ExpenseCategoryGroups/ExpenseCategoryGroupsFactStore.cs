@@ -18,13 +18,14 @@ public sealed class ExpenseCategoryGroupsFactStore(string connectionString)
 
   public async Task<Result<ExpenseCategoryGroupType>> ReadAsync(
     string streamId,
+    Func<IEnumerable<Fact>, Result<ExpenseCategoryGroupType>> recreate,
     CancellationToken cancellationToken)
   {
     Result<(List<Fact> Facts, VersionType Version)> facts =
       await _eventStore.GetEventsAsync(streamId, cancellationToken);
 
     return facts.Bind(
-      x => ExpenseCategoryGroup.Recreate(x.Facts)
+      x => recreate(x.Facts)
         .Map(r => r with { Version = x.Version }));
   }
 

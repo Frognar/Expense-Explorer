@@ -19,7 +19,11 @@ public static class RenameExpenseCategoryGroup
       CancellationToken cancellationToken)
     {
       ArgumentNullException.ThrowIfNull(command);
-      Result<ExpenseCategoryGroupType> loadedGroup = await factStore.ReadAsync(command.Id, cancellationToken);
+      Result<ExpenseCategoryGroupType> loadedGroup = await factStore.ReadAsync(
+        command.Id,
+        ExpenseCategoryGroup.Recreate,
+        cancellationToken);
+
       return await Rename(loadedGroup, command)
         .BindAsync(g => factStore.SaveAsync(g.Id.Value, g, cancellationToken));
     }
