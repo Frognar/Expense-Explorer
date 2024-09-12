@@ -17,7 +17,6 @@ public sealed record ExpenseCategoryGroupType(
   VersionType Version)
   : EntityType(UnsavedChanges, Version);
 
-#pragma warning disable SA1402
 public static class ExpenseCategoryGroup
 {
   public static ExpenseCategoryGroupType Create(

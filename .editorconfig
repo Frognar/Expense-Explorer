@@ -93,6 +93,9 @@ dotnet_diagnostic.sa1602.severity = none
 dotnet_diagnostic.sa1633.severity = none
 
 #SonarAnalyzer.CSharp
+#SA1402: File may contain only single type
+dotnet_diagnostic.sa1402.severity = none
+
 #S2094: Classes should not be empty
 dotnet_diagnostic.s2094.severity = none
 
