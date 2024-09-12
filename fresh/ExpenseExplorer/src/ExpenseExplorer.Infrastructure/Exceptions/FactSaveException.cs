@@ -10,6 +10,6 @@ public sealed class FactSaveException(
 {
   public static FactSaveException Wrap(Exception exception)
   {
-    return new FactSaveException("Error reading facts", exception);
+    return new FactSaveException("Error saving facts", exception);
   }
 }
