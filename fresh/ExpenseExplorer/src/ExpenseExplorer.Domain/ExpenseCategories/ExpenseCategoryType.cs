@@ -10,6 +10,7 @@ namespace ExpenseExplorer.Domain.ExpenseCategories;
 
 public sealed record ExpenseCategoryType(
   ExpenseCategoryIdType Id,
+  ExpenseCategoryGroupIdType GroupId,
   NameType Name,
   DescriptionType Description,
   uint NumberOfUses,
@@ -21,13 +22,15 @@ public sealed record ExpenseCategoryType(
 public static class ExpenseCategory
 {
   public static ExpenseCategoryType Create(
+    ExpenseCategoryGroupIdType groupId,
     NameType name,
     DescriptionType description)
   {
     ExpenseCategoryIdType expenseCategoryId = ExpenseCategoryId.Unique();
-    Fact fact = ExpenseCategoryCreated.Create(expenseCategoryId, name, description);
+    Fact fact = ExpenseCategoryCreated.Create(expenseCategoryId, groupId, name, description);
     return new ExpenseCategoryType(
       expenseCategoryId,
+      groupId,
       name,
       description,
       0,
@@ -150,10 +153,12 @@ public static class ExpenseCategory
   private static Result<ExpenseCategoryType> Apply(ExpenseCategoryCreated fact)
     => (
         from id in ExpenseCategoryId.Create(fact.ExpenseCategoryId)
+        from groupId in ExpenseCategoryGroupId.Create(fact.ExpenseCategoryGroupId)
         from name in Name.Create(fact.Name)
         let description = Description.Create(fact.Description)
         select new ExpenseCategoryType(
           id,
+          groupId,
           name,
           description,
           0,
