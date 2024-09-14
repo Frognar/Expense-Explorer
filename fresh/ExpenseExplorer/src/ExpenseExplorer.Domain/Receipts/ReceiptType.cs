@@ -7,14 +7,15 @@ using Version = ExpenseExplorer.Domain.ValueObjects.Version;
 
 namespace ExpenseExplorer.Domain.Receipts;
 
-public readonly record struct ReceiptType(
+public sealed record ReceiptType(
   ReceiptIdType Id,
   StoreType Store,
   NonFutureDateType PurchaseDate,
   PurchaseIdsType PurchaseIds,
   bool Deleted,
   UnsavedChangesType UnsavedChanges,
-  VersionType Version);
+  VersionType Version)
+  : EntityType(UnsavedChanges, Version);
 
 public static class Receipt
 {
@@ -41,11 +42,12 @@ public static class Receipt
     => receipt switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot change store of deleted receipt"),
-      { } when receipt.Store == store => receipt,
-      _ => receipt with
+      not null when receipt.Store == store => receipt,
+      not null => receipt with
       {
         Store = store, UnsavedChanges = receipt.UnsavedChanges.Append(ReceiptStoreChanged.Create(receipt.Id, store)),
       },
+      _ => Failure.Fatal(message: "Receipt is null"),
     };
 
   public static Result<ReceiptType> ChangePurchaseDate(
@@ -54,13 +56,14 @@ public static class Receipt
     => receipt switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot change purchase date of deleted receipt"),
-      { } when receipt.PurchaseDate == purchaseDate => receipt,
-      _ => receipt with
+      not null when receipt.PurchaseDate == purchaseDate => receipt,
+      not null => receipt with
       {
         PurchaseDate = purchaseDate,
         UnsavedChanges = receipt.UnsavedChanges
           .Append(ReceiptPurchaseDateChanged.Create(receipt.Id, purchaseDate)),
       },
+      _ => Failure.Fatal(message: "Receipt is null"),
     };
 
   public static Result<ReceiptType> Delete(
@@ -68,12 +71,13 @@ public static class Receipt
     => receipt switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot delete already deleted receipt"),
-      _ => receipt with
+      not null => receipt with
       {
         Deleted = true,
         UnsavedChanges = receipt.UnsavedChanges
           .Append(ReceiptDeleted.Create(receipt.Id)),
       },
+      _ => Failure.Fatal(message: "Receipt is null"),
     };
 
   public static Result<ReceiptType> AddPurchase(
@@ -82,13 +86,14 @@ public static class Receipt
     => receipt switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot add purchase to deleted receipt"),
-      { } when receipt.PurchaseIds.Contains(purchaseId) => receipt,
-      _ => receipt with
+      not null when receipt.PurchaseIds.Contains(purchaseId) => receipt,
+      not null => receipt with
       {
         PurchaseIds = receipt.PurchaseIds.Append(purchaseId),
         UnsavedChanges = receipt.UnsavedChanges
           .Append(ReceiptPurchaseAdded.Create(receipt.Id, purchaseId)),
       },
+      _ => Failure.Fatal(message: "Receipt is null"),
     };
 
   public static Result<ReceiptType> RemovePurchase(
@@ -97,21 +102,23 @@ public static class Receipt
     => receipt switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot remove purchase from deleted receipt"),
-      { } when !receipt.PurchaseIds.Contains(purchaseId) => receipt,
-      _ => receipt with
+      not null when !receipt.PurchaseIds.Contains(purchaseId) => receipt,
+      not null => receipt with
       {
         PurchaseIds = receipt.PurchaseIds.Without(purchaseId),
         UnsavedChanges = receipt.UnsavedChanges
           .Append(ReceiptPurchaseRemoved.Create(receipt.Id, purchaseId)),
       },
+      _ => Failure.Fatal(message: "Receipt is null"),
     };
 
   public static Result<ReceiptType> ClearChanges(
     this ReceiptType receipt)
-    => receipt.Deleted switch
+    => receipt switch
     {
-      true => Failure.Validation(message: "Cannot clear changes of deleted receipt"),
-      _ => receipt with { UnsavedChanges = UnsavedChanges.Empty() },
+      { Deleted: true } => Failure.Validation(message: "Cannot clear changes of deleted receipt"),
+      not null => receipt with { UnsavedChanges = UnsavedChanges.Empty() },
+      _ => Failure.Fatal(message: "Receipt is null"),
     };
 
   public static Result<ReceiptType> Recreate(
