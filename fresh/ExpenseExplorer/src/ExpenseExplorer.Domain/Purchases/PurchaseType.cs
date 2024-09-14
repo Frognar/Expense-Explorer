@@ -1,4 +1,3 @@
-using DotMaybe;
 using DotResult;
 using ExpenseExplorer.Domain.Extensions;
 using ExpenseExplorer.Domain.Facts;
@@ -8,7 +7,7 @@ using Version = ExpenseExplorer.Domain.ValueObjects.Version;
 
 namespace ExpenseExplorer.Domain.Purchases;
 
-public readonly record struct PurchaseType(
+public sealed record PurchaseType(
   PurchaseIdType Id,
   ReceiptIdType ReceiptId,
   ItemType Item,
@@ -19,7 +18,8 @@ public readonly record struct PurchaseType(
   DescriptionType Description,
   bool Deleted,
   UnsavedChangesType UnsavedChanges,
-  VersionType Version);
+  VersionType Version)
+  : EntityType(UnsavedChanges, Version);
 
 public static class Purchase
 {
@@ -63,13 +63,14 @@ public static class Purchase
     => purchase switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot change item of deleted purchase"),
-      { } when purchase.Item == item => purchase,
-      _ => purchase with
+      not null when purchase.Item == item => purchase,
+      not null => purchase with
       {
         Item = item,
         UnsavedChanges = purchase.UnsavedChanges
           .Append(PurchaseItemChanged.Create(purchase.Id, item)),
       },
+      _ => Failure.Fatal(message: "Purchase is null"),
     };
 
   public static Result<PurchaseType> ChangeCategoryId(
@@ -78,13 +79,14 @@ public static class Purchase
     => purchase switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot change category of deleted purchase"),
-      { } when purchase.CategoryId == categoryId => purchase,
-      _ => purchase with
+      not null when purchase.CategoryId == categoryId => purchase,
+      not null => purchase with
       {
         CategoryId = categoryId,
         UnsavedChanges = purchase.UnsavedChanges
           .Append(PurchaseCategoryIdChanged.Create(purchase.Id, categoryId)),
       },
+      _ => Failure.Fatal(message: "Purchase is null"),
     };
 
   public static Result<PurchaseType> ChangeQuantity(
@@ -93,13 +95,14 @@ public static class Purchase
     => purchase switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot change quantity of deleted purchase"),
-      { } when purchase.Quantity == quantity => purchase,
-      _ => purchase with
+      not null when purchase.Quantity == quantity => purchase,
+      not null => purchase with
       {
         Quantity = quantity,
         UnsavedChanges = purchase.UnsavedChanges
           .Append(PurchaseQuantityChanged.Create(purchase.Id, quantity)),
       },
+      _ => Failure.Fatal(message: "Purchase is null"),
     };
 
   public static Result<PurchaseType> ChangeUnitPrice(
@@ -108,34 +111,31 @@ public static class Purchase
     => purchase switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot change unit price of deleted purchase"),
-      { } when purchase.UnitPrice == unitPrice => purchase,
-      _ => purchase with
+      not null when purchase.UnitPrice == unitPrice => purchase,
+      not null => purchase with
       {
         UnitPrice = unitPrice,
         UnsavedChanges = purchase.UnsavedChanges
           .Append(PurchaseUnitPriceChanged.Create(purchase.Id, unitPrice)),
       },
+      _ => Failure.Fatal(message: "Purchase is null"),
     };
 
   public static Result<PurchaseType> ChangeTotalDiscount(
     this PurchaseType purchase,
     MoneyType totalDiscount)
   {
-    if (purchase.Deleted)
+    return purchase switch
     {
-      return Failure.Validation(message: "Cannot change total discount of deleted purchase");
-    }
-
-    if (purchase.TotalDiscount == totalDiscount)
-    {
-      return purchase;
-    }
-
-    return purchase with
-    {
-      TotalDiscount = totalDiscount,
-      UnsavedChanges = purchase.UnsavedChanges
-        .Append(PurchaseTotalDiscountChanged.Create(purchase.Id, totalDiscount)),
+      { Deleted: true } => Failure.Validation(message: "Cannot change total discount of deleted purchase"),
+      not null when purchase.TotalDiscount == totalDiscount => purchase,
+      not null => purchase with
+      {
+        TotalDiscount = totalDiscount,
+        UnsavedChanges = purchase.UnsavedChanges
+          .Append(PurchaseTotalDiscountChanged.Create(purchase.Id, totalDiscount)),
+      },
+      _ => Failure.Fatal(message: "Purchase is null"),
     };
   }
 
@@ -145,13 +145,14 @@ public static class Purchase
     => purchase switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot change description of deleted purchase"),
-      { } when purchase.Description == description => purchase,
-      _ => purchase with
+      not null when purchase.Description == description => purchase,
+      not null => purchase with
       {
         Description = description,
         UnsavedChanges = purchase.UnsavedChanges
           .Append(PurchaseDescriptionChanged.Create(purchase.Id, description)),
       },
+      _ => Failure.Fatal(message: "Purchase is null"),
     };
 
   public static Result<PurchaseType> Delete(
@@ -159,12 +160,13 @@ public static class Purchase
     => purchase switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot delete already deleted purchase"),
-      _ => purchase with
+      not null => purchase with
       {
         Deleted = true,
         UnsavedChanges = purchase.UnsavedChanges
           .Append(PurchaseDeleted.Create(purchase.Id)),
       },
+      _ => Failure.Fatal(message: "Purchase is null"),
     };
 
   public static Result<PurchaseType> ClearChanges(
@@ -172,7 +174,8 @@ public static class Purchase
     => purchase switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot clear changes of deleted purchase"),
-      _ => purchase with { UnsavedChanges = UnsavedChanges.Empty() },
+      not null => purchase with { UnsavedChanges = UnsavedChanges.Empty() },
+      _ => Failure.Fatal(message: "Purchase is null"),
     };
 
   public static Result<PurchaseType> Recreate(
