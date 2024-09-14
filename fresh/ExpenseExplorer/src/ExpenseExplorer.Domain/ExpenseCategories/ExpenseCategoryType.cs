@@ -45,8 +45,8 @@ public static class ExpenseCategory
     => category switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot rename deleted category"),
-      { } when category.Name == name => category,
-      { } => category with
+      not null when category.Name == name => category,
+      not null => category with
       {
         Name = name,
         UnsavedChanges = category.UnsavedChanges
@@ -61,8 +61,8 @@ public static class ExpenseCategory
     => category switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot change description of deleted category"),
-      { } when category.Description == description => category,
-      { } => category with
+      not null when category.Description == description => category,
+      not null => category with
       {
         Description = description,
         UnsavedChanges = category.UnsavedChanges
@@ -77,7 +77,7 @@ public static class ExpenseCategory
     {
       { Deleted: true } => Failure.Validation(message: "Cannot delete already deleted category"),
       { NumberOfUses: > 0 } => Failure.Validation(message: "Cannot delete used category"),
-      { } => category with
+      not null => category with
       {
         Deleted = true,
         UnsavedChanges = category.UnsavedChanges
@@ -91,7 +91,7 @@ public static class ExpenseCategory
     => category switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot increase usage of deleted category"),
-      { } => category with
+      not null => category with
       {
         NumberOfUses = category.NumberOfUses + 1,
         UnsavedChanges = category.UnsavedChanges
@@ -106,7 +106,7 @@ public static class ExpenseCategory
     {
       { Deleted: true } => Failure.Validation(message: "Cannot decrease usage of deleted category"),
       { NumberOfUses: <= 0 } => Failure.Validation(message: "Cannot decrease usage below zero"),
-      { } => category with
+      not null => category with
       {
         NumberOfUses = category.NumberOfUses - 1,
         UnsavedChanges = category.UnsavedChanges
@@ -120,7 +120,7 @@ public static class ExpenseCategory
     => category switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot clear changes of deleted category"),
-      { } => category with { UnsavedChanges = UnsavedChanges.Empty(), },
+      not null => category with { UnsavedChanges = UnsavedChanges.Empty(), },
       _ => throw new UnreachableException(),
     };
 

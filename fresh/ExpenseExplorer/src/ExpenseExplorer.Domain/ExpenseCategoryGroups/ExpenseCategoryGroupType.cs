@@ -41,8 +41,8 @@ public static class ExpenseCategoryGroup
     => categoryGroup switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot rename deleted group"),
-      { } when categoryGroup.Name == name => categoryGroup,
-      { } => categoryGroup with
+      not null when categoryGroup.Name == name => categoryGroup,
+      not null => categoryGroup with
       {
         Name = name,
         UnsavedChanges = categoryGroup.UnsavedChanges
@@ -57,8 +57,8 @@ public static class ExpenseCategoryGroup
     => categoryGroup switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot change description of deleted group"),
-      { } when categoryGroup.Description == description => categoryGroup,
-      { } => categoryGroup with
+      not null when categoryGroup.Description == description => categoryGroup,
+      not null => categoryGroup with
       {
         Description = description,
         UnsavedChanges = categoryGroup.UnsavedChanges
@@ -72,7 +72,7 @@ public static class ExpenseCategoryGroup
     => categoryGroup switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot delete already deleted group"),
-      { } => categoryGroup with
+      not null => categoryGroup with
       {
         Deleted = true,
         UnsavedChanges = categoryGroup.UnsavedChanges
@@ -87,8 +87,8 @@ public static class ExpenseCategoryGroup
     => categoryGroup switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot add expense category to deleted group"),
-      { } when categoryGroup.ExpenseCategoryIds.Contains(categoryId) => categoryGroup,
-      { } => categoryGroup with
+      not null when categoryGroup.ExpenseCategoryIds.Contains(categoryId) => categoryGroup,
+      not null => categoryGroup with
       {
         ExpenseCategoryIds = categoryGroup.ExpenseCategoryIds.Append(categoryId),
         UnsavedChanges = categoryGroup.UnsavedChanges
@@ -103,8 +103,8 @@ public static class ExpenseCategoryGroup
     => categoryGroup switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot remove expense category from deleted group"),
-      { } when !categoryGroup.ExpenseCategoryIds.Contains(categoryId) => categoryGroup,
-      { } => categoryGroup with
+      not null when !categoryGroup.ExpenseCategoryIds.Contains(categoryId) => categoryGroup,
+      not null => categoryGroup with
       {
         ExpenseCategoryIds = categoryGroup.ExpenseCategoryIds.Without(categoryId),
         UnsavedChanges = categoryGroup.UnsavedChanges
@@ -118,7 +118,7 @@ public static class ExpenseCategoryGroup
     => categoryGroup switch
     {
       { Deleted: true } => Failure.Validation(message: "Cannot clear changes of deleted group"),
-      { } => categoryGroup with { UnsavedChanges = UnsavedChanges.Empty() },
+      not null => categoryGroup with { UnsavedChanges = UnsavedChanges.Empty() },
       _ => Failure.Fatal(message: "Category group is null"),
     };
 
