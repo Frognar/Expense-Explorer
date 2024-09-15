@@ -6,6 +6,8 @@ public readonly record struct PurchaseIdsType(IReadOnlyCollection<PurchaseIdType
 
 public static class PurchaseIds
 {
+  public static PurchaseIdsType Empty() => new([]);
+
   public static PurchaseIdsType New(params PurchaseIdType[] ids) => new(ids);
 
   public static bool Contains(this PurchaseIdsType ids, PurchaseIdType id) => ids.Ids.Contains(id);
