@@ -21,8 +21,7 @@ public static class Receipt
 {
   public static ReceiptType Create(
     StoreType store,
-    NonFutureDateType purchaseDate,
-    PurchaseIdsType purchaseIds)
+    NonFutureDateType purchaseDate)
   {
     ReceiptIdType receiptId = ReceiptId.Unique();
     Fact fact = ReceiptCreated.Create(receiptId, store, purchaseDate);
@@ -30,7 +29,7 @@ public static class Receipt
       receiptId,
       store,
       purchaseDate,
-      purchaseIds,
+      PurchaseIds.Empty(),
       false,
       UnsavedChanges.New(fact),
       Version.New());
