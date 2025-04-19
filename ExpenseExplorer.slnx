@@ -1,0 +1,13 @@
+﻿<Solution>
+  <Folder Name="/solution-items/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Packages.props" />
+    <File Path="Directory.Build.props" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path=".editorconfig" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src\ExpenseExplorer.Domain\ExpenseExplorer.Domain.csproj" Type="Classic C#" />
+  </Folder>
+</Solution>
