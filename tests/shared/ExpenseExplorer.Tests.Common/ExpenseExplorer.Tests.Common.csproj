@@ -1,8 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\..\src\ExpenseExplorer.API.Contract\ExpenseExplorer.API.Contract.csproj"/>
-        <ProjectReference Include="..\..\..\src\ExpenseExplorer.Application\ExpenseExplorer.Application.csproj"/>
-    </ItemGroup>
-
-</Project>
