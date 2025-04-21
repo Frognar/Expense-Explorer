@@ -1,20 +1,24 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenStack
+            Orientation="Orientation.Horizontal"
+            AlignItems="AlignItems.Center"
+            Gap="0">
+            <RadzenSidebarToggle Click="@(() => _navMenuExpanded = !_navMenuExpanded)"/>
+            <RadzenLabel Text="ExpenseExplorer"/>
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@_navMenuExpanded">
         <NavMenu/>
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+    </RadzenSidebar>
+    <RadzenBody>
+        @Body
+    </RadzenBody>
+    <RadzenFooter>
+    </RadzenFooter>
+</RadzenLayout>
 
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
@@ -23,3 +27,6 @@
 </div>
 
 <RadzenComponents @rendermode="InteractiveServer" />
+@code {
+    bool _navMenuExpanded = true;
+}
