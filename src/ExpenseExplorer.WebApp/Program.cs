@@ -1,4 +1,5 @@
 using ExpenseExplorer.WebApp.Components;
+using Radzen;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddRadzenComponents();
 WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
