@@ -1,3 +1,5 @@
-﻿<RadzenPanelMenu>
-    <RadzenPanelMenuItem Path="" Match="NavLinkMatch.All" Text="Home" Icon="home" />
+﻿@inject IStringLocalizer<NavMenu> Localizer
+
+<RadzenPanelMenu>
+    <RadzenPanelMenuItem Path="" Match="NavLinkMatch.All" Text="@Localizer["Receipts"]" Icon="home" />
 </RadzenPanelMenu>

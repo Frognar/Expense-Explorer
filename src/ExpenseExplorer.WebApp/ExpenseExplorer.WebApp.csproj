@@ -10,6 +10,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Receipts.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Components\Layout\NavMenu.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>NavMenu.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Components\Pages\Receipts.Designer.cs">
