@@ -5,6 +5,74 @@
 
 <h3>@Localizer["_Receipts"]</h3>
 
+<RadzenDataGrid
+    @ref=grid
+    Data="@receiptDetails"
+    Count="@count"
+    LoadData="@LoadData"
+    AllowVirtualization="true"
+    Style="height: 400px"
+    AllowFiltering="true"
+    FilterPopupRenderMode="PopupRenderMode.OnDemand"
+    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+    LogicalFilterOperator="LogicalFilterOperator.Or"
+    AllowSorting="true">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Id)" Title="@Localizer["Id"]" Visible="false" />
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Store)" Title="@Localizer["Store"]" />
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.PurchaseDate)" Title="@Localizer["PurchaseDate"]" />
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]" />
+    </Columns>
+</RadzenDataGrid>
+
 @code {
-    
+    private RadzenDataGrid<ReceiptDetail> grid = null!;
+    private int count;
+    IEnumerable<ReceiptDetail> receiptDetails = null!;
+
+    string lastfilter = null!;
+    private async Task LoadData(LoadDataArgs args)
+    {
+        await Task.Yield();
+        if (!string.IsNullOrEmpty(args.Filter) && lastfilter != args.Filter)
+        {
+            args.Skip = 0;
+        }
+
+        var query = Enumerable.Range(1, 10000)
+            .Select(x => new ReceiptDetail
+            {
+                Id = x,
+                PurchaseDate = DateTime.Today.AddDays(-x),
+                Store = "Store " + x,
+                TotalCost = x * 10m
+            })
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            lastfilter = args.Filter;
+            query = query.Where(grid.ColumnsCollection);
+            count = await Task.FromResult(query.Count());
+        }
+        else
+        {
+            count = await Task.FromResult(query.Count());
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        receiptDetails = await Task.FromResult(query.Skip(args.Skip!.Value).Take(args.Top!.Value).ToList());
+    }
+
+    public sealed class ReceiptDetail
+    {
+        public required int Id { get; set; }
+        public required string Store { get; set; }
+        public required DateTime PurchaseDate { get; set; }
+        public required decimal TotalCost { get; set; }
+    }
 }
