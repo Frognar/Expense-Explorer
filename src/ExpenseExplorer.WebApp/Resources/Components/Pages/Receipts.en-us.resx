@@ -26,4 +26,19 @@
     <data name="TotalCost" xml:space="preserve">
         <value>Total cost</value>
     </data>
+    <data name="From" xml:space="preserve">
+        <value>From</value>
+    </data>
+    <data name="To" xml:space="preserve">
+        <value>To</value>
+    </data>
+    <data name="Min" xml:space="preserve">
+        <value>Min</value>
+    </data>
+    <data name="Max" xml:space="preserve">
+        <value>Max</value>
+    </data>
+    <data name="Search" xml:space="preserve">
+        <value>Search</value>
+    </data>
 </root>

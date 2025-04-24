@@ -33,4 +33,19 @@
     <data name="TotalCost" xml:space="preserve">
         <value>Koszt całkowity</value>
     </data>
+    <data name="From" xml:space="preserve">
+        <value>Od</value>
+    </data>
+    <data name="To" xml:space="preserve">
+        <value>Do</value>
+    </data>
+    <data name="Min" xml:space="preserve">
+        <value>Min</value>
+    </data>
+    <data name="Max" xml:space="preserve">
+        <value>Maks</value>
+    </data>
+    <data name="Search" xml:space="preserve">
+        <value>Szukaj</value>
+    </data>
 </root>
