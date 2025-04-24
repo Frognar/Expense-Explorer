@@ -50,5 +50,29 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("_Receipts", resourceCulture);
             }
         }
+        
+        internal static string Id {
+            get {
+                return ResourceManager.GetString("Id", resourceCulture);
+            }
+        }
+        
+        internal static string Store {
+            get {
+                return ResourceManager.GetString("Store", resourceCulture);
+            }
+        }
+        
+        internal static string PurchaseDate {
+            get {
+                return ResourceManager.GetString("PurchaseDate", resourceCulture);
+            }
+        }
+        
+        internal static string TotalCost {
+            get {
+                return ResourceManager.GetString("TotalCost", resourceCulture);
+            }
+        }
     }
 }

@@ -14,4 +14,16 @@
     <data name="_Receipts" xml:space="preserve">
         <value>Receipts</value>
     </data>
+    <data name="Id" xml:space="preserve">
+        <value>Id</value>
+    </data>
+    <data name="PurchaseDate" xml:space="preserve">
+        <value>Purchase date</value>
+    </data>
+    <data name="Store" xml:space="preserve">
+        <value>Store</value>
+    </data>
+    <data name="TotalCost" xml:space="preserve">
+        <value>Total cost</value>
+    </data>
 </root>
