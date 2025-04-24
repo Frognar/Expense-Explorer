@@ -13,14 +13,13 @@
     AllowVirtualization="true"
     Style="height: 400px"
     AllowFiltering="true"
-    FilterPopupRenderMode="PopupRenderMode.OnDemand"
     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-    LogicalFilterOperator="LogicalFilterOperator.Or"
+    LogicalFilterOperator="LogicalFilterOperator.And"
     AllowSorting="true">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Id)" Title="@Localizer["Id"]" Visible="false" />
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Store)" Title="@Localizer["Store"]" />
-        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.PurchaseDate)" Title="@Localizer["PurchaseDate"]" />
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.PurchaseDate)" FormatString="{0:dd/MM/yyyy}" Title="@Localizer["PurchaseDate"]" SortOrder="SortOrder.Descending" />
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]" />
     </Columns>
 </RadzenDataGrid>
@@ -66,6 +65,26 @@
         }
 
         receiptDetails = await Task.FromResult(query.Skip(args.Skip!.Value).Take(args.Top!.Value).ToList());
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return base.OnAfterRenderAsync(firstRender);
+        }
+
+        RadzenDataGridColumn<ReceiptDetail>? column = grid.ColumnsCollection.FirstOrDefault(c => c.Property == nameof(ReceiptDetail.PurchaseDate));
+        if (column == null)
+        {
+            return base.OnAfterRenderAsync(firstRender);
+        }
+
+        column.SetFilterValue(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
+        column.SetFilterOperator(FilterOperator.GreaterThanOrEquals);
+        grid.Reload();
+
+        return base.OnAfterRenderAsync(firstRender);
     }
 
     public sealed class ReceiptDetail
