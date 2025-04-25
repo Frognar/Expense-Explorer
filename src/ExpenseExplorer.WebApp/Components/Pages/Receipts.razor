@@ -29,8 +29,10 @@
             SecondFilterValue="@to?.Date"
             SecondFilterOperator="FilterOperator.LessThanOrEquals">
             <FilterTemplate>
-                <RadzenDatePicker @bind-Value="@from"/>
-                <RadzenDatePicker @bind-Value="@to"/>
+                <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="FromDatePicker" />
+                <RadzenDatePicker @bind-Value="@from" AllowClear="true" Name="FromDatePicker" />
+                <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="ToDatePicker" />
+                <RadzenDatePicker @bind-Value="@to" AllowClear="true" Name="ToDatePicker" />
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]" />
