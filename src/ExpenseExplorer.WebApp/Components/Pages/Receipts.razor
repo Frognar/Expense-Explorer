@@ -47,10 +47,18 @@
     // Filters
     DateTime? from = DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1);
     DateTime? to = null;
-    
+
+    string? lastFilter;
     private async Task LoadData(LoadDataArgs args)
     {
         await Task.Yield();
+        if (lastFilter != args.Filter)
+        {
+            lastFilter = args.Filter;
+            await grid.FirstPage(true);
+            return;
+        }
+
         var query = Enumerable.Range(1, 10000)
             .Select(x => new ReceiptDetail
             {
