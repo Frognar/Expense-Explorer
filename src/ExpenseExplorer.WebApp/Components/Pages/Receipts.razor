@@ -1,4 +1,5 @@
 @page "/"
+@using System.Linq.Dynamic.Core
 @inject IStringLocalizer<Receipts> Localizer
 
 <PageTitle>@Localizer["_Receipts"]</PageTitle>
@@ -51,14 +52,19 @@
     string? lastFilter;
     private async Task LoadData(LoadDataArgs args)
     {
-        await Task.Yield();
         if (lastFilter != args.Filter)
         {
             lastFilter = args.Filter;
-            await grid.FirstPage(true);
-            return;
+            args.Skip = 0;
         }
 
+        var response = await GetData(args.Filter, args.OrderBy, args.Skip.GetValueOrDefault(), args.Top.GetValueOrDefault(10));
+        (receiptDetails, count, grid.CurrentPage) = response;
+    }
+
+    private async Task<ReceiptDetailsResponse> GetData(string? filter, string? orderBy, int skip, int take)
+    {
+        await Task.Yield();
         var query = Enumerable.Range(1, 10000)
             .Select(x => new ReceiptDetail
             {
@@ -69,19 +75,26 @@
             })
             .AsQueryable();
 
-        if (!string.IsNullOrEmpty(args.Filter))
+        if (!string.IsNullOrWhiteSpace(filter))
         {
-            query = query.Where(grid.ColumnsCollection);
-        }
-        
-        count = await Task.FromResult(query.Count());
-        if (!string.IsNullOrEmpty(args.OrderBy))
-        {
-            query = query.OrderBy(args.OrderBy);
+            query = query.Where(filter);
         }
 
-        receiptDetails = await Task.FromResult(query.Skip(args.Skip!.Value).Take(args.Top!.Value).ToList());
+        var receiptsCount = query.Count();
+        if (!string.IsNullOrWhiteSpace(orderBy))
+        {
+            query = query.OrderBy(orderBy);
+        }
+
+        var data = query.Skip(skip).Take(take).ToList();
+        var currentPage = skip / take;
+        return new ReceiptDetailsResponse(data, receiptsCount, currentPage);
     }
+
+    public sealed record ReceiptDetailsResponse(
+        IEnumerable<ReceiptDetail> Receipts,
+        int Count,
+        int CurrentPage);
 
     public sealed class ReceiptDetail
     {
