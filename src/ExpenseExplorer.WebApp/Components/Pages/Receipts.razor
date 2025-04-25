@@ -24,16 +24,12 @@
             Property="@nameof(ReceiptDetail.PurchaseDate)"
             FormatString="{0:dd/MM/yyyy}"
             Title="@Localizer["PurchaseDate"]"
-            SortOrder="SortOrder.Descending"
-            FilterValue="@from?.Date"
-            FilterOperator="FilterOperator.GreaterThanOrEquals"
-            SecondFilterValue="@to?.Date"
-            SecondFilterOperator="FilterOperator.LessThanOrEquals">
+            SortOrder="SortOrder.Descending">
             <FilterTemplate>
                 <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="FromDatePicker" />
-                <RadzenDatePicker @bind-Value="@from" AllowClear="true" Name="FromDatePicker" />
+                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@from" AllowClear="true" Name="FromDatePicker" Change="@(() => grid.FirstPage(true))" />
                 <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="ToDatePicker" />
-                <RadzenDatePicker @bind-Value="@to" AllowClear="true" Name="ToDatePicker" />
+                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@to" AllowClear="true" Name="ToDatePicker" Change="@(() => grid.FirstPage(true))" />
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]" />
@@ -43,42 +39,37 @@
 @code {
     private RadzenDataGrid<ReceiptDetail> grid = null!;
     private int count;
-    IEnumerable<ReceiptDetail> receiptDetails = null!;
+    private IEnumerable<ReceiptDetail> receiptDetails = null!;
 
     // Filters
-    DateTime? from = DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1);
-    DateTime? to = null;
+    DateOnly? from = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
+    DateOnly? to = null;
 
-    string? lastFilter;
     private async Task LoadData(LoadDataArgs args)
     {
-        if (lastFilter != args.Filter)
-        {
-            lastFilter = args.Filter;
-            args.Skip = 0;
-        }
-
-        var response = await GetData(args.Filter, args.OrderBy, args.Skip.GetValueOrDefault(), args.Top.GetValueOrDefault(10));
-        (receiptDetails, count, grid.CurrentPage) = response;
+        (receiptDetails, count) = await GetData(from, to, args.OrderBy, args.Skip.GetValueOrDefault(), args.Top.GetValueOrDefault(10));
     }
 
-    private async Task<ReceiptDetailsResponse> GetData(string? filter, string? orderBy, int skip, int take)
+    private async Task<ReceiptDetailsResponse> GetData(
+        DateOnly? purchaseDateMin,
+        DateOnly? purchaseDateMax,
+        string? orderBy,
+        int skip,
+        int take)
     {
         await Task.Yield();
         var query = Enumerable.Range(1, 10000)
             .Select(x => new ReceiptDetail
             {
                 Id = x,
-                PurchaseDate = DateTime.Today.AddDays(-x),
+                PurchaseDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-x)),
                 Store = "Store " + x,
                 TotalCost = x * 10m
             })
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(filter))
-        {
-            query = query.Where(filter);
-        }
+            .AsQueryable()
+            .Where(r 
+                => r.PurchaseDate >= purchaseDateMin.GetValueOrDefault(DateOnly.MinValue)
+                && r.PurchaseDate <= purchaseDateMax.GetValueOrDefault(DateOnly.MaxValue));
 
         var receiptsCount = query.Count();
         if (!string.IsNullOrWhiteSpace(orderBy))
@@ -87,20 +78,18 @@
         }
 
         var data = query.Skip(skip).Take(take).ToList();
-        var currentPage = skip / take;
-        return new ReceiptDetailsResponse(data, receiptsCount, currentPage);
+        return new ReceiptDetailsResponse(data, receiptsCount);
     }
 
     public sealed record ReceiptDetailsResponse(
         IEnumerable<ReceiptDetail> Receipts,
-        int Count,
-        int CurrentPage);
+        int Count);
 
     public sealed class ReceiptDetail
     {
         public required int Id { get; set; }
         public required string Store { get; set; }
-        public required DateTime PurchaseDate { get; set; }
+        public required DateOnly PurchaseDate { get; set; }
         public required decimal TotalCost { get; set; }
     }
 }
