@@ -10,16 +10,29 @@
     Data="@receiptDetails"
     Count="@count"
     LoadData="@LoadData"
-    AllowVirtualization="true"
     Style="height: 400px"
+    AllowPaging="true"
     AllowFiltering="true"
-    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-    LogicalFilterOperator="LogicalFilterOperator.And"
-    AllowSorting="true">
+    FilterMode="FilterMode.Simple"
+    AllowSorting="true"
+    GotoFirstPageOnSort="true">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Id)" Title="@Localizer["Id"]" Visible="false" />
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Store)" Title="@Localizer["Store"]" />
-        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.PurchaseDate)" FormatString="{0:dd/MM/yyyy}" Title="@Localizer["PurchaseDate"]" SortOrder="SortOrder.Descending" />
+        <RadzenDataGridColumn
+            Property="@nameof(ReceiptDetail.PurchaseDate)"
+            FormatString="{0:dd/MM/yyyy}"
+            Title="@Localizer["PurchaseDate"]"
+            SortOrder="SortOrder.Descending"
+            FilterValue="@from?.Date"
+            FilterOperator="FilterOperator.GreaterThanOrEquals"
+            SecondFilterValue="@to?.Date"
+            SecondFilterOperator="FilterOperator.LessThanOrEquals">
+            <FilterTemplate>
+                <RadzenDatePicker @bind-Value="@from"/>
+                <RadzenDatePicker @bind-Value="@to"/>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]" />
     </Columns>
 </RadzenDataGrid>
@@ -29,15 +42,13 @@
     private int count;
     IEnumerable<ReceiptDetail> receiptDetails = null!;
 
-    string lastfilter = null!;
+    // Filters
+    DateTime? from = DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1);
+    DateTime? to = null;
+    
     private async Task LoadData(LoadDataArgs args)
     {
         await Task.Yield();
-        if (!string.IsNullOrEmpty(args.Filter) && lastfilter != args.Filter)
-        {
-            args.Skip = 0;
-        }
-
         var query = Enumerable.Range(1, 10000)
             .Select(x => new ReceiptDetail
             {
@@ -50,41 +61,16 @@
 
         if (!string.IsNullOrEmpty(args.Filter))
         {
-            lastfilter = args.Filter;
             query = query.Where(grid.ColumnsCollection);
-            count = await Task.FromResult(query.Count());
         }
-        else
-        {
-            count = await Task.FromResult(query.Count());
-        }
-
+        
+        count = await Task.FromResult(query.Count());
         if (!string.IsNullOrEmpty(args.OrderBy))
         {
             query = query.OrderBy(args.OrderBy);
         }
 
         receiptDetails = await Task.FromResult(query.Skip(args.Skip!.Value).Take(args.Top!.Value).ToList());
-    }
-
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-        {
-            return base.OnAfterRenderAsync(firstRender);
-        }
-
-        RadzenDataGridColumn<ReceiptDetail>? column = grid.ColumnsCollection.FirstOrDefault(c => c.Property == nameof(ReceiptDetail.PurchaseDate));
-        if (column == null)
-        {
-            return base.OnAfterRenderAsync(firstRender);
-        }
-
-        column.SetFilterValue(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
-        column.SetFilterOperator(FilterOperator.GreaterThanOrEquals);
-        grid.Reload();
-
-        return base.OnAfterRenderAsync(firstRender);
     }
 
     public sealed class ReceiptDetail
