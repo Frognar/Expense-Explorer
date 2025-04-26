@@ -26,10 +26,10 @@
             Title="@Localizer["PurchaseDate"]"
             SortOrder="SortOrder.Descending">
             <FilterTemplate>
-                <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="FromDatePicker" />
-                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@from" AllowClear="true" Name="FromDatePicker" Change="@(() => grid.FirstPage(true))" />
-                <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="ToDatePicker" />
-                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@to" AllowClear="true" Name="ToDatePicker" Change="@(() => grid.FirstPage(true))" />
+                <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="PurchaseDateFromDatePicker" />
+                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@purchaseDateFrom" AllowClear="true" Name="PurchaseDateFromDatePicker" Change="@Reload" />
+                <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="PurchaseDateToDatePicker" />
+                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@purchaseDateTo" AllowClear="true" Name="PurchaseDateToDatePicker" Change="@Reload" />
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]" />
@@ -42,12 +42,18 @@
     private IEnumerable<ReceiptDetail> receiptDetails = null!;
 
     // Filters
-    DateOnly? from = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
-    DateOnly? to = null;
-
+    DateOnly? purchaseDateFrom = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
+    DateOnly? purchaseDateTo;
+    private async Task Reload() => await grid.FirstPage(forceReload: true);
+    
     private async Task LoadData(LoadDataArgs args)
     {
-        (receiptDetails, count) = await GetData(from, to, args.OrderBy, args.Skip.GetValueOrDefault(), args.Top.GetValueOrDefault(10));
+        (receiptDetails, count) = await GetData(
+            purchaseDateFrom,
+            purchaseDateTo,
+            args.OrderBy,
+            args.Skip.GetValueOrDefault(),
+            args.Top.GetValueOrDefault(10));
     }
 
     private async Task<ReceiptDetailsResponse> GetData(
