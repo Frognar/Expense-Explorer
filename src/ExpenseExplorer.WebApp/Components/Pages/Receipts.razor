@@ -10,7 +10,6 @@
     Data="@_receiptDetails"
     Count="@_count"
     LoadData="@LoadData"
-    Style="height: 400px"
     AllowPaging="true"
     AllowFiltering="true"
     FilterMode="FilterMode.Simple"
@@ -20,7 +19,7 @@
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Id)" Title="@Localizer["Id"]" Visible="false" />
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Store)" Title="@Localizer["Store"]">
             <FilterTemplate>
-                <RadzenDropDown @bind-Value="@_selectedStores" Data="@_stores" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Change="@Reload"/>
+                <RadzenDropDown @bind-Value="@_selectedStores" Data="@_stores" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Change="@Reload" Style="width:100%" />
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn
@@ -29,18 +28,22 @@
             Title="@Localizer["PurchaseDate"]"
             SortOrder="SortOrder.Descending">
             <FilterTemplate>
-                <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="PurchaseDateFromDatePicker" />
-                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@_purchaseDateFrom" AllowClear="true" Name="PurchaseDateFromDatePicker" Change="@Reload" />
-                <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="PurchaseDateToDatePicker" />
-                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@_purchaseDateTo" AllowClear="true" Name="PurchaseDateToDatePicker" Change="@Reload" />
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="PurchaseDateFromDatePicker"/>
+                    <RadzenDatePicker TValue="DateOnly?" @bind-Value="@_purchaseDateFrom" AllowClear="true" Name="PurchaseDateFromDatePicker" Change="@Reload"/>
+                    <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="PurchaseDateToDatePicker"/>
+                    <RadzenDatePicker TValue="DateOnly?" @bind-Value="@_purchaseDateTo" AllowClear="true" Name="PurchaseDateToDatePicker" Change="@Reload"/>
+                </RadzenStack>
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]">
             <FilterTemplate>
-                <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="TotalCostFromDatePicker" />
-                <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostFrom" ShowUpDown="false" Name="TotalCostFromDatePicker" Change="@Reload" />
-                <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="TotalCostToDatePicker" />
-                <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostTo" ShowUpDown="false" Name="TotalCostToDatePicker" Change="@Reload" />
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="TotalCostFromDatePicker" />
+                    <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostFrom" ShowUpDown="false" Name="TotalCostFromDatePicker" Change="@Reload" />
+                    <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="TotalCostToDatePicker" />
+                    <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostTo" ShowUpDown="false" Name="TotalCostToDatePicker" Change="@Reload" />
+                </RadzenStack>
             </FilterTemplate>
         </RadzenDataGridColumn>
     </Columns>
