@@ -48,9 +48,9 @@
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]">
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-                    <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="TotalCostFromDatePicker"/>
+                    <RadzenLabel Text="@($"{Localizer["Min"]}: ")" Component="TotalCostFromDatePicker"/>
                     <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostFrom" ShowUpDown="false" Name="TotalCostFromDatePicker" Change="@Reload"/>
-                    <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="TotalCostToDatePicker"/>
+                    <RadzenLabel Text="@($"{Localizer["Max"]}: ")" Component="TotalCostToDatePicker"/>
                     <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostTo" ShowUpDown="false" Name="TotalCostToDatePicker" Change="@Reload"/>
                 </RadzenStack>
             </FilterTemplate>
