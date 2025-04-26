@@ -1,5 +1,4 @@
 @page "/"
-@using System.Linq.Dynamic.Core
 @inject IStringLocalizer<Receipts> Localizer
 
 <PageTitle>@Localizer["_Receipts"]</PageTitle>
@@ -7,9 +6,9 @@
 <h3>@Localizer["_Receipts"]</h3>
 
 <RadzenDataGrid
-    @ref=grid
-    Data="@receiptDetails"
-    Count="@count"
+    @ref=_grid
+    Data="@_receiptDetails"
+    Count="@_count"
     LoadData="@LoadData"
     Style="height: 400px"
     AllowPaging="true"
@@ -19,7 +18,9 @@
     GotoFirstPageOnSort="true">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Id)" Title="@Localizer["Id"]" Visible="false" />
-        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Store)" Title="@Localizer["Store"]" />
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Store)" Title="@Localizer["Store"]">
+            
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn
             Property="@nameof(ReceiptDetail.PurchaseDate)"
             FormatString="{0:dd/MM/yyyy}"
@@ -27,42 +28,42 @@
             SortOrder="SortOrder.Descending">
             <FilterTemplate>
                 <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="PurchaseDateFromDatePicker" />
-                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@purchaseDateFrom" AllowClear="true" Name="PurchaseDateFromDatePicker" Change="@Reload" />
+                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@_purchaseDateFrom" AllowClear="true" Name="PurchaseDateFromDatePicker" Change="@Reload" />
                 <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="PurchaseDateToDatePicker" />
-                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@purchaseDateTo" AllowClear="true" Name="PurchaseDateToDatePicker" Change="@Reload" />
+                <RadzenDatePicker TValue="DateOnly?" @bind-Value="@_purchaseDateTo" AllowClear="true" Name="PurchaseDateToDatePicker" Change="@Reload" />
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]">
             <FilterTemplate>
                 <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="TotalCostFromDatePicker" />
-                <RadzenNumeric TValue="decimal?" @bind-Value="@totalCostFrom" ShowUpDown="false" Name="TotalCostFromDatePicker" Change="@Reload" />
+                <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostFrom" ShowUpDown="false" Name="TotalCostFromDatePicker" Change="@Reload" />
                 <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="TotalCostToDatePicker" />
-                <RadzenNumeric TValue="decimal?" @bind-Value="@totalCostTo" ShowUpDown="false" Name="TotalCostToDatePicker" Change="@Reload" />
+                <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostTo" ShowUpDown="false" Name="TotalCostToDatePicker" Change="@Reload" />
             </FilterTemplate>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
 @code {
-    private RadzenDataGrid<ReceiptDetail> grid = null!;
-    private int count;
-    private IEnumerable<ReceiptDetail> receiptDetails = null!;
+    private RadzenDataGrid<ReceiptDetail> _grid = null!;
+    private int _count;
+    private IEnumerable<ReceiptDetail> _receiptDetails = null!;
 
     // Filters
-    DateOnly? purchaseDateFrom = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
-    DateOnly? purchaseDateTo;
-    decimal? totalCostFrom;
-    decimal? totalCostTo;
+    DateOnly? _purchaseDateFrom = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
+    DateOnly? _purchaseDateTo;
+    decimal? _totalCostFrom;
+    decimal? _totalCostTo;
 
-    private async Task Reload() => await grid.FirstPage(forceReload: true);
+    private async Task Reload() => await _grid.FirstPage(forceReload: true);
     
     private async Task LoadData(LoadDataArgs args)
     {
-        (receiptDetails, count) = await GetData(
-            purchaseDateFrom,
-            purchaseDateTo,
-            totalCostFrom,
-            totalCostTo,
+        (_receiptDetails, _count) = await GetData(
+            _purchaseDateFrom,
+            _purchaseDateTo,
+            _totalCostFrom,
+            _totalCostTo,
             args.OrderBy,
             args.Skip.GetValueOrDefault(),
             args.Top.GetValueOrDefault(10));
