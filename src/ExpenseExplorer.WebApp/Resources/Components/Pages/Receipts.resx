@@ -48,4 +48,10 @@
     <data name="Search" xml:space="preserve">
         <value>Szukaj</value>
     </data>
+    <data name="PagingSummaryTemplate" xml:space="preserve">
+        <value>Wyświetlana strona {0} z {1} &lt;b&gt;(razem {2} rekordów)&lt;/b&gt;</value>
+    </data>
+    <data name="PageSizeText" xml:space="preserve">
+        <value>wierszy na stronę</value>
+    </data>
 </root>

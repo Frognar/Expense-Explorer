@@ -104,5 +104,17 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("Search", resourceCulture);
             }
         }
+        
+        internal static string PagingSummaryTemplate {
+            get {
+                return ResourceManager.GetString("PagingSummaryTemplate", resourceCulture);
+            }
+        }
+        
+        internal static string PageSizeText {
+            get {
+                return ResourceManager.GetString("PageSizeText", resourceCulture);
+            }
+        }
     }
 }
