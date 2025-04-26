@@ -50,10 +50,10 @@
     private IEnumerable<ReceiptDetail> _receiptDetails = null!;
 
     // Filters
-    DateOnly? _purchaseDateFrom = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
-    DateOnly? _purchaseDateTo;
-    decimal? _totalCostFrom;
-    decimal? _totalCostTo;
+    private DateOnly? _purchaseDateFrom = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
+    private DateOnly? _purchaseDateTo;
+    private decimal? _totalCostFrom;
+    private decimal? _totalCostTo;
 
     private async Task Reload() => await _grid.FirstPage(forceReload: true);
     
