@@ -32,7 +32,14 @@
                 <RadzenDatePicker TValue="DateOnly?" @bind-Value="@purchaseDateTo" AllowClear="true" Name="PurchaseDateToDatePicker" Change="@Reload" />
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]" />
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]">
+            <FilterTemplate>
+                <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="TotalCostFromDatePicker" />
+                <RadzenNumeric TValue="decimal?" @bind-Value="@totalCostFrom" ShowUpDown="false" Name="TotalCostFromDatePicker" Change="@Reload" />
+                <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="TotalCostToDatePicker" />
+                <RadzenNumeric TValue="decimal?" @bind-Value="@totalCostTo" ShowUpDown="false" Name="TotalCostToDatePicker" Change="@Reload" />
+            </FilterTemplate>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
@@ -44,6 +51,9 @@
     // Filters
     DateOnly? purchaseDateFrom = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
     DateOnly? purchaseDateTo;
+    decimal? totalCostFrom;
+    decimal? totalCostTo;
+
     private async Task Reload() => await grid.FirstPage(forceReload: true);
     
     private async Task LoadData(LoadDataArgs args)
@@ -51,6 +61,8 @@
         (receiptDetails, count) = await GetData(
             purchaseDateFrom,
             purchaseDateTo,
+            totalCostFrom,
+            totalCostTo,
             args.OrderBy,
             args.Skip.GetValueOrDefault(),
             args.Top.GetValueOrDefault(10));
@@ -59,6 +71,8 @@
     private async Task<ReceiptDetailsResponse> GetData(
         DateOnly? purchaseDateMin,
         DateOnly? purchaseDateMax,
+        decimal? totalCostMin,
+        decimal? totalCostMax,
         string? orderBy,
         int skip,
         int take)
@@ -75,7 +89,9 @@
             .AsQueryable()
             .Where(r 
                 => r.PurchaseDate >= purchaseDateMin.GetValueOrDefault(DateOnly.MinValue)
-                && r.PurchaseDate <= purchaseDateMax.GetValueOrDefault(DateOnly.MaxValue));
+                && r.PurchaseDate <= purchaseDateMax.GetValueOrDefault(DateOnly.MaxValue)
+                && r.TotalCost >= totalCostMin.GetValueOrDefault(decimal.MinValue)
+                && r.TotalCost <= totalCostMax.GetValueOrDefault(decimal.MaxValue));
 
         var receiptsCount = query.Count();
         if (!string.IsNullOrWhiteSpace(orderBy))
