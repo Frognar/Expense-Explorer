@@ -82,7 +82,7 @@
     private async Task LoadData(LoadDataArgs args)
     {
         (_receiptDetails, _count) = await GetData(
-            _selectedStores,
+            _selectedStores ?? [],
             _purchaseDateFrom,
             _purchaseDateTo,
             _totalCostFrom,
@@ -99,7 +99,7 @@
     }
 
     private async Task<ReceiptDetailsResponse> GetData(
-        IEnumerable<string>? stores,
+        IEnumerable<string> stores,
         DateOnly? purchaseDateMin,
         DateOnly? purchaseDateMax,
         decimal? totalCostMin,
@@ -119,7 +119,7 @@
             })
             .AsQueryable()
             .Where(r 
-                => (stores == null || stores.Contains(r.Store))
+                => (!stores.Any() || stores.Contains(r.Store))
                    && r.PurchaseDate >= purchaseDateMin.GetValueOrDefault(DateOnly.MinValue)
                    && r.PurchaseDate <= purchaseDateMax.GetValueOrDefault(DateOnly.MaxValue)
                    && r.TotalCost >= totalCostMin.GetValueOrDefault(decimal.MinValue)
