@@ -52,9 +52,9 @@
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
                     <RadzenLabel Text="@($"{Localizer["Min"]}: ")" Component="TotalCostFromDatePicker"/>
-                    <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostFrom" ShowUpDown="false" Name="TotalCostFromDatePicker" Change="@Reload"/>
+                    <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostMin" ShowUpDown="false" Name="TotalCostFromDatePicker" Change="@Reload"/>
                     <RadzenLabel Text="@($"{Localizer["Max"]}: ")" Component="TotalCostToDatePicker"/>
-                    <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostTo" ShowUpDown="false" Name="TotalCostToDatePicker" Change="@Reload"/>
+                    <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostMax" ShowUpDown="false" Name="TotalCostToDatePicker" Change="@Reload"/>
                 </RadzenStack>
             </FilterTemplate>
         </RadzenDataGridColumn>
@@ -71,9 +71,10 @@
     private IEnumerable<string>? _selectedStores;
     private DateOnly? _purchaseDateFrom = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
     private DateOnly? _purchaseDateTo;
-    private decimal? _totalCostFrom;
-    private decimal? _totalCostTo;
+    private decimal? _totalCostMin;
+    private decimal? _totalCostMax;
 
+    /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
         _stores = await ReceiptService.GetStores();
@@ -91,7 +92,7 @@
             _selectedStores ?? [],
             _purchaseDateFrom,
             _purchaseDateTo,
-            _totalCostFrom,
-            _totalCostTo);
+            _totalCostMin,
+            _totalCostMax);
     }
 }
