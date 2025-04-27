@@ -1,4 +1,5 @@
 @page "/"
+@using ExpenseExplorer.WebApp.Models
 @inject IStringLocalizer<Receipts> Localizer
 
 <PageTitle>@Localizer["_Receipts"]</PageTitle>
@@ -25,14 +26,14 @@
         @((MarkupString)string.Format(Localizer["PagingSummaryTemplate"], context.CurrentPage, context.NumberOfPages, context.TotalCount))
     </PagingSummaryTemplate>
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Id)" Title="@Localizer["Id"]" Visible="false"/>
-        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Store)" Title="@Localizer["Store"]">
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Id)" Title="@Localizer["Id"]" Visible="false"/>
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Store)" Title="@Localizer["Store"]">
             <FilterTemplate>
                 <RadzenDropDown @bind-Value="@_selectedStores" Data="@_stores" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" Style="width:100%"/>
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn
-            Property="@nameof(ReceiptDetail.PurchaseDate)"
+            Property="@nameof(ReceiptDetails.PurchaseDate)"
             FormatString="{0:dd/MM/yyyy}"
             Title="@Localizer["PurchaseDate"]"
             SortOrder="SortOrder.Descending">
@@ -45,7 +46,7 @@
                 </RadzenStack>
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(ReceiptDetail.TotalCost)" Title="@Localizer["TotalCost"]">
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetails.TotalCost)" Title="@Localizer["TotalCost"]">
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
                     <RadzenLabel Text="@($"{Localizer["Min"]}: ")" Component="TotalCostFromDatePicker"/>
@@ -59,9 +60,9 @@
 </RadzenDataGrid>
 
 @code {
-    private RadzenDataGrid<ReceiptDetail> _grid = null!;
+    private RadzenDataGrid<ReceiptDetails> _grid = null!;
     private int _count;
-    private IEnumerable<ReceiptDetail> _receiptDetails = null!;
+    private IEnumerable<ReceiptDetails> _receiptDetails = null!;
 
     // Filters
     private IEnumerable<string> _stores = [];
@@ -110,13 +111,12 @@
     {
         await Task.Yield();
         var query = Enumerable.Range(1, 10000)
-            .Select(x => new ReceiptDetail
-            {
-                Id = x,
-                PurchaseDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-x)),
-                Store = "Store " + x,
-                TotalCost = x * 10m
-            })
+            .Select(x => new ReceiptDetails(
+                x,
+                "Store " + x,
+                DateOnly.FromDateTime(DateTime.Today.AddDays(-x)),
+                x * 10m)
+            )
             .AsQueryable()
             .Where(r 
                 => (!stores.Any() || stores.Contains(r.Store))
@@ -133,17 +133,5 @@
 
         var data = query.Skip(skip).Take(take).ToList();
         return new ReceiptDetailsResponse(data, receiptsCount);
-    }
-
-    public sealed record ReceiptDetailsResponse(
-        IEnumerable<ReceiptDetail> Receipts,
-        int Count);
-
-    public sealed class ReceiptDetail
-    {
-        public required int Id { get; set; }
-        public required string Store { get; set; }
-        public required DateOnly PurchaseDate { get; set; }
-        public required decimal TotalCost { get; set; }
     }
 }
