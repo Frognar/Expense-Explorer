@@ -116,5 +116,11 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("PageSizeText", resourceCulture);
             }
         }
+        
+        internal static string SelectedItemsText {
+            get {
+                return ResourceManager.GetString("SelectedItemsText", resourceCulture);
+            }
+        }
     }
 }

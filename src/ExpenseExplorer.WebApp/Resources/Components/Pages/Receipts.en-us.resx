@@ -47,4 +47,7 @@
     <data name="PageSizeText" xml:space="preserve">
         <value>items per page</value>
     </data>
+    <data name="SelectedItemsText" xml:space="preserve">
+        <value>selected items</value>
+    </data>
 </root>

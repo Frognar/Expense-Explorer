@@ -54,4 +54,7 @@
     <data name="PageSizeText" xml:space="preserve">
         <value>wierszy na stronę</value>
     </data>
+    <data name="SelectedItemsText" xml:space="preserve">
+        <value>wybranych wierszy</value>
+    </data>
 </root>

@@ -28,7 +28,7 @@
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Id)" Title="@Localizer["Id"]" Visible="false"/>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetail.Store)" Title="@Localizer["Store"]">
             <FilterTemplate>
-                <RadzenDropDown @bind-Value="@_selectedStores" Data="@_stores" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Change="@Reload" Style="width:100%"/>
+                <RadzenDropDown @bind-Value="@_selectedStores" Data="@_stores" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" Style="width:100%"/>
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn
