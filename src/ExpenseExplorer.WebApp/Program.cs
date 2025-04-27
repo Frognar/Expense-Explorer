@@ -1,4 +1,6 @@
+using ExpenseExplorer.WebApp;
 using ExpenseExplorer.WebApp.Components;
+using ExpenseExplorer.WebApp.Services;
 using Radzen;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,8 @@ builder.Services.AddLocalization(options =>
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddScoped<ReceiptService>();
 
 builder.Services.AddRadzenComponents();
 WebApplication app = builder.Build();
