@@ -35,7 +35,9 @@ internal sealed class ReceiptService
         int count = x.Count();
         if (!string.IsNullOrWhiteSpace(orderBy))
         {
-            x = x.OrderBy(GetOrderBy(orderBy));
+            x = orderBy.EndsWith(" desc", StringComparison.InvariantCultureIgnoreCase)
+                ? x.OrderByDescending(GetOrderBy(orderBy))
+                : x.OrderBy(GetOrderBy(orderBy));
         }
 
         List<ReceiptDetails> data = x
@@ -46,10 +48,15 @@ internal sealed class ReceiptService
         return new ReceiptDetailsResponse(data, count);
     }
 
-    private static Func<ReceiptDetails, object> GetOrderBy(string? orderBy)
+    private static Func<ReceiptDetails, object> GetOrderBy(string orderBy)
     {
-        return orderBy switch
+        return orderBy
+                .Replace(" asc", "", StringComparison.InvariantCultureIgnoreCase)
+                .Replace(" desc", "", StringComparison.InvariantCultureIgnoreCase) switch
         {
+            nameof(ReceiptDetails.Store) => r => r.Store,
+            nameof(ReceiptDetails.PurchaseDate) => r => r.PurchaseDate,
+            nameof(ReceiptDetails.TotalCost) => r => r.TotalCost,
             _ => r => r.Id
         };
     }
