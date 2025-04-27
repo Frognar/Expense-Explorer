@@ -60,4 +60,10 @@ internal sealed class ReceiptService
             _ => r => r.Id
         };
     }
+
+    internal async Task<IEnumerable<string>> GetStores()
+    {
+        await Task.Yield();
+        return _receipts.Select(r => r.Store);
+    }
 }

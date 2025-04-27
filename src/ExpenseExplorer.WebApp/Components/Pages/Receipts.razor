@@ -76,7 +76,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _stores = await GetStores();
+        _stores = await ReceiptService.GetStores();
         await base.OnInitializedAsync();
     }
 
@@ -93,11 +93,5 @@
             _purchaseDateTo,
             _totalCostFrom,
             _totalCostTo);
-    }
-
-    private static async Task<IEnumerable<string>> GetStores()
-    {
-        await Task.Yield();
-        return Enumerable.Range(1, 10000).Select(x => "Store " + x);
     }
 }
