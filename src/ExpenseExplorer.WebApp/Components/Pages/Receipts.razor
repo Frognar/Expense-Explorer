@@ -46,6 +46,9 @@
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetails.TotalCost)" Title="@Localizer["TotalCost"]">
+            <Template>
+                @context.TotalCost.ToString("0.00") zł
+            </Template>
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
                     <RadzenLabel Text="@($"{Localizer["Min"]}: ")" Component="TotalCostMinDatePicker"/>
