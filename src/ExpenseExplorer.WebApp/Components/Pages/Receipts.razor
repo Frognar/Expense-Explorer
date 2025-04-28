@@ -12,11 +12,11 @@
     Count="@_count"
     LoadData="@LoadData"
     Density="Density.Compact"
-    PageSize="25"
+    PageSize="20"
     AllowPaging="true"
     PagerHorizontalAlign="HorizontalAlign.Center"
     ShowPagingSummary="true"
-    PageSizeOptions="[10, 25]"
+    PageSizeOptions="[10, 20]"
     PageSizeText="@Localizer["PageSizeText"]"
     AllowFiltering="true"
     FilterMode="FilterMode.Simple"
@@ -47,7 +47,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetails.TotalCost)" Title="@Localizer["TotalCost"]">
             <Template>
-                @context.TotalCost.ToString("0.00") zł
+                @string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", context.TotalCost)
             </Template>
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
