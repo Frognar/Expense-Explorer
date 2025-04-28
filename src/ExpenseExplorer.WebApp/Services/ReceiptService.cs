@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using ExpenseExplorer.WebApp.Models;
 
 namespace ExpenseExplorer.WebApp.Services;
@@ -25,14 +26,16 @@ internal sealed class ReceiptService
     {
         await Task.Yield();
         var x = _receipts
+            .AsQueryable()
             .Where(r =>
                 (!stores.Any() || stores.Contains(r.Store))
-                && (purchaseDateFrom is null || r.PurchaseDate >= purchaseDateFrom)
-                && (purchaseDateTo is null || r.PurchaseDate <= purchaseDateTo)
-                && (totalCostMin is null || r.TotalCost >= totalCostMin)
-                && (totalCostMax is null || r.TotalCost <= totalCostMax));
+                && (purchaseDateFrom == null || r.PurchaseDate >= purchaseDateFrom)
+                && (purchaseDateTo == null || r.PurchaseDate <= purchaseDateTo)
+                && (totalCostMin == null || r.TotalCost >= totalCostMin)
+                && (totalCostMax == null || r.TotalCost <= totalCostMax));
 
         int count = x.Count();
+        decimal totalCost = x.Sum(r => r.TotalCost);
         if (!string.IsNullOrWhiteSpace(orderBy))
         {
             x = orderBy.EndsWith(" desc", StringComparison.InvariantCultureIgnoreCase)
@@ -45,10 +48,10 @@ internal sealed class ReceiptService
             .Take(pageSize)
             .ToList();
 
-        return new ReceiptDetailsResponse(data, count);
+        return new ReceiptDetailsResponse(data, count, totalCost);
     }
 
-    private static Func<ReceiptDetails, object> GetOrderBy(string orderBy)
+    private static Expression<Func<ReceiptDetails, object>> GetOrderBy(string orderBy)
     {
         return orderBy
                 .Replace(" asc", "", StringComparison.InvariantCultureIgnoreCase)

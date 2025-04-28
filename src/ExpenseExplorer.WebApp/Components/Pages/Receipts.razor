@@ -49,6 +49,9 @@
             <Template>
                 @string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", context.TotalCost)
             </Template>
+            <FooterTemplate>
+                @Localizer["TotalCost"]: <b>@string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", _totalCost)</b>
+            </FooterTemplate>
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
                     <RadzenLabel Text="@($"{Localizer["Min"]}: ")" Component="TotalCostMinDatePicker"/>
@@ -71,6 +74,7 @@
 @code {
     private RadzenDataGrid<ReceiptDetails> _grid = null!;
     private int _count;
+    private decimal _totalCost = decimal.Zero;
     private IEnumerable<ReceiptDetails> _receiptDetails = null!;
 
     // Filters
@@ -92,7 +96,7 @@
     
     private async Task LoadData(LoadDataArgs args)
     {
-        (_receiptDetails, _count) = await ReceiptService.GetReceiptsAsync(
+        (_receiptDetails, _count, _totalCost) = await ReceiptService.GetReceiptsAsync(
             args.Top.GetValueOrDefault(10),
             args.Skip.GetValueOrDefault(),
             args.OrderBy,
