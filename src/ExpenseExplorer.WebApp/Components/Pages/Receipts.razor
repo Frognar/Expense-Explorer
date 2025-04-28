@@ -28,7 +28,6 @@
         @((MarkupString)string.Format(Localizer["PagingSummaryTemplate"], context.CurrentPage, context.NumberOfPages, context.TotalCount))
     </PagingSummaryTemplate>
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Id)" Title="@Localizer["Id"]" Visible="false"/>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Store)" Title="@Localizer["Store"]">
             <FilterTemplate>
                 <RadzenDropDown @bind-Value="@_selectedStores" Data="@_stores" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" Style="width:100%"/>
@@ -57,6 +56,13 @@
                     <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostMax" ShowUpDown="false" Name="TotalCostMaxDatePicker" Change="@Reload"/>
                 </RadzenStack>
             </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Id)" Filterable="false" Sortable="false" Width="105px" >
+            <Template>
+                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" />
+                <RadzenButton Icon="library_add" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" />
+                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger" />
+            </Template>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
