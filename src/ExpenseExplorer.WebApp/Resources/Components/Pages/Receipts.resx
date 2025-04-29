@@ -57,4 +57,7 @@
     <data name="SelectedItemsText" xml:space="preserve">
         <value>wybranych wierszy</value>
     </data>
+    <data name="NewReceipt" xml:space="preserve">
+        <value>Nowy paragon</value>
+    </data>
 </root>

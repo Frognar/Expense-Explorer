@@ -61,11 +61,14 @@
                 </RadzenStack>
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Id)" Filterable="false" Sortable="false" Width="105px" >
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Id)" Filterable="false" Sortable="false" Width="145px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Success" Text="@Localizer["NewReceipt"]" />
+            </HeaderTemplate>
             <Template>
-                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" />
-                <RadzenButton Icon="library_add" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" />
-                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger" />
+                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light"/>
+                <RadzenButton Icon="library_add" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light"/>
+                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger"/>
             </Template>
         </RadzenDataGridColumn>
     </Columns>

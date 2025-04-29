@@ -122,5 +122,11 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("SelectedItemsText", resourceCulture);
             }
         }
+        
+        internal static string NewReceipt {
+            get {
+                return ResourceManager.GetString("NewReceipt", resourceCulture);
+            }
+        }
     }
 }

@@ -50,4 +50,7 @@
     <data name="SelectedItemsText" xml:space="preserve">
         <value>selected items</value>
     </data>
+    <data name="NewReceipt" xml:space="preserve">
+        <value>New receipt</value>
+    </data>
 </root>
