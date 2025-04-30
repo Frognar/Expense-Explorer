@@ -9,7 +9,7 @@ internal sealed class ReceiptService
     private readonly IEnumerable<ReceiptDetails> _receipts =
         Enumerable.Range(1, 10000)
             .Select(i => new ReceiptDetails(
-                i,
+                Guid.CreateVersion7(),
                 $"Store {i}",
                 DateOnly.FromDateTime(DateTime.Today).AddDays(-i),
                 i * 10m));
