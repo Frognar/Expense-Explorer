@@ -2,6 +2,7 @@
 @using ExpenseExplorer.WebApp.Services
 @inject ReceiptService ReceiptService
 @inject IStringLocalizer<NewReceipt> Localizer
+@inject NavigationManager NavigationManager
 
 <RadzenCard class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
     <RadzenStack Orientation="Orientation.Vertical">
@@ -12,7 +13,7 @@
             <RadzenDatePicker @bind-Value="@_purchaseDate"/>
         </RadzenFormField>
         <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
-            <RadzenButton Text="@Localizer["Cancel"]" Icon="highlight_off" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger" />
+            <RadzenButton Text="@Localizer["Cancel"]" Icon="highlight_off" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger" Click="@OnCancel" />
             <RadzenButton Text="@Localizer["Save"]" Icon="check_circle" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" />
         </RadzenRow>
     </RadzenStack>
@@ -35,4 +36,5 @@
         _stores = await ReceiptService.GetStores(args.Filter);
     }
 
+    private void OnCancel() => NavigationManager.NavigateTo("/");
 }

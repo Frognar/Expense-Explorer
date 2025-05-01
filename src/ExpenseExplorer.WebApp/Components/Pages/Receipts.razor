@@ -111,6 +111,6 @@
             _totalCostMax);
     }
 
-    void OnCreate() => NavigationManager.NavigateTo("/receipts/new");
-    void OnEdit(Guid id) => NavigationManager.NavigateTo($"/receipts/{id}");
+    private void OnCreate() => NavigationManager.NavigateTo("/receipts/new");
+    private void OnEdit(Guid id) => NavigationManager.NavigateTo($"/receipts/{id}");
 }
