@@ -18,6 +18,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Receipt.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Components\Pages\NewReceipt.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>NewReceipt.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Components\Pages\Receipts.Designer.cs">
@@ -29,6 +33,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Receipt.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Components\Pages\NewReceipt.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>NewReceipt.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

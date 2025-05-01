@@ -1,0 +1,38 @@
+@page "/receipts/new"
+@using ExpenseExplorer.WebApp.Services
+@inject ReceiptService ReceiptService
+@inject IStringLocalizer<NewReceipt> Localizer
+
+<RadzenCard class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenFormField Text="@Localizer["Store"]">
+            <RadzenAutoComplete @bind-Value="@_store" Data="_stores" OpenOnFocus="true" LoadData="OnLoadData"/>
+        </RadzenFormField>
+        <RadzenFormField Text="@Localizer["PurchaseDate"]">
+            <RadzenDatePicker @bind-Value="@_purchaseDate"/>
+        </RadzenFormField>
+        <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenButton Text="@Localizer["Cancel"]" Icon="highlight_off" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger" />
+            <RadzenButton Text="@Localizer["Save"]" Icon="check_circle" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" />
+        </RadzenRow>
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    private string _store = "";
+    private DateOnly _purchaseDate = DateOnly.FromDateTime(DateTime.Today);
+    private IEnumerable<string> _stores = [];
+
+    /// <inheritdoc />
+    protected override async Task OnInitializedAsync()
+    {
+        _stores = await ReceiptService.GetStores();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OnLoadData(LoadDataArgs args)
+    {
+        _stores = await ReceiptService.GetStores(args.Filter);
+    }
+
+}
