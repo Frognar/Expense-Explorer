@@ -64,7 +64,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Id)" Filterable="false" Sortable="false" Width="145px" TextAlign="TextAlign.Center">
             <HeaderTemplate>
-                <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Success" Text="@Localizer["NewReceipt"]" />
+                <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Text="@Localizer["NewReceipt"]" Click="@OnCreate" />
             </HeaderTemplate>
             <Template>
                 <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Click="@(() => OnEdit(context.Id))"/>
@@ -111,5 +111,6 @@
             _totalCostMax);
     }
 
+    void OnCreate() => NavigationManager.NavigateTo("/receipts/new");
     void OnEdit(Guid id) => NavigationManager.NavigateTo($"/receipts/{id}");
 }
