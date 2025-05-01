@@ -3,6 +3,7 @@
 @using ExpenseExplorer.WebApp.Services
 @inject IStringLocalizer<Receipts> Localizer
 @inject ReceiptService ReceiptService
+@inject NavigationManager NavigationManager
 
 <PageTitle>@Localizer["_Receipts"]</PageTitle>
 
@@ -66,7 +67,7 @@
                 <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Success" Text="@Localizer["NewReceipt"]" />
             </HeaderTemplate>
             <Template>
-                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light"/>
+                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Click="@(() => OnEdit(context.Id))"/>
                 <RadzenButton Icon="library_add" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light"/>
                 <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger"/>
             </Template>
@@ -109,4 +110,6 @@
             _totalCostMin,
             _totalCostMax);
     }
+
+    void OnEdit(Guid id) => NavigationManager.NavigateTo($"/receipts/{id}");
 }

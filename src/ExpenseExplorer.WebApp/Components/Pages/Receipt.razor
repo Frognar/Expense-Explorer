@@ -1,4 +1,11 @@
-@page "/Receipt/{id:guid}"
+@page "/Receipts/{id:guid}"
 @inject IStringLocalizer<Receipt> Localizer
 
 <PageTitle>@Localizer["_Receipt"]</PageTitle>
+
+
+@code
+{
+    [Parameter]
+    public required Guid Id { get; set; }
+}
