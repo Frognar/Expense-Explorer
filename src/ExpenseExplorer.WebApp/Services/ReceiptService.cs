@@ -64,9 +64,17 @@ internal sealed class ReceiptService
         };
     }
 
-    internal async Task<IEnumerable<string>> GetStores()
+    internal async Task<IEnumerable<string>> GetStores(string? search = null)
     {
         await Task.Yield();
-        return _receipts.Select(r => r.Store);
+        IEnumerable<string> stores = _receipts.Select(r => r.Store);
+        if (string.IsNullOrWhiteSpace(search))
+        {
+            return stores;
+        }
+
+        return stores.Where(s => search
+            .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .All(f => s.Contains(f, StringComparison.InvariantCultureIgnoreCase)));
     }
 }
