@@ -3,6 +3,7 @@
 @inject ReceiptService ReceiptService
 @inject IStringLocalizer<NewReceipt> Localizer
 @inject NavigationManager NavigationManager
+@inject DialogService DialogService
 
 <RadzenCard class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
     <RadzenStack Orientation="Orientation.Vertical">
@@ -14,7 +15,7 @@
         </RadzenFormField>
         <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
             <RadzenButton Text="@Localizer["Cancel"]" Icon="highlight_off" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger" Click="@OnCancel" />
-            <RadzenButton Text="@Localizer["Save"]" Icon="check_circle" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" />
+            <RadzenButton Text="@Localizer["Save"]" Icon="check_circle" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Click="@OnSave" />
         </RadzenRow>
     </RadzenStack>
 </RadzenCard>
@@ -37,4 +38,45 @@
     }
 
     private void OnCancel() => NavigationManager.NavigateTo("/");
+
+    private async Task OnSave()
+    {
+        ICreateResult response = await ReceiptService.CreateReceiptAsync(_store, _purchaseDate);
+        if (response is SuccessCreateResult success)
+        {
+            NavigationManager.NavigateTo($"/receipts/{success.Id}");
+        }
+        else if (response is ErrorCreateResult error)
+        {
+            await BusyDialog(error.Error);
+        }
+    }
+
+    private async Task BusyDialog(string message)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await Task.Delay(2000);
+            DialogService.Close();
+        });
+        
+        await DialogService.OpenAsync("", _ =>
+        {
+            return b =>
+            {
+                b.OpenElement(0, "RadzenRow");
+                b.OpenElement(1, "RadzenColumn");
+                b.AddAttribute(2, "Size", "12");
+                b.AddContent(3, message);
+                b.CloseElement();
+                b.CloseElement();
+            };
+            
+        }, new DialogOptions
+        {
+            ShowTitle = false,
+            Style = "min-height:auto;min-width:auto;width:auto",
+            CloseDialogOnEsc = false
+        });
+    }
 }

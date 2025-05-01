@@ -4,15 +4,18 @@ using ExpenseExplorer.WebApp.Models;
 namespace ExpenseExplorer.WebApp.Services;
 
 #pragma warning disable CA1812
+#pragma warning disable S2325
+#pragma warning disable CA1822
 internal sealed class ReceiptService
 {
-    private readonly IEnumerable<ReceiptDetails> _receipts =
+    private static readonly List<ReceiptDetails> Receipts =
         Enumerable.Range(1, 10000)
             .Select(i => new ReceiptDetails(
                 Guid.CreateVersion7(),
                 $"Store {i}",
                 DateOnly.FromDateTime(DateTime.Today).AddDays(-i),
-                i * 10m));
+                i * 10m))
+            .ToList();
 
     public async Task<ReceiptDetailsResponse> GetReceiptsAsync(
         int pageSize,
@@ -25,7 +28,7 @@ internal sealed class ReceiptService
         decimal? totalCostMax)
     {
         await Task.Yield();
-        var x = _receipts
+        var x = Receipts
             .AsQueryable()
             .Where(r =>
                 (!stores.Any() || stores.Contains(r.Store))
@@ -67,7 +70,7 @@ internal sealed class ReceiptService
     internal async Task<IEnumerable<string>> GetStores(string? search = null)
     {
         await Task.Yield();
-        IEnumerable<string> stores = _receipts.Select(r => r.Store);
+        IEnumerable<string> stores = Receipts.Select(r => r.Store);
         if (string.IsNullOrWhiteSpace(search))
         {
             return stores;
@@ -77,4 +80,26 @@ internal sealed class ReceiptService
             .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .All(f => s.Contains(f, StringComparison.InvariantCultureIgnoreCase)));
     }
+
+    internal async Task<ICreateResult> CreateReceiptAsync(string store, DateOnly purchaseDate)
+    {
+        await Task.Yield();
+        if (string.IsNullOrWhiteSpace(store))
+        {
+            return new ErrorCreateResult("Invalid store");
+        }
+
+        if (purchaseDate > DateOnly.FromDateTime(DateTime.Today))
+        {
+            return new ErrorCreateResult("Invalid purchase date");
+        }
+
+        ReceiptDetails receipt = new(Guid.CreateVersion7(), store, purchaseDate, 0);
+        Receipts.Add(receipt);
+        return new SuccessCreateResult(receipt.Id);
+    }
 }
+
+internal interface ICreateResult;
+internal sealed record SuccessCreateResult(Guid Id): ICreateResult;
+internal sealed record ErrorCreateResult(string Error) : ICreateResult;
