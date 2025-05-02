@@ -27,7 +27,6 @@ internal sealed class ReceiptService
         decimal? totalCostMin,
         decimal? totalCostMax)
     {
-        await Task.Yield();
         var x = Receipts
             .AsQueryable()
             .Where(r =>
@@ -51,6 +50,7 @@ internal sealed class ReceiptService
             .Take(pageSize)
             .ToList();
 
+        await Task.CompletedTask;
         return new ReceiptDetailsResponse(data, count, totalCost);
     }
 
@@ -69,13 +69,13 @@ internal sealed class ReceiptService
 
     internal async Task<IEnumerable<string>> GetStores(string? search = null)
     {
-        await Task.Yield();
         IEnumerable<string> stores = Receipts.Select(r => r.Store);
         if (string.IsNullOrWhiteSpace(search))
         {
             return stores;
         }
 
+        await Task.CompletedTask;
         return stores.Where(s => search
             .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .All(f => s.Contains(f, StringComparison.InvariantCultureIgnoreCase)));
@@ -83,7 +83,6 @@ internal sealed class ReceiptService
 
     internal async Task<ICreateResult> CreateReceiptAsync(string store, DateOnly purchaseDate)
     {
-        await Task.Yield();
         if (string.IsNullOrWhiteSpace(store))
         {
             return new ErrorCreateResult("Invalid store");
@@ -96,7 +95,30 @@ internal sealed class ReceiptService
 
         ReceiptDetails receipt = new(Guid.CreateVersion7(), store, purchaseDate, 0);
         Receipts.Add(receipt);
+        await Task.CompletedTask;
         return new SuccessCreateResult(receipt.Id);
+    }
+
+    public async Task<ReceiptWithPurchases> GetReceiptAsync(Guid id)
+    {
+        ReceiptDetails? receipt = Receipts.FirstOrDefault(r => r.Id == id);
+        if (receipt == null)
+        {
+            throw new InvalidOperationException("Receipt not found");
+        }
+
+        await Task.CompletedTask;
+        return new ReceiptWithPurchases(receipt.Id, receipt.Store, receipt.PurchaseDate,
+            [
+                new PurchaseDetails(
+                    Guid.CreateVersion7(),
+                    "Item 1",
+                    "Category 1",
+                    1,
+                    2,
+                    null,
+                    null)
+            ]);
     }
 }
 
