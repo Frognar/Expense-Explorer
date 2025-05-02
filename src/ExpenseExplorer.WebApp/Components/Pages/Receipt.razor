@@ -1,11 +1,72 @@
 @page "/Receipts/{id:guid}"
+@using System.Globalization
+@using ExpenseExplorer.WebApp.Models
+@using ExpenseExplorer.WebApp.Services
 @inject IStringLocalizer<Receipt> Localizer
+@inject ReceiptService ReceiptService
 
 <PageTitle>@Localizer["_Receipt"]</PageTitle>
-
+<RadzenCard>
+    <RadzenCard>
+        <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenFormField Text="@Localizer["Store"]">
+            <RadzenAutoComplete @bind-Value="@_store" Data="_stores" OpenOnFocus="true" LoadData="OnStoresLoadData"/>
+        </RadzenFormField>
+        <RadzenFormField Text="@Localizer["PurchaseDate"]">
+            <RadzenDatePicker @bind-Value="@_purchaseDate"/>
+        </RadzenFormField>
+        <RadzenFormField Text="@Localizer["TotalCost"]">
+            <RadzenNumeric @bind-Value="@_totalCost" Disabled="true" Format="C2" Culture="@(new CultureInfo("pl-PL"))"/>
+        </RadzenFormField>
+        </RadzenRow>
+    </RadzenCard>
+    <RadzenCard>
+        <RadzenDataGrid
+            Data="@_receipt.Purchases"
+            Count="@_count"
+            Density="Density.Compact"
+            PagerHorizontalAlign="HorizontalAlign.Center"
+            AllowVirtualization="true"
+            AllowSorting="true">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Id)" Visible="false"/>
+                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["ItemName"]"/>
+                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Category)" Title="@Localizer["Category"]"/>
+                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Quantity)" Title="@Localizer["Quantity"]"/>
+                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.UnitPrice)" Title="@Localizer["UnitPrice"]"/>
+                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Discount)" Title="@Localizer["Discount"]"/>
+                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.TotalPrice)" Title="@Localizer["TotalPrice"]"/>
+                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Description)" Title="@Localizer["Description"]"/>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenCard>
+</RadzenCard>
 
 @code
 {
-    [Parameter]
-    public required Guid Id { get; set; }
+    [Parameter] public required Guid Id { get; set; }
+
+    private ReceiptWithPurchases _receipt = null!;
+    private string _store = "";
+    private DateOnly _purchaseDate;
+    private int _count;
+    private decimal _totalCost;
+    private IEnumerable<string> _stores = [];
+
+    /// <inheritdoc />
+    protected override async Task OnInitializedAsync()
+    {
+        _stores = await ReceiptService.GetStores();
+        _receipt = await ReceiptService.GetReceiptAsync(Id);
+        _store = _receipt.Store;
+        _purchaseDate = _receipt.PurchaseDate;
+        _totalCost = _receipt.TotalCost;
+        _count = _receipt.Purchases.Count();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OnStoresLoadData(LoadDataArgs args)
+    {
+        _stores = await ReceiptService.GetStores(args.Filter);
+    }
 }
