@@ -14,4 +14,34 @@
     <data name="_Receipt" xml:space="preserve">
         <value>Receipt</value>
     </data>
+    <data name="Store" xml:space="preserve">
+        <value>Store</value>
+    </data>
+    <data name="PurchaseDate" xml:space="preserve">
+        <value>Purchase date</value>
+    </data>
+    <data name="TotalCost" xml:space="preserve">
+        <value>Total cost</value>
+    </data>
+    <data name="UnitPrice" xml:space="preserve">
+        <value>Unit price</value>
+    </data>
+    <data name="TotalPrice" xml:space="preserve">
+        <value>Total price</value>
+    </data>
+    <data name="Quantity" xml:space="preserve">
+        <value>Quantity</value>
+    </data>
+    <data name="ItemName" xml:space="preserve">
+        <value>Item</value>
+    </data>
+    <data name="Discount" xml:space="preserve">
+        <value>Discount</value>
+    </data>
+    <data name="Category" xml:space="preserve">
+        <value>Category</value>
+    </data>
+    <data name="Description" xml:space="preserve">
+        <value>Description</value>
+    </data>
 </root>

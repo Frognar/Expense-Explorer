@@ -21,4 +21,34 @@
     <data name="_Receipt" xml:space="preserve">
         <value>Paragon</value>
     </data>
+    <data name="Store" xml:space="preserve">
+        <value>Sklep</value>
+    </data>
+    <data name="PurchaseDate" xml:space="preserve">
+        <value>Data zakupu</value>
+    </data>
+    <data name="TotalCost" xml:space="preserve">
+        <value>Koszt całkowity</value>
+    </data>
+    <data name="ItemName" xml:space="preserve">
+        <value>Przedmiot</value>
+    </data>
+    <data name="Category" xml:space="preserve">
+        <value>Kategoria</value>
+    </data>
+    <data name="Quantity" xml:space="preserve">
+        <value>Ilość</value>
+    </data>
+    <data name="UnitPrice" xml:space="preserve">
+        <value>Cena jednostkowa</value>
+    </data>
+    <data name="Discount" xml:space="preserve">
+        <value>Zniżka</value>
+    </data>
+    <data name="TotalPrice" xml:space="preserve">
+        <value>Cena całkowita</value>
+    </data>
+    <data name="Description" xml:space="preserve">
+        <value>Opis</value>
+    </data>
 </root>
