@@ -9,5 +9,5 @@ internal sealed record PurchaseDetails(
     decimal? Discount,
     string? Description)
 {
-    public decimal TotalPrice => Quantity * UnitPrice * (1 - Discount ?? 0);
+    public decimal TotalPrice => Quantity * UnitPrice * (1 - (Discount ?? 0));
 }
