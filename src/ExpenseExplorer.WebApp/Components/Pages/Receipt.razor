@@ -6,9 +6,8 @@
 @inject ReceiptService ReceiptService
 
 <PageTitle>@Localizer["_Receipt"]</PageTitle>
-<RadzenCard>
-    <RadzenCard>
-        <RadzenRow JustifyContent="JustifyContent.Center">
+<RadzenCard Variant="Variant.Outlined" class="rz-my-2 rz-mx-auto">
+    <RadzenRow JustifyContent="JustifyContent.Center">
         <RadzenFormField Text="@Localizer["Store"]">
             <RadzenAutoComplete @bind-Value="@_store" Data="_stores" OpenOnFocus="true" LoadData="OnStoresLoadData"/>
         </RadzenFormField>
@@ -18,29 +17,26 @@
         <RadzenFormField Text="@Localizer["TotalCost"]">
             <RadzenNumeric @bind-Value="@_totalCost" Disabled="true" Format="C2" Culture="@(new CultureInfo("pl-PL"))"/>
         </RadzenFormField>
-        </RadzenRow>
-    </RadzenCard>
-    <RadzenCard>
-        <RadzenDataGrid
-            Data="@_receipt.Purchases"
-            Count="@_count"
-            Density="Density.Compact"
-            PagerHorizontalAlign="HorizontalAlign.Center"
-            AllowVirtualization="true"
-            AllowSorting="true">
-            <Columns>
-                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Id)" Visible="false"/>
-                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["ItemName"]"/>
-                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Category)" Title="@Localizer["Category"]"/>
-                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Quantity)" Title="@Localizer["Quantity"]"/>
-                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.UnitPrice)" Title="@Localizer["UnitPrice"]"/>
-                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Discount)" Title="@Localizer["Discount"]"/>
-                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.TotalPrice)" Title="@Localizer["TotalPrice"]"/>
-                <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Description)" Title="@Localizer["Description"]"/>
-            </Columns>
-        </RadzenDataGrid>
-    </RadzenCard>
+    </RadzenRow>
 </RadzenCard>
+<RadzenDataGrid
+    Data="@_receipt.Purchases"
+    Count="@_count"
+    Density="Density.Compact"
+    PagerHorizontalAlign="HorizontalAlign.Center"
+    AllowVirtualization="true"
+    AllowSorting="true">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Id)" Visible="false"/>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["ItemName"]"/>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Category)" Title="@Localizer["Category"]"/>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Quantity)" Title="@Localizer["Quantity"]"/>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.UnitPrice)" Title="@Localizer["UnitPrice"]"/>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Discount)" Title="@Localizer["Discount"]"/>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.TotalPrice)" Title="@Localizer["TotalPrice"]"/>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Description)" Title="@Localizer["Description"]"/>
+    </Columns>
+</RadzenDataGrid>
 
 @code
 {
