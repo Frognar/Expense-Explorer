@@ -1,5 +1,5 @@
 @page "/receipts/new"
-@using ExpenseExplorer.WebApp.Models
+@using ExpenseExplorer.WebApp.Helpers
 @using ExpenseExplorer.WebApp.Services
 @inject ReceiptService ReceiptService
 @inject IStringLocalizer<NewReceipt> Localizer
@@ -42,13 +42,20 @@
 
     private async Task OnSave()
     {
-        await ReceiptService.CreateReceiptAsync(_store, _purchaseDate)
-            .SwitchAsync(
-                s => NavigationManager.NavigateTo($"/receipts/{s.Id}"),
-                e => BusyDialog(e.Error));
+        Result<Guid, string> result = await ReceiptService.CreateReceiptAsync(_store, _purchaseDate);
+        await result
+            .MatchAsync(
+                id => NavigateTo($"/receipts/{id}"),
+                BusyDialog);
     }
 
-    private async Task BusyDialog(string message)
+    private Unit NavigateTo(string url)
+    {
+        NavigationManager.NavigateTo(url);
+        return Unit.Instance;
+    }
+
+    private async Task<Unit> BusyDialog(string message)
     {
         _ = InvokeAsync(async () =>
         {
@@ -74,5 +81,7 @@
             Style = "min-height:auto;min-width:auto;width:auto",
             CloseDialogOnEsc = false
         });
+
+        return Unit.Instance;
     }
 }

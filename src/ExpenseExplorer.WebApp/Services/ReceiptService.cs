@@ -1,4 +1,5 @@
 using ExpenseExplorer.WebApp.Data;
+using ExpenseExplorer.WebApp.Helpers;
 using ExpenseExplorer.WebApp.Models;
 
 namespace ExpenseExplorer.WebApp.Services;
@@ -39,21 +40,21 @@ internal sealed class ReceiptService(
         return await receiptRepository.GetStoresAsync(search);
     }
 
-    internal async Task<ICreateResult> CreateReceiptAsync(string store, DateOnly purchaseDate)
+    internal async Task<Result<Guid, string>> CreateReceiptAsync(string store, DateOnly purchaseDate)
     {
         if (string.IsNullOrWhiteSpace(store))
         {
-            return new ErrorCreateResult("Invalid store");
+            return Result.Failure<Guid, string>("Invalid store");
         }
 
         if (purchaseDate > DateOnly.FromDateTime(DateTime.Today))
         {
-            return new ErrorCreateResult("Invalid purchase date");
+            return Result.Failure<Guid, string>("Invalid purchase date");
         }
 
         ReceiptDetails receipt = new(Guid.CreateVersion7(), store, purchaseDate, 0);
         await receiptRepository.AddAsync(receipt);
-        return new SuccessCreateResult(receipt.Id);
+        return Result.Success<Guid, string>(receipt.Id);
     }
 
     public async Task<ReceiptWithPurchases> GetReceiptAsync(Guid id)
