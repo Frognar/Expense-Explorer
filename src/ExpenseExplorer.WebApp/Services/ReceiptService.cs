@@ -17,7 +17,7 @@ internal sealed class ReceiptService
                 i * 10m))
             .ToList();
 
-    public async Task<ReceiptDetailsResponse> GetReceiptsAsync(
+    public async Task<ReceiptDetailsPage> GetReceiptsAsync(
         int pageSize,
         int skip,
         string? orderBy,
@@ -51,7 +51,7 @@ internal sealed class ReceiptService
             .ToList();
 
         await Task.CompletedTask;
-        return new ReceiptDetailsResponse(data, count, totalCost);
+        return new ReceiptDetailsPage(data, count, totalCost);
     }
 
     private static Expression<Func<ReceiptDetails, object>> GetOrderBy(string orderBy)
