@@ -1,9 +1,11 @@
 @page "/Receipts/{id:guid}"
 @using System.Globalization
+@using ExpenseExplorer.WebApp.Helpers
 @using ExpenseExplorer.WebApp.Models
 @using ExpenseExplorer.WebApp.Services
 @inject IStringLocalizer<Receipt> Localizer
 @inject ReceiptService ReceiptService
+@inject NavigationManager NavigationManager
 
 <PageTitle>@Localizer["_Receipt"]</PageTitle>
 <RadzenCard Variant="Variant.Outlined" class="rz-my-2 rz-mx-auto">
@@ -20,7 +22,7 @@
     </RadzenRow>
 </RadzenCard>
 <RadzenDataGrid
-    Data="@_receipt.Purchases"
+    Data="@_receipt?.Purchases"
     Count="@_count"
     Density="Density.Compact"
     PagerHorizontalAlign="HorizontalAlign.Center"
@@ -42,7 +44,7 @@
 {
     [Parameter] public required Guid Id { get; set; }
 
-    private ReceiptWithPurchases _receipt = null!;
+    private ReceiptWithPurchases? _receipt;
     private string _store = "";
     private DateOnly _purchaseDate;
     private int _count;
@@ -52,12 +54,23 @@
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
+        Result<ReceiptWithPurchases, string> receiptResult = await ReceiptService.GetReceiptAsync(Id);
+        receiptResult.Match(receipt =>
+            {
+                _receipt = receipt;
+                return Unit.Instance;
+            },
+            _ =>
+            {
+                NavigationManager.NavigateTo("/");
+                return Unit.Instance;
+            });
+
         _stores = await ReceiptService.GetStores();
-        _receipt = await ReceiptService.GetReceiptAsync(Id);
-        _store = _receipt.Store;
-        _purchaseDate = _receipt.PurchaseDate;
-        _totalCost = _receipt.TotalCost;
-        _count = _receipt.Purchases.Count();
+        _store = _receipt?.Store ?? "";
+        _purchaseDate = _receipt?.PurchaseDate ?? DateOnly.FromDateTime(DateTime.Today);
+        _totalCost = _receipt?.TotalCost ?? 0;
+        _count = _receipt?.Purchases.Count() ?? 0;
         await base.OnInitializedAsync();
     }
 

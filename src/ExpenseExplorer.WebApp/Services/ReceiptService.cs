@@ -57,15 +57,14 @@ internal sealed class ReceiptService(
         return Result.Success<Guid, string>(receipt.Id);
     }
 
-    public async Task<ReceiptWithPurchases> GetReceiptAsync(Guid id)
+    public async Task<Result<ReceiptWithPurchases, string>> GetReceiptAsync(Guid id)
     {
         ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(id);
         if (receipt == null)
         {
-            throw new InvalidOperationException("Receipt not found");
+            return Result<ReceiptWithPurchases, string>.Failure("Receipt not found");
         }
 
-        return receipt;
-
+        return Result<ReceiptWithPurchases, string>.Success(receipt);
     }
 }
