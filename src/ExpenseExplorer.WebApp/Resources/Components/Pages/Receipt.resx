@@ -51,4 +51,7 @@
     <data name="Description" xml:space="preserve">
         <value>Opis</value>
     </data>
+    <data name="AddItem" xml:space="preserve">
+        <value>Dodaj przedmiot</value>
+    </data>
 </root>

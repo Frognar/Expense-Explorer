@@ -1,4 +1,4 @@
-@page "/Receipts/{id:guid}"
+@page "/Receipts/{receiptId:guid}"
 @using System.Globalization
 @using ExpenseExplorer.WebApp.Helpers
 @using ExpenseExplorer.WebApp.Models
@@ -6,6 +6,7 @@
 @inject IStringLocalizer<Receipt> Localizer
 @inject ReceiptService ReceiptService
 @inject NavigationManager NavigationManager
+@inject DialogService DialogService
 
 <PageTitle>@Localizer["_Receipt"]</PageTitle>
 <RadzenCard Variant="Variant.Outlined" class="rz-my-2 rz-mx-auto">
@@ -21,15 +22,19 @@
         </RadzenFormField>
     </RadzenRow>
 </RadzenCard>
+
 <RadzenDataGrid
+    @ref="_grid"
     Data="@_purchases"
+    TItem="PurchaseDetails"
     Count="@_count"
     Density="Density.Compact"
     PagerHorizontalAlign="HorizontalAlign.Center"
-    AllowVirtualization="true"
-    AllowSorting="true">
+    AllowSorting="true"
+    EditMode="DataGridEditMode.Single"
+    RowUpdate="@OnUpdateRow"
+    RowCreate="@OnCreateRow">
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Id)" Visible="false"/>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["ItemName"]"/>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Category)" Title="@Localizer["Category"]"/>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Quantity)" Title="@Localizer["Quantity"]"/>
@@ -37,12 +42,22 @@
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Discount)" Title="@Localizer["Discount"]"/>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.TotalPrice)" Title="@Localizer["TotalPrice"]"/>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Description)" Title="@Localizer["Description"]"/>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Id)" Filterable="false" Sortable="false" Width="150px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Text="@Localizer["AddItem"]" Click="@InsertRow" />
+            </HeaderTemplate>
+            <Template Context="purchase">
+                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Click="@(_ => EditRow(purchase))"/>
+                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger"/>
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
 @code
 {
-    [Parameter] public required Guid Id { get; set; }
+    [Parameter] public required Guid ReceiptId { get; set; }
+    private RadzenDataGrid<PurchaseDetails> _grid = null!;
 
     private ReceiptWithPurchases? _receipt;
     private string _store = "";
@@ -55,7 +70,7 @@
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
-        Result<ReceiptWithPurchases, string> receiptResult = await ReceiptService.GetReceiptAsync(Id);
+        Result<ReceiptWithPurchases, string> receiptResult = await ReceiptService.GetReceiptAsync(ReceiptId);
         receiptResult.Match(receipt =>
             {
                 _receipt = receipt;
@@ -78,5 +93,49 @@
     private async Task OnStoresLoadData(LoadDataArgs args)
     {
         _stores = await ReceiptService.GetStores(args.Filter);
+    }
+
+    private async Task InsertRow()
+    {
+        if (!_grid.IsValid)
+        {
+            return;
+        }
+
+        PurchaseDetails purchase = new(Guid.CreateVersion7(), "", "", 0, 0, null, null);
+        await _grid.InsertRow(purchase);
+    }
+
+    private async Task EditRow(PurchaseDetails purchase)
+    {
+        if (!_grid.IsValid)
+        {
+            return;
+        }
+        
+        await _grid.EditRow(purchase);
+    }
+
+    private async Task OnUpdateRow(PurchaseDetails purchase)
+    {
+        var result = await ReceiptService.UpdatePurchase(purchase);
+        await result.MatchAsync(Id, BusyDialog);
+    }
+
+    private async Task OnCreateRow(PurchaseDetails purchase)
+    {
+        var result = await ReceiptService.AddPurchase(ReceiptId, purchase);
+        await result.MatchAsync(Id, BusyDialog);
+    }
+    
+    private async Task<Unit> BusyDialog(string message)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await Task.Delay(2000);
+            DialogService.Close();
+        });
+        
+        return await DialogService.OpenErrorDialogAsync("", message);
     }
 }
