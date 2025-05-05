@@ -22,7 +22,7 @@
     </RadzenRow>
 </RadzenCard>
 <RadzenDataGrid
-    Data="@_receipt?.Purchases"
+    Data="@_purchases"
     Count="@_count"
     Density="Density.Compact"
     PagerHorizontalAlign="HorizontalAlign.Center"
@@ -50,6 +50,7 @@
     private int _count;
     private decimal _totalCost;
     private IEnumerable<string> _stores = [];
+    private IEnumerable<PurchaseDetails> _purchases = [];
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
@@ -71,6 +72,7 @@
         _purchaseDate = _receipt?.PurchaseDate ?? DateOnly.FromDateTime(DateTime.Today);
         _totalCost = _receipt?.TotalCost ?? 0;
         _count = _receipt?.Purchases.Count() ?? 0;
+        _purchases = _receipt?.Purchases ?? [];
         await base.OnInitializedAsync();
     }
 
