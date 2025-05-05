@@ -17,7 +17,7 @@
             <RadzenDatePicker @bind-Value="@_purchaseDate"/>
         </RadzenFormField>
         <RadzenFormField Text="@Localizer["TotalCost"]">
-            <RadzenNumeric @bind-Value="@_totalCost" Disabled="true" Format="C2" Culture="@(new CultureInfo("pl-PL"))"/>
+            <RadzenTextBox Disabled="true" Value="@TotalCost.ToString("C2", new CultureInfo("pl-PL"))"/>
         </RadzenFormField>
     </RadzenRow>
 </RadzenCard>
@@ -48,7 +48,7 @@
     private string _store = "";
     private DateOnly _purchaseDate;
     private int _count;
-    private decimal _totalCost;
+    private decimal TotalCost => _purchases.Sum(p => p.TotalPrice);
     private IEnumerable<string> _stores = [];
     private IEnumerable<PurchaseDetails> _purchases = [];
 
@@ -70,7 +70,6 @@
         _stores = await ReceiptService.GetStores();
         _store = _receipt?.Store ?? "";
         _purchaseDate = _receipt?.PurchaseDate ?? DateOnly.FromDateTime(DateTime.Today);
-        _totalCost = _receipt?.TotalCost ?? 0;
         _count = _receipt?.Purchases.Count() ?? 0;
         _purchases = _receipt?.Purchases ?? [];
         await base.OnInitializedAsync();
