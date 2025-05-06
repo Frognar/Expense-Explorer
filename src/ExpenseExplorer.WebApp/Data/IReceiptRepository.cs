@@ -16,6 +16,7 @@ internal interface IReceiptRepository
         decimal? totalCostMax);
 
     public Task<IEnumerable<string>> GetStoresAsync(string? search = null);
+    public Task<IEnumerable<string>> GetItemsAsync(string? search = null);
     public Task AddAsync(ReceiptDetails receipt);
     public Task<ReceiptWithPurchases?> GetReceiptAsync(Guid id);
 }

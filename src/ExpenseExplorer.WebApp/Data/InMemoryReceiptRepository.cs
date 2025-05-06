@@ -76,6 +76,20 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
             .All(f => s.Contains(f, StringComparison.InvariantCultureIgnoreCase)));
     }
 
+    public async Task<IEnumerable<string>> GetItemsAsync(string? search = null)
+    {
+        IEnumerable<string> items = Enumerable.Range(1, 100).Select(i => $"Item {i}");
+        if (string.IsNullOrWhiteSpace(search))
+        {
+            return items;
+        }
+
+        await Task.CompletedTask;
+        return items.Where(s => search
+            .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .All(f => s.Contains(f, StringComparison.InvariantCultureIgnoreCase)));
+    }
+
     public async Task AddAsync(ReceiptDetails receipt)
     {
         Receipts.Add(receipt);

@@ -40,6 +40,11 @@ internal sealed class ReceiptService(
         return await receiptRepository.GetStoresAsync(search);
     }
 
+    internal async Task<IEnumerable<string>> GetItemsAsync(string? search = null)
+    {
+        return await receiptRepository.GetItemsAsync(search);
+    }
+
     internal async Task<Result<Guid, string>> CreateReceiptAsync(string store, DateOnly purchaseDate)
     {
         if (string.IsNullOrWhiteSpace(store))
