@@ -29,13 +29,13 @@
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
-        _stores = await ReceiptService.GetStores();
+        _stores = await ReceiptService.GetStoresAsync();
         await base.OnInitializedAsync();
     }
 
     private async Task OnLoadData(LoadDataArgs args)
     {
-        _stores = await ReceiptService.GetStores(args.Filter);
+        _stores = await ReceiptService.GetStoresAsync(args.Filter);
     }
 
     private void OnCancel() => NavigationManager.NavigateTo("/");

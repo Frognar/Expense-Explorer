@@ -35,7 +35,7 @@ internal sealed class ReceiptService(
                 totalCostMax);
     }
 
-    internal async Task<IEnumerable<string>> GetStores(string? search = null)
+    internal async Task<IEnumerable<string>> GetStoresAsync(string? search = null)
     {
         return await receiptRepository.GetStoresAsync(search);
     }
