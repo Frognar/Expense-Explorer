@@ -47,9 +47,14 @@
                 <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Text="@Localizer["AddItem"]" Click="@InsertRow" />
             </HeaderTemplate>
             <Template Context="purchase">
-                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Click="@(_ => EditRow(purchase))"/>
+                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Light" Click="@(_ => EditRow(purchase))"/>
                 <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger"/>
             </Template>
+            <EditTemplate Context="purchase">
+                <RadzenButton Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success"/>
+                <RadzenButton Icon="close" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Light"/>
+                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger"/>
+            </EditTemplate>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
