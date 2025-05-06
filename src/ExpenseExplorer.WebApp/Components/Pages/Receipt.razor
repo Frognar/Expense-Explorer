@@ -40,7 +40,11 @@
                 <RadzenAutoComplete @bind-Value="@purchase.ItemName" Data="_items" OpenOnFocus="true" LoadData="OnItemsLoadData"/>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Category)" Title="@Localizer["Category"]"/>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Category)" Title="@Localizer["Category"]">
+            <EditTemplate Context="purchase">
+                <RadzenAutoComplete @bind-Value="@purchase.Category" Data="_categories" OpenOnFocus="true" LoadData="OnCategoriesLoadData"/>
+            </EditTemplate>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Quantity)" Title="@Localizer["Quantity"]"/>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.UnitPrice)" Title="@Localizer["UnitPrice"]"/>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Discount)" Title="@Localizer["Discount"]"/>
@@ -75,6 +79,7 @@
     private decimal TotalCost => _purchases.Sum(p => p.TotalPrice);
     private IEnumerable<string> _stores = [];
     private IEnumerable<string> _items = [];
+    private IEnumerable<string> _categories = [];
     private IEnumerable<PurchaseDetails> _purchases = [];
 
     /// <inheritdoc />
@@ -94,6 +99,7 @@
 
         _stores = await ReceiptService.GetStoresAsync();
         _items = await ReceiptService.GetItemsAsync();
+        _categories = await ReceiptService.GetCategoriesAsync();
         _store = _receipt?.Store ?? "";
         _purchaseDate = _receipt?.PurchaseDate ?? DateOnly.FromDateTime(DateTime.Today);
         _count = _receipt?.Purchases.Count() ?? 0;
@@ -109,6 +115,11 @@
     private async Task OnItemsLoadData(LoadDataArgs args)
     {
         _items = await ReceiptService.GetItemsAsync(args.Filter);
+    }
+
+    private async Task OnCategoriesLoadData(LoadDataArgs args)
+    {
+        _categories = await ReceiptService.GetCategoriesAsync(args.Filter);
     }
 
     private async Task InsertRow()
