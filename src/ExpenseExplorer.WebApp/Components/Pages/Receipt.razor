@@ -35,7 +35,11 @@
     RowUpdate="@OnUpdateRow"
     RowCreate="@OnCreateRow">
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["ItemName"]"/>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["ItemName"]">
+            <EditTemplate Context="purchase">
+                <RadzenAutoComplete @bind-Value="@purchase.ItemName" Data="_items" OpenOnFocus="true" LoadData="OnItemsLoadData"/>
+            </EditTemplate>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Category)" Title="@Localizer["Category"]"/>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Quantity)" Title="@Localizer["Quantity"]"/>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.UnitPrice)" Title="@Localizer["UnitPrice"]"/>
@@ -70,6 +74,7 @@
     private int _count;
     private decimal TotalCost => _purchases.Sum(p => p.TotalPrice);
     private IEnumerable<string> _stores = [];
+    private IEnumerable<string> _items = [];
     private IEnumerable<PurchaseDetails> _purchases = [];
 
     /// <inheritdoc />
@@ -88,6 +93,7 @@
             });
 
         _stores = await ReceiptService.GetStoresAsync();
+        _items = await ReceiptService.GetItemsAsync();
         _store = _receipt?.Store ?? "";
         _purchaseDate = _receipt?.PurchaseDate ?? DateOnly.FromDateTime(DateTime.Today);
         _count = _receipt?.Purchases.Count() ?? 0;
@@ -98,6 +104,11 @@
     private async Task OnStoresLoadData(LoadDataArgs args)
     {
         _stores = await ReceiptService.GetStoresAsync(args.Filter);
+    }
+
+    private async Task OnItemsLoadData(LoadDataArgs args)
+    {
+        _items = await ReceiptService.GetItemsAsync(args.Filter);
     }
 
     private async Task InsertRow()
