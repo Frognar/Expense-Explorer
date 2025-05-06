@@ -17,6 +17,7 @@ internal interface IReceiptRepository
 
     public Task<IEnumerable<string>> GetStoresAsync(string? search = null);
     public Task<IEnumerable<string>> GetItemsAsync(string? search = null);
+    public Task<IEnumerable<string>> GetCategoriesAsync(string? search = null);
     public Task AddAsync(ReceiptDetails receipt);
     public Task<ReceiptWithPurchases?> GetReceiptAsync(Guid id);
 }
