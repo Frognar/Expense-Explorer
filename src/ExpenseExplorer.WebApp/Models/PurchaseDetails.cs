@@ -18,3 +18,27 @@ internal sealed class PurchaseDetails(
     public decimal? Discount { get; set; } = discount;
     public string? Description { get; set; } = description;
 }
+
+internal static class PurchaseDetailsExtensions
+{
+    public static PurchaseDetails MakeCopy(this PurchaseDetails purchase)
+    {
+        return new PurchaseDetails(purchase.Id,
+            purchase.ItemName,
+            purchase.Category,
+            purchase.Quantity,
+            purchase.UnitPrice,
+            purchase.Discount,
+            purchase.Description);
+    }
+
+    public static void Update(this PurchaseDetails purchase, PurchaseDetails newPurchase)
+    {
+        purchase.ItemName = newPurchase.ItemName;
+        purchase.Category = newPurchase.Category;
+        purchase.Quantity = newPurchase.Quantity;
+        purchase.UnitPrice = newPurchase.UnitPrice;
+        purchase.Discount = newPurchase.Discount;
+        purchase.Description = newPurchase.Description;
+    }
+}
