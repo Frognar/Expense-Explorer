@@ -203,7 +203,13 @@
     private async Task OnCreateRow(PurchaseDetails purchase)
     {
         var result = await ReceiptService.AddPurchase(ReceiptId, purchase);
-        await result.MatchAsync(Id, BusyDialog);
+        await result.MatchAsync(
+            Id,
+            error =>
+            {
+                _grid.CancelEditRow(purchase);
+                return BusyDialog(error);
+            });
     }
     
     private async Task<Unit> BusyDialog(string message)
