@@ -59,8 +59,8 @@
                 <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger"/>
             </Template>
             <EditTemplate Context="purchase">
-                <RadzenButton Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success"/>
-                <RadzenButton Icon="close" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Light"/>
+                <RadzenButton Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Click="@(_ => SaveRow(purchase))"/>
+                <RadzenButton Icon="close" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Light" Click="@(_ => CancelEdit(purchase))"/>
                 <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger"/>
             </EditTemplate>
         </RadzenDataGridColumn>
@@ -81,6 +81,8 @@
     private IEnumerable<string> _items = [];
     private IEnumerable<string> _categories = [];
     private IEnumerable<PurchaseDetails> _purchases = [];
+    
+    private PurchaseDetails? _backup;
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
@@ -139,13 +141,30 @@
         {
             return;
         }
-        
+
+        _backup = purchase.MakeCopy();
         await _grid.EditRow(purchase);
+    }
+
+    async Task SaveRow(PurchaseDetails purchase)
+    {
+        await _grid.UpdateRow(purchase);
+    }
+
+    private void CancelEdit(PurchaseDetails purchase)
+    {
+        purchase.Update(_backup!);
+        _grid.CancelEditRow(purchase);
     }
 
     private async Task OnUpdateRow(PurchaseDetails purchase)
     {
         var result = await ReceiptService.UpdatePurchase(purchase);
+        if (result.Match(_ => false, _ => true))
+        {
+            purchase.Update(_backup!);
+        }
+
         await result.MatchAsync(Id, BusyDialog);
     }
 
