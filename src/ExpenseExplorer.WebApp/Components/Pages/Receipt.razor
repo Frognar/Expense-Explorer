@@ -90,7 +90,6 @@
             <EditTemplate Context="purchase">
                 <RadzenButton Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Click="@(_ => SaveRow(purchase))"/>
                 <RadzenButton Icon="close" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Light" Click="@(_ => CancelEdit(purchase))"/>
-                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger"/>
             </EditTemplate>
         </RadzenDataGridColumn>
     </Columns>
@@ -182,7 +181,11 @@
 
     private void CancelEdit(PurchaseDetails purchase)
     {
-        purchase.Update(_backup!);
+        if (_backup is not null)
+        {
+            purchase.Update(_backup);
+        }
+
         _grid.CancelEditRow(purchase);
     }
 
