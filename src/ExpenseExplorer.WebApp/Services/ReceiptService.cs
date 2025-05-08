@@ -91,4 +91,10 @@ internal sealed class ReceiptService(
         await Task.CompletedTask;
         return Result<Unit, string>.Failure("Hello there!");
     }
+
+    public async Task<Result<Unit, string>> DeletePurchaseAsync(Guid purchaseId)
+    {
+        await Task.CompletedTask;
+        return Result<Unit, string>.Success(Unit.Instance);
+    }
 }

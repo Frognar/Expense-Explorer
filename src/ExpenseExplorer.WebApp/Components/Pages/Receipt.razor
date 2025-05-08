@@ -85,7 +85,7 @@
             </HeaderTemplate>
             <Template Context="purchase">
                 <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Light" Click="@(_ => EditRow(purchase))"/>
-                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger"/>
+                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger" Click="@(_ => Delete(purchase))"/>
             </Template>
             <EditTemplate Context="purchase">
                 <RadzenButton Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Click="@(_ => SaveRow(purchase))"/>
@@ -221,5 +221,28 @@
         });
         
         return await DialogService.OpenErrorDialogAsync("", message);
+    }
+
+    private async Task Delete(PurchaseDetails purchase)
+    {
+        bool? delete = await DialogService.Confirm("Are you sure?", "Confirm", new ConfirmOptions
+        {
+            CancelButtonText = "No",
+            OkButtonText = "Ok",
+        });
+
+        if (delete is not true)
+        {
+            return;
+        }
+
+        Result<Unit, string> result = await ReceiptService.DeletePurchaseAsync(purchase.Id);
+        await result.MatchAsync(
+            unit =>
+            {
+                _purchases = _purchases.Where(p => p.Id != purchase.Id);
+                return Id(unit);
+            },
+            BusyDialog);
     }
 }
