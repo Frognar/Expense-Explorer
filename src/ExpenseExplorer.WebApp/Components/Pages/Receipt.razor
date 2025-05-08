@@ -225,11 +225,14 @@
 
     private async Task Delete(PurchaseDetails purchase)
     {
-        bool? delete = await DialogService.Confirm("Are you sure?", "Confirm", new ConfirmOptions
-        {
-            CancelButtonText = "No",
-            OkButtonText = "Ok",
-        });
+        bool? delete = await DialogService.Confirm(
+            Localizer["AreYouSure?"],
+            Localizer["Confirm"],
+            new ConfirmOptions
+            {
+                CancelButtonText = Localizer["No"],
+                OkButtonText = Localizer["Yes"]
+            });
 
         if (delete is not true)
         {
