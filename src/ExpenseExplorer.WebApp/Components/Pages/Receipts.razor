@@ -1,9 +1,12 @@
 @page "/"
+@using ExpenseExplorer.WebApp.Helpers
 @using ExpenseExplorer.WebApp.Models
 @using ExpenseExplorer.WebApp.Services
 @inject IStringLocalizer<Receipts> Localizer
+@inject IStringLocalizer<SharedResources> SharedLocalizer
 @inject ReceiptService ReceiptService
 @inject NavigationManager NavigationManager
+@inject DialogService DialogService
 
 <PageTitle>@Localizer["_Receipts"]</PageTitle>
 
@@ -69,11 +72,13 @@
             <Template>
                 <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Click="@(() => OnEdit(context.Id))"/>
                 <RadzenButton Icon="library_add" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light"/>
-                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger"/>
+                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger" Click="@(() => Delete(context))"/>
             </Template>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
+
+<ErrorDialog @ref="@_errorDialog"/>
 
 @code {
     private RadzenDataGrid<ReceiptDetails> _grid = null!;
@@ -88,6 +93,8 @@
     private DateOnly? _purchaseDateTo;
     private decimal? _totalCostMin;
     private decimal? _totalCostMax;
+
+    private ErrorDialog _errorDialog = null!;
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
@@ -113,4 +120,30 @@
 
     private void OnCreate() => NavigationManager.NavigateTo("/receipts/new");
     private void OnEdit(Guid id) => NavigationManager.NavigateTo($"/receipts/{id}");
+
+    private async Task Delete(ReceiptDetails receipt)
+    {
+        bool? delete = await DialogService.Confirm(
+            SharedLocalizer["Are you sure?"],
+            SharedLocalizer["Confirm"],
+            new ConfirmOptions
+            {
+                CancelButtonText = SharedLocalizer["No"],
+                OkButtonText = SharedLocalizer["Yes"]
+            });
+
+        if (delete is not true)
+        {
+            return;
+        }
+
+        Result<Unit, string> result = await ReceiptService.DeleteReceiptAsync(receipt.Id);
+        await result.MatchAsync(
+            unit =>
+            {
+                _grid.Reload();
+                return Id(unit);
+            },
+            _errorDialog.OpenErrorDialogAsync);
+    }
 }
