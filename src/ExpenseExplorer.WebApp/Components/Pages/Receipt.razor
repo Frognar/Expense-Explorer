@@ -95,6 +95,8 @@
     </Columns>
 </RadzenDataGrid>
 
+<ErrorDialog @ref="@_errorDialog"/>
+
 @code
 {
     [Parameter] public required Guid ReceiptId { get; set; }
@@ -111,6 +113,7 @@
     private IEnumerable<PurchaseDetails> _purchases = [];
     
     private PurchaseDetails? _backup;
+    private ErrorDialog _errorDialog = null!;
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
@@ -197,7 +200,7 @@
             purchase.Update(_backup!);
         }
 
-        await result.MatchAsync(Id, BusyDialog);
+        await result.MatchAsync(Id, _errorDialog.OpenErrorDialogAsync);
     }
 
     private async Task OnCreateRow(PurchaseDetails purchase)
@@ -208,19 +211,8 @@
             error =>
             {
                 _grid.CancelEditRow(purchase);
-                return BusyDialog(error);
+                return _errorDialog.OpenErrorDialogAsync(error);
             });
-    }
-    
-    private async Task<Unit> BusyDialog(string message)
-    {
-        _ = InvokeAsync(async () =>
-        {
-            await Task.Delay(2000);
-            DialogService.Close();
-        });
-        
-        return await DialogService.OpenErrorDialogAsync("", message);
     }
 
     private async Task Delete(PurchaseDetails purchase)
@@ -246,6 +238,6 @@
                 _purchases = _purchases.Where(p => p.Id != purchase.Id);
                 return Id(unit);
             },
-            BusyDialog);
+            _errorDialog.OpenErrorDialogAsync);
     }
 }

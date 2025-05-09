@@ -4,7 +4,6 @@
 @inject ReceiptService ReceiptService
 @inject IStringLocalizer<NewReceipt> Localizer
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
 
 <RadzenCard class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
     <RadzenStack Orientation="Orientation.Vertical">
@@ -21,10 +20,13 @@
     </RadzenStack>
 </RadzenCard>
 
+<ErrorDialog @ref="@_errorDialog"/>
+
 @code {
     private string _store = "";
     private DateOnly _purchaseDate = DateOnly.FromDateTime(DateTime.Today);
     private IEnumerable<string> _stores = [];
+    private ErrorDialog _errorDialog = null!;
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
@@ -46,23 +48,12 @@
         await result
             .MatchAsync(
                 id => NavigateTo($"/receipts/{id}"),
-                BusyDialog);
+                _errorDialog.OpenErrorDialogAsync);
     }
 
     private Unit NavigateTo(string url)
     {
         NavigationManager.NavigateTo(url);
         return Unit.Instance;
-    }
-
-    private async Task<Unit> BusyDialog(string message)
-    {
-        _ = InvokeAsync(async () =>
-        {
-            await Task.Delay(2000);
-            DialogService.Close();
-        });
-        
-        return await DialogService.OpenErrorDialogAsync("", message);
     }
 }
