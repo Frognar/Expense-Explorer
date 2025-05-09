@@ -47,16 +47,4 @@
     <data name="AddItem" xml:space="preserve">
         <value>Add item</value>
     </data>
-    <data name="AreYouSure?" xml:space="preserve">
-        <value>Are you sure?</value>
-    </data>
-    <data name="Confirm" xml:space="preserve">
-        <value>Confirm</value>
-    </data>
-    <data name="No" xml:space="preserve">
-        <value>No</value>
-    </data>
-    <data name="Yes" xml:space="preserve">
-        <value>Yes</value>
-    </data>
 </root>

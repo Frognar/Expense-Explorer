@@ -116,29 +116,5 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("AddItem", resourceCulture);
             }
         }
-        
-        internal static string AreYouSure_ {
-            get {
-                return ResourceManager.GetString("AreYouSure?", resourceCulture);
-            }
-        }
-        
-        internal static string Confirm {
-            get {
-                return ResourceManager.GetString("Confirm", resourceCulture);
-            }
-        }
-        
-        internal static string Yes {
-            get {
-                return ResourceManager.GetString("Yes", resourceCulture);
-            }
-        }
-        
-        internal static string No {
-            get {
-                return ResourceManager.GetString("No", resourceCulture);
-            }
-        }
     }
 }

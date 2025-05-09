@@ -4,6 +4,7 @@
 @using ExpenseExplorer.WebApp.Models
 @using ExpenseExplorer.WebApp.Services
 @inject IStringLocalizer<Receipt> Localizer
+@inject IStringLocalizer<SharedResources> SharedLocalizer
 @inject ReceiptService ReceiptService
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
@@ -218,12 +219,12 @@
     private async Task Delete(PurchaseDetails purchase)
     {
         bool? delete = await DialogService.Confirm(
-            Localizer["AreYouSure?"],
-            Localizer["Confirm"],
+            SharedLocalizer["Are you sure?"],
+            SharedLocalizer["Confirm"],
             new ConfirmOptions
             {
-                CancelButtonText = Localizer["No"],
-                OkButtonText = Localizer["Yes"]
+                CancelButtonText = SharedLocalizer["No"],
+                OkButtonText = SharedLocalizer["Yes"]
             });
 
         if (delete is not true)
