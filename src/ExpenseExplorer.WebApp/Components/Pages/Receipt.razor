@@ -4,10 +4,8 @@
 @using ExpenseExplorer.WebApp.Models
 @using ExpenseExplorer.WebApp.Services
 @inject IStringLocalizer<Receipt> Localizer
-@inject IStringLocalizer<SharedResources> SharedLocalizer
 @inject ReceiptService ReceiptService
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
 
 <PageTitle>@Localizer["_Receipt"]</PageTitle>
 <RadzenCard Variant="Variant.Outlined" class="rz-my-2 rz-mx-auto">
@@ -97,6 +95,7 @@
 </RadzenDataGrid>
 
 <ErrorDialog @ref="@_errorDialog"/>
+<ConfirmationDialog @ref="@_confirmationDialog"/>
 
 @code
 {
@@ -115,6 +114,7 @@
     
     private PurchaseDetails? _backup;
     private ErrorDialog _errorDialog = null!;
+    private ConfirmationDialog _confirmationDialog = null!;
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
@@ -218,16 +218,7 @@
 
     private async Task Delete(PurchaseDetails purchase)
     {
-        bool? delete = await DialogService.Confirm(
-            SharedLocalizer["Are you sure?"],
-            SharedLocalizer["Confirm"],
-            new ConfirmOptions
-            {
-                CancelButtonText = SharedLocalizer["No"],
-                OkButtonText = SharedLocalizer["Yes"]
-            });
-
-        if (delete is not true)
+        if (!await _confirmationDialog.IsConfirmed())
         {
             return;
         }

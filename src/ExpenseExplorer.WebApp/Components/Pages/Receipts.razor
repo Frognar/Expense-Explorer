@@ -3,10 +3,8 @@
 @using ExpenseExplorer.WebApp.Models
 @using ExpenseExplorer.WebApp.Services
 @inject IStringLocalizer<Receipts> Localizer
-@inject IStringLocalizer<SharedResources> SharedLocalizer
 @inject ReceiptService ReceiptService
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
 
 <PageTitle>@Localizer["_Receipts"]</PageTitle>
 
@@ -79,6 +77,7 @@
 </RadzenDataGrid>
 
 <ErrorDialog @ref="@_errorDialog"/>
+<ConfirmationDialog @ref="@_confirmationDialog"/>
 
 @code {
     private RadzenDataGrid<ReceiptDetails> _grid = null!;
@@ -95,6 +94,7 @@
     private decimal? _totalCostMax;
 
     private ErrorDialog _errorDialog = null!;
+    private ConfirmationDialog _confirmationDialog = null!;
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
@@ -123,16 +123,7 @@
 
     private async Task Delete(ReceiptDetails receipt)
     {
-        bool? delete = await DialogService.Confirm(
-            SharedLocalizer["Are you sure?"],
-            SharedLocalizer["Confirm"],
-            new ConfirmOptions
-            {
-                CancelButtonText = SharedLocalizer["No"],
-                OkButtonText = SharedLocalizer["Yes"]
-            });
-
-        if (delete is not true)
+        if (!await _confirmationDialog.IsConfirmed())
         {
             return;
         }
