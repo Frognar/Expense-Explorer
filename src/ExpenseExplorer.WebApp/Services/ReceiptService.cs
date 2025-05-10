@@ -52,6 +52,19 @@ internal sealed class ReceiptService(
 
     internal async Task<Result<Guid, string>> CreateReceiptAsync(string store, DateOnly purchaseDate)
     {
+        ValidationResult validationResult = Validate(store, purchaseDate);
+        if (!validationResult.IsValid)
+        {
+            return Result<Guid, string>.Failure(string.Join(Environment.NewLine, validationResult.Errors));
+        }
+
+        ReceiptDetails receipt = new(Guid.CreateVersion7(), store, purchaseDate, 0);
+        await receiptRepository.AddAsync(receipt);
+        return Result.Success<Guid, string>(receipt.Id);
+    }
+
+    private static ValidationResult Validate(string store, DateOnly purchaseDate)
+    {
         List<string> errors = [];
         if (string.IsNullOrWhiteSpace(store))
         {
@@ -63,14 +76,12 @@ internal sealed class ReceiptService(
             errors.Add("Invalid purchase date");
         }
 
-        if (errors.Count != 0)
-        {
-            return Result<Guid, string>.Failure(string.Join(Environment.NewLine, errors));
-        }
+        return new ValidationResult(errors);
+    }
 
-        ReceiptDetails receipt = new(Guid.CreateVersion7(), store, purchaseDate, 0);
-        await receiptRepository.AddAsync(receipt);
-        return Result.Success<Guid, string>(receipt.Id);
+    private readonly record struct ValidationResult(IEnumerable<string> Errors)
+    {
+        public bool IsValid => !Errors.Any();
     }
 
     public async Task<Result<ReceiptWithPurchases, string>> GetReceiptAsync(Guid id)
