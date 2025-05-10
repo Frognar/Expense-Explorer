@@ -52,14 +52,20 @@ internal sealed class ReceiptService(
 
     internal async Task<Result<Guid, string>> CreateReceiptAsync(string store, DateOnly purchaseDate)
     {
+        List<string> errors = [];
         if (string.IsNullOrWhiteSpace(store))
         {
-            return Result.Failure<Guid, string>("Invalid store");
+            errors.Add("Invalid store");
         }
 
         if (purchaseDate > DateOnly.FromDateTime(DateTime.Today))
         {
-            return Result.Failure<Guid, string>("Invalid purchase date");
+            errors.Add("Invalid purchase date");
+        }
+
+        if (errors.Count != 0)
+        {
+            return Result<Guid, string>.Failure(string.Join(Environment.NewLine, errors));
         }
 
         ReceiptDetails receipt = new(Guid.CreateVersion7(), store, purchaseDate, 0);
