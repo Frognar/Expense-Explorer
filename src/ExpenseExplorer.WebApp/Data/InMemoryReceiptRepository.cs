@@ -4,13 +4,13 @@ namespace ExpenseExplorer.WebApp.Data;
 
 internal sealed class InMemoryReceiptRepository : IReceiptRepository
 {
-    private static readonly List<ReceiptDetails> Receipts =
+    private static readonly List<ReceiptWithPurchases> Receipts =
         Enumerable.Range(1, 10000)
-            .Select(i => new ReceiptDetails(
+            .Select(i => new ReceiptWithPurchases(
                 Guid.CreateVersion7(),
                 $"Store {i}",
                 DateOnly.FromDateTime(DateTime.Today).AddDays(-i),
-                i * 10m))
+                []))
             .ToList();
 
     public async Task<ReceiptDetailsPage> GetReceiptsAsync(
@@ -25,6 +25,7 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
         decimal? totalCostMax)
     {
         IEnumerable<ReceiptDetails> result = Receipts
+            .Select(r => new ReceiptDetails(r.Id, r.Store, r.PurchaseDate, r.Purchases.Sum(p => p.TotalPrice)))
             .Where(r =>
                 (!stores.Any() || stores.Contains(r.Store))
                 && (purchaseDateFrom == null || r.PurchaseDate >= purchaseDateFrom)
@@ -106,30 +107,20 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
 
     public async Task AddAsync(ReceiptDetails receipt)
     {
-        Receipts.Add(receipt);
+        Receipts.Add(new ReceiptWithPurchases(receipt.Id, receipt.Store, receipt.PurchaseDate, []));
         await Task.CompletedTask;
     }
 
     public async Task<ReceiptWithPurchases?> GetReceiptAsync(Guid id)
     {
-        ReceiptDetails? receipt = Receipts.FirstOrDefault(r => r.Id == id);
+        ReceiptWithPurchases? receipt = Receipts.FirstOrDefault(r => r.Id == id);
         if (receipt == null)
         {
             return null;
         }
 
         await Task.CompletedTask;
-        return new ReceiptWithPurchases(receipt.Id, receipt.Store, receipt.PurchaseDate,
-        [
-            new PurchaseDetails(
-                Guid.CreateVersion7(),
-                "Item 1",
-                "Category 1",
-                1,
-                2,
-                null,
-                null)
-        ]);
+        return receipt;
     }
 
     public async Task DeleteReceiptAsync(Guid id)
