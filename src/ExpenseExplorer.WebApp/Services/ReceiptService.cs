@@ -95,27 +95,27 @@ internal sealed class ReceiptService(
         return Result<ReceiptWithPurchases, string>.Success(receipt);
     }
 
-#pragma warning disable CA1822
-#pragma warning disable S2325
-    public async Task<Result<Unit, string>> UpdatePurchase(PurchaseDetails purchase)
+    public async Task<Result<Unit, string>> DeleteReceiptAsync(Guid receiptId)
     {
-        await Task.CompletedTask;
-        return Result<Unit, string>.Failure("Hello there!");
+        await receiptRepository.DeleteReceiptAsync(receiptId);
+        return Result<Unit, string>.Success(Unit.Instance);
     }
 
+#pragma warning disable CA1822
+#pragma warning disable S2325
     public async Task<Result<Unit, string>> AddPurchase(Guid receiptId, PurchaseDetails purchase)
     {
         await Task.CompletedTask;
         return Result<Unit, string>.Failure("Hello there!");
     }
 
-    public async Task<Result<Unit, string>> DeletePurchaseAsync(Guid purchaseId)
+    public async Task<Result<Unit, string>> UpdatePurchase(PurchaseDetails purchase)
     {
         await Task.CompletedTask;
-        return Result<Unit, string>.Success(Unit.Instance);
+        return Result<Unit, string>.Failure("Hello there!");
     }
 
-    public async Task<Result<Unit, string>> DeleteReceiptAsync(Guid receiptId)
+    public async Task<Result<Unit, string>> DeletePurchaseAsync(Guid purchaseId)
     {
         await Task.CompletedTask;
         return Result<Unit, string>.Success(Unit.Instance);

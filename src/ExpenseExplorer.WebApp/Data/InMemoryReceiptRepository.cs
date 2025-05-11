@@ -131,4 +131,10 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
                 null)
         ]);
     }
+
+    public async Task DeleteReceiptAsync(Guid id)
+    {
+        Receipts.RemoveAll(r => r.Id == id);
+        await Task.CompletedTask;
+    }
 }

@@ -20,4 +20,5 @@ internal interface IReceiptRepository
     public Task<IEnumerable<string>> GetCategoriesAsync(string? search = null);
     public Task AddAsync(ReceiptDetails receipt);
     public Task<ReceiptWithPurchases?> GetReceiptAsync(Guid id);
+    public Task DeleteReceiptAsync(Guid id);
 }
