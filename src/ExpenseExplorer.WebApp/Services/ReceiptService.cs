@@ -101,14 +101,20 @@ internal sealed class ReceiptService(
         return Result<Unit, string>.Success(Unit.Instance);
     }
 
-#pragma warning disable CA1822
-#pragma warning disable S2325
     public async Task<Result<Unit, string>> AddPurchase(Guid receiptId, PurchaseDetails purchase)
     {
-        await Task.CompletedTask;
-        return Result<Unit, string>.Failure("Hello there!");
+        ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(receiptId);
+        if (receipt == null)
+        {
+            return Result<Unit, string>.Failure("Receipt not found");
+        }
+
+        await receiptRepository.AddPurchaseAsync(receiptId, purchase);
+        return Result<Unit, string>.Success(Unit.Instance);
     }
 
+#pragma warning disable CA1822
+#pragma warning disable S2325
     public async Task<Result<Unit, string>> UpdatePurchase(PurchaseDetails purchase)
     {
         await Task.CompletedTask;

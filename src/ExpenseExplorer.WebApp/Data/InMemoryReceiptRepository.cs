@@ -128,4 +128,12 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
         Receipts.RemoveAll(r => r.Id == id);
         await Task.CompletedTask;
     }
+
+    public Task AddPurchaseAsync(Guid receiptId, PurchaseDetails purchase)
+    {
+        ReceiptWithPurchases receipt = Receipts.FirstOrDefault(r => r.Id == receiptId)!;
+        var index = Receipts.IndexOf(receipt);
+        Receipts[index] = receipt with { Purchases = receipt.Purchases.Append(purchase).ToList() };
+        return Task.CompletedTask;
+    }
 }
