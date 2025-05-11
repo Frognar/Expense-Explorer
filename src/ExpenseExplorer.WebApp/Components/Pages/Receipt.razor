@@ -164,6 +164,7 @@
         }
 
         PurchaseDetails purchase = new(Guid.CreateVersion7(), "", "", 0, 0, null, null);
+        _count++;
         await _grid.InsertRow(purchase);
     }
 
@@ -189,6 +190,10 @@
         {
             purchase.Update(_backup);
         }
+        else
+        {
+            _count--;
+        }
 
         _grid.CancelEditRow(purchase);
     }
@@ -208,7 +213,11 @@
     {
         var result = await ReceiptService.AddPurchase(ReceiptId, purchase);
         await result.MatchAsync(
-            Id,
+            unit =>
+            {
+                _purchases = _purchases.Append(purchase);
+                return Id(unit);
+            },
             error =>
             {
                 _grid.CancelEditRow(purchase);
