@@ -132,8 +132,31 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
     public Task AddPurchaseAsync(Guid receiptId, PurchaseDetails purchase)
     {
         ReceiptWithPurchases receipt = Receipts.FirstOrDefault(r => r.Id == receiptId)!;
-        var index = Receipts.IndexOf(receipt);
+        int index = Receipts.IndexOf(receipt);
         Receipts[index] = receipt with { Purchases = receipt.Purchases.Append(purchase).ToList() };
         return Task.CompletedTask;
+    }
+
+    public Task UpdatePurchaseAsync(Guid receiptId, PurchaseDetails purchase)
+    {
+        ReceiptWithPurchases receipt = Receipts.FirstOrDefault(r => r.Id == receiptId)!;
+        int index = Receipts.IndexOf(receipt);
+        Receipts[index] = receipt with { Purchases = UpdatePurchase(receipt.Purchases, purchase) };
+        return Task.CompletedTask;
+    }
+
+    private static IEnumerable<PurchaseDetails> UpdatePurchase(IEnumerable<PurchaseDetails> purchases, PurchaseDetails purchase)
+    {
+        foreach (PurchaseDetails purchaseDetails in purchases)
+        {
+            if (purchaseDetails.Id == purchase.Id)
+            {
+                yield return purchase;
+            }
+            else
+            {
+                yield return purchaseDetails;
+            }
+        }
     }
 }
