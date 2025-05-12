@@ -200,7 +200,7 @@
 
     private async Task OnUpdateRow(PurchaseDetails purchase)
     {
-        var result = await ReceiptService.UpdatePurchase(purchase);
+        var result = await ReceiptService.UpdatePurchase(ReceiptId, purchase);
         if (result.Match(_ => false, _ => true))
         {
             purchase.Update(_backup!);
