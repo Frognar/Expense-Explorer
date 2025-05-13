@@ -25,7 +25,7 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
         decimal? totalCostMax)
     {
         IEnumerable<ReceiptDetails> result = Receipts
-            .Select(r => new ReceiptDetails(r.Id, r.Store, r.PurchaseDate, r.Purchases.Sum(p => p.FinalPrice)))
+            .Select(r => new ReceiptDetails(r.Id, r.Store, r.PurchaseDate, r.Purchases.Sum(p => p.PriceAfterDiscount)))
             .Where(r =>
                 (!stores.Any() || stores.Contains(r.Store))
                 && (purchaseDateFrom == null || r.PurchaseDate >= purchaseDateFrom)

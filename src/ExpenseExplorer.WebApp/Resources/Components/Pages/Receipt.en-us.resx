@@ -26,8 +26,8 @@
     <data name="UnitPrice" xml:space="preserve">
         <value>Unit price</value>
     </data>
-    <data name="TotalPrice" xml:space="preserve">
-        <value>Total price</value>
+    <data name="PriceBeforeDiscount" xml:space="preserve">
+        <value>Price Before Discount</value>
     </data>
     <data name="Quantity" xml:space="preserve">
         <value>Quantity</value>
@@ -47,7 +47,7 @@
     <data name="AddItem" xml:space="preserve">
         <value>Add item</value>
     </data>
-    <data name="FinalPrice" xml:space="preserve">
-        <value>Final price</value>
+    <data name="PriceAfterDiscount" xml:space="preserve">
+        <value>Price After Discount</value>
     </data>
 </root>

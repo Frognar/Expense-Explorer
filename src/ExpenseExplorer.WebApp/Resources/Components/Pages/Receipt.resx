@@ -45,8 +45,8 @@
     <data name="Discount" xml:space="preserve">
         <value>Zniżka</value>
     </data>
-    <data name="TotalPrice" xml:space="preserve">
-        <value>Cena całkowita</value>
+    <data name="PriceBeforeDiscount" xml:space="preserve">
+        <value>Cena przed rabatem</value>
     </data>
     <data name="Description" xml:space="preserve">
         <value>Opis</value>
@@ -54,7 +54,7 @@
     <data name="AddItem" xml:space="preserve">
         <value>Dodaj przedmiot</value>
     </data>
-    <data name="FinalPrice" xml:space="preserve">
-        <value>Cena końcowa</value>
+    <data name="PriceAfterDiscount" xml:space="preserve">
+        <value>Cena po rabacie</value>
     </data>
 </root>

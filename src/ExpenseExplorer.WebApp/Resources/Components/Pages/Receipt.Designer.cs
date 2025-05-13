@@ -99,9 +99,9 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string TotalPrice {
+        internal static string PriceBeforeDiscount {
             get {
-                return ResourceManager.GetString("TotalPrice", resourceCulture);
+                return ResourceManager.GetString("PriceBeforeDiscount", resourceCulture);
             }
         }
         
@@ -117,9 +117,9 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string FinalPrice {
+        internal static string PriceAfterDiscount {
             get {
-                return ResourceManager.GetString("FinalPrice", resourceCulture);
+                return ResourceManager.GetString("PriceAfterDiscount", resourceCulture);
             }
         }
     }

@@ -60,6 +60,11 @@
                 <RadzenNumeric @bind-Value="@context.UnitPrice" ShowUpDown="false"/>
             </EditTemplate>
         </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceBeforeDiscount)" Title="@Localizer["PriceBeforeDiscount"]">
+            <Template>
+                @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.PriceBeforeDiscount)
+            </Template>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Discount)" Title="@Localizer["Discount"]">
             <Template>
                 @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.Discount)
@@ -68,9 +73,9 @@
                 <RadzenNumeric @bind-Value="@context.Discount" ShowUpDown="false"/>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.FinalPrice)" Title="@Localizer["FinalPrice"]">
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceAfterDiscount)" Title="@Localizer["PriceAfterDiscount"]">
             <Template>
-                @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.FinalPrice)
+                @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.PriceAfterDiscount)
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Description)" Title="@Localizer["Description"]">
@@ -106,7 +111,7 @@
     private string _store = "";
     private DateOnly _purchaseDate;
     private int _count;
-    private decimal TotalCost => _purchases.Sum(p => p.FinalPrice);
+    private decimal TotalCost => _purchases.Sum(p => p.PriceAfterDiscount);
     private IEnumerable<string> _stores = [];
     private IEnumerable<string> _items = [];
     private IEnumerable<string> _categories = [];

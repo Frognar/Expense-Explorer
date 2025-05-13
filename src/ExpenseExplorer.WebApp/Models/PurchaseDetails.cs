@@ -9,7 +9,8 @@ internal sealed class PurchaseDetails(
     decimal? discount,
     string? description)
 {
-    public decimal FinalPrice => Quantity * UnitPrice - (Discount ?? 0);
+    public decimal PriceBeforeDiscount => Quantity * UnitPrice;
+    public decimal PriceAfterDiscount => PriceBeforeDiscount - (Discount ?? 0);
     public Guid Id { get; init; } = id;
     public string ItemName { get; set; } = itemName;
     public string Category { get; set; } = category;
