@@ -68,7 +68,7 @@
                 <RadzenNumeric @bind-Value="@context.Discount" ShowUpDown="false"/>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.FinalPrice)" Title="@Localizer["TotalPrice"]">
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.FinalPrice)" Title="@Localizer["FinalPrice"]">
             <Template>
                 @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.FinalPrice)
             </Template>

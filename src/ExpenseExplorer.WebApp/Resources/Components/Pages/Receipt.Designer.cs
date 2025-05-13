@@ -116,5 +116,11 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("AddItem", resourceCulture);
             }
         }
+        
+        internal static string FinalPrice {
+            get {
+                return ResourceManager.GetString("FinalPrice", resourceCulture);
+            }
+        }
     }
 }

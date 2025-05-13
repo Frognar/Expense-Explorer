@@ -47,4 +47,7 @@
     <data name="AddItem" xml:space="preserve">
         <value>Add item</value>
     </data>
+    <data name="FinalPrice" xml:space="preserve">
+        <value>Final price</value>
+    </data>
 </root>
