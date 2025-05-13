@@ -68,9 +68,9 @@
                 <RadzenNumeric @bind-Value="@context.Discount" ShowUpDown="false"/>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.TotalPrice)" Title="@Localizer["TotalPrice"]">
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.FinalPrice)" Title="@Localizer["TotalPrice"]">
             <Template>
-                @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.TotalPrice)
+                @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.FinalPrice)
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Description)" Title="@Localizer["Description"]">
@@ -106,7 +106,7 @@
     private string _store = "";
     private DateOnly _purchaseDate;
     private int _count;
-    private decimal TotalCost => _purchases.Sum(p => p.TotalPrice);
+    private decimal TotalCost => _purchases.Sum(p => p.FinalPrice);
     private IEnumerable<string> _stores = [];
     private IEnumerable<string> _items = [];
     private IEnumerable<string> _categories = [];
