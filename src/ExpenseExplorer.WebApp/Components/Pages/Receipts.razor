@@ -125,8 +125,9 @@
     {
         Result<Guid, string> result = await ReceiptService.DuplicateReceipt(id);
         await result.MatchAsync(
-            receiptId =>
+            async receiptId =>
             {
+                await _toast.OpenAsync("Copied");
                 NavigationManager.NavigateTo($"/receipts/{receiptId}");
                 return Unit.Instance;
             },
