@@ -69,7 +69,7 @@
             </HeaderTemplate>
             <Template>
                 <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Click="@(() => OnEdit(context.Id))"/>
-                <RadzenButton Icon="library_add" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light"/>
+                <RadzenButton Icon="library_add" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Click="@(() => OnCopy(context.Id))"/>
                 <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger" Click="@(() => Delete(context))"/>
             </Template>
         </RadzenDataGridColumn>
@@ -120,6 +120,18 @@
 
     private void OnCreate() => NavigationManager.NavigateTo("/receipts/new");
     private void OnEdit(Guid id) => NavigationManager.NavigateTo($"/receipts/{id}");
+
+    private async Task OnCopy(Guid id)
+    {
+        Result<Guid, string> result = await ReceiptService.DuplicateReceipt(id);
+        await result.MatchAsync(
+            receiptId =>
+            {
+                NavigationManager.NavigateTo($"/receipts/{receiptId}");
+                return Unit.Instance;
+            },
+            _errorDialog.OpenErrorDialogAsync);
+    }
 
     private async Task Delete(ReceiptDetails receipt)
     {

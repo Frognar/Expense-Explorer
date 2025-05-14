@@ -95,6 +95,34 @@ internal sealed class ReceiptService(
         return Result<ReceiptWithPurchases, string>.Success(receipt);
     }
 
+    public async Task<Result<Guid, string>> DuplicateReceipt(Guid id)
+    {
+        ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(id);
+        if (receipt == null)
+        {
+            return Result<Guid, string>.Failure("Receipt not found");
+        }
+
+        Guid newId = Guid.CreateVersion7();
+        ReceiptDetails duplicate = new(newId, receipt.Store, DateOnly.FromDateTime(DateTime.Today), 0);
+        await receiptRepository.AddAsync(duplicate);
+        foreach (PurchaseDetails purchase in receipt.Purchases)
+        {
+            PurchaseDetails newPurchase = new(
+                Guid.CreateVersion7(),
+                purchase.ItemName,
+                purchase.Category,
+                purchase.Quantity,
+                purchase.UnitPrice,
+                purchase.Discount,
+                purchase.Description);
+
+            await receiptRepository.AddPurchaseAsync(newId, newPurchase);
+        }
+
+        return Result<Guid, string>.Success(newId);
+    }
+
     public async Task<Result<Unit, string>> DeleteReceiptAsync(Guid receiptId)
     {
         await receiptRepository.DeleteReceiptAsync(receiptId);
