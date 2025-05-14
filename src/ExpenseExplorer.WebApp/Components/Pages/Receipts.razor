@@ -76,7 +76,7 @@
     </Columns>
 </RadzenDataGrid>
 
-<ErrorDialog @ref="@_errorDialog"/>
+<Toast @ref="@_toast"/>
 <ConfirmationDialog @ref="@_confirmationDialog"/>
 
 @code {
@@ -93,7 +93,7 @@
     private decimal? _totalCostMin;
     private decimal? _totalCostMax;
 
-    private ErrorDialog _errorDialog = null!;
+    private Toast _toast = null!;
     private ConfirmationDialog _confirmationDialog = null!;
 
     /// <inheritdoc />
@@ -130,7 +130,7 @@
                 NavigationManager.NavigateTo($"/receipts/{receiptId}");
                 return Unit.Instance;
             },
-            _errorDialog.OpenErrorDialogAsync);
+            _toast.OpenAsync);
     }
 
     private async Task Delete(ReceiptDetails receipt)
@@ -147,6 +147,6 @@
                 _grid.Reload();
                 return Id(unit);
             },
-            _errorDialog.OpenErrorDialogAsync);
+            _toast.OpenAsync);
     }
 }

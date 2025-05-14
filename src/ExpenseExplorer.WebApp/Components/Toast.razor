@@ -2,7 +2,7 @@
 @inject DialogService DialogService
 
 @code {
-    internal async Task<Unit> OpenErrorDialogAsync(string message)
+    internal async Task<Unit> OpenAsync(string message)
     {
         _ = InvokeAsync(async () =>
         {

@@ -20,13 +20,13 @@
     </RadzenStack>
 </RadzenCard>
 
-<ErrorDialog @ref="@_errorDialog"/>
+<Toast @ref="@_toast"/>
 
 @code {
     private string _store = "";
     private DateOnly _purchaseDate = DateOnly.FromDateTime(DateTime.Today);
     private IEnumerable<string> _stores = [];
-    private ErrorDialog _errorDialog = null!;
+    private Toast _toast = null!;
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
@@ -48,7 +48,7 @@
         await result
             .MatchAsync(
                 id => NavigateTo($"/receipts/{id}"),
-                _errorDialog.OpenErrorDialogAsync);
+                _toast.OpenAsync);
     }
 
     private Unit NavigateTo(string url)

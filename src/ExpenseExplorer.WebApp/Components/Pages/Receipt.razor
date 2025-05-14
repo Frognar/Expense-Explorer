@@ -99,7 +99,7 @@
     </Columns>
 </RadzenDataGrid>
 
-<ErrorDialog @ref="@_errorDialog"/>
+<Toast @ref="@_toast"/>
 <ConfirmationDialog @ref="@_confirmationDialog"/>
 
 @code
@@ -118,7 +118,7 @@
     private IEnumerable<PurchaseDetails> _purchases = [];
     
     private PurchaseDetails? _backup;
-    private ErrorDialog _errorDialog = null!;
+    private Toast _toast = null!;
     private ConfirmationDialog _confirmationDialog = null!;
 
     /// <inheritdoc />
@@ -211,7 +211,7 @@
             purchase.Update(_backup!);
         }
 
-        await result.MatchAsync(Id, _errorDialog.OpenErrorDialogAsync);
+        await result.MatchAsync(Id, _toast.OpenAsync);
     }
 
     private async Task OnCreateRow(PurchaseDetails purchase)
@@ -226,7 +226,7 @@
             error =>
             {
                 _grid.CancelEditRow(purchase);
-                return _errorDialog.OpenErrorDialogAsync(error);
+                return _toast.OpenAsync(error);
             });
     }
 
@@ -244,6 +244,6 @@
                 _purchases = _purchases.Where(p => p.Id != purchase.Id);
                 return Id(unit);
             },
-            _errorDialog.OpenErrorDialogAsync);
+            _toast.OpenAsync);
     }
 }
