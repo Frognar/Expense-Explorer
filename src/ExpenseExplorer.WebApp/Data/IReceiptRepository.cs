@@ -24,4 +24,5 @@ internal interface IReceiptRepository
 
     public Task AddPurchaseAsync(Guid receiptId, PurchaseDetails purchase);
     public Task UpdatePurchaseAsync(Guid receiptId, PurchaseDetails purchase);
+    public Task DeletePurchaseAsync(Guid receiptId, Guid purchaseId);
 }

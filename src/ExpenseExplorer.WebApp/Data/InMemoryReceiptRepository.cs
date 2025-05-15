@@ -159,4 +159,12 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
             }
         }
     }
+
+    public Task DeletePurchaseAsync(Guid receiptId, Guid purchaseId)
+    {
+        ReceiptWithPurchases receipt = Receipts.FirstOrDefault(r => r.Id == receiptId)!;
+        int index = Receipts.IndexOf(receipt);
+        Receipts[index] = receipt with { Purchases = receipt.Purchases.Where(p => p.Id != purchaseId).ToList() };
+        return Task.CompletedTask;
+    }
 }

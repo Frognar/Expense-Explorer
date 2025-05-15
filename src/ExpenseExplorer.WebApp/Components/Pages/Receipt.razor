@@ -237,7 +237,7 @@
             return;
         }
 
-        Result<Unit, string> result = await ReceiptService.DeletePurchaseAsync(purchase.Id);
+        Result<Unit, string> result = await ReceiptService.DeletePurchaseAsync(ReceiptId, purchase.Id);
         await result.MatchAsync(
             unit =>
             {
