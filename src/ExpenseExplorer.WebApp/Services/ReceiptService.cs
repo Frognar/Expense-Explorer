@@ -1,3 +1,4 @@
+using ExpenseExplorer.Application;
 using ExpenseExplorer.WebApp.Data;
 using ExpenseExplorer.WebApp.Helpers;
 using ExpenseExplorer.WebApp.Models;
@@ -52,10 +53,15 @@ internal sealed class ReceiptService(
 
     internal async Task<Result<Guid, string>> CreateReceiptAsync(string store, DateOnly purchaseDate)
     {
-        ValidationResult validationResult = Validate(store, purchaseDate);
-        if (!validationResult.IsValid)
+        Validated<(string, DateOnly)> validationResult = Validate(store, purchaseDate);
+        if (validationResult.Match(errors: _ => true, value: _ => false))
         {
-            return Result<Guid, string>.Failure(string.Join(Environment.NewLine, validationResult.Errors));
+            return Result<Guid, string>.Failure(
+                string.Join(
+                    Environment.NewLine,
+                    validationResult.Match(
+                        errors: errors => errors.Select(e => e.Error),
+                        value: _ => [])));
         }
 
         ReceiptDetails receipt = new(Guid.CreateVersion7(), store, purchaseDate, 0);
@@ -63,25 +69,22 @@ internal sealed class ReceiptService(
         return Result.Success<Guid, string>(receipt.Id);
     }
 
-    private static ValidationResult Validate(string store, DateOnly purchaseDate)
+    private static Validated<(string, DateOnly)> Validate(string store, DateOnly purchaseDate)
     {
-        List<string> errors = [];
+        List<ValidationError> errors = [];
         if (string.IsNullOrWhiteSpace(store))
         {
-            errors.Add("Invalid store");
+            errors.Add(new ValidationError(nameof(store), "Invalid store"));
         }
 
         if (purchaseDate > DateOnly.FromDateTime(DateTime.Today))
         {
-            errors.Add("Invalid purchase date");
+            errors.Add(new ValidationError(nameof(purchaseDate), "Invalid purchase date"));
         }
 
-        return new ValidationResult(errors);
-    }
-
-    private readonly record struct ValidationResult(IEnumerable<string> Errors)
-    {
-        public bool IsValid => !Errors.Any();
+        return errors.Count != 0
+            ? Validation.Failed<(string, DateOnly)>(errors)
+            : Validation.Succeed((store, purchaseDate));
     }
 
     public async Task<Result<ReceiptWithPurchases, string>> GetReceiptAsync(Guid id)
