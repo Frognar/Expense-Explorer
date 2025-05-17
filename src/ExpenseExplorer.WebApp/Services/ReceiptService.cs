@@ -56,7 +56,7 @@ internal sealed class ReceiptService(
         Validated<(string, DateOnly)> validationResult = Validate(store, purchaseDate);
         if (validationResult.Match(errors: _ => true, value: _ => false))
         {
-            return Result<Guid, string>.Failure(
+            return Result.Failure<Guid, string>(
                 string.Join(
                     Environment.NewLine,
                     validationResult.Match(
@@ -92,10 +92,10 @@ internal sealed class ReceiptService(
         ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(id);
         if (receipt == null)
         {
-            return Result<ReceiptWithPurchases, string>.Failure("Receipt not found");
+            return Result.Failure<ReceiptWithPurchases, string>("Receipt not found");
         }
 
-        return Result<ReceiptWithPurchases, string>.Success(receipt);
+        return Result.Success<ReceiptWithPurchases, string>(receipt);
     }
 
     public async Task<Result<Guid, string>> DuplicateReceipt(Guid id)
@@ -103,7 +103,7 @@ internal sealed class ReceiptService(
         ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(id);
         if (receipt == null)
         {
-            return Result<Guid, string>.Failure("Receipt not found");
+            return Result.Failure<Guid, string>("Receipt not found");
         }
 
         Guid newId = Guid.CreateVersion7();
@@ -123,13 +123,13 @@ internal sealed class ReceiptService(
             await receiptRepository.AddPurchaseAsync(newId, newPurchase);
         }
 
-        return Result<Guid, string>.Success(newId);
+        return Result.Success<Guid, string>(newId);
     }
 
     public async Task<Result<Unit, string>> DeleteReceiptAsync(Guid receiptId)
     {
         await receiptRepository.DeleteReceiptAsync(receiptId);
-        return Result<Unit, string>.Success(Unit.Instance);
+        return Result.Success<Unit, string>(Unit.Instance);
     }
 
     public async Task<Result<Unit, string>> AddPurchase(Guid receiptId, PurchaseDetails purchase)
@@ -137,11 +137,11 @@ internal sealed class ReceiptService(
         ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(receiptId);
         if (receipt == null)
         {
-            return Result<Unit, string>.Failure("Receipt not found");
+            return Result.Failure<Unit, string>("Receipt not found");
         }
 
         await receiptRepository.AddPurchaseAsync(receiptId, purchase);
-        return Result<Unit, string>.Success(Unit.Instance);
+        return Result.Success<Unit, string>(Unit.Instance);
     }
 
     public async Task<Result<Unit, string>> UpdatePurchase(Guid receiptId, PurchaseDetails purchase)
@@ -149,11 +149,11 @@ internal sealed class ReceiptService(
         ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(receiptId);
         if (receipt == null)
         {
-            return Result<Unit, string>.Failure("Receipt not found");
+            return Result.Failure<Unit, string>("Receipt not found");
         }
 
         await receiptRepository.UpdatePurchaseAsync(receiptId, purchase);
-        return Result<Unit, string>.Success(Unit.Instance);
+        return Result.Success<Unit, string>(Unit.Instance);
     }
 
     public async Task<Result<Unit, string>> DeletePurchaseAsync(Guid receiptId, Guid purchaseId)
@@ -161,10 +161,10 @@ internal sealed class ReceiptService(
         ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(receiptId);
         if (receipt == null)
         {
-            return Result<Unit, string>.Failure("Receipt not found");
+            return Result.Failure<Unit, string>("Receipt not found");
         }
 
         await receiptRepository.DeletePurchaseAsync(receiptId, purchaseId);
-        return Result<Unit, string>.Success(Unit.Instance);
+        return Result.Success<Unit, string>(Unit.Instance);
     }
 }
