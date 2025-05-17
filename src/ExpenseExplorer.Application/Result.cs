@@ -15,61 +15,61 @@ public sealed class Result<T, TError>
     internal static Result<T, TError> Failure(TError error) => new(new FailureResult(error));
 
     public TResult Match<TResult>(
-        Func<T, TResult> onSuccess,
-        Func<TError, TResult> onError)
+        Func<T, TResult> value,
+        Func<TError, TResult> error)
     {
-        ArgumentNullException.ThrowIfNull(onSuccess);
-        ArgumentNullException.ThrowIfNull(onError);
+        ArgumentNullException.ThrowIfNull(error);
+        ArgumentNullException.ThrowIfNull(value);
 
         return _result switch
         {
-            SuccessResult success => onSuccess(success.Value),
-            FailureResult failure => onError(failure.Error),
+            FailureResult failure => error(failure.Error),
+            SuccessResult success => value(success.Value),
             _ => throw new InvalidOperationException("Invalid result")
         };
     }
 
     public async Task<TResult> MatchAsync<TResult>(
-        Func<T, Task<TResult>> onSuccess,
-        Func<TError, Task<TResult>> onError)
+        Func<T, Task<TResult>> value,
+        Func<TError, Task<TResult>> error)
     {
-        ArgumentNullException.ThrowIfNull(onSuccess);
-        ArgumentNullException.ThrowIfNull(onError);
+        ArgumentNullException.ThrowIfNull(error);
+        ArgumentNullException.ThrowIfNull(value);
 
         return _result switch
         {
-            SuccessResult success => await onSuccess(success.Value),
-            FailureResult failure => await onError(failure.Error),
+            FailureResult failure => await error(failure.Error),
+            SuccessResult success => await value(success.Value),
             _ => throw new InvalidOperationException("Invalid result")
         };
     }
 
     public async Task<TResult> MatchAsync<TResult>(
-        Func<T, TResult> onSuccess,
-        Func<TError, Task<TResult>> onError)
+        Func<T, TResult> value,
+        Func<TError, Task<TResult>> error)
     {
-        ArgumentNullException.ThrowIfNull(onSuccess);
-        ArgumentNullException.ThrowIfNull(onError);
+        ArgumentNullException.ThrowIfNull(error);
+        ArgumentNullException.ThrowIfNull(value);
 
         return _result switch
         {
-            SuccessResult success => onSuccess(success.Value),
-            FailureResult failure => await onError(failure.Error),
+            FailureResult failure => await error(failure.Error),
+            SuccessResult success => value(success.Value),
             _ => throw new InvalidOperationException("Invalid result")
         };
     }
 
     public async Task<TResult> MatchAsync<TResult>(
-        Func<T, Task<TResult>> onSuccess,
-        Func<TError, TResult> onError)
+        Func<TError, TResult> error,
+        Func<T, Task<TResult>> value)
     {
-        ArgumentNullException.ThrowIfNull(onSuccess);
-        ArgumentNullException.ThrowIfNull(onError);
+        ArgumentNullException.ThrowIfNull(error);
+        ArgumentNullException.ThrowIfNull(value);
 
         return _result switch
         {
-            SuccessResult success => await onSuccess(success.Value),
-            FailureResult failure => onError(failure.Error),
+            FailureResult failure => error(failure.Error),
+            SuccessResult success => await value(success.Value),
             _ => throw new InvalidOperationException("Invalid result")
         };
     }
