@@ -47,9 +47,7 @@
     {
         Result<Guid, string> result = await ReceiptService.CreateReceiptAsync(_store, _purchaseDate);
         await result
-            .MatchAsync(
-                id => NavigateTo($"/receipts/{id}"),
-                _toast.OpenAsync);
+            .MatchAsync(_toast.OpenAsync, id => NavigateTo($"/receipts/{id}"));
     }
 
     private Unit NavigateTo(string url)

@@ -125,14 +125,12 @@
     private async Task OnCopy(Guid id)
     {
         Result<Guid, string> result = await ReceiptService.DuplicateReceipt(id);
-        await result.MatchAsync(
-            async receiptId =>
-            {
-                await _toast.OpenAsync("Copied");
-                NavigationManager.NavigateTo($"/receipts/{receiptId}");
-                return Unit.Instance;
-            },
-            _toast.OpenAsync);
+        await result.MatchAsync(_toast.OpenAsync, async receiptId =>
+        {
+            await _toast.OpenAsync("Copied");
+            NavigationManager.NavigateTo($"/receipts/{receiptId}");
+            return Unit.Instance;
+        });
     }
 
     private async Task Delete(ReceiptDetails receipt)
@@ -143,12 +141,10 @@
         }
 
         Result<Unit, string> result = await ReceiptService.DeleteReceiptAsync(receipt.Id);
-        await result.MatchAsync(
-            unit =>
-            {
-                _grid.Reload();
-                return Id(unit);
-            },
-            _toast.OpenAsync);
+        await result.MatchAsync(_toast.OpenAsync, unit =>
+        {
+            _grid.Reload();
+            return Id<string>(unit);
+        });
     }
 }

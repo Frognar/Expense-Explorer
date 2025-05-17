@@ -15,8 +15,8 @@ public sealed class Result<T, TError>
     internal static Result<T, TError> Failure(TError error) => new(new FailureResult(error));
 
     public TResult Match<TResult>(
-        Func<T, TResult> value,
-        Func<TError, TResult> error)
+        Func<TError, TResult> error,
+        Func<T, TResult> value)
     {
         ArgumentNullException.ThrowIfNull(error);
         ArgumentNullException.ThrowIfNull(value);
@@ -30,8 +30,8 @@ public sealed class Result<T, TError>
     }
 
     public async Task<TResult> MatchAsync<TResult>(
-        Func<T, Task<TResult>> value,
-        Func<TError, Task<TResult>> error)
+        Func<TError, Task<TResult>> error,
+        Func<T, Task<TResult>> value)
     {
         ArgumentNullException.ThrowIfNull(error);
         ArgumentNullException.ThrowIfNull(value);
@@ -44,9 +44,7 @@ public sealed class Result<T, TError>
         };
     }
 
-    public async Task<TResult> MatchAsync<TResult>(
-        Func<T, TResult> value,
-        Func<TError, Task<TResult>> error)
+    public async Task<TResult> MatchAsync<TResult>(Func<TError, Task<TResult>> error, Func<T, TResult> value)
     {
         ArgumentNullException.ThrowIfNull(error);
         ArgumentNullException.ThrowIfNull(value);

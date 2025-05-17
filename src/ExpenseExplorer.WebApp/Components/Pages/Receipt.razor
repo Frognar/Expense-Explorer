@@ -126,16 +126,15 @@
     protected override async Task OnInitializedAsync()
     {
         Result<ReceiptWithPurchases, string> receiptResult = await ReceiptService.GetReceiptAsync(ReceiptId);
-        receiptResult.Match(receipt =>
-            {
-                _receipt = receipt;
-                return Unit.Instance;
-            },
-            _ =>
-            {
-                NavigationManager.NavigateTo("/");
-                return Unit.Instance;
-            });
+        receiptResult.Match(_ =>
+        {
+            NavigationManager.NavigateTo("/");
+            return Unit.Instance;
+        }, receipt =>
+        {
+            _receipt = receipt;
+            return Unit.Instance;
+        });
 
         _stores = await ReceiptService.GetStoresAsync();
         _items = await ReceiptService.GetItemsAsync();
@@ -207,28 +206,26 @@
     private async Task OnUpdateRow(PurchaseDetails purchase)
     {
         var result = await ReceiptService.UpdatePurchase(ReceiptId, purchase);
-        if (result.Match(_ => false, _ => true))
+        if (result.Match(_ => true, _ => false))
         {
             purchase.Update(_backup!);
         }
 
-        await result.MatchAsync(Id, _toast.OpenAsync);
+        await result.MatchAsync(_toast.OpenAsync, Id);
     }
 
     private async Task OnCreateRow(PurchaseDetails purchase)
     {
         var result = await ReceiptService.AddPurchase(ReceiptId, purchase);
-        await result.MatchAsync(
-            unit =>
-            {
-                _purchases = _purchases.Append(purchase);
-                return Id(unit);
-            },
-            error =>
-            {
-                _grid.CancelEditRow(purchase);
-                return _toast.OpenAsync(error);
-            });
+        await result.MatchAsync(error =>
+        {
+            _grid.CancelEditRow(purchase);
+            return _toast.OpenAsync(error);
+        }, unit =>
+        {
+            _purchases = _purchases.Append(purchase);
+            return Id<string>(unit);
+        });
     }
 
     private async Task Delete(PurchaseDetails purchase)
@@ -239,12 +236,10 @@
         }
 
         Result<Unit, string> result = await ReceiptService.DeletePurchaseAsync(ReceiptId, purchase.Id);
-        await result.MatchAsync(
-            unit =>
-            {
-                _purchases = _purchases.Where(p => p.Id != purchase.Id);
-                return Id(unit);
-            },
-            _toast.OpenAsync);
+        await result.MatchAsync(_toast.OpenAsync, unit =>
+        {
+            _purchases = _purchases.Where(p => p.Id != purchase.Id);
+            return Id<string>(unit);
+        });
     }
 }
