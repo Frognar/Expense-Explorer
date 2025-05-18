@@ -224,7 +224,7 @@
         }, unit =>
         {
             _purchases = _purchases.Append(purchase);
-            return Id<string>(unit);
+            return Id(unit);
         });
     }
 
@@ -239,7 +239,7 @@
         await result.MatchAsync(_toast.OpenAsync, unit =>
         {
             _purchases = _purchases.Where(p => p.Id != purchase.Id);
-            return Id<string>(unit);
+            return Id(unit);
         });
     }
 }

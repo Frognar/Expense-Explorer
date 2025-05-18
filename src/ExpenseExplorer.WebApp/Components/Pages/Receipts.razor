@@ -141,10 +141,12 @@
         }
 
         Result<Unit, string> result = await ReceiptService.DeleteReceiptAsync(receipt.Id);
-        await result.MatchAsync(_toast.OpenAsync, unit =>
+        await result.MatchAsync(
+            _toast.OpenAsync,
+            unit =>
         {
             _grid.Reload();
-            return Id<string>(unit);
+            return Id(unit);
         });
     }
 }
