@@ -1,3 +1,5 @@
+using ExpenseExplorer.Application.Receipts.ValueObjects;
+
 namespace ExpenseExplorer.Application.Receipts.DTO;
 
-public sealed record ReceiptSummary(string Store, DateOnly PurchaseDate, decimal Total);
+public sealed record ReceiptSummary(Store Store, PurchaseDate PurchaseDate, Money Total);
