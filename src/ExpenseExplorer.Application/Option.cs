@@ -15,6 +15,21 @@ public sealed class Option<T>
     internal static Option<T> Some(T value) => new(new SomeOption(value));
     internal static Option<T> None() => new(new NoneOption());
 
+    public TResult Match<TResult>(
+        Func<TResult> none,
+        Func<T, TResult> some
+        )
+    {
+        ArgumentNullException.ThrowIfNull(none);
+        ArgumentNullException.ThrowIfNull(some);
+        return _option switch
+        {
+            NoneOption => none(),
+            SomeOption s => some(s.Value),
+            _ => throw new InvalidOperationException("Invalid option")
+        };
+    }
+
     private interface IOption;
     private sealed record SomeOption(T Value) : IOption;
     private sealed record NoneOption : IOption;
