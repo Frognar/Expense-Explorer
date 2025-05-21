@@ -4,6 +4,26 @@ public static class Result
 {
     public static Result<T, TError> Success<T, TError>(T value) => Result<T, TError>.Success(value);
     public static Result<T, TError> Failure<T, TError>(TError error) => Result<T, TError>.Failure(error);
+
+    public static Result<T, TErrorResult> MapError<T, TError, TErrorResult>(
+        this Result<T, TError> source,
+        Func<TError, TErrorResult> map)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        return source.Match(
+            error: e => Failure<T, TErrorResult>(map(e)),
+            value: Success<T, TErrorResult>);
+    }
+
+    public static Task<Result<TResult, TError>> MapAsync<T, TResult, TError>(
+        this Result<T, TError> source,
+        Func<T, Task<TResult>> map)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        return source.MatchAsync(
+            error: Failure<TResult, TError>,
+            value: async v => Success<TResult, TError>(await map(v)));
+    }
 }
 
 public sealed class Result<T, TError>
