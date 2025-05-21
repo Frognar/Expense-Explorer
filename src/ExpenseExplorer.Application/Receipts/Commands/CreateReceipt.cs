@@ -12,14 +12,10 @@ public sealed class CreateReceiptHandler(IReceiptRepository receiptRepository)
         CreateReceiptCommand command,
         CancellationToken cancellationToken)
     {
-        Validated<CreateReceiptRequest> validated = CreateReceiptValidator.Validate(command);
-        Result<CreateReceiptRequest, IEnumerable<string>> result = validated.Match(
-            errors => Result.Failure<CreateReceiptRequest, IEnumerable<string>>(errors.Select(e => e.Error)),
-            value: Result.Success<CreateReceiptRequest, IEnumerable<string>>);
-
-        return await result.MatchAsync<Result<Unit, IEnumerable<string>>>(
-            error: Result.Failure<Unit, IEnumerable<string>>,
-            value: async request => Result<Unit, IEnumerable<string>>.Success(await receiptRepository.CreateReceipt(request, cancellationToken)));
+        return await CreateReceiptValidator.Validate(command)
+            .ToResult()
+            .MapError(errors => errors.Select(e => e.Error))
+            .MapAsync(request => receiptRepository.CreateReceipt(request, cancellationToken));
     }
 }
 
