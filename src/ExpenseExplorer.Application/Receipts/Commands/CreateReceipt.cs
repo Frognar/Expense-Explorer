@@ -28,23 +28,12 @@ public static class CreateReceiptValidator
     public static Validated<CreateReceiptRequest> Validate(CreateReceiptCommand command)
     {
         ArgumentNullException.ThrowIfNull(command);
-        Option<Store> store = Store.TryCreate(command.StoreName);
+        Validated<Store> validatedStore = Store.TryCreate(command.StoreName)
+                .ToValidated(() => new ValidationError(nameof(command.StoreName), "Store name cannot be empty"));
 
-        Validated<Store> validatedStore = store.Match(
-            none: () => Validation.Failed<Store>([new ValidationError(nameof(command.StoreName),"Store name cannot be empty")]),
-            some: Validation.Succeed);
+        Validated<PurchaseDate> validatedPurchaseDate = PurchaseDate.TryCreate(command.PurchaseDate, command.Today)
+            .ToValidated(() => new ValidationError(nameof(command.PurchaseDate), "Purchase date cannot be in the future"));
 
-        Option<PurchaseDate> purchaseDate = PurchaseDate.TryCreate(command.PurchaseDate, command.Today);
-        Validated<PurchaseDate> validatedPurchaseDate = purchaseDate.Match(
-            none: () => Validation.Failed<PurchaseDate>([new ValidationError(nameof(command.PurchaseDate), "Purchase date cannot be in the future")]),
-            some: Validation.Succeed);
-
-        return validatedStore.Match(
-            errors: storeErrors => validatedPurchaseDate.Match(
-                errors: purchaseDateErrors => Validation.Failed<CreateReceiptRequest>(storeErrors.Concat(purchaseDateErrors)),
-                value: _ => Validation.Failed<CreateReceiptRequest>(storeErrors)),
-            value: s => validatedPurchaseDate.Match(
-                errors: Validation.Failed<CreateReceiptRequest>,
-                value: pd => Validation.Succeed(new CreateReceiptRequest(s, pd))));
+        return validatedStore.Join(validatedPurchaseDate, (store, purchaseDate) => new CreateReceiptRequest(store, purchaseDate));
     }
 }
