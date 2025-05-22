@@ -21,4 +21,32 @@ public static class Validation
                     errors: Failed<TResult>,
                     value: otherValue => Succeed(join(sourceValue, otherValue))));
     }
+
+    public static Validated<Func<T2, TResult>> Apply<T1, T2, TResult>(
+        this Func<T1, T2, TResult> map,
+        Validated<T1> value) =>
+        Succeed(map).Apply(value);
+
+    public static Validated<Func<T2, TResult>> Apply<T1, T2, TResult>(
+        this Validated<Func<T1, T2, TResult>> map,
+        Validated<T1> value) =>
+        map.Match(
+            errors: errors => value.Match(
+                errors: otherErrors => Failed<Func<T2, TResult>>(errors.Concat(otherErrors)),
+                value: _ => Failed<Func<T2, TResult>>(errors)),
+            value: f => value.Match(
+                errors: Failed<Func<T2, TResult>>,
+                value: t1 => Succeed((T2 t2) => f(t1, t2))));
+
+    public static Validated<TResult> Apply<T1, TResult>(
+        this Validated<Func<T1, TResult>> map,
+        Validated<T1> value) =>
+        map.Match(
+            errors: errors => value.Match(
+                errors: otherErrors => Failed<TResult>(errors.Concat(otherErrors)),
+                value: _ => Failed<TResult>(errors)),
+            value: f => value.Match(
+                errors: Failed<TResult>,
+                value: t1 => Succeed(f(t1))));
+
 }
