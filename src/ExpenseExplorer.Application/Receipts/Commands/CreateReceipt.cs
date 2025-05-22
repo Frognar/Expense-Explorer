@@ -21,15 +21,16 @@ public sealed class CreateReceiptHandler(IReceiptRepository receiptRepository)
 
 public static class CreateReceiptValidator
 {
-    public static Validated<CreateReceiptRequest> Validate(CreateReceiptCommand command)
-    {
-        ArgumentNullException.ThrowIfNull(command);
-        Validated<Store> validatedStore = Store.TryCreate(command.StoreName)
-                .ToValidated(() => new ValidationError(nameof(command.StoreName), "Store name cannot be empty"));
+    public static Validated<CreateReceiptRequest> Validate(CreateReceiptCommand command) =>
+        CreateReceiptRequest.Create
+            .Apply(ValidateStore(command.StoreName))
+            .Apply(ValidatePurchaseDate(command.PurchaseDate, command.Today));
 
-        Validated<PurchaseDate> validatedPurchaseDate = PurchaseDate.TryCreate(command.PurchaseDate, command.Today)
-            .ToValidated(() => new ValidationError(nameof(command.PurchaseDate), "Purchase date cannot be in the future"));
+    private static Validated<Store> ValidateStore(string storeName) =>
+        Store.TryCreate(storeName)
+            .ToValidated(() => new ValidationError(nameof(storeName), "Store name cannot be empty"));
 
-        return validatedStore.Join(validatedPurchaseDate, (store, purchaseDate) => new CreateReceiptRequest(store, purchaseDate));
-    }
+    private static Validated<PurchaseDate> ValidatePurchaseDate(DateOnly purchaseDate, DateOnly today) =>
+        PurchaseDate.TryCreate(purchaseDate, today)
+            .ToValidated(() => new ValidationError(nameof(purchaseDate), "Purchase date cannot be in the future"));
 }
