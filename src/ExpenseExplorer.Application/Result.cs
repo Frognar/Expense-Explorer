@@ -9,7 +9,6 @@ public static class Result
         this Result<T, TError> source,
         Func<TError, TErrorResult> map)
     {
-        ArgumentNullException.ThrowIfNull(source);
         return source.Match(
             error: e => Failure<T, TErrorResult>(map(e)),
             value: Success<T, TErrorResult>);
@@ -19,7 +18,6 @@ public static class Result
         this Result<T, TError> source,
         Func<T, Task<TResult>> map)
     {
-        ArgumentNullException.ThrowIfNull(source);
         return source.MatchAsync(
             error: Failure<TResult, TError>,
             value: async v => Success<TResult, TError>(await map(v)));
@@ -38,9 +36,6 @@ public sealed class Result<T, TError>
         Func<TError, TResult> error,
         Func<T, TResult> value)
     {
-        ArgumentNullException.ThrowIfNull(error);
-        ArgumentNullException.ThrowIfNull(value);
-
         return _result switch
         {
             FailureResult failure => error(failure.Error),
@@ -53,9 +48,6 @@ public sealed class Result<T, TError>
         Func<TError, Task<TResult>> error,
         Func<T, Task<TResult>> value)
     {
-        ArgumentNullException.ThrowIfNull(error);
-        ArgumentNullException.ThrowIfNull(value);
-
         return _result switch
         {
             FailureResult failure => await error(failure.Error),
@@ -64,11 +56,10 @@ public sealed class Result<T, TError>
         };
     }
 
-    public async Task<TResult> MatchAsync<TResult>(Func<TError, Task<TResult>> error, Func<T, TResult> value)
+    public async Task<TResult> MatchAsync<TResult>(
+        Func<TError, Task<TResult>> error,
+        Func<T, TResult> value)
     {
-        ArgumentNullException.ThrowIfNull(error);
-        ArgumentNullException.ThrowIfNull(value);
-
         return _result switch
         {
             FailureResult failure => await error(failure.Error),
@@ -81,9 +72,6 @@ public sealed class Result<T, TError>
         Func<TError, TResult> error,
         Func<T, Task<TResult>> value)
     {
-        ArgumentNullException.ThrowIfNull(error);
-        ArgumentNullException.ThrowIfNull(value);
-
         return _result switch
         {
             FailureResult failure => error(failure.Error),
@@ -94,7 +82,7 @@ public sealed class Result<T, TError>
 
     private interface IResult;
 
-    private sealed record SuccessResult(T Value) : IResult;
-
     private sealed record FailureResult(TError Error) : IResult;
+
+    private sealed record SuccessResult(T Value) : IResult;
 }
