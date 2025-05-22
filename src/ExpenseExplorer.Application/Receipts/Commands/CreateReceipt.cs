@@ -19,7 +19,7 @@ public sealed class CreateReceiptHandler(IReceiptRepository receiptRepository)
     }
 }
 
-public static class CreateReceiptValidator
+internal static class CreateReceiptValidator
 {
     public static Validated<CreateReceiptRequest> Validate(CreateReceiptCommand command) =>
         CreateReceiptRequest.Create
