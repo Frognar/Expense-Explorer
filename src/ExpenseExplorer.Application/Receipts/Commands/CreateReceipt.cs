@@ -1,6 +1,7 @@
 using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.Application.Receipts.DTO;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
+using static ExpenseExplorer.Application.Receipts.Commands.CreateReceiptValidator;
 
 namespace ExpenseExplorer.Application.Receipts.Commands;
 
@@ -12,7 +13,7 @@ public sealed class CreateReceiptHandler(IReceiptRepository receiptRepository)
         CreateReceiptCommand command,
         CancellationToken cancellationToken)
     {
-        return await CreateReceiptValidator.Validate(command)
+        return await Validate(command)
             .ToResult()
             .MapError(errors => errors.Select(e => e.Error))
             .MapAsync(request => receiptRepository.CreateReceipt(request, cancellationToken));
