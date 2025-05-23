@@ -14,6 +14,15 @@ public static class Result
             value: Success<T, TErrorResult>);
     }
 
+    public static Result<TResult, TError> Map<T, TResult, TError>(
+        this Result<T, TError> source,
+        Func<T, TResult> map)
+    {
+        return source.Match(
+            error: Failure<TResult, TError>,
+            value: v => Success<TResult, TError>(map(v)));
+    }
+
     public static Task<Result<TResult, TError>> MapAsync<T, TResult, TError>(
         this Result<T, TError> source,
         Func<T, Task<TResult>> map)
