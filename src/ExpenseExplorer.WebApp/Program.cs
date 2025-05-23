@@ -1,7 +1,9 @@
+using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.WebApp.Components;
 using ExpenseExplorer.WebApp.Data;
 using ExpenseExplorer.WebApp.Services;
 using Radzen;
+using IReceiptRepository = ExpenseExplorer.WebApp.Data.IReceiptRepository;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddLocalization(options =>
@@ -14,6 +16,8 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddScoped<IReceiptRepository, InMemoryReceiptRepository>();
+builder.Services
+    .AddScoped<ExpenseExplorer.Application.Receipts.Data.IReceiptRepository>(_ => ReceiptRepositoryFactory.Create());
 builder.Services.AddScoped<ReceiptService>();
 
 builder.Services.AddRadzenComponents();
