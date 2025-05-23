@@ -9,14 +9,18 @@ public sealed record CreateReceiptCommand(string StoreName, DateOnly PurchaseDat
 
 public sealed class CreateReceiptHandler(IReceiptRepository receiptRepository)
 {
-    public async Task<Result<Unit, IEnumerable<string>>> HandleAsync(
+    public async Task<Result<ReceiptId, IEnumerable<string>>> HandleAsync(
         CreateReceiptCommand command,
         CancellationToken cancellationToken)
     {
         return await Validate(command)
             .ToResult()
             .MapError(errors => errors.Select(e => e.Error))
-            .MapAsync(request => receiptRepository.CreateReceipt(request, cancellationToken));
+            .MapAsync(async request =>
+            {
+                await receiptRepository.CreateReceipt(request, cancellationToken);
+                return request.Id;
+            });
     }
 }
 
