@@ -1,12 +1,15 @@
 using ExpenseExplorer.Application;
+using ExpenseExplorer.Application.Receipts.Commands;
+using ExpenseExplorer.Application.Receipts.ValueObjects;
 using ExpenseExplorer.WebApp.Data;
-using ExpenseExplorer.WebApp.Helpers;
 using ExpenseExplorer.WebApp.Models;
+using IReceiptRepository = ExpenseExplorer.WebApp.Data.IReceiptRepository;
 
 namespace ExpenseExplorer.WebApp.Services;
 
 internal sealed class ReceiptService(
-    IReceiptRepository receiptRepository)
+    IReceiptRepository receiptRepository,
+    ExpenseExplorer.Application.Receipts.Data.IReceiptRepository applicationReceiptRepository)
 {
     public async Task<ReceiptDetailsPage> GetReceiptsAsync(
         int pageSize,
@@ -53,38 +56,12 @@ internal sealed class ReceiptService(
 
     internal async Task<Result<Guid, string>> CreateReceiptAsync(string store, DateOnly purchaseDate)
     {
-        Validated<(string, DateOnly)> validationResult = Validate(store, purchaseDate);
-        if (validationResult.Match(errors: _ => true, value: _ => false))
-        {
-            return Result.Failure<Guid, string>(
-                string.Join(
-                    Environment.NewLine,
-                    validationResult.Match(
-                        errors: errors => errors.Select(e => e.Error),
-                        value: _ => [])));
-        }
-
-        ReceiptDetails receipt = new(Guid.CreateVersion7(), store, purchaseDate, 0);
-        await receiptRepository.AddAsync(receipt);
-        return Result.Success<Guid, string>(receipt.Id);
-    }
-
-    private static Validated<(string, DateOnly)> Validate(string store, DateOnly purchaseDate)
-    {
-        List<ValidationError> errors = [];
-        if (string.IsNullOrWhiteSpace(store))
-        {
-            errors.Add(new ValidationError(nameof(store), "Invalid store"));
-        }
-
-        if (purchaseDate > DateOnly.FromDateTime(DateTime.Today))
-        {
-            errors.Add(new ValidationError(nameof(purchaseDate), "Invalid purchase date"));
-        }
-
-        return errors.Count != 0
-            ? Validation.Failed<(string, DateOnly)>(errors)
-            : Validation.Succeed((store, purchaseDate));
+        CreateReceiptCommand command = new(store, purchaseDate, DateOnly.FromDateTime(DateTime.Today));
+        CreateReceiptHandler handler = new(applicationReceiptRepository);
+        Result<ReceiptId, IEnumerable<string>> result = await handler.HandleAsync(command, CancellationToken.None);
+        return result
+            .MapError(errors => string.Join(Environment.NewLine, errors))
+            .Map(receiptId => receiptId.Value);
     }
 
     public async Task<Result<ReceiptWithPurchases, string>> GetReceiptAsync(Guid id)
