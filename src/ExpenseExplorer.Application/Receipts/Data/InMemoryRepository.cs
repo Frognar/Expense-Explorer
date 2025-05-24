@@ -8,7 +8,7 @@ internal sealed class InMemoryRepository : IReceiptRepository
 
     public Task<Unit> CreateReceipt(CreateReceiptRequest receipt, CancellationToken cancellationToken)
     {
-        Receipts.Add(new ReceiptDetails(receipt.Store, receipt.PurchaseDate, []));
+        Receipts.Add(new ReceiptDetails(receipt.Id, receipt.Store, receipt.PurchaseDate, []));
         return Task.FromResult(Unit.Instance);
     }
 }
