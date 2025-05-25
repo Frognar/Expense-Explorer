@@ -1,3 +1,4 @@
+using ExpenseExplorer.Application;
 using ExpenseExplorer.WebApp.Models;
 
 namespace ExpenseExplorer.WebApp.Data;
