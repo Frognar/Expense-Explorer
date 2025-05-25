@@ -1,9 +1,12 @@
 using ExpenseExplorer.Application;
+using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Application.Receipts.Commands;
+using ExpenseExplorer.Application.Receipts.DTO;
+using ExpenseExplorer.Application.Receipts.Queries;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
-using ExpenseExplorer.WebApp.Data;
 using ExpenseExplorer.WebApp.Models;
 using IReceiptRepository = ExpenseExplorer.WebApp.Data.IReceiptRepository;
+using ReceiptDetails = ExpenseExplorer.WebApp.Models.ReceiptDetails;
 
 namespace ExpenseExplorer.WebApp.Services;
 
@@ -21,22 +24,31 @@ internal sealed class ReceiptService(
         decimal? totalCostMin,
         decimal? totalCostMax)
     {
-        return await receiptRepository
-            .GetReceiptsAsync(
-                pageSize,
-                skip,
-                orderBy?
-                    .Replace(" asc", "", StringComparison.InvariantCultureIgnoreCase)
-                    .Replace(" desc", "", StringComparison.InvariantCultureIgnoreCase)
-                ?? "",
-                orderBy?.EndsWith(" desc", StringComparison.InvariantCultureIgnoreCase) == true
-                    ? SortDirection.Descending
-                    : SortDirection.Ascending,
-                stores,
-                purchaseDateFrom,
-                purchaseDateTo,
-                totalCostMin,
-                totalCostMax);
+        GetReceiptsQuery query = GetReceiptsQuery.Default
+            .Where(ReceiptFilter.StoresIn(stores))
+            .Where(ReceiptFilter.PurchaseDateBetween(purchaseDateFrom, purchaseDateTo))
+            .Where(ReceiptFilter.TotalCostBetween(totalCostMin, totalCostMax))
+            .GetPage(pageSize, skip);
+
+        ReceiptOrder order = orderBy?.Replace("desc", "", StringComparison.CurrentCultureIgnoreCase).Trim() switch
+        {
+            nameof(ReceiptDetails.Store) => ReceiptOrder.Store,
+            nameof(ReceiptDetails.PurchaseDate) => ReceiptOrder.PurchaseDate,
+            nameof(ReceiptDetails.TotalCost) => ReceiptOrder.TotalCost,
+            _ => ReceiptOrder.Id
+        };
+
+        query = orderBy?.Contains("desc", StringComparison.InvariantCultureIgnoreCase) == true
+            ? query.OrderByDescending(order)
+            : query.OrderBy(order);
+
+        GetReceiptsHandler handler = new(applicationReceiptRepository);
+        (PageOf<ReceiptSummary> pageOfReceipts, Money total) = await handler.HandleAsync(query, CancellationToken.None);
+
+        return new ReceiptDetailsPage(
+            pageOfReceipts.Items.Select(r => new ReceiptDetails(r.Id.Value, r.Store.Name, r.PurchaseDate.Date, r.Total.Value)),
+            (int)pageOfReceipts.TotalCount,
+            total.Value);
     }
 
     internal async Task<IEnumerable<string>> GetStoresAsync(string? search = null)
