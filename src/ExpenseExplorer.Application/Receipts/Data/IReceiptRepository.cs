@@ -18,4 +18,6 @@ public interface IReceiptRepository
     public Task<Money> GetTotalCostAsync(
         ImmutableArray<ReceiptFilter> filters,
         CancellationToken cancellationToken);
+
+    public Task<ReceiptDetails?> GetReceiptByIdAsync(ReceiptId id, CancellationToken cancellationToken);
 }

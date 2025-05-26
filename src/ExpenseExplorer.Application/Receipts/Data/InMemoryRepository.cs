@@ -74,4 +74,10 @@ internal sealed class InMemoryRepository : IReceiptRepository
         await Task.CompletedTask;
         return receipts.Aggregate(Money.Zero, (m, r) => m + r.Total);
     }
+
+    public async Task<ReceiptDetails?> GetReceiptByIdAsync(ReceiptId id, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        return Receipts.FirstOrDefault(r => r.Id == id);
+    }
 }
