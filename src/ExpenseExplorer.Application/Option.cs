@@ -13,6 +13,13 @@ public static class Option
             none: None<TResult>,
             some: async v => Some(await map(v)));
     }
+
+    public static T OrElse<T>(
+        this Option<T> source,
+        Func<T> onNone) =>
+        source.Match(
+            none: onNone,
+            some: v => v);
 }
 
 public sealed class Option<T>
@@ -26,8 +33,7 @@ public sealed class Option<T>
 
     public TResult Match<TResult>(
         Func<TResult> none,
-        Func<T, TResult> some
-        )
+        Func<T, TResult> some)
     {
         ArgumentNullException.ThrowIfNull(none);
         ArgumentNullException.ThrowIfNull(some);
