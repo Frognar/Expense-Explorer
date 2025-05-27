@@ -41,7 +41,7 @@ internal sealed class InMemoryRepository : IReceiptRepository
                 r.Store,
                 r.PurchaseDate,
                 r.Items.Aggregate(
-                    Money.Zero, (m, i) => m + (i.UnitPrice * i.Quantity - i.Discount ?? Money.Zero))))
+                    Money.Zero, (m, i) => m + (i.UnitPrice * i.Quantity - i.Discount.OrElse(() => Money.Zero)))))
             .Where(MatchesReceiptFilters(filters));
     }
 

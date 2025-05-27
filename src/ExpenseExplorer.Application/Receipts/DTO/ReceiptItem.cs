@@ -8,5 +8,5 @@ public sealed record ReceiptItem(
     Category Category,
     Money UnitPrice,
     Quantity Quantity,
-    Money? Discount,
-    Description? Description);
+    Option<Money> Discount,
+    Option<Description> Description);

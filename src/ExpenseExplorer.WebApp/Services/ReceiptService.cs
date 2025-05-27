@@ -94,8 +94,8 @@ internal sealed class ReceiptService(
                             i.Category.Name,
                             i.Quantity.Value,
                             i.UnitPrice.Value,
-                            i.Discount?.Value,
-                            i.Description?.Value))));
+                            i.Discount.Match<decimal?>(none: () => null, some: m => m.Value),
+                            i.Description.Match<string?>(none: () => null, some: m => m.Value)))));
     }
 
     public async Task<Result<Guid, string>> DuplicateReceipt(Guid id)
