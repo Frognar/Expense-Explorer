@@ -19,5 +19,5 @@ public interface IReceiptRepository
         ImmutableArray<ReceiptFilter> filters,
         CancellationToken cancellationToken);
 
-    public Task<ReceiptDetails?> GetReceiptByIdAsync(ReceiptId id, CancellationToken cancellationToken);
+    public Task<Option<ReceiptDetails>> GetReceiptByIdAsync(ReceiptId id, CancellationToken cancellationToken);
 }
