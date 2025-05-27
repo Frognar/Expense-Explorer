@@ -78,13 +78,24 @@ internal sealed class ReceiptService(
 
     public async Task<Result<ReceiptWithPurchases, string>> GetReceiptAsync(Guid id)
     {
-        ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(id);
-        if (receipt == null)
-        {
-            return Result.Failure<ReceiptWithPurchases, string>("Receipt not found");
-        }
-
-        return Result.Success<ReceiptWithPurchases, string>(receipt);
+        GetReceiptByIdQuery query = new(id);
+        GetReceiptByIdHandler handler = new(applicationReceiptRepository);
+        Result<Application.Receipts.DTO.ReceiptDetails, ValidationError> response = await handler.HandleAsync(query, CancellationToken.None);
+        return response.MapError(e => e.Error)
+            .Map(r =>
+                new ReceiptWithPurchases(
+                    r.Id.Value,
+                    r.Store.Name,
+                    r.PurchaseDate.Date,
+                    r.Items.Select(i =>
+                        new PurchaseDetails(
+                            i.Id.Value,
+                            i.Item.Name,
+                            i.Category.Name,
+                            i.Quantity.Value,
+                            i.UnitPrice.Value,
+                            i.Discount?.Value,
+                            i.Description?.Value))));
     }
 
     public async Task<Result<Guid, string>> DuplicateReceipt(Guid id)
