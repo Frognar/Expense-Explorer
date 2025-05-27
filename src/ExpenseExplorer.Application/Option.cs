@@ -4,6 +4,15 @@ public static class Option
 {
     public static Option<T> Some<T>(T value) => Option<T>.Some(value);
     public static Option<T> None<T>() => Option<T>.None();
+
+    public static Task<Option<TResult>> MapAsync<T, TResult>(
+        this Option<T> source,
+        Func<T, Task<TResult>> map)
+    {
+        return source.MatchAsync(
+            none: None<TResult>,
+            some: async v => Some(await map(v)));
+    }
 }
 
 public sealed class Option<T>
@@ -26,6 +35,20 @@ public sealed class Option<T>
         {
             NoneOption => none(),
             SomeOption s => some(s.Value),
+            _ => throw new InvalidOperationException("Invalid option")
+        };
+    }
+
+    public async Task<TResult> MatchAsync<TResult>(
+        Func<TResult> none,
+        Func<T, Task<TResult>> some)
+    {
+        ArgumentNullException.ThrowIfNull(none);
+        ArgumentNullException.ThrowIfNull(some);
+        return _option switch
+        {
+            NoneOption => none(),
+            SomeOption s => await some(s.Value),
             _ => throw new InvalidOperationException("Invalid option")
         };
     }
