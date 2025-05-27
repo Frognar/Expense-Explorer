@@ -7,6 +7,11 @@ public static class FunctionalConversions
             none: () => Validation.Failed<T>([onNone()]),
             some: Validation.Succeed);
 
+    public static Result<T, TError> ToResult<T, TError>(this Option<T> source, Func<TError> onNone) =>
+        source.Match(
+            none: () => Result.Failure<T, TError>(onNone()),
+            some: Result.Success<T, TError>);
+
     public static Result<T, IEnumerable<ValidationError>> ToResult<T>(this Validated<T> source) =>
         source.Match(
             errors: Result.Failure<T, IEnumerable<ValidationError>>,
