@@ -31,6 +31,12 @@ public static class Result
             error: Failure<TResult, TError>,
             value: async v => Success<TResult, TError>(await map(v)));
     }
+
+    public static async Task<TResult> MatchAsync<T, TError, TResult>(
+        this Task<Result<T, TError>> source,
+        Func<TError, TResult> error,
+        Func<T, TResult> value) =>
+        (await source).Match(error, value);
 }
 
 public sealed class Result<T, TError>
