@@ -112,4 +112,19 @@ internal sealed class InMemoryRepository : IReceiptRepository
                         .All(str => item.Name.Contains(str, StringComparison.InvariantCultureIgnoreCase)))
             ]);
     }
+
+    public async Task<ImmutableArray<Category>> GetCategoriesAsync(Option<string> search, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        IEnumerable<Category> categories = Receipts.SelectMany(r => r.Items.Select(i => i.Category)).Distinct();
+        return search.Match<ImmutableArray<Category>>(
+            none: () => [..categories],
+            some: searchTerm =>
+            [
+                ..categories
+                    .Where(category => searchTerm
+                        .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .All(str => category.Name.Contains(str, StringComparison.InvariantCultureIgnoreCase)))
+            ]);
+    }
 }

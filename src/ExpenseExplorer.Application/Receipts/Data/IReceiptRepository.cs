@@ -22,4 +22,5 @@ public interface IReceiptRepository
     public Task<Option<ReceiptDetails>> GetReceiptByIdAsync(ReceiptId id, CancellationToken cancellationToken);
     public Task<ImmutableArray<Store>> GetStoresAsync(Option<string> search, CancellationToken cancellationToken);
     public Task<ImmutableArray<Item>> GetItemsAsync(Option<string> search, CancellationToken cancellationToken);
+    public Task<ImmutableArray<Category>> GetCategoriesAsync(Option<string> search, CancellationToken cancellationToken);
 }
