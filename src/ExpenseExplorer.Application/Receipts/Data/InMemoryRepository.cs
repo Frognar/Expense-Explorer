@@ -82,4 +82,19 @@ internal sealed class InMemoryRepository : IReceiptRepository
             ? Option.Some(receipt)
             : Option.None<ReceiptDetails>();
     }
+
+    public async Task<ImmutableArray<Store>> GetStoresAsync(Option<string> search, CancellationToken cancellationToken)
+    {
+        await Task.CompletedTask;
+        IEnumerable<Store> stores = Receipts.Select(r => r.Store).Distinct();
+        return search.Match<ImmutableArray<Store>>(
+            none: () => [..stores],
+            some: searchTerm =>
+            [
+                ..stores
+                    .Where(store => searchTerm
+                        .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                        .All(str => store.Name.Contains(str, StringComparison.InvariantCultureIgnoreCase)))
+            ]);
+    }
 }
