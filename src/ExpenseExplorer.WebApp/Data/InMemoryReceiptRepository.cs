@@ -1,4 +1,3 @@
-using ExpenseExplorer.Application;
 using ExpenseExplorer.WebApp.Models;
 
 namespace ExpenseExplorer.WebApp.Data;
@@ -13,20 +12,6 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
                 DateOnly.FromDateTime(DateTime.Today).AddDays(-i),
                 []))
             .ToList();
-
-    public async Task<IEnumerable<string>> GetCategoriesAsync(string? search = null)
-    {
-        IEnumerable<string> categories = Enumerable.Range(1, 100).Select(i => $"Category {i}");
-        if (string.IsNullOrWhiteSpace(search))
-        {
-            return categories;
-        }
-
-        await Task.CompletedTask;
-        return categories.Where(s => search
-            .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .All(f => s.Contains(f, StringComparison.InvariantCultureIgnoreCase)));
-    }
 
     public async Task AddAsync(ReceiptDetails receipt)
     {
