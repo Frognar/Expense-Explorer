@@ -14,20 +14,6 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
                 []))
             .ToList();
 
-    public async Task<IEnumerable<string>> GetStoresAsync(string? search = null)
-    {
-        IEnumerable<string> stores = Receipts.Select(r => r.Store);
-        if (string.IsNullOrWhiteSpace(search))
-        {
-            return stores;
-        }
-
-        await Task.CompletedTask;
-        return stores.Where(s => search
-            .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .All(f => s.Contains(f, StringComparison.InvariantCultureIgnoreCase)));
-    }
-
     public async Task<IEnumerable<string>> GetItemsAsync(string? search = null)
     {
         IEnumerable<string> items = Enumerable.Range(1, 100).Select(i => $"Item {i}");
