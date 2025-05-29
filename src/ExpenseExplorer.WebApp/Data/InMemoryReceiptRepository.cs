@@ -14,56 +14,6 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
                 []))
             .ToList();
 
-    public async Task<ReceiptDetailsPage> GetReceiptsAsync(
-        int pageSize,
-        int skip,
-        string orderBy,
-        SortDirection sortDirection,
-        IEnumerable<string> stores,
-        DateOnly? purchaseDateFrom,
-        DateOnly? purchaseDateTo,
-        decimal? totalCostMin,
-        decimal? totalCostMax)
-    {
-        IEnumerable<ReceiptDetails> result = Receipts
-            .Select(r => new ReceiptDetails(r.Id, r.Store, r.PurchaseDate, r.Purchases.Sum(p => p.PriceAfterDiscount)))
-            .Where(r =>
-                (!stores.Any() || stores.Contains(r.Store))
-                && (purchaseDateFrom == null || r.PurchaseDate >= purchaseDateFrom)
-                && (purchaseDateTo == null || r.PurchaseDate <= purchaseDateTo)
-                && (totalCostMin == null || r.TotalCost >= totalCostMin)
-                && (totalCostMax == null || r.TotalCost <= totalCostMax))
-            .ToList();
-
-        int count = result.Count();
-        decimal totalCost = result.Sum(r => r.TotalCost);
-        if (!string.IsNullOrWhiteSpace(orderBy))
-        {
-            result = sortDirection == SortDirection.Descending
-                ? result.OrderByDescending(GetOrderBy(orderBy))
-                : result.OrderBy(GetOrderBy(orderBy));
-        }
-
-        List<ReceiptDetails> data = result
-            .Skip(skip)
-            .Take(pageSize)
-            .ToList();
-
-        await Task.CompletedTask;
-        return new ReceiptDetailsPage(data, count, totalCost);
-    }
-
-    private static Func<ReceiptDetails, object> GetOrderBy(string orderBy)
-    {
-        return orderBy switch
-            {
-                nameof(ReceiptDetails.Store) => r => r.Store,
-                nameof(ReceiptDetails.PurchaseDate) => r => r.PurchaseDate,
-                nameof(ReceiptDetails.TotalCost) => r => r.TotalCost,
-                _ => r => r.Id
-            };
-    }
-
     public async Task<IEnumerable<string>> GetStoresAsync(string? search = null)
     {
         IEnumerable<string> stores = Receipts.Select(r => r.Store);
