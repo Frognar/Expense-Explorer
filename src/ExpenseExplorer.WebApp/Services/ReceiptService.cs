@@ -53,7 +53,10 @@ internal sealed class ReceiptService(
 
     internal async Task<IEnumerable<string>> GetStoresAsync(string? search = null)
     {
-        return await receiptRepository.GetStoresAsync(search);
+        GetStoresQuery query = new(search is not null ? Option.Some(search) : Option.None<string>());
+        GetStoresHandler handler = new(applicationReceiptRepository);
+        IEnumerable<Store> stores = await handler.HandleAsync(query, CancellationToken.None);
+        return stores.Select(s => s.Name);
     }
 
     internal async Task<IEnumerable<string>> GetItemsAsync(string? search = null)
