@@ -7,6 +7,7 @@ namespace ExpenseExplorer.Application.Receipts.Data;
 public interface IReceiptRepository
 {
     public Task<Unit> CreateReceipt(CreateReceiptRequest receipt, CancellationToken cancellationToken);
+    public Task<Unit> DeleteReceipt(ReceiptId id, CancellationToken cancellationToken);
 
     public Task<PageOf<ReceiptSummary>> GetReceiptsAsync(
         int pageSize,
