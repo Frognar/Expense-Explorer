@@ -6,7 +6,6 @@ internal interface IReceiptRepository
 {
     public Task AddAsync(ReceiptDetails receipt);
     public Task<ReceiptWithPurchases?> GetReceiptAsync(Guid id);
-    public Task DeleteReceiptAsync(Guid id);
 
     public Task AddPurchaseAsync(Guid receiptId, PurchaseDetails purchase);
     public Task UpdatePurchaseAsync(Guid receiptId, PurchaseDetails purchase);

@@ -31,12 +31,6 @@ internal sealed class InMemoryReceiptRepository : IReceiptRepository
         return receipt;
     }
 
-    public async Task DeleteReceiptAsync(Guid id)
-    {
-        Receipts.RemoveAll(r => r.Id == id);
-        await Task.CompletedTask;
-    }
-
     public Task AddPurchaseAsync(Guid receiptId, PurchaseDetails purchase)
     {
         ReceiptWithPurchases receipt = Receipts.FirstOrDefault(r => r.Id == receiptId)!;
