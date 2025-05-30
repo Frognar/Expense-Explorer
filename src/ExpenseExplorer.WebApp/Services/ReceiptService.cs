@@ -137,8 +137,11 @@ internal sealed class ReceiptService(
 
     public async Task<Result<Unit, string>> DeleteReceiptAsync(Guid receiptId)
     {
-        await receiptRepository.DeleteReceiptAsync(receiptId);
-        return Result.Success<Unit, string>(Unit.Instance);
+        DeleteReceiptCommand command = new(receiptId);
+        DeleteReceiptHandler handler = new(applicationReceiptRepository);
+        Result<Unit, ValidationError> result = await handler.HandleAsync(command, CancellationToken.None);
+        return result
+            .MapError(errors => string.Join(Environment.NewLine, errors));
     }
 
     public async Task<Result<Unit, string>> AddPurchase(Guid receiptId, PurchaseDetails purchase)
