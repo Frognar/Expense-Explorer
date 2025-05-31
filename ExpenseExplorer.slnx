@@ -9,6 +9,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src\ExpenseExplorer.Application\ExpenseExplorer.Application.csproj" Type="Classic C#" />
+    <Project Path="src\ExpenseExplorer.Infrastructure\ExpenseExplorer.Infrastructure.csproj" Type="Classic C#" />
     <Project Path="src\ExpenseExplorer.WebApp\ExpenseExplorer.WebApp.csproj" Type="Classic C#" />
   </Folder>
 </Solution>
