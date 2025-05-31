@@ -14,4 +14,8 @@
         <PackageReference Include="Dapper" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\ExpenseExplorer.WebApp\ExpenseExplorer.WebApp.csproj" />
+    </ItemGroup>
+
 </Project>
