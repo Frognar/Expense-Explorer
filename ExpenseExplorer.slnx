@@ -12,4 +12,7 @@
     <Project Path="src\ExpenseExplorer.Infrastructure\ExpenseExplorer.Infrastructure.csproj" Type="Classic C#" />
     <Project Path="src\ExpenseExplorer.WebApp\ExpenseExplorer.WebApp.csproj" Type="Classic C#" />
   </Folder>
+  <Folder Name="/src/aspire/">
+    <Project Path="src\aspire\AppHost\AppHost.csproj" Type="Classic C#" />
+  </Folder>
 </Solution>
