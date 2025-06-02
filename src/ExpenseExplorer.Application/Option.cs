@@ -59,6 +59,20 @@ public sealed class Option<T>
         };
     }
 
+    public async Task<TResult> MatchAsync<TResult>(
+        Func<Task<TResult>> none,
+        Func<T, Task<TResult>> some)
+    {
+        ArgumentNullException.ThrowIfNull(none);
+        ArgumentNullException.ThrowIfNull(some);
+        return _option switch
+        {
+            NoneOption => await none(),
+            SomeOption s => await some(s.Value),
+            _ => throw new InvalidOperationException("Invalid option")
+        };
+    }
+
     private interface IOption;
     private sealed record SomeOption(T Value) : IOption;
     private sealed record NoneOption : IOption;
