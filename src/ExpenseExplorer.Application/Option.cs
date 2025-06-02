@@ -5,6 +5,15 @@ public static class Option
     public static Option<T> Some<T>(T value) => Option<T>.Some(value);
     public static Option<T> None<T>() => Option<T>.None();
 
+    public static Option<TResult> Map<T, TResult>(
+        this Option<T> source,
+        Func<T, TResult> map)
+    {
+        return source.Match(
+            none: None<TResult>,
+            some: v => Some(map(v)));
+    }
+
     public static Task<Option<TResult>> MapAsync<T, TResult>(
         this Option<T> source,
         Func<T, Task<TResult>> map)
