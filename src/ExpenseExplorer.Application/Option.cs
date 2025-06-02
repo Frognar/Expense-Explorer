@@ -31,6 +31,9 @@ public sealed class Option<T>
     internal static Option<T> Some(T value) => new(new SomeOption(value));
     internal static Option<T> None() => new(new NoneOption());
 
+    public bool IsSome => Match(() => false, _ => true);
+    public bool IsNone => Match(() => true, _ => false);
+
     public TResult Match<TResult>(
         Func<TResult> none,
         Func<T, TResult> some)
