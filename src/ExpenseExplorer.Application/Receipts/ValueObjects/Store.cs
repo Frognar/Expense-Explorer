@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics;
 
 namespace ExpenseExplorer.Application.Receipts.ValueObjects;
@@ -18,10 +19,10 @@ public readonly record struct Store
 
 public static class Stores
 {
-    public static Option<IEnumerable<Store>> CreateMany(params IEnumerable<Option<Store>> stores)
-    {
-        return stores.Any(o => o.IsNone)
-            ? Option.None<IEnumerable<Store>>()
-            : Option.Some(stores.Select(o => o.OrElse(() => throw new UnreachableException())));
-    }
+    public static Option<ImmutableArray<Store>> CreateMany(params IEnumerable<Option<Store>> stores) =>
+        stores.Any(o => o.IsNone)
+            ? Option.None<ImmutableArray<Store>>()
+            : Option.Some<ImmutableArray<Store>>([
+                ..stores.Select(o => o.OrElse(() => throw new UnreachableException()))
+            ]);
 }
