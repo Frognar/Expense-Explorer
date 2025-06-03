@@ -9,12 +9,10 @@ public readonly record struct Category
 
     private Category(string name) => Name = name;
 
-    public static Option<Category> TryCreate(string name)
-    {
-        return string.IsNullOrWhiteSpace(name)
+    public static Option<Category> TryCreate(string name) =>
+        string.IsNullOrWhiteSpace(name)
             ? Option.None<Category>()
             : Option.Some(new Category(name.Trim()));
-    }
 }
 
 public static class Categories

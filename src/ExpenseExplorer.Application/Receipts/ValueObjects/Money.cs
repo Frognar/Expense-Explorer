@@ -6,12 +6,10 @@ public readonly record struct Money
 
     private Money(decimal value) => Value = value;
 
-    public static Option<Money> TryCreate(decimal value)
-    {
-        return value < decimal.Zero
+    public static Option<Money> TryCreate(decimal value) =>
+        value < decimal.Zero
             ? Option.None<Money>()
             : Option.Some(new Money(value));
-    }
 
     public static readonly Money Zero = new(0);
 

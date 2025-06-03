@@ -6,10 +6,8 @@ public readonly record struct Quantity
 
     private Quantity(decimal value) => Value = value;
 
-    public static Option<Quantity> TryCreate(decimal value)
-    {
-        return value < decimal.Zero
+    public static Option<Quantity> TryCreate(decimal value) =>
+        value < decimal.Zero
             ? Option.None<Quantity>()
             : Option.Some(new Quantity(value));
-    }
 }

@@ -9,12 +9,10 @@ public readonly record struct Item
 
     private Item(string name) => Name = name;
 
-    public static Option<Item> TryCreate(string name)
-    {
-        return string.IsNullOrWhiteSpace(name)
+    public static Option<Item> TryCreate(string name) =>
+        string.IsNullOrWhiteSpace(name)
             ? Option.None<Item>()
             : Option.Some(new Item(name.Trim()));
-    }
 }
 
 public static class Items
