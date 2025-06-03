@@ -6,11 +6,11 @@ public readonly record struct Money
 
     private Money(decimal value) => Value = value;
 
-    public static Result<Money, string> TryCreate(decimal value)
+    public static Option<Money> TryCreate(decimal value)
     {
         return value < decimal.Zero
-            ? Result.Failure<Money, string>("Money cannot be negative")
-            : Result.Success<Money, string>(new Money(value));
+            ? Option.None<Money>()
+            : Option.Some(new Money(value));
     }
 
     public static readonly Money Zero = new(0);
