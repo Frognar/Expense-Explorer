@@ -6,10 +6,10 @@ public readonly record struct Category
 
     private Category(string name) => Name = name;
 
-    public static Result<Category, string> TryCreate(string name)
+    public static Option<Category> TryCreate(string name)
     {
         return string.IsNullOrWhiteSpace(name)
-            ? Result.Failure<Category, string>("Category name cannot be empty")
-            : Result.Success<Category, string>(new Category(name.Trim()));
+            ? Option.None<Category>()
+            : Option.Some(new Category(name.Trim()));
     }
 }
