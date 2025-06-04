@@ -8,7 +8,7 @@ internal interface IDbConnectionFactory
     Task<IDbConnection> CreateConnectionAsync(CancellationToken cancellationToken);
 }
 
-internal sealed class DbConnectionFactory(string connectionString)
+internal sealed class DbConnectionFactory(string connectionString) : IDbConnectionFactory
 {
     public async Task<IDbConnection> CreateConnectionAsync(CancellationToken cancellationToken)
     {
