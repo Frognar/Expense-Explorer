@@ -3,4 +3,7 @@
     <PackageReference Include="Dapper" />
     <PackageReference Include="Npgsql" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExpenseExplorer.Application\ExpenseExplorer.Application.csproj" />
+  </ItemGroup>
 </Project>
