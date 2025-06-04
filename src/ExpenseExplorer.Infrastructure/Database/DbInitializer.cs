@@ -12,7 +12,7 @@ internal sealed class DbInitializer(IDbConnectionFactory connectionFactory)
                                        create table if not exists receipts (
                                            id UUID primary key,
                                            store text not null,
-                                           purchase_date data not null);
+                                           purchase_date date not null);
                                        """);
 
         await connection.ExecuteAsync("""
