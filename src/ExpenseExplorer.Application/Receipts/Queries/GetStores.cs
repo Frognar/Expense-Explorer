@@ -6,8 +6,8 @@ namespace ExpenseExplorer.Application.Receipts.Queries;
 
 public sealed record GetStoresQuery(Option<string> SearchTerm);
 
-public sealed class GetStoresHandler(IReceiptRepository receiptRepository)
+public sealed class GetStoresHandler(IStoreRepository storeRepository)
 {
     public async Task<ImmutableArray<Store>> HandleAsync(GetStoresQuery query, CancellationToken cancellationToken) =>
-        await receiptRepository.GetStoresAsync(query.SearchTerm, cancellationToken);
+        await storeRepository.GetStoresAsync(query.SearchTerm, cancellationToken);
 }

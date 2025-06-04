@@ -1,6 +1,7 @@
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Application.Receipts.Commands;
+using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.Application.Receipts.DTO;
 using ExpenseExplorer.Application.Receipts.Queries;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
@@ -12,7 +13,8 @@ namespace ExpenseExplorer.WebApp.Services;
 
 internal sealed class ReceiptService(
     IReceiptRepository receiptRepository,
-    ExpenseExplorer.Application.Receipts.Data.IReceiptRepository applicationReceiptRepository)
+    ExpenseExplorer.Application.Receipts.Data.IReceiptRepository applicationReceiptRepository,
+    IStoreRepository storeRepository)
 {
     public async Task<ReceiptDetailsPage> GetReceiptsAsync(
         int pageSize,
@@ -54,7 +56,7 @@ internal sealed class ReceiptService(
     internal async Task<IEnumerable<string>> GetStoresAsync(string? search = null)
     {
         GetStoresQuery query = new(search is not null ? Option.Some(search) : Option.None<string>());
-        GetStoresHandler handler = new(applicationReceiptRepository);
+        GetStoresHandler handler = new(storeRepository);
         IEnumerable<Store> stores = await handler.HandleAsync(query, CancellationToken.None);
         return stores.Select(s => s.Name);
     }
