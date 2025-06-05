@@ -1,4 +1,5 @@
 using ExpenseExplorer.Application.Receipts.Data;
+using ExpenseExplorer.Infrastructure;
 using ExpenseExplorer.WebApp.Components;
 using ExpenseExplorer.WebApp.Data;
 using ExpenseExplorer.WebApp.Services;
@@ -18,6 +19,11 @@ builder.Services.AddRazorComponents()
 builder.Services.AddScoped<IReceiptRepository, InMemoryReceiptRepository>();
 builder.Services
     .AddScoped<ExpenseExplorer.Application.Receipts.Data.IReceiptRepository>(_ => ReceiptRepositoryFactory.Create());
+
+builder.Services.AddDatabase(
+    builder.Configuration.GetConnectionString("expense-explorer") ?? throw new InvalidOperationException());
+
+builder.Services.AddInfrastructure();
 builder.Services.AddScoped<ReceiptService>();
 
 builder.Services.AddRadzenComponents();
@@ -45,5 +51,7 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+await app.Services.InitializeDatabase();
 
 await app.RunAsync();
