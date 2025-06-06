@@ -10,7 +10,8 @@ public static class InfrastructureExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         return services
-            .AddScoped<IStoreRepository, Repository>();
+            .AddScoped<IStoreRepository, Repository>()
+            .AddScoped<IItemRepository, Repository>();
     }
 
     public static IServiceCollection AddDatabase(
