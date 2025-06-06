@@ -14,7 +14,8 @@ namespace ExpenseExplorer.WebApp.Services;
 internal sealed class ReceiptService(
     IReceiptRepository receiptRepository,
     ExpenseExplorer.Application.Receipts.Data.IReceiptRepository applicationReceiptRepository,
-    IStoreRepository storeRepository)
+    IStoreRepository storeRepository,
+    IItemRepository itemRepository)
 {
     public async Task<ReceiptDetailsPage> GetReceiptsAsync(
         int pageSize,
@@ -64,7 +65,7 @@ internal sealed class ReceiptService(
     internal async Task<IEnumerable<string>> GetItemsAsync(string? search = null)
     {
         GetItemsQuery query = new(search is not null ? Option.Some(search) : Option.None<string>());
-        GetItemsHandler handler = new(applicationReceiptRepository);
+        GetItemsHandler handler = new(itemRepository);
         IEnumerable<Item> items = await handler.HandleAsync(query, CancellationToken.None);
         return items.Select(i => i.Name);
     }
