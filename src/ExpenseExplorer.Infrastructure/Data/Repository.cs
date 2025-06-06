@@ -99,6 +99,6 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
     {
         return string.Join(" AND ", searchTerms
             .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(str => $"UPPER(item) LIKE '%{str.ToUpperInvariant()}%'"));
+            .Select(str => $"UPPER(category) LIKE '%{str.ToUpperInvariant()}%'"));
     }
 }
