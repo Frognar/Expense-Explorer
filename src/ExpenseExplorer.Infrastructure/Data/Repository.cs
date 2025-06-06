@@ -10,7 +10,8 @@ namespace ExpenseExplorer.Infrastructure.Data;
 
 internal sealed class Repository(IDbConnectionFactory connectionFactory)
     : IStoreRepository,
-        IItemRepository
+        IItemRepository,
+        ICategoryRepository
 {
     public async Task<ImmutableArray<Store>> GetStoresAsync(Option<string> search, CancellationToken cancellationToken)
     {
@@ -64,6 +65,37 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
     }
 
     private static string FormatItemSearchFilters(string searchTerms)
+    {
+        return string.Join(" AND ", searchTerms
+            .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(str => $"UPPER(item) LIKE '%{str.ToUpperInvariant()}%'"));
+    }
+
+    public async Task<ImmutableArray<Category>> GetCategoriesAsync(
+        Option<string> search,
+        CancellationToken cancellationToken)
+    {
+        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(CancellationToken.None);
+        IEnumerable<string> categories = await search
+            .Map(FormatCategorySearchFilters)
+            .MatchAsync(
+                none: () => connection.QueryAsync<string>("""
+                                                          select category
+                                                          from receipt_items
+                                                          """),
+                some: whereClauses => connection.QueryAsync<string>($"""
+                                                                     select category
+                                                                     from receipt_items
+                                                                     where {whereClauses}
+                                                                     """
+                ));
+
+        return Categories
+            .CreateMany([..categories.Select(Category.TryCreate)])
+            .OrElse(() => []);
+    }
+
+    private static string FormatCategorySearchFilters(string searchTerms)
     {
         return string.Join(" AND ", searchTerms
             .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
