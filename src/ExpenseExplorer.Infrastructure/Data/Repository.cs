@@ -16,59 +16,31 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
     public async Task<ImmutableArray<Store>> GetStoresAsync(Option<string> search, CancellationToken cancellationToken)
     {
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(CancellationToken.None);
-        IEnumerable<string> stores = await search
-            .Map(FormatStoreSearchFilters)
-            .MatchAsync(
-                none: () => connection.QueryAsync<string>("""
-                                                          select store
-                                                          from receipts
-                                                          """),
-                some: whereClauses => connection.QueryAsync<string>($"""
-                                                                     select store
-                                                                     from receipts
-                                                                     where {whereClauses}
-                                                                     """
-                ));
+        string sql = "select store from receipts"
+                     + search
+                         .Map(FormatSearchFilters("item"))
+                         .Map(whereClauses => $" where {whereClauses}")
+                         .OrElse(() => "");
 
+        IEnumerable<string> stores = await connection.QueryAsync<string>(sql);
         return Stores
             .CreateMany([..stores.Select(Store.TryCreate)])
             .OrElse(() => []);
     }
 
-    private static string FormatStoreSearchFilters(string searchTerms)
-    {
-        return string.Join(" AND ", searchTerms
-            .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(str => $"UPPER(store) LIKE '%{str.ToUpperInvariant()}%'"));
-    }
-
     public async Task<ImmutableArray<Item>> GetItemsAsync(Option<string> search, CancellationToken cancellationToken)
     {
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(CancellationToken.None);
-        IEnumerable<string> items = await search
-            .Map(FormatItemSearchFilters)
-            .MatchAsync(
-                none: () => connection.QueryAsync<string>("""
-                                                          select item
-                                                          from receipt_items
-                                                          """),
-                some: whereClauses => connection.QueryAsync<string>($"""
-                                                                     select item
-                                                                     from receipt_items
-                                                                     where {whereClauses}
-                                                                     """
-                ));
+        string sql = "select item from receipt_items"
+                     + search
+                         .Map(FormatSearchFilters("item"))
+                         .Map(whereClauses => $" where {whereClauses}")
+                         .OrElse(() => "");
 
+        IEnumerable<string> items = await connection.QueryAsync<string>(sql);
         return Items
             .CreateMany([..items.Select(Item.TryCreate)])
             .OrElse(() => []);
-    }
-
-    private static string FormatItemSearchFilters(string searchTerms)
-    {
-        return string.Join(" AND ", searchTerms
-            .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(str => $"UPPER(item) LIKE '%{str.ToUpperInvariant()}%'"));
     }
 
     public async Task<ImmutableArray<Category>> GetCategoriesAsync(
@@ -76,29 +48,23 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
         CancellationToken cancellationToken)
     {
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(CancellationToken.None);
-        IEnumerable<string> categories = await search
-            .Map(FormatCategorySearchFilters)
-            .MatchAsync(
-                none: () => connection.QueryAsync<string>("""
-                                                          select category
-                                                          from receipt_items
-                                                          """),
-                some: whereClauses => connection.QueryAsync<string>($"""
-                                                                     select category
-                                                                     from receipt_items
-                                                                     where {whereClauses}
-                                                                     """
-                ));
+        string sql = "select category from receipt_items"
+                     + search
+                         .Map(FormatSearchFilters("category"))
+                         .Map(whereClauses => $" where {whereClauses}")
+                         .OrElse(() => "");
 
+        IEnumerable<string> categories = await connection.QueryAsync<string>(sql);
         return Categories
             .CreateMany([..categories.Select(Category.TryCreate)])
             .OrElse(() => []);
     }
 
-    private static string FormatCategorySearchFilters(string searchTerms)
-    {
-        return string.Join(" AND ", searchTerms
+    private static Func<string, string> FormatSearchFilters(string column) =>
+        searchTerms => FormatSearchFilters(searchTerms, column);
+
+    private static string FormatSearchFilters(string searchTerms, string column) =>
+        string.Join(" AND ", searchTerms
             .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(str => $"UPPER(category) LIKE '%{str.ToUpperInvariant()}%'"));
-    }
+            .Select(str => $"UPPER({column}) LIKE '%{str.ToUpperInvariant()}%'"));
 }
