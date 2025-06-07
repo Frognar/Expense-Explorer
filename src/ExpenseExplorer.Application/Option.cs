@@ -19,6 +19,13 @@ public static class Option
             none: None<TResult>,
             some: async v => Some(await map(v)));
 
+    public static Option<TResult> FlatMap<T, TResult>(
+        this Option<T> source,
+        Func<T, Option<TResult>> map) =>
+    source.Match(
+        none: None<TResult>,
+        some: map);
+
     public static T OrElse<T>(
         this Option<T> source,
         Func<T> onNone) =>
