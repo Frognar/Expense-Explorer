@@ -32,6 +32,12 @@ public static class Option
         source.Match(
             none: onNone,
             some: v => v);
+
+    public static Option<IEnumerable<T>> TraverseOption<T>(this IEnumerable<Option<T>> options) =>
+        options.Aggregate(
+            Some(Enumerable.Empty<T>()),
+            (acc, opt) => acc.FlatMap(accList => opt.Map(accList.Append))
+        );
 }
 
 public sealed class Option<T>
