@@ -38,8 +38,8 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
                          .OrElse(() => "");
 
         IEnumerable<string> items = await connection.QueryAsync<string>(sql);
-        return Items
-            .CreateMany([..items.Select(Item.TryCreate)])
+        return items.Select(Item.TryCreate)
+            .TraverseOptionToImmutableArray()
             .OrElse(() => []);
     }
 
