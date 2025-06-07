@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+
 namespace ExpenseExplorer.Application;
 
 public static class Option
@@ -38,6 +40,9 @@ public static class Option
             Some(Enumerable.Empty<T>()),
             (acc, opt) => acc.FlatMap(accList => opt.Map(accList.Append))
         );
+
+    public static Option<ImmutableArray<T>> TraverseOptionToImmutableArray<T>(this IEnumerable<Option<T>> options) =>
+        options.TraverseOption().Map(seq => seq.ToImmutableArray());
 }
 
 public sealed class Option<T>
