@@ -88,49 +88,4 @@ internal sealed class InMemoryRepository : IReceiptRepository
             ? Option.Some(receipt)
             : Option.None<ReceiptDetails>();
     }
-
-    public async Task<ImmutableArray<Store>> GetStoresAsync(Option<string> search, CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
-        IEnumerable<Store> stores = Receipts.Select(r => r.Store).Distinct();
-        return search.Match<ImmutableArray<Store>>(
-            none: () => [..stores],
-            some: searchTerm =>
-            [
-                ..stores
-                    .Where(store => searchTerm
-                        .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                        .All(str => store.Name.Contains(str, StringComparison.InvariantCultureIgnoreCase)))
-            ]);
-    }
-
-    public async Task<ImmutableArray<Item>> GetItemsAsync(Option<string> search, CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
-        IEnumerable<Item> items = Receipts.SelectMany(r => r.Items.Select(i => i.Item)).Distinct();
-        return search.Match<ImmutableArray<Item>>(
-            none: () => [..items],
-            some: searchTerm =>
-            [
-                ..items
-                    .Where(item => searchTerm
-                        .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                        .All(str => item.Name.Contains(str, StringComparison.InvariantCultureIgnoreCase)))
-            ]);
-    }
-
-    public async Task<ImmutableArray<Category>> GetCategoriesAsync(Option<string> search, CancellationToken cancellationToken)
-    {
-        await Task.CompletedTask;
-        IEnumerable<Category> categories = Receipts.SelectMany(r => r.Items.Select(i => i.Category)).Distinct();
-        return search.Match<ImmutableArray<Category>>(
-            none: () => [..categories],
-            some: searchTerm =>
-            [
-                ..categories
-                    .Where(category => searchTerm
-                        .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                        .All(str => category.Name.Contains(str, StringComparison.InvariantCultureIgnoreCase)))
-            ]);
-    }
 }
