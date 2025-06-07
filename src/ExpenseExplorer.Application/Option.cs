@@ -7,21 +7,17 @@ public static class Option
 
     public static Option<TResult> Map<T, TResult>(
         this Option<T> source,
-        Func<T, TResult> map)
-    {
-        return source.Match(
+        Func<T, TResult> map) =>
+        source.Match(
             none: None<TResult>,
             some: v => Some(map(v)));
-    }
 
     public static Task<Option<TResult>> MapAsync<T, TResult>(
         this Option<T> source,
-        Func<T, Task<TResult>> map)
-    {
-        return source.MatchAsync(
+        Func<T, Task<TResult>> map) =>
+        source.MatchAsync(
             none: None<TResult>,
             some: async v => Some(await map(v)));
-    }
 
     public static T OrElse<T>(
         this Option<T> source,
