@@ -18,7 +18,7 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(CancellationToken.None);
         string sql = "select store from receipts"
                      + search
-                         .Map(FormatSearchFilters("item"))
+                         .Map(FormatSearchFilters("store"))
                          .Map(whereClauses => $" where {whereClauses}")
                          .OrElse(() => "");
 
