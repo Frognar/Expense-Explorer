@@ -55,8 +55,9 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
                          .OrElse(() => "");
 
         IEnumerable<string> categories = await connection.QueryAsync<string>(sql);
-        return Categories
-            .CreateMany([..categories.Select(Category.TryCreate)])
+
+        return categories.Select(Category.TryCreate)
+            .TraverseOptionToImmutableArray()
             .OrElse(() => []);
     }
 
