@@ -46,24 +46,31 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
     }
 
     private static string PrepareSql(string column, string table, Option<string> search) =>
-        $"select {column} from {table}" + FormatSearchFilters(search, column);
+        SqlQueryBuilder.BuildSelectQuery(column, table, search);
 
-    private static string FormatSearchFilters(Option<string> search, string column) =>
-        search
-            .Map(FormatSearchFilters(column))
-            .Map(whereClauses => $" where {whereClauses}")
-            .OrElse(() => "");
+    private static class SqlQueryBuilder
+    {
+        public static string BuildSelectQuery(
+            string columnName,
+            string tableName,
+            Option<string> searchTerms)
+        {
+            string baseQuery = $"select {columnName} from {tableName}";
+            return searchTerms
+                .Map(terms => BuildWhereClause(terms, columnName))
+                .Map(whereClause => $"{baseQuery} where {whereClause}")
+                .OrElse(() => baseQuery);
+        }
 
-    private static Func<string, string> FormatSearchFilters(string column) =>
-        searchTerms => BuildWhereClause(searchTerms, column);
+        private static string BuildWhereClause(string searchTerms, string columnName) =>
+            string.Join(" AND ",
+                ParseSearchTerms(searchTerms)
+                    .Select(term => CreateLikeCondition(columnName, term)));
 
-    private static string BuildWhereClause(string searchTerms, string columnName) =>
-        string.Join(" AND ", ParseSearchTerms(searchTerms).Select(term => CreateLikeCondition(columnName, term)));
+        private static string[] ParseSearchTerms(string searchTerms) =>
+            searchTerms.Split(" ",StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-    private static string[] ParseSearchTerms(string searchTerms) =>
-        searchTerms.Split(" ",StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-    private static string CreateLikeCondition(string columnName, string searchTerm) =>
-        $"UPPER({columnName}) LIKE '%{searchTerm.ToUpperInvariant()}%'";
-
+        private static string CreateLikeCondition(string columnName, string searchTerm) =>
+            $"UPPER({columnName}) LIKE '%{searchTerm.ToUpperInvariant()}%'";
+    }
 }
