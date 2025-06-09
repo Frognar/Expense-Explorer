@@ -15,13 +15,8 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
 {
     public async Task<ImmutableArray<Store>> GetStoresAsync(Option<string> search, CancellationToken cancellationToken)
     {
-        string sql = "select store from receipts"
-                     + search
-                         .Map(FormatSearchFilters("store"))
-                         .Map(whereClauses => $" where {whereClauses}")
-                         .OrElse(() => "");
-
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+        string sql = PrepareSql("store","receipts", search);
         IEnumerable<string> stores = await connection.QueryAsync<string>(sql);
         return stores.Select(Store.TryCreate)
             .TraverseOptionToImmutableArray()
@@ -30,13 +25,8 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
 
     public async Task<ImmutableArray<Item>> GetItemsAsync(Option<string> search, CancellationToken cancellationToken)
     {
-        string sql = "select item from receipt_items"
-                     + search
-                         .Map(FormatSearchFilters("item"))
-                         .Map(whereClauses => $" where {whereClauses}")
-                         .OrElse(() => "");
-
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+        string sql = PrepareSql("item","receipt_items", search);
         IEnumerable<string> items = await connection.QueryAsync<string>(sql);
         return items.Select(Item.TryCreate)
             .TraverseOptionToImmutableArray()
@@ -47,19 +37,22 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
         Option<string> search,
         CancellationToken cancellationToken)
     {
-        string sql = "select category from receipt_items"
-                     + search
-                         .Map(FormatSearchFilters("category"))
-                         .Map(whereClauses => $" where {whereClauses}")
-                         .OrElse(() => "");
-
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+        string sql = PrepareSql("category","receipt_items", search);
         IEnumerable<string> categories = await connection.QueryAsync<string>(sql);
-
         return categories.Select(Category.TryCreate)
             .TraverseOptionToImmutableArray()
             .OrElse(() => []);
     }
+
+    private static string PrepareSql(string column, string table, Option<string> search) =>
+        $"select {column} from {table}" + FormatSearchFilters(search, column);
+
+    private static string FormatSearchFilters(Option<string> search, string column) =>
+        search
+            .Map(FormatSearchFilters(column))
+            .Map(whereClauses => $" where {whereClauses}")
+            .OrElse(() => "");
 
     private static Func<string, string> FormatSearchFilters(string column) =>
         searchTerms => FormatSearchFilters(searchTerms, column);
