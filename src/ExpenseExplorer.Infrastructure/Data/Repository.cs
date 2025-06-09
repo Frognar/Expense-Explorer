@@ -55,10 +55,15 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
             .OrElse(() => "");
 
     private static Func<string, string> FormatSearchFilters(string column) =>
-        searchTerms => FormatSearchFilters(searchTerms, column);
+        searchTerms => BuildWhereClause(searchTerms, column);
 
-    private static string FormatSearchFilters(string searchTerms, string column) =>
-        string.Join(" AND ", searchTerms
-            .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(str => $"UPPER({column}) LIKE '%{str.ToUpperInvariant()}%'"));
+    private static string BuildWhereClause(string searchTerms, string columnName) =>
+        string.Join(" AND ", ParseSearchTerms(searchTerms).Select(term => CreateLikeCondition(columnName, term)));
+
+    private static string[] ParseSearchTerms(string searchTerms) =>
+        searchTerms.Split(" ",StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    private static string CreateLikeCondition(string columnName, string searchTerm) =>
+        $"UPPER({columnName}) LIKE '%{searchTerm.ToUpperInvariant()}%'";
+
 }
