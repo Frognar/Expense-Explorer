@@ -16,7 +16,7 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
     public async Task<ImmutableArray<Store>> GetStoresAsync(Option<string> search, CancellationToken cancellationToken)
     {
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
-        string sql = PrepareSql("store","receipts", search);
+        string sql = SqlQueryBuilder.BuildSelectQuery("store","receipts", search);
         IEnumerable<string> stores = await connection.QueryAsync<string>(sql);
         return stores.Select(Store.TryCreate)
             .TraverseOptionToImmutableArray()
@@ -26,7 +26,7 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
     public async Task<ImmutableArray<Item>> GetItemsAsync(Option<string> search, CancellationToken cancellationToken)
     {
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
-        string sql = PrepareSql("item","receipt_items", search);
+        string sql = SqlQueryBuilder.BuildSelectQuery("item","receipt_items", search);
         IEnumerable<string> items = await connection.QueryAsync<string>(sql);
         return items.Select(Item.TryCreate)
             .TraverseOptionToImmutableArray()
@@ -38,15 +38,12 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
         CancellationToken cancellationToken)
     {
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
-        string sql = PrepareSql("category","receipt_items", search);
+        string sql = SqlQueryBuilder.BuildSelectQuery("category","receipt_items", search);
         IEnumerable<string> categories = await connection.QueryAsync<string>(sql);
         return categories.Select(Category.TryCreate)
             .TraverseOptionToImmutableArray()
             .OrElse(() => []);
     }
-
-    private static string PrepareSql(string column, string table, Option<string> search) =>
-        SqlQueryBuilder.BuildSelectQuery(column, table, search);
 
     private static class SqlQueryBuilder
     {
