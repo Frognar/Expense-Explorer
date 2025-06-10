@@ -13,15 +13,19 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
         IItemRepository,
         ICategoryRepository
 {
-    public async Task<ImmutableArray<Store>> GetStoresAsync(Option<string> search, CancellationToken cancellationToken)
+    public async Task<ImmutableArray<Store>> GetStoresAsync(
+        Option<string> search,
+        CancellationToken cancellationToken)
     {
-        string sql = SqlQueryBuilder.BuildSelectQuery("store","receipts", search);
+        string sql = SqlQueryBuilder.BuildSelectQuery("store", "receipts", search);
         return await FetchEntitiesAsync(sql, Store.TryCreate, cancellationToken);
     }
 
-    public async Task<ImmutableArray<Item>> GetItemsAsync(Option<string> search, CancellationToken cancellationToken)
+    public async Task<ImmutableArray<Item>> GetItemsAsync(
+        Option<string> search,
+        CancellationToken cancellationToken)
     {
-        string sql = SqlQueryBuilder.BuildSelectQuery("item","receipt_items", search);
+        string sql = SqlQueryBuilder.BuildSelectQuery("item", "receipt_items", search);
         return await FetchEntitiesAsync(sql, Item.TryCreate, cancellationToken);
     }
 
@@ -29,7 +33,7 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
         Option<string> search,
         CancellationToken cancellationToken)
     {
-        string sql = SqlQueryBuilder.BuildSelectQuery("category","receipt_items", search);
+        string sql = SqlQueryBuilder.BuildSelectQuery("category", "receipt_items", search);
         return await FetchEntitiesAsync(sql, Category.TryCreate, cancellationToken);
     }
 
