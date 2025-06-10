@@ -15,32 +15,32 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
 {
     public async Task<ImmutableArray<Store>> GetStoresAsync(Option<string> search, CancellationToken cancellationToken)
     {
-        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
         string sql = SqlQueryBuilder.BuildSelectQuery("store","receipts", search);
-        IEnumerable<string> stores = await connection.QueryAsync<string>(sql);
-        return stores.Select(Store.TryCreate)
-            .TraverseOptionToImmutableArray()
-            .OrElse(() => []);
+        return await FetchEntitiesAsync(sql, Store.TryCreate, cancellationToken);
     }
 
     public async Task<ImmutableArray<Item>> GetItemsAsync(Option<string> search, CancellationToken cancellationToken)
     {
-        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
         string sql = SqlQueryBuilder.BuildSelectQuery("item","receipt_items", search);
-        IEnumerable<string> items = await connection.QueryAsync<string>(sql);
-        return items.Select(Item.TryCreate)
-            .TraverseOptionToImmutableArray()
-            .OrElse(() => []);
+        return await FetchEntitiesAsync(sql, Item.TryCreate, cancellationToken);
     }
 
     public async Task<ImmutableArray<Category>> GetCategoriesAsync(
         Option<string> search,
         CancellationToken cancellationToken)
     {
-        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
         string sql = SqlQueryBuilder.BuildSelectQuery("category","receipt_items", search);
-        IEnumerable<string> categories = await connection.QueryAsync<string>(sql);
-        return categories.Select(Category.TryCreate)
+        return await FetchEntitiesAsync(sql, Category.TryCreate, cancellationToken);
+    }
+
+    private async Task<ImmutableArray<T>> FetchEntitiesAsync<T>(
+        string sql,
+        Func<string, Option<T>> entityFactory,
+        CancellationToken cancellationToken)
+    {
+        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+        IEnumerable<string> rawData = await connection.QueryAsync<string>(sql);
+        return rawData.Select(entityFactory)
             .TraverseOptionToImmutableArray()
             .OrElse(() => []);
     }
