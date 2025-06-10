@@ -50,14 +50,11 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
         public static string BuildSelectQuery(
             string columnName,
             string tableName,
-            Option<string> searchTerms)
-        {
-            string baseQuery = $"select {columnName} from {tableName}";
-            return searchTerms
+            Option<string> searchTerms) =>
+            searchTerms
                 .Map(terms => BuildWhereClause(terms, columnName))
-                .Map(whereClause => $"{baseQuery} where {whereClause}")
-                .OrElse(() => baseQuery);
-        }
+                .Map(whereClause => $"select {columnName} from {tableName} where {whereClause}")
+                .OrElse(() => $"select {columnName} from {tableName}");
 
         private static string BuildWhereClause(string searchTerms, string columnName) =>
             string.Join(" AND ",
@@ -65,7 +62,7 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
                     .Select(term => CreateLikeCondition(columnName, term)));
 
         private static string[] ParseSearchTerms(string searchTerms) =>
-            searchTerms.Split(" ",StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            searchTerms.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         private static string CreateLikeCondition(string columnName, string searchTerm) =>
             $"UPPER({columnName}) LIKE '%{searchTerm.ToUpperInvariant()}%'";
