@@ -12,7 +12,8 @@ public static class InfrastructureExtensions
         return services
             .AddScoped<IStoreRepository, Repository>()
             .AddScoped<IItemRepository, Repository>()
-            .AddScoped<ICategoryRepository, Repository>();
+            .AddScoped<ICategoryRepository, Repository>()
+            .AddScoped<IReceiptCommandRepository, Repository>();
     }
 
     public static IServiceCollection AddDatabase(
