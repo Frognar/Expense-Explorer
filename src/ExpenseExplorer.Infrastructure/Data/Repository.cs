@@ -3,6 +3,7 @@ using System.Data;
 using Dapper;
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Receipts.Data;
+using ExpenseExplorer.Application.Receipts.DTO;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
 using ExpenseExplorer.Infrastructure.Database;
 
@@ -11,7 +12,8 @@ namespace ExpenseExplorer.Infrastructure.Data;
 internal sealed class Repository(IDbConnectionFactory connectionFactory)
     : IStoreRepository,
         IItemRepository,
-        ICategoryRepository
+        ICategoryRepository,
+        IReceiptCommandRepository
 {
     public async Task<ImmutableArray<Store>> GetStoresAsync(
         Option<string> search,
@@ -70,5 +72,27 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
 
         private static string CreateLikeCondition(string columnName, string searchTerm) =>
             $"UPPER({columnName}) LIKE '%{searchTerm.ToUpperInvariant()}%'";
+    }
+
+    public async Task<Result<Unit, string>> CreateReceipt(CreateReceiptRequest receipt, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+            _ = await connection.ExecuteAsync(
+                "INSERT INTO receipts (id, store, purchase_date) VALUES (@Id, @Store, @PurchaseDate)",
+                new
+                {
+                    Id = receipt.Id.Value,
+                    Store = receipt.Store.Name,
+                    PurchaseDate = receipt.PurchaseDate.Date
+                });
+
+            return Result.Success<Unit, string>(Unit.Instance);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<Unit, string>(ex.Message);
+        }
     }
 }
