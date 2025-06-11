@@ -7,7 +7,7 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 
 public sealed record CreateReceiptCommand(string StoreName, DateOnly PurchaseDate, DateOnly Today);
 
-public sealed class CreateReceiptHandler(IReceiptRepository receiptRepository)
+public sealed class CreateReceiptHandler(IReceiptCommandRepository receiptRepository)
 {
     public async Task<Result<ReceiptId, IEnumerable<string>>> HandleAsync(
         CreateReceiptCommand command,

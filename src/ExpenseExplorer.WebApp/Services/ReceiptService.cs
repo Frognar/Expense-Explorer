@@ -14,6 +14,7 @@ namespace ExpenseExplorer.WebApp.Services;
 internal sealed class ReceiptService(
     IReceiptRepository receiptRepository,
     ExpenseExplorer.Application.Receipts.Data.IReceiptRepository applicationReceiptRepository,
+    IReceiptCommandRepository commandRepository,
     IStoreRepository storeRepository,
     IItemRepository itemRepository,
     ICategoryRepository categoryRepository)
@@ -82,7 +83,7 @@ internal sealed class ReceiptService(
     internal async Task<Result<Guid, string>> CreateReceiptAsync(string store, DateOnly purchaseDate)
     {
         CreateReceiptCommand command = new(store, purchaseDate, DateOnly.FromDateTime(DateTime.Today));
-        CreateReceiptHandler handler = new(applicationReceiptRepository);
+        CreateReceiptHandler handler = new(commandRepository);
         Result<ReceiptId, IEnumerable<string>> result = await handler.HandleAsync(command, CancellationToken.None);
         return result
             .MapError(errors => string.Join(Environment.NewLine, errors))
