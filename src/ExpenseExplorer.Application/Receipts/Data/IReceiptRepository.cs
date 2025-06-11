@@ -22,3 +22,8 @@ public interface IReceiptRepository
 
     public Task<Option<ReceiptDetails>> GetReceiptByIdAsync(ReceiptId id, CancellationToken cancellationToken);
 }
+
+public interface IReceiptCommandRepository
+{
+    public Task<Result<Unit, string>> CreateReceipt(CreateReceiptRequest receipt, CancellationToken cancellationToken);
+}
