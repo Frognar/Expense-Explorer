@@ -8,12 +8,6 @@ internal sealed class InMemoryRepository : IReceiptRepository
 {
     private static readonly List<ReceiptDetails> Receipts = [];
 
-    public Task<Unit> DeleteReceipt(ReceiptId id, CancellationToken cancellationToken)
-    {
-        Receipts.RemoveAll(r => r.Id == id);
-        return Task.FromResult(Unit.Instance);
-    }
-
     public async Task<PageOf<ReceiptSummary>> GetReceiptsAsync(
         int pageSize,
         int skip,

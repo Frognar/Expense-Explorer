@@ -6,8 +6,6 @@ namespace ExpenseExplorer.Application.Receipts.Data;
 
 public interface IReceiptRepository
 {
-    public Task<Unit> DeleteReceipt(ReceiptId id, CancellationToken cancellationToken);
-
     public Task<PageOf<ReceiptSummary>> GetReceiptsAsync(
         int pageSize,
         int skip,
