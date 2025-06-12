@@ -32,6 +32,15 @@ public static class Result
             value: async v => Success<TResult, TError>(await map(v)));
     }
 
+    public static Task<Result<TResult, TError>> FlatMapAsync<T, TResult, TError>(
+        this Result<T, TError> source,
+        Func<T, Task<Result<TResult, TError>>> map)
+    {
+        return source.MatchAsync(
+            error: Failure<TResult, TError>,
+            value: async v => await map(v));
+    }
+
     public static async Task<TResult> MatchAsync<T, TError, TResult>(
         this Task<Result<T, TError>> source,
         Func<TError, TResult> error,
