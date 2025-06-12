@@ -5,12 +5,13 @@ namespace ExpenseExplorer.Application.Receipts.Commands;
 
 public sealed record DeleteReceiptCommand(Guid Id);
 
-public sealed class DeleteReceiptHandler(IReceiptRepository receiptRepository)
+public sealed class DeleteReceiptHandler(IReceiptCommandRepository receiptRepository)
 {
     public async Task<Result<Unit, ValidationError>> HandleAsync(
         DeleteReceiptCommand command,
         CancellationToken cancellationToken) =>
         await ReceiptId.TryCreate(command.Id)
-            .ToResult(onNone: () => new ValidationError(nameof(command.Id), "Invalid receipt id"))
-            .MapAsync(id => receiptRepository.DeleteReceipt(id, cancellationToken));
+            .ToResult(onNone: () => "Invalid receipt id")
+            .FlatMapAsync(id => receiptRepository.DeleteReceipt(id ,cancellationToken))
+            .MapErrorAsync(error => new ValidationError(nameof(command.Id), error));
 }

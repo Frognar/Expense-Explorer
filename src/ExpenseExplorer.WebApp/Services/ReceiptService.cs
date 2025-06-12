@@ -143,7 +143,7 @@ internal sealed class ReceiptService(
     public async Task<Result<Unit, string>> DeleteReceiptAsync(Guid receiptId)
     {
         DeleteReceiptCommand command = new(receiptId);
-        DeleteReceiptHandler handler = new(applicationReceiptRepository);
+        DeleteReceiptHandler handler = new(commandRepository);
         Result<Unit, ValidationError> result = await handler.HandleAsync(command, CancellationToken.None);
         return result
             .MapError(errors => string.Join(Environment.NewLine, errors));
