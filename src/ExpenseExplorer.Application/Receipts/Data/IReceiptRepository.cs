@@ -25,4 +25,5 @@ public interface IReceiptRepository
 public interface IReceiptCommandRepository
 {
     public Task<Result<Unit, string>> CreateReceipt(CreateReceiptRequest receipt, CancellationToken cancellationToken);
+    public Task<Result<Unit, string>> DeleteReceipt(ReceiptId id, CancellationToken cancellationToken);
 }

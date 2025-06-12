@@ -95,4 +95,29 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
             return Result.Failure<Unit, string>(ex.Message);
         }
     }
+
+    public async Task<Result<Unit, string>> DeleteReceipt(ReceiptId id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+            IDbTransaction transaction = connection.BeginTransaction();
+            _ = await connection.ExecuteAsync(
+                "DELETE FROM receipt_items WHERE receipt_id = @Id",
+                new { Id = id.Value },
+                transaction: transaction);
+
+            _ = await connection.ExecuteAsync(
+                "DELETE FROM receipts WHERE id = @Id",
+                new { Id = id.Value },
+                transaction: transaction);
+
+            transaction.Commit();
+            return Result.Success<Unit, string>(Unit.Instance);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<Unit, string>(ex.Message);
+        }
+    }
 }
