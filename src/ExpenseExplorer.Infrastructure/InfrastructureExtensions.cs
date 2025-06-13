@@ -1,6 +1,8 @@
+using Dapper;
 using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.Infrastructure.Data;
 using ExpenseExplorer.Infrastructure.Database;
+using ExpenseExplorer.Infrastructure.Database.TypeHandlers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ExpenseExplorer.Infrastructure;
@@ -20,6 +22,7 @@ public static class InfrastructureExtensions
         this IServiceCollection services,
         string connectionString)
     {
+        SqlMapper.AddTypeHandler(new DateOnlyHandler());
         return services
             .AddSingleton<IDbConnectionFactory>(_ => new DbConnectionFactory(connectionString))
             .AddSingleton<DbInitializer>();
