@@ -16,11 +16,10 @@ public sealed class CreateReceiptHandler(IReceiptCommandRepository receiptReposi
         return await Validate(command)
             .ToResult()
             .MapError(errors => errors.Select(e => e.Error))
-            .MapAsync(async request =>
-            {
-                await receiptRepository.CreateReceipt(request, cancellationToken);
-                return request.Id;
-            });
+            .FlatMapAsync(async request =>
+                await receiptRepository.CreateReceipt(request, cancellationToken)
+                    .MapAsync(_ => request.Id)
+                    .MapErrorAsync(error => new[] { error }.AsEnumerable()));
     }
 }
 
