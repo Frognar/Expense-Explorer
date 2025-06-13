@@ -1,3 +1,5 @@
+using DotMaybe;
+
 namespace ExpenseExplorer.Application.Receipts.ValueObjects;
 
 public readonly record struct PurchaseDate
@@ -6,8 +8,8 @@ public readonly record struct PurchaseDate
 
     private PurchaseDate(DateOnly date) => Date = date;
 
-    public static Option<PurchaseDate> TryCreate(DateOnly date, DateOnly today) =>
+    public static Maybe<PurchaseDate> TryCreate(DateOnly date, DateOnly today) =>
         date > today
-            ? Option.None<PurchaseDate>()
-            : Option.Some(new PurchaseDate(date));
+            ? None.OfType<PurchaseDate>()
+            : Some.With(new PurchaseDate(date));
 }

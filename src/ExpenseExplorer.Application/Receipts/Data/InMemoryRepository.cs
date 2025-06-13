@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using DotMaybe;
 using ExpenseExplorer.Application.Receipts.DTO;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
 
@@ -35,7 +36,7 @@ internal sealed class InMemoryRepository : IReceiptRepository
                 r.Store,
                 r.PurchaseDate,
                 r.Items.Aggregate(
-                    Money.Zero, (m, i) => m + (i.UnitPrice * i.Quantity - i.Discount.OrElse(() => Money.Zero)))))
+                    Money.Zero, (m, i) => m + (i.UnitPrice * i.Quantity - i.Discount.OrDefault(() => Money.Zero)))))
             .Where(MatchesReceiptFilters(filters));
     }
 
@@ -69,11 +70,11 @@ internal sealed class InMemoryRepository : IReceiptRepository
         return receipts.Aggregate(Money.Zero, (m, r) => m + r.Total);
     }
 
-    public async Task<Option<ReceiptDetails>> GetReceiptByIdAsync(ReceiptId id, CancellationToken cancellationToken)
+    public async Task<Maybe<ReceiptDetails>> GetReceiptByIdAsync(ReceiptId id, CancellationToken cancellationToken)
     {
         await Task.CompletedTask;
         return Receipts.FirstOrDefault(r => r.Id == id) is { } receipt
-            ? Option.Some(receipt)
-            : Option.None<ReceiptDetails>();
+            ? Some.With(receipt)
+            : None.OfType<ReceiptDetails>();
     }
 }

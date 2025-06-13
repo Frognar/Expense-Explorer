@@ -1,3 +1,5 @@
+using DotMaybe;
+
 namespace ExpenseExplorer.Application.Receipts.ValueObjects;
 
 public readonly record struct Item
@@ -6,8 +8,8 @@ public readonly record struct Item
 
     private Item(string name) => Name = name;
 
-    public static Option<Item> TryCreate(string name) =>
+    public static Maybe<Item> TryCreate(string name) =>
         string.IsNullOrWhiteSpace(name)
-            ? Option.None<Item>()
-            : Option.Some(new Item(name.Trim()));
+            ? None.OfType<Item>()
+            : Some.With(new Item(name.Trim()));
 }

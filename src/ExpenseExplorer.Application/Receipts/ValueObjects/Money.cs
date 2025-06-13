@@ -1,3 +1,5 @@
+using DotMaybe;
+
 namespace ExpenseExplorer.Application.Receipts.ValueObjects;
 
 public readonly record struct Money
@@ -6,10 +8,10 @@ public readonly record struct Money
 
     private Money(decimal value) => Value = value;
 
-    public static Option<Money> TryCreate(decimal value) =>
+    public static Maybe<Money> TryCreate(decimal value) =>
         value < decimal.Zero
-            ? Option.None<Money>()
-            : Option.Some(new Money(value));
+            ? None.OfType<Money>()
+            : Some.With(new Money(value));
 
     public static readonly Money Zero = new(0);
 

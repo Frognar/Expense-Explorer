@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Data;
 using Dapper;
+using DotMaybe;
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.Application.Receipts.DTO;
@@ -16,7 +17,7 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
         IReceiptCommandRepository
 {
     public async Task<ImmutableArray<Store>> GetStoresAsync(
-        Option<string> search,
+        Maybe<string> search,
         CancellationToken cancellationToken)
     {
         string sql = SqlQueryBuilder.BuildSelectQuery("store", "receipts", search);
@@ -24,7 +25,7 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
     }
 
     public async Task<ImmutableArray<Item>> GetItemsAsync(
-        Option<string> search,
+        Maybe<string> search,
         CancellationToken cancellationToken)
     {
         string sql = SqlQueryBuilder.BuildSelectQuery("item", "receipt_items", search);
@@ -32,7 +33,7 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
     }
 
     public async Task<ImmutableArray<Category>> GetCategoriesAsync(
-        Option<string> search,
+        Maybe<string> search,
         CancellationToken cancellationToken)
     {
         string sql = SqlQueryBuilder.BuildSelectQuery("category", "receipt_items", search);
@@ -41,14 +42,14 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
 
     private async Task<ImmutableArray<T>> FetchEntitiesAsync<T>(
         string sql,
-        Func<string, Option<T>> entityFactory,
+        Func<string, Maybe<T>> entityFactory,
         CancellationToken cancellationToken)
     {
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
         IEnumerable<string> rawData = await connection.QueryAsync<string>(sql);
         return rawData.Select(entityFactory)
-            .TraverseOptionToImmutableArray()
-            .OrElse(() => []);
+            .TraverseMaybeToImmutableArray()
+            .OrDefault(() => []);
     }
 
     private static class SqlQueryBuilder
@@ -56,11 +57,11 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
         public static string BuildSelectQuery(
             string columnName,
             string tableName,
-            Option<string> searchTerms) =>
+            Maybe<string> searchTerms) =>
             searchTerms
                 .Map(terms => BuildWhereClause(terms, columnName))
                 .Map(whereClause => $"select {columnName} from {tableName} where {whereClause}")
-                .OrElse(() => $"select {columnName} from {tableName}");
+                .OrDefault(() => $"select {columnName} from {tableName}");
 
         private static string BuildWhereClause(string searchTerms, string columnName) =>
             string.Join(" AND ",

@@ -1,13 +1,15 @@
+using DotMaybe;
+
 namespace ExpenseExplorer.Application;
 
 public static class FunctionalConversions
 {
-    public static Validated<T> ToValidated<T>(this Option<T> source, Func<ValidationError> onNone) =>
+    public static Validated<T> ToValidated<T>(this Maybe<T> source, Func<ValidationError> onNone) =>
         source.Match(
             none: () => Validation.Failed<T>([onNone()]),
             some: Validation.Succeed);
 
-    public static Result<T, TError> ToResult<T, TError>(this Option<T> source, Func<TError> onNone) =>
+    public static Result<T, TError> ToResult<T, TError>(this Maybe<T> source, Func<TError> onNone) =>
         source.Match(
             none: () => Result.Failure<T, TError>(onNone()),
             some: Result.Success<T, TError>);

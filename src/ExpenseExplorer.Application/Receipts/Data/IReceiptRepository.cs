@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using DotMaybe;
 using ExpenseExplorer.Application.Receipts.DTO;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
 
@@ -17,7 +18,7 @@ public interface IReceiptRepository
         ImmutableArray<ReceiptFilter> filters,
         CancellationToken cancellationToken);
 
-    public Task<Option<ReceiptDetails>> GetReceiptByIdAsync(ReceiptId id, CancellationToken cancellationToken);
+    public Task<Maybe<ReceiptDetails>> GetReceiptByIdAsync(ReceiptId id, CancellationToken cancellationToken);
 }
 
 public interface IReceiptCommandRepository

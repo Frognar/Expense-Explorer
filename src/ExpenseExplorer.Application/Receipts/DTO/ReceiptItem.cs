@@ -1,3 +1,4 @@
+using DotMaybe;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
 
 namespace ExpenseExplorer.Application.Receipts.DTO;
@@ -8,5 +9,5 @@ public sealed record ReceiptItem(
     Category Category,
     Money UnitPrice,
     Quantity Quantity,
-    Option<Money> Discount,
-    Option<Description> Description);
+    Maybe<Money> Discount,
+    Maybe<Description> Description);

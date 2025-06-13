@@ -1,10 +1,11 @@
 using System.Collections.Immutable;
+using DotMaybe;
 using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
 
 namespace ExpenseExplorer.Application.Receipts.Queries;
 
-public sealed record GetStoresQuery(Option<string> SearchTerm);
+public sealed record GetStoresQuery(Maybe<string> SearchTerm);
 
 public sealed class GetStoresHandler(IStoreRepository storeRepository)
 {

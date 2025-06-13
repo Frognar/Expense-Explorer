@@ -1,3 +1,4 @@
+using DotMaybe;
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Application.Receipts.Commands;
@@ -58,7 +59,7 @@ internal sealed class ReceiptService(
 
     internal async Task<IEnumerable<string>> GetStoresAsync(string? search = null)
     {
-        GetStoresQuery query = new(search is not null ? Option.Some(search) : Option.None<string>());
+        GetStoresQuery query = new(search is not null ? Some.With(search) : None.OfType<string>());
         GetStoresHandler handler = new(storeRepository);
         IEnumerable<Store> stores = await handler.HandleAsync(query, CancellationToken.None);
         return stores.Select(s => s.Name);
@@ -66,7 +67,7 @@ internal sealed class ReceiptService(
 
     internal async Task<IEnumerable<string>> GetItemsAsync(string? search = null)
     {
-        GetItemsQuery query = new(search is not null ? Option.Some(search) : Option.None<string>());
+        GetItemsQuery query = new(search is not null ? Some.With(search) : None.OfType<string>());
         GetItemsHandler handler = new(itemRepository);
         IEnumerable<Item> items = await handler.HandleAsync(query, CancellationToken.None);
         return items.Select(i => i.Name);
@@ -74,7 +75,7 @@ internal sealed class ReceiptService(
 
     internal async Task<IEnumerable<string>> GetCategoriesAsync(string? search = null)
     {
-        GetCategoriesQuery query = new(search is not null ? Option.Some(search) : Option.None<string>());
+        GetCategoriesQuery query = new(search is not null ? Some.With(search) : None.OfType<string>());
         GetCategoriesHandler handler = new(categoryRepository);
         IEnumerable<Category> categories = await handler.HandleAsync(query, CancellationToken.None);
         return categories.Select(c => c.Name);
