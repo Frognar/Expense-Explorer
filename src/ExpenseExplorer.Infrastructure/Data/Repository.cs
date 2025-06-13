@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Data;
 using Dapper;
 using DotMaybe;
+using DotResult;
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.Application.Receipts.DTO;
@@ -75,7 +76,7 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
             $"UPPER({columnName}) LIKE '%{searchTerm.ToUpperInvariant()}%'";
     }
 
-    public async Task<Result<Unit, string>> CreateReceipt(CreateReceiptRequest receipt, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> CreateReceipt(CreateReceiptRequest receipt, CancellationToken cancellationToken)
     {
         try
         {
@@ -89,15 +90,15 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
                     PurchaseDate = receipt.PurchaseDate.Date
                 });
 
-            return Result.Success<Unit, string>(Unit.Instance);
+            return Unit.Instance;
         }
         catch (Exception ex)
         {
-            return Result.Failure<Unit, string>(ex.Message);
+            return Failure.Fatal("Receipt.Exception", ex.Message);
         }
     }
 
-    public async Task<Result<Unit, string>> DeleteReceipt(ReceiptId id, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> DeleteReceipt(ReceiptId id, CancellationToken cancellationToken)
     {
         try
         {
@@ -114,11 +115,11 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
                 transaction: transaction);
 
             transaction.Commit();
-            return Result.Success<Unit, string>(Unit.Instance);
+            return Unit.Instance;
         }
         catch (Exception ex)
         {
-            return Result.Failure<Unit, string>(ex.Message);
+            return Failure.Fatal("Receipt.Exception", ex.Message);
         }
     }
 }

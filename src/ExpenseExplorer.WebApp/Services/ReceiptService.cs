@@ -1,4 +1,5 @@
 using DotMaybe;
+using DotResult;
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Application.Receipts.Commands;
@@ -81,22 +82,20 @@ internal sealed class ReceiptService(
         return categories.Select(c => c.Name);
     }
 
-    internal async Task<Result<Guid, string>> CreateReceiptAsync(string store, DateOnly purchaseDate)
+    internal async Task<Result<Guid>> CreateReceiptAsync(string store, DateOnly purchaseDate)
     {
         CreateReceiptCommand command = new(store, purchaseDate, DateOnly.FromDateTime(DateTime.Today));
         CreateReceiptHandler handler = new(commandRepository);
-        Result<ReceiptId, IEnumerable<string>> result = await handler.HandleAsync(command, CancellationToken.None);
-        return result
-            .MapError(errors => string.Join(Environment.NewLine, errors))
-            .Map(receiptId => receiptId.Value);
+        Result<ReceiptId> result = await handler.HandleAsync(command, CancellationToken.None);
+        return result.Map(receiptId => receiptId.Value);
     }
 
-    public async Task<Result<ReceiptWithPurchases, string>> GetReceiptAsync(Guid id)
+    public async Task<Result<ReceiptWithPurchases>> GetReceiptAsync(Guid id)
     {
         GetReceiptByIdQuery query = new(id);
         GetReceiptByIdHandler handler = new(applicationReceiptRepository);
-        Result<Application.Receipts.DTO.ReceiptDetails, ValidationError> response = await handler.HandleAsync(query, CancellationToken.None);
-        return response.MapError(e => e.Error)
+        Result<Application.Receipts.DTO.ReceiptDetails> response = await handler.HandleAsync(query, CancellationToken.None);
+        return response
             .Map(r =>
                 new ReceiptWithPurchases(
                     r.Id.Value,
@@ -113,12 +112,12 @@ internal sealed class ReceiptService(
                             i.Description.Match<string?>(none: () => null, some: m => m.Value)))));
     }
 
-    public async Task<Result<Guid, string>> DuplicateReceipt(Guid id)
+    public async Task<Result<Guid>> DuplicateReceipt(Guid id)
     {
         ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(id);
         if (receipt == null)
         {
-            return Result.Failure<Guid, string>("Receipt not found");
+            return Failure.NotFound(message: "Receipt not found");
         }
 
         Guid newId = Guid.CreateVersion7();
@@ -138,51 +137,49 @@ internal sealed class ReceiptService(
             await receiptRepository.AddPurchaseAsync(newId, newPurchase);
         }
 
-        return Result.Success<Guid, string>(newId);
+        return newId;
     }
 
-    public async Task<Result<Unit, string>> DeleteReceiptAsync(Guid receiptId)
+    public async Task<Result<Unit>> DeleteReceiptAsync(Guid receiptId)
     {
         DeleteReceiptCommand command = new(receiptId);
         DeleteReceiptHandler handler = new(commandRepository);
-        Result<Unit, ValidationError> result = await handler.HandleAsync(command, CancellationToken.None);
-        return result
-            .MapError(errors => string.Join(Environment.NewLine, errors));
+        return await handler.HandleAsync(command, CancellationToken.None);
     }
 
-    public async Task<Result<Unit, string>> AddPurchase(Guid receiptId, PurchaseDetails purchase)
+    public async Task<Result<Unit>> AddPurchase(Guid receiptId, PurchaseDetails purchase)
     {
         ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(receiptId);
         if (receipt == null)
         {
-            return Result.Failure<Unit, string>("Receipt not found");
+            return Failure.NotFound(message: "Receipt not found");
         }
 
         await receiptRepository.AddPurchaseAsync(receiptId, purchase);
-        return Result.Success<Unit, string>(Unit.Instance);
+        return Unit.Instance;
     }
 
-    public async Task<Result<Unit, string>> UpdatePurchase(Guid receiptId, PurchaseDetails purchase)
+    public async Task<Result<Unit>> UpdatePurchase(Guid receiptId, PurchaseDetails purchase)
     {
         ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(receiptId);
         if (receipt == null)
         {
-            return Result.Failure<Unit, string>("Receipt not found");
+            return Failure.NotFound(message: "Receipt not found");
         }
 
         await receiptRepository.UpdatePurchaseAsync(receiptId, purchase);
-        return Result.Success<Unit, string>(Unit.Instance);
+        return Unit.Instance;
     }
 
-    public async Task<Result<Unit, string>> DeletePurchaseAsync(Guid receiptId, Guid purchaseId)
+    public async Task<Result<Unit>> DeletePurchaseAsync(Guid receiptId, Guid purchaseId)
     {
         ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(receiptId);
         if (receipt == null)
         {
-            return Result.Failure<Unit, string>("Receipt not found");
+            return Failure.NotFound(message: "Receipt not found");
         }
 
         await receiptRepository.DeletePurchaseAsync(receiptId, purchaseId);
-        return Result.Success<Unit, string>(Unit.Instance);
+        return Unit.Instance;
     }
 }

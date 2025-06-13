@@ -1,6 +1,6 @@
 @page "/receipts/new"
+@using DotResult
 @using ExpenseExplorer.Application
-@using ExpenseExplorer.WebApp.Helpers
 @using ExpenseExplorer.WebApp.Services
 @inject ReceiptService ReceiptService
 @inject IStringLocalizer<NewReceipt> Localizer
@@ -45,9 +45,11 @@
 
     private async Task OnSave()
     {
-        Result<Guid, string> result = await ReceiptService.CreateReceiptAsync(_store, _purchaseDate);
+        Result<Guid> result = await ReceiptService.CreateReceiptAsync(_store, _purchaseDate);
         await result
-            .MatchAsync(_toast.OpenAsync, id => NavigateTo($"/receipts/{id}"));
+            .MatchAsync(
+                error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message))),
+                id => Task.FromResult(NavigateTo($"/receipts/{id}")));
     }
 
     private Unit NavigateTo(string url)

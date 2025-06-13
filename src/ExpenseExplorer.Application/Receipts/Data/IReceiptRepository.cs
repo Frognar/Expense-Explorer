@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using DotMaybe;
+using DotResult;
 using ExpenseExplorer.Application.Receipts.DTO;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
 
@@ -23,6 +24,6 @@ public interface IReceiptRepository
 
 public interface IReceiptCommandRepository
 {
-    public Task<Result<Unit, string>> CreateReceipt(CreateReceiptRequest receipt, CancellationToken cancellationToken);
-    public Task<Result<Unit, string>> DeleteReceipt(ReceiptId id, CancellationToken cancellationToken);
+    public Task<Result<Unit>> CreateReceipt(CreateReceiptRequest receipt, CancellationToken cancellationToken);
+    public Task<Result<Unit>> DeleteReceipt(ReceiptId id, CancellationToken cancellationToken);
 }

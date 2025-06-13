@@ -1,7 +1,7 @@
 @page "/Receipts/{receiptId:guid}"
 @using System.Globalization
+@using DotResult
 @using ExpenseExplorer.Application
-@using ExpenseExplorer.WebApp.Helpers
 @using ExpenseExplorer.WebApp.Models
 @using ExpenseExplorer.WebApp.Services
 @inject IStringLocalizer<Receipt> Localizer
@@ -37,12 +37,14 @@
     <Columns>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["ItemName"]">
             <EditTemplate Context="purchase">
-                <RadzenAutoComplete @bind-Value="@purchase.ItemName" Data="_items" OpenOnFocus="true" LoadData="OnItemsLoadData"/>
+                <RadzenAutoComplete @bind-Value="@purchase.ItemName" Data="_items" OpenOnFocus="true"
+                                    LoadData="OnItemsLoadData"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Category)" Title="@Localizer["Category"]">
             <EditTemplate Context="purchase">
-                <RadzenAutoComplete @bind-Value="@purchase.Category" Data="_categories" OpenOnFocus="true" LoadData="OnCategoriesLoadData"/>
+                <RadzenAutoComplete @bind-Value="@purchase.Category" Data="_categories" OpenOnFocus="true"
+                                    LoadData="OnCategoriesLoadData"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Quantity)" Title="@Localizer["Quantity"]">
@@ -61,7 +63,8 @@
                 <RadzenNumeric @bind-Value="@context.UnitPrice" ShowUpDown="false"/>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceBeforeDiscount)" Title="@Localizer["PriceBeforeDiscount"]">
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceBeforeDiscount)"
+                              Title="@Localizer["PriceBeforeDiscount"]">
             <Template>
                 @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.PriceBeforeDiscount)
             </Template>
@@ -74,7 +77,8 @@
                 <RadzenNumeric @bind-Value="@context.Discount" ShowUpDown="false"/>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceAfterDiscount)" Title="@Localizer["PriceAfterDiscount"]">
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceAfterDiscount)"
+                              Title="@Localizer["PriceAfterDiscount"]">
             <Template>
                 @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.PriceAfterDiscount)
             </Template>
@@ -84,17 +88,23 @@
                 <RadzenTextArea @bind-Value="@context.Description"/>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Id)" Filterable="false" Sortable="false" Width="150px" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Id)" Filterable="false" Sortable="false" Width="150px"
+                              TextAlign="TextAlign.Center">
             <HeaderTemplate>
-                <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Text="@Localizer["AddItem"]" Click="@InsertRow" />
+                <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
+                              ButtonStyle="ButtonStyle.Success" Text="@Localizer["AddItem"]" Click="@InsertRow"/>
             </HeaderTemplate>
             <Template Context="purchase">
-                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Light" Click="@(_ => EditRow(purchase))"/>
-                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Danger" Click="@(_ => Delete(purchase))"/>
+                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
+                              ButtonStyle="ButtonStyle.Light" Click="@(_ => EditRow(purchase))"/>
+                <RadzenButton Icon="delete" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
+                              ButtonStyle="ButtonStyle.Danger" Click="@(_ => Delete(purchase))"/>
             </Template>
             <EditTemplate Context="purchase">
-                <RadzenButton Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Click="@(_ => SaveRow(purchase))"/>
-                <RadzenButton Icon="close" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Light" Click="@(_ => CancelEdit(purchase))"/>
+                <RadzenButton Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
+                              ButtonStyle="ButtonStyle.Success" Click="@(_ => SaveRow(purchase))"/>
+                <RadzenButton Icon="close" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
+                              ButtonStyle="ButtonStyle.Light" Click="@(_ => CancelEdit(purchase))"/>
             </EditTemplate>
         </RadzenDataGridColumn>
     </Columns>
@@ -117,7 +127,7 @@
     private IEnumerable<string> _items = [];
     private IEnumerable<string> _categories = [];
     private IEnumerable<PurchaseDetails> _purchases = [];
-    
+
     private PurchaseDetails? _backup;
     private Toast _toast = null!;
     private ConfirmationDialog _confirmationDialog = null!;
@@ -125,7 +135,7 @@
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
-        Result<ReceiptWithPurchases, string> receiptResult = await ReceiptService.GetReceiptAsync(ReceiptId);
+        Result<ReceiptWithPurchases> receiptResult = await ReceiptService.GetReceiptAsync(ReceiptId);
         receiptResult.Match(_ =>
         {
             NavigationManager.NavigateTo("/");
@@ -211,7 +221,9 @@
             purchase.Update(_backup!);
         }
 
-        await result.MatchAsync(_toast.OpenAsync, Id);
+        await result.MatchAsync(
+            error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message))),
+            Task.FromResult);
     }
 
     private async Task OnCreateRow(PurchaseDetails purchase)
@@ -220,11 +232,11 @@
         await result.MatchAsync(error =>
         {
             _grid.CancelEditRow(purchase);
-            return _toast.OpenAsync(error);
+            return _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message)));
         }, unit =>
         {
             _purchases = _purchases.Append(purchase);
-            return Id(unit);
+            return Task.FromResult(unit);
         });
     }
 
@@ -235,11 +247,13 @@
             return;
         }
 
-        Result<Unit, string> result = await ReceiptService.DeletePurchaseAsync(ReceiptId, purchase.Id);
-        await result.MatchAsync(_toast.OpenAsync, unit =>
-        {
-            _purchases = _purchases.Where(p => p.Id != purchase.Id);
-            return Id(unit);
-        });
+        Result<Unit> result = await ReceiptService.DeletePurchaseAsync(ReceiptId, purchase.Id);
+        await result.MatchAsync(
+            error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message))),
+            unit =>
+            {
+                _purchases = _purchases.Where(p => p.Id != purchase.Id);
+                return Task.FromResult(unit);
+            });
     }
 }

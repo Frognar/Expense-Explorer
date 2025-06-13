@@ -1,6 +1,6 @@
 @page "/"
+@using DotResult
 @using ExpenseExplorer.Application
-@using ExpenseExplorer.WebApp.Helpers
 @using ExpenseExplorer.WebApp.Models
 @using ExpenseExplorer.WebApp.Services
 @inject IStringLocalizer<Receipts> Localizer
@@ -124,8 +124,10 @@
 
     private async Task OnCopy(Guid id)
     {
-        Result<Guid, string> result = await ReceiptService.DuplicateReceipt(id);
-        await result.MatchAsync(_toast.OpenAsync, async receiptId =>
+        Result<Guid> result = await ReceiptService.DuplicateReceipt(id);
+        await result.MatchAsync(
+            error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message))),
+            async receiptId =>
         {
             await _toast.OpenAsync("Copied");
             NavigationManager.NavigateTo($"/receipts/{receiptId}");
@@ -140,13 +142,13 @@
             return;
         }
 
-        Result<Unit, string> result = await ReceiptService.DeleteReceiptAsync(receipt.Id);
+        Result<Unit> result = await ReceiptService.DeleteReceiptAsync(receipt.Id);
         await result.MatchAsync(
-            _toast.OpenAsync,
+            error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message))),
             unit =>
         {
             _grid.Reload();
-            return Id(unit);
+            return Task.FromResult(unit);
         });
     }
 }

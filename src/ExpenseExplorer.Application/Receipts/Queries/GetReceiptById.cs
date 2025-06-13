@@ -1,3 +1,4 @@
+using DotResult;
 using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.Application.Receipts.DTO;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
@@ -8,14 +9,12 @@ public sealed record GetReceiptByIdQuery(Guid Id);
 
 public sealed class GetReceiptByIdHandler(IReceiptRepository receiptRepository)
 {
-    public async Task<Result<ReceiptDetails, ValidationError>> HandleAsync(
+    public async Task<Result<ReceiptDetails>> HandleAsync(
         GetReceiptByIdQuery query,
         CancellationToken cancellationToken) =>
         await ReceiptId.TryCreate(query.Id)
-            .ToResult(onNone: () => new ValidationError(nameof(query.Id), "Invalid receipt id"))
+            .ToResult(onNone: () => Failure.Validation(nameof(query.Id), "Invalid receipt id"))
             .MapAsync(id => receiptRepository.GetReceiptByIdAsync(id, cancellationToken))
-            .MatchAsync(
-                error: Result.Failure<ReceiptDetails, ValidationError>,
-                value: receipt =>
-                    receipt.ToResult(onNone: () => new ValidationError(nameof(query.Id), "Invalid receipt id")));
+            .BindAsync(receipt =>
+                receipt.ToResult(onNone: () => Failure.Validation(nameof(query.Id), "Invalid receipt id")));
 }

@@ -1,4 +1,5 @@
 using DotMaybe;
+using DotResult;
 
 namespace ExpenseExplorer.Application;
 
@@ -9,13 +10,14 @@ public static class FunctionalConversions
             none: () => Validation.Failed<T>([onNone()]),
             some: Validation.Succeed);
 
-    public static Result<T, TError> ToResult<T, TError>(this Maybe<T> source, Func<TError> onNone) =>
+    public static Result<T> ToResult<T>(this Maybe<T> source, Func<Failure> onNone) =>
         source.Match(
-            none: () => Result.Failure<T, TError>(onNone()),
-            some: Result.Success<T, TError>);
+            none: () => Fail.OfType<T>(onNone()),
+            some: Success.From);
 
-    public static Result<T, IEnumerable<ValidationError>> ToResult<T>(this Validated<T> source) =>
+    public static Result<T> ToResult<T>(this Validated<T> source) =>
         source.Match(
-            errors: Result.Failure<T, IEnumerable<ValidationError>>,
-            value: Result.Success<T, IEnumerable<ValidationError>>);
+            errors: errors => Fail.OfType<T>(
+                errors.Select(e => Failure.Validation(e.PropertyName, e.Error))),
+            value: Success.From);
 }

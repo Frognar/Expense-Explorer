@@ -1,3 +1,4 @@
+using DotResult;
 using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.Application.Receipts.DTO;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
@@ -9,17 +10,14 @@ public sealed record CreateReceiptCommand(string StoreName, DateOnly PurchaseDat
 
 public sealed class CreateReceiptHandler(IReceiptCommandRepository receiptRepository)
 {
-    public async Task<Result<ReceiptId, IEnumerable<string>>> HandleAsync(
+    public async Task<Result<ReceiptId>> HandleAsync(
         CreateReceiptCommand command,
         CancellationToken cancellationToken)
     {
         return await Validate(command)
             .ToResult()
-            .MapError(errors => errors.Select(e => e.Error))
-            .FlatMapAsync(async request =>
-                await receiptRepository.CreateReceipt(request, cancellationToken)
-                    .MapAsync(_ => request.Id)
-                    .MapErrorAsync(error => new[] { error }.AsEnumerable()));
+            .BindAsync(async request =>
+                await receiptRepository.CreateReceipt(request, cancellationToken).MapAsync(_ => request.Id));
     }
 }
 
