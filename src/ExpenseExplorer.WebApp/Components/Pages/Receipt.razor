@@ -115,6 +115,13 @@
 
 @code
 {
+    /// <summary>
+    /// The unique identifier for the receipt being viewed or edited.
+    /// </summary>
+    /// <remarks>
+    /// This parameter is required and is passed via the route. It is used to fetch the receipt
+    /// details and associated purchases from the database.
+    /// </remarks>
     [Parameter] public required Guid ReceiptId { get; set; }
     private RadzenDataGrid<PurchaseDetails> _grid = null!;
 
