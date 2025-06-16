@@ -27,4 +27,10 @@ public readonly record struct Money
 
     public static Money Subtract(Money left, Money right) =>
         left.Value < right.Value ? Zero : new Money(left.Value - right.Value);
+
+    public static bool operator <(Money left, Money right) => left.Value < right.Value;
+
+    public static bool operator >(Money left, Money right) => left.Value > right.Value;
+
+    public int CompareTo(Money other) => Value.CompareTo(other.Value);
 }
