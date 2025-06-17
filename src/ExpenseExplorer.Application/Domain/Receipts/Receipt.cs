@@ -39,4 +39,14 @@ public static class ReceiptExtensions
                 id, receipt.Id, item, category, quantity, unitPrice, discount, description))
         };
     }
+
+    public static Result<Receipt> RemoveItem(this Receipt receipt, ReceiptItemId id)
+    {
+        if (receipt.Items.All(ri => ri.Id != id))
+        {
+            return Failure.NotFound(message: "Receipt item not found");
+        }
+
+        return receipt with { Items = receipt.Items.RemoveAll(ri => ri.Id == id) };
+    }
 }
