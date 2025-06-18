@@ -1,0 +1,3 @@
+namespace ExpenseExplorer.Application.Features.Receipts.UpdateItem;
+
+public record UpdateReceiptItemResponse;
