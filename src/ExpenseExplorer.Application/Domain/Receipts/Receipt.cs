@@ -40,6 +40,20 @@ public static class ReceiptExtensions
         };
     }
 
+    public static Result<Receipt> UpdateItem(this Receipt receipt, ReceiptItem item)
+    {
+        int index = receipt.Items.FindIndex(ri => ri.Id == item.Id);
+        if (index == -1)
+        {
+            return Failure.NotFound(message: "Receipt item to update not found");
+        }
+
+        return receipt with
+        {
+            Items = receipt.Items.SetItem(index, item)
+        };
+    }
+
     public static Result<Receipt> RemoveItem(this Receipt receipt, ReceiptItemId id)
     {
         if (receipt.Items.All(ri => ri.Id != id))
