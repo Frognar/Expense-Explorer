@@ -13,6 +13,29 @@ public static class ReceiptFactory
         => new(id, store, purchaseDate, []);
 }
 
+public static class ReceiptHeaderExtensions
+{
+    public static Result<Receipt> UpdateStore(this Receipt receipt, Store store)
+    {
+        if (receipt.Store == store)
+        {
+            return receipt;
+        }
+
+        return receipt with { Store = store };
+    }
+
+    public static Result<Receipt> UpdatePurchaseDate(this Receipt receipt, PurchaseDate purchaseDate)
+    {
+        if (receipt.PurchaseDate == purchaseDate)
+        {
+            return receipt;
+        }
+
+        return receipt with { PurchaseDate = purchaseDate };
+    }
+}
+
 public static class ReceiptExtensions
 {
     public static Result<Receipt> AddItem(
