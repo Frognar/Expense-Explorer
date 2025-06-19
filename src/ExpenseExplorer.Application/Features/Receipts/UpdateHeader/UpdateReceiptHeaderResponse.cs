@@ -1,0 +1,3 @@
+namespace ExpenseExplorer.Application.Features.Receipts.UpdateHeader;
+
+public sealed record UpdateReceiptHeaderResponse;
