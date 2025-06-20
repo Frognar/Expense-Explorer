@@ -5,7 +5,18 @@ using ExpenseExplorer.Application.Receipts.ValueObjects;
 
 namespace ExpenseExplorer.Application.Domain.Receipts;
 
-public sealed record Receipt(ReceiptId Id, Store Store, PurchaseDate PurchaseDate, ImmutableList<ReceiptItem> Items);
+public record Receipt(
+    ReceiptId Id,
+    Store Store,
+    PurchaseDate PurchaseDate,
+    ImmutableList<ReceiptItem> Items);
+
+public sealed record DeletedReceipt(
+    ReceiptId Id,
+    Store Store,
+    PurchaseDate PurchaseDate,
+    ImmutableList<ReceiptItem> Items)
+    : Receipt(Id, Store, PurchaseDate, Items);
 
 public static class ReceiptFactory
 {
@@ -17,6 +28,11 @@ public static class ReceiptHeaderExtensions
 {
     public static Result<Receipt> UpdateStore(this Receipt receipt, Store store)
     {
+        if (receipt is DeletedReceipt)
+        {
+            return Failure.NotFound(message: "Receipt is deleted");
+        }
+
         if (receipt.Store == store)
         {
             return receipt;
@@ -27,12 +43,27 @@ public static class ReceiptHeaderExtensions
 
     public static Result<Receipt> UpdatePurchaseDate(this Receipt receipt, PurchaseDate purchaseDate)
     {
+        if (receipt is DeletedReceipt)
+        {
+            return Failure.NotFound(message: "Receipt is deleted");
+        }
+
         if (receipt.PurchaseDate == purchaseDate)
         {
             return receipt;
         }
 
         return receipt with { PurchaseDate = purchaseDate };
+    }
+
+    public static Result<Receipt> Delete(this Receipt receipt)
+    {
+        if (receipt is DeletedReceipt)
+        {
+            return Failure.NotFound(message: "Receipt is deleted");
+        }
+
+        return new DeletedReceipt(receipt.Id, receipt.Store, receipt.PurchaseDate, receipt.Items);
     }
 }
 
@@ -48,6 +79,11 @@ public static class ReceiptExtensions
         Maybe<Money> discount,
         Maybe<Description> description)
     {
+        if (receipt is DeletedReceipt)
+        {
+            return Failure.NotFound(message: "Receipt is deleted");
+        }
+
         bool isDiscountExceeding = discount.Match(none: () => false, some: d => unitPrice * quantity < d);
         if (isDiscountExceeding)
         {
@@ -65,6 +101,11 @@ public static class ReceiptExtensions
 
     public static Result<Receipt> UpdateItem(this Receipt receipt, ReceiptItem item)
     {
+        if (receipt is DeletedReceipt)
+        {
+            return Failure.NotFound(message: "Receipt is deleted");
+        }
+
         int index = receipt.Items.FindIndex(ri => ri.Id == item.Id);
         if (index == -1)
         {
@@ -79,6 +120,11 @@ public static class ReceiptExtensions
 
     public static Result<Receipt> RemoveItem(this Receipt receipt, ReceiptItemId id)
     {
+        if (receipt is DeletedReceipt)
+        {
+            return Failure.NotFound(message: "Receipt is deleted");
+        }
+
         if (receipt.Items.All(ri => ri.Id != id))
         {
             return Failure.NotFound(message: "Receipt item not found");
