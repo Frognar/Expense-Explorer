@@ -118,6 +118,11 @@ public static class Validation
                 value: t1 => Succeed((T2 t2) => f(t1, t2))));
 
     public static Validated<TResult> Apply<T1, TResult>(
+        this Func<T1, TResult> map,
+        Validated<T1> value) =>
+        Succeed(map).Apply(value);
+
+    public static Validated<TResult> Apply<T1, TResult>(
         this Validated<Func<T1, TResult>> map,
         Validated<T1> value) =>
         map.Match(
