@@ -1,0 +1,3 @@
+namespace ExpenseExplorer.Application.Features.Receipts.DeleteHeader;
+
+public sealed record DeleteReceiptHeaderResponse;
