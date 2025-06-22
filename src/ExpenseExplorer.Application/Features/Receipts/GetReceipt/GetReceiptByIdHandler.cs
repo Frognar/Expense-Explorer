@@ -4,9 +4,9 @@ using ExpenseExplorer.Application.Abstractions.Messaging;
 namespace ExpenseExplorer.Application.Features.Receipts.GetReceipt;
 
 public sealed class GetReceiptByIdHandler(IGetReceiptByIdPersistence persistence)
-    : IQueryHandler<GetReceiptByIdQuery, Result<GetReceiptByIdResponse>>
+    : IQueryHandler<GetReceiptByIdQuery, GetReceiptByIdResponse>
 {
-    public async Task<Result<Result<GetReceiptByIdResponse>>> HandleAsync(
+    public async Task<Result<GetReceiptByIdResponse>> HandleAsync(
         GetReceiptByIdQuery query,
         CancellationToken cancellationToken)
     {
