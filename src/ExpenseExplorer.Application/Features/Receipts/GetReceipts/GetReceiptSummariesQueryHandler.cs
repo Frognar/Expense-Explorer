@@ -11,11 +11,11 @@ public sealed class GetReceiptSummariesQueryHandler(
         GetReceiptSummariesQuery query,
         CancellationToken cancellationToken)
     {
-        return await
+        return await (
             from receipts in persistence
                 .GetReceiptsAsync(query.PageSize, query.Skip, query.Order, query.Filters, cancellationToken)
             from total in persistence
                 .GetTotalCostAsync(query.Filters, cancellationToken)
-            select new GetReceiptSummariesResponse(receipts, total);
+            select new GetReceiptSummariesResponse(receipts, total));
     }
 }
