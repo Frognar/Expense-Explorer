@@ -10,4 +10,10 @@ public static class MaybeExtensions
                 Some.With(Enumerable.Empty<T>()),
                 (acc, opt) => acc.Bind(accList => opt.Map(accList.Append)))
             .Map(col => col.ToImmutableArray());
+
+    public static Maybe<ImmutableList<T>> TraverseMaybeToImmutableList<T>(this IEnumerable<Maybe<T>> source)
+        => source.Aggregate(
+                Some.With(Enumerable.Empty<T>()),
+                (acc, opt) => acc.Bind(accList => opt.Map(accList.Append)))
+            .Map(col => col.ToImmutableList());
 }
