@@ -96,10 +96,10 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
                         from quantity in Quantity.TryCreate(receiptItem.Quantity)
                         from discount in receiptItem.Discount.HasValue
                             ? Some.With(Money.TryCreate(receiptItem.Discount.Value))
-                            : None.OfType<Money>()
+                            : Some.With(None.OfType<Money>())
                         from description in receiptItem.Description is not null
                             ? Some.With(new Description(receiptItem.Description))
-                            : None.OfType<Description>()
+                            : Some.With(None.OfType<Description>())
                         select new ReceiptItem(
                             id,
                             relatedReceiptId,
