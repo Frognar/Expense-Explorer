@@ -165,9 +165,93 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
                 rItem.Description is not null ? Some.With(rItem.Description) : None.OfType<string>()))));
     }
 
-    public Task<Result<Unit>> SaveReceiptAsync(Receipt receipt, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> SaveReceiptAsync(Receipt receipt, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+        using IDbTransaction transaction = connection.BeginTransaction();
+
+        try
+        {
+            if (receipt is DeletedReceipt)
+            {
+                await connection.ExecuteAsync(
+                    """
+                    delete from receipt_items where receipt_id = @Id
+                    delete from receipts where id = @Id
+                    """,
+                    new { Id = receipt.Id.Value },
+                    transaction);
+
+                transaction.Commit();
+                return Unit.Instance;
+            }
+
+            await connection.ExecuteAsync(
+                """
+                insert into receipts (id, store, purchase_date)
+                values (@Id, @Store, @PurchaseDate)
+                on conflict (id) do update
+                  set store = excluded.store,
+                    purchase_date = excluded.purchase_date;
+                """,
+                new { Id = receipt.Id.Value, Store = receipt.Store.Name, PurchaseDate = receipt.PurchaseDate.Date },
+                transaction);
+
+            HashSet<Guid> existingItemIds = (await connection.QueryAsync<Guid>(
+                "select id from receipt_items where receipt_id = @ReceiptId",
+                new { ReceiptId = receipt.Id.Value },
+                transaction)).ToHashSet();
+
+            HashSet<Guid> incomingItemIds = receipt.Items.Select(i => i.Id.Value).ToHashSet();
+
+            Guid[] itemsToDelete = existingItemIds.Except(incomingItemIds).ToArray();
+            if (itemsToDelete.Length != 0)
+            {
+                await connection.ExecuteAsync(
+                    """
+                    delete from receipt_items
+                    where id = any(@Ids)
+                    """,
+                    new { Ids = itemsToDelete },
+                    transaction);
+            }
+
+            foreach (var item in receipt.Items)
+            {
+                await connection.ExecuteAsync(
+                    """
+                        insert into receipt_items
+                            (id, receipt_id, item, category, unit_price, quantity, discount, description)
+                        values
+                            (@Id, @ReceiptId, @Item, @Category, @UnitPrice, @Quantity, @Discount, @Description)
+                        on conflict (id) do update set
+                            item = excluded.item,
+                            category = excluded.category,
+                            unit_price = excluded.unit_price,
+                            quantity = excluded.quantity,
+                            discount = excluded.discount,
+                            description = excluded.description;
+                    """, new
+                    {
+                        Id = item.Id.Value,
+                        ReceiptId = receipt.Id.Value,
+                        Item = item.Item.Name,
+                        Category = item.Category.Name,
+                        UnitPrice = item.UnitPrice.Value,
+                        Quantity = item.Quantity.Value,
+                        Discount = item.Discount.Match<decimal?>(none: () => null, some: m => m.Value),
+                        Description = item.Description.Match<string?>(none: () => null, some: m => m.Value)
+                    }, transaction);
+            }
+
+            transaction.Commit();
+            return Unit.Instance;
+        }
+        catch (Exception ex)
+        {
+            transaction.Rollback();
+            return Failure.Fatal("Receipt.Save.Failed", ex.Message);
+        }
     }
 
     public Task<Result<PageOf<ReceiptSummary>>> GetReceiptsAsync(
