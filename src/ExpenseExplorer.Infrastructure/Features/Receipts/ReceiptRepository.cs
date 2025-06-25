@@ -344,11 +344,59 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
         return Page.Of(list.ToImmutableList(), (uint)totalCount);
     }
 
-    public Task<Result<decimal>> GetTotalCostAsync(
+    public async Task<Result<decimal>> GetTotalCostAsync(
         IEnumerable<ReceiptFilter> filters,
         CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+        List<string> whereClauses = [];
+        DynamicParameters parameters = new();
+
+        int idx = 0;
+        foreach (ReceiptFilter f in filters)
+        {
+            if (f.Stores.Any())
+            {
+                whereClauses.Add($"r.store = any(@stores{idx})");
+                parameters.Add($"stores{idx}", f.Stores.ToArray());
+            }
+
+            if (f.PurchaseDateFrom.HasValue)
+            {
+                whereClauses.Add($"r.purchase_date >= @pdateFrom{idx}");
+                parameters.Add($"pdateFrom{idx}", f.PurchaseDateFrom.Value);
+            }
+
+            if (f.PurchaseDateTo.HasValue)
+            {
+                whereClauses.Add($"r.purchase_date <= @pdateTo{idx}");
+                parameters.Add($"pdateTo{idx}", f.PurchaseDateTo.Value);
+            }
+
+            if (f.TotalMin.HasValue)
+            {
+                whereClauses.Add($"total >= @tmin{idx}");
+                parameters.Add($"tmin{idx}", f.TotalMin.Value);
+            }
+
+            if (f.TotalMax.HasValue)
+            {
+                whereClauses.Add($"total <= @tmax{idx}");
+                parameters.Add($"tmax{idx}", f.TotalMax.Value);
+            }
+
+            idx++;
+        }
+
+        string where = whereClauses.Count != 0 ? $"where {string.Join(" and ", whereClauses)}" : "";
+        string sql = $@"
+            select coalesce(sum(ri.unit_price * ri.quantity - coalesce(ri.discount,0)), 0) as TotalCost
+            from receipts r
+            join receipt_items ri on ri.receipt_id = r.id
+            {where}
+        ";
+
+        return await connection.ExecuteScalarAsync<decimal>(sql, parameters);
     }
 
     private sealed record ReceiptDto(
