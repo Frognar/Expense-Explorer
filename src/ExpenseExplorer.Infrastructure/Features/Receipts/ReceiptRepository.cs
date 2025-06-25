@@ -303,13 +303,13 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
         }
 
         string where = whereClauses.Count != 0 ? $"where {string.Join(" and ", whereClauses)}" : "";
-        string sqlBase = $@"""
+        string sqlBase = $"""
             from receipts r
             left join (
                 select
                     receipt_id,
                     sum(unit_price * quantity - coalesce(discount, 0)) as total
-                from receipt_items,
+                from receipt_items
                 group by receipt_id
             ) ri on ri.receipt_id = r.id
             {where}
