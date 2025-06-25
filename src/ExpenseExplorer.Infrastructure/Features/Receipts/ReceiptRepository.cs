@@ -115,9 +115,54 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
                 Failure.Custom(code: "Receipt.GetById.Invalid", message: "Invalid receipt", type: "InvalidReceipt"));
     }
 
-    public Task<Result<Maybe<ReceiptDetails>>> GetReceiptByIdAsync(Guid receiptId, CancellationToken cancellationToken)
+    public async Task<Result<Maybe<ReceiptDetails>>> GetReceiptByIdAsync(
+        Guid receiptId,
+        CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+        string receiptQuery = """
+                              select id as "Id", store as "Store", purchase_date as "PurchaseDate"
+                              from receipts
+                              where id = @Id
+                              """;
+
+        ReceiptDto? receiptDto = await connection
+            .QueryFirstOrDefaultAsync<ReceiptDto>(receiptQuery, new { Id = receiptId });
+
+        if (receiptDto is null)
+        {
+            return None.OfType<ReceiptDetails>();
+        }
+
+        string receiptItemsQuery = """
+                                   select
+                                      id as "Id"
+                                    , receipt_id as "ReceiptId"
+                                    , item as "Item"
+                                    , category as "Category"
+                                    , unit_price as "UnitPrice"
+                                    , quantity as "Quantity"
+                                    , discount as "Discount"
+                                    , description as "Description"
+                                   from receipt_items
+                                   where receipt_id = @ReceiptId
+                                   """;
+
+        IEnumerable<ReceiptItemDto> receiptItemDtos = await connection
+            .QueryAsync<ReceiptItemDto>(receiptItemsQuery, new { ReceiptId = receiptId });
+
+        return Some.With(new ReceiptDetails(
+            receiptDto.Id,
+            receiptDto.Store,
+            receiptDto.PurchaseDate,
+            receiptItemDtos.Select(rItem => new ReceiptItemDetails(
+                rItem.Id,
+                rItem.Item,
+                rItem.Category,
+                rItem.UnitPrice,
+                rItem.Quantity,
+                rItem.Discount.HasValue ? Some.With(rItem.Discount.Value) : None.OfType<decimal>(),
+                rItem.Description is not null ? Some.With(rItem.Description) : None.OfType<string>()))));
     }
 
     public Task<Result<Unit>> SaveReceiptAsync(Receipt receipt, CancellationToken cancellationToken)
