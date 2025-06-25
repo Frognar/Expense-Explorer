@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Data;
 using Dapper;
 using DotMaybe;
@@ -254,14 +255,93 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
         }
     }
 
-    public Task<Result<PageOf<ReceiptSummary>>> GetReceiptsAsync(
+    public async Task<Result<PageOf<ReceiptSummary>>> GetReceiptsAsync(
         int pageSize,
         int skip,
         ReceiptOrder order,
         IEnumerable<ReceiptFilter> filters,
         CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+        List<string> whereClauses = [];
+        DynamicParameters parameters = new();
+
+        int idx = 0;
+        foreach (ReceiptFilter f in filters)
+        {
+            if (f.Stores.Any())
+            {
+                whereClauses.Add($"r.store = any(@stores{idx})");
+                parameters.Add($"stores{idx}", f.Stores.ToArray());
+            }
+
+            if (f.PurchaseDateFrom.HasValue)
+            {
+                whereClauses.Add($"r.purchase_date >= @pdateFrom{idx}");
+                parameters.Add($"pdateFrom{idx}", f.PurchaseDateFrom.Value);
+            }
+
+            if (f.PurchaseDateTo.HasValue)
+            {
+                whereClauses.Add($"r.purchase_date <= @pdateTo{idx}");
+                parameters.Add($"pdateTo{idx}", f.PurchaseDateTo.Value);
+            }
+
+            if (f.TotalMin.HasValue)
+            {
+                whereClauses.Add($"total >= @tmin{idx}");
+                parameters.Add($"tmin{idx}", f.TotalMin.Value);
+            }
+
+            if (f.TotalMax.HasValue)
+            {
+                whereClauses.Add($"total <= @tmax{idx}");
+                parameters.Add($"tmax{idx}", f.TotalMax.Value);
+            }
+
+            idx++;
+        }
+
+        string where = whereClauses.Count != 0 ? $"where {string.Join(" and ", whereClauses)}" : "";
+        string sqlBase = $@"""
+            from receipts r
+            left join (
+                select
+                    receipt_id,
+                    sum(unit_price * quantity - coalesce(discount, 0)) as total
+                from receipt_items,
+                group by receipt_id
+            ) ri on ri.receipt_id = r.id
+            {where}
+            """;
+
+        string sqlCount = $"SELECT COUNT(*) {sqlBase}";
+        int totalCount = await connection.ExecuteScalarAsync<int>(sqlCount, parameters);
+        string orderDir = order.Descending ? "DESC" : "ASC";
+        string orderBy = order.OrderBy.ToUpperInvariant() switch
+        {
+            "ID" => "r.id",
+            "STORE" => "r.store",
+            "PURCHASEDATE" => "r.purchase_date",
+            "TOTAL" => "total",
+            _ => "r.id"
+        };
+
+        string sqlList = $@"
+            select
+                r.id as Id,
+                r.store as Store,
+                r.purchase_date as PurchaseDate,
+                COALESCE(total, 0) as Total
+            {sqlBase}
+            order by {orderBy} {orderDir}
+            limit @pageSize offset @skip
+        ";
+        parameters.Add("pageSize", pageSize);
+        parameters.Add("skip", skip);
+
+        IEnumerable<ReceiptSummary> list = await connection.QueryAsync<ReceiptSummary>(sqlList, parameters);
+        return Page.Of(list.ToImmutableList(), (uint)totalCount);
     }
 
     public Task<Result<decimal>> GetTotalCostAsync(
