@@ -1,7 +1,6 @@
 using DotResult;
 using ExpenseExplorer.Application.Abstractions.Messaging;
 using ExpenseExplorer.Application.Domain.Receipts;
-using ExpenseExplorer.Application.Receipts.ValueObjects;
 
 namespace ExpenseExplorer.Application.Features.Receipts.DeleteHeader;
 
