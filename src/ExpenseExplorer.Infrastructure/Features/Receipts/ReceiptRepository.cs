@@ -176,10 +176,12 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
             if (receipt is DeletedReceipt)
             {
                 await connection.ExecuteAsync(
-                    """
-                    delete from receipt_items where receipt_id = @Id
-                    delete from receipts where id = @Id
-                    """,
+                    "delete from receipt_items where receipt_id = @Id",
+                    new { Id = receipt.Id.Value },
+                    transaction);
+
+                await connection.ExecuteAsync(
+                    "delete from receipts where id = @Id",
                     new { Id = receipt.Id.Value },
                     transaction);
 
