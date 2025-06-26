@@ -1,3 +1,4 @@
+using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.Infrastructure;
 using ExpenseExplorer.WebApp.Components;
@@ -23,7 +24,9 @@ builder.Services
 builder.Services.AddDatabase(
     builder.Configuration.GetConnectionString("expense-explorer") ?? throw new InvalidOperationException());
 
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure()
+    .AddApplication();
+
 builder.Services.AddScoped<ReceiptService>();
 
 builder.Services.AddRadzenComponents();
