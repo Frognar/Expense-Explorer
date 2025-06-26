@@ -48,7 +48,9 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
     {
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
         IEnumerable<string> rawData = await connection.QueryAsync<string>(sql);
-        return rawData.Select(entityFactory)
+        return rawData
+            .Distinct()
+            .Select(entityFactory)
             .TraverseMaybeToImmutableArray()
             .OrDefault(() => []);
     }
