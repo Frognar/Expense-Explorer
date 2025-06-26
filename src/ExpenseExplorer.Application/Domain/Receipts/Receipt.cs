@@ -65,6 +65,26 @@ public static class ReceiptHeaderExtensions
 
         return new DeletedReceipt(receipt.Id, receipt.Store, receipt.PurchaseDate, receipt.Items);
     }
+
+    public static Result<Receipt> Duplicate(this Receipt receipt, PurchaseDate newPurchaseDate)
+    {
+        if (receipt is DeletedReceipt)
+        {
+            return Failure.NotFound(message: "Receipt is deleted");
+        }
+
+        ReceiptId newId = ReceiptId.Unique();
+        return receipt with
+        {
+            Id = newId,
+            PurchaseDate = newPurchaseDate,
+            Items = receipt.Items.Select(item => item with
+            {
+                Id = ReceiptItemId.Unique(),
+                ReceiptId = newId
+            }).ToImmutableList()
+        };
+    }
 }
 
 public static class ReceiptExtensions
