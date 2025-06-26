@@ -1,5 +1,6 @@
 @page "/Receipts/{receiptId:guid}"
 @using System.Globalization
+@using DotMaybe
 @using DotResult
 @using ExpenseExplorer.Application
 @using ExpenseExplorer.WebApp.Models
@@ -122,7 +123,9 @@
     /// This parameter is required and is passed via the route. It is used to fetch the receipt
     /// details and associated purchases from the database.
     /// </remarks>
-    [Parameter] public required Guid ReceiptId { get; set; }
+    [Parameter]
+    public required Guid ReceiptId { get; set; }
+
     private RadzenDataGrid<PurchaseDetails> _grid = null!;
 
     private ReceiptWithPurchases? _receipt;
@@ -142,16 +145,21 @@
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
     {
-        Result<ReceiptWithPurchases> receiptResult = await ReceiptService.GetReceiptAsync(ReceiptId);
+        Result<Maybe<ReceiptWithPurchases>> receiptResult = await ReceiptService.GetReceiptAsync(ReceiptId);
         receiptResult.Match(_ =>
         {
             NavigationManager.NavigateTo("/");
             return Unit.Instance;
-        }, receipt =>
-        {
-            _receipt = receipt;
-            return Unit.Instance;
-        });
+        }, maybe => maybe.Match(() =>
+            {
+                NavigationManager.NavigateTo("/");
+                return Unit.Instance;
+            },
+            receipt =>
+            {
+                _receipt = receipt;
+                return Unit.Instance;
+            }));
 
         _stores = await ReceiptService.GetStoresAsync();
         _items = await ReceiptService.GetItemsAsync();
@@ -230,7 +238,11 @@
 
         await result.MatchAsync(
             error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message))),
-            Task.FromResult);
+            x =>
+            {
+                
+                return Task.FromResult(x);
+            });
     }
 
     private async Task OnCreateRow(PurchaseDetails purchase)
@@ -240,10 +252,11 @@
         {
             _grid.CancelEditRow(purchase);
             return _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message)));
-        }, unit =>
+        }, purchaseId =>
         {
+            purchase.Id = purchaseId;
             _purchases = _purchases.Append(purchase);
-            return Task.FromResult(unit);
+            return Task.FromResult(Unit.Instance);
         });
     }
 

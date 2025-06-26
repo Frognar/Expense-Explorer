@@ -1,22 +1,36 @@
 using DotMaybe;
 using DotResult;
 using ExpenseExplorer.Application;
-using ExpenseExplorer.Application.Receipts;
-using ExpenseExplorer.Application.Receipts.Commands;
+using ExpenseExplorer.Application.Abstractions.Messaging;
+using ExpenseExplorer.Application.Features.Receipts.AddItem;
+using ExpenseExplorer.Application.Features.Receipts.CreateHeader;
+using ExpenseExplorer.Application.Features.Receipts.DeleteHeader;
+using ExpenseExplorer.Application.Features.Receipts.DeleteItem;
+using ExpenseExplorer.Application.Features.Receipts.Duplicate;
+using ExpenseExplorer.Application.Features.Receipts.GetReceipt;
+using ExpenseExplorer.Application.Features.Receipts.GetReceipts;
+using ExpenseExplorer.Application.Features.Receipts.UpdateHeader;
+using ExpenseExplorer.Application.Features.Receipts.UpdateItem;
 using ExpenseExplorer.Application.Receipts.Data;
-using ExpenseExplorer.Application.Receipts.DTO;
 using ExpenseExplorer.Application.Receipts.Queries;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
 using ExpenseExplorer.WebApp.Models;
-using IReceiptRepository = ExpenseExplorer.WebApp.Data.IReceiptRepository;
-using ReceiptDetails = ExpenseExplorer.WebApp.Models.ReceiptDetails;
+using GetReceiptByIdQuery = ExpenseExplorer.Application.Features.Receipts.GetReceipt.GetReceiptByIdQuery;
 
 namespace ExpenseExplorer.WebApp.Services;
 
 internal sealed class ReceiptService(
-    IReceiptRepository receiptRepository,
-    ExpenseExplorer.Application.Receipts.Data.IReceiptRepository applicationReceiptRepository,
-    IReceiptCommandRepository commandRepository,
+    ICommandHandler<CreateReceiptHeaderRequest, CreateReceiptHeaderResponse> createReceiptHeaderCommandHandler,
+#pragma warning disable CS9113 // Parameter is unread.
+    ICommandHandler<UpdateReceiptHeaderRequest, UpdateReceiptHeaderResponse> updateReceiptHeaderCommandHandler,
+#pragma warning restore CS9113 // Parameter is unread.
+    ICommandHandler<DeleteReceiptHeaderRequest, DeleteReceiptHeaderResponse> deleteReceiptHeaderCommandHandler,
+    ICommandHandler<DuplicateReceiptRequest, DuplicateReceiptResponse> duplicateReceiptCommandHandler,
+    ICommandHandler<AddReceiptItemRequest, AddReceiptItemResponse> addReceiptItemCommandHandler,
+    ICommandHandler<UpdateReceiptItemRequest, UpdateReceiptItemResponse> updateReceiptItemCommandHandler,
+    ICommandHandler<DeleteReceiptItemRequest, DeleteReceiptItemResponse> deleteReceiptItemCommandHandler,
+    IQueryHandler<GetReceiptByIdQuery, GetReceiptByIdResponse> getReceiptByIdQueryHandler,
+    IQueryHandler<GetReceiptSummariesQuery, GetReceiptSummariesResponse> getReceiptSummariesQueryHandler,
     IStoreRepository storeRepository,
     IItemRepository itemRepository,
     ICategoryRepository categoryRepository)
@@ -31,17 +45,20 @@ internal sealed class ReceiptService(
         decimal? totalCostMin,
         decimal? totalCostMax)
     {
-        GetReceiptsQuery query = GetReceiptsQuery.Default
+        GetReceiptSummariesQuery query = GetReceiptSummariesQuery.Default
             .Where(ReceiptFilter.StoresIn(stores))
             .Where(ReceiptFilter.PurchaseDateBetween(purchaseDateFrom, purchaseDateTo))
-            .Where(ReceiptFilter.TotalCostBetween(totalCostMin, totalCostMax))
+            .Where(ReceiptFilter.TotalBetween(totalCostMin, totalCostMax))
             .GetPage(pageSize, skip);
 
-        ReceiptOrder order = orderBy?.Replace("desc", "", StringComparison.CurrentCultureIgnoreCase).Trim() switch
+        ReceiptOrder order = orderBy?
+                .Replace("desc", "", StringComparison.CurrentCultureIgnoreCase)
+                .Replace("asc", "", StringComparison.CurrentCultureIgnoreCase)
+                .Trim() switch
         {
-            nameof(ReceiptDetails.Store) => ReceiptOrder.Store,
-            nameof(ReceiptDetails.PurchaseDate) => ReceiptOrder.PurchaseDate,
-            nameof(ReceiptDetails.TotalCost) => ReceiptOrder.TotalCost,
+            nameof(Models.ReceiptDetails.Store) => ReceiptOrder.Store,
+            nameof(Models.ReceiptDetails.PurchaseDate) => ReceiptOrder.PurchaseDate,
+            nameof(Models.ReceiptDetails.TotalCost) => ReceiptOrder.Total,
             _ => ReceiptOrder.Id
         };
 
@@ -49,13 +66,19 @@ internal sealed class ReceiptService(
             ? query.OrderByDescending(order)
             : query.OrderBy(order);
 
-        GetReceiptsHandler handler = new(applicationReceiptRepository);
-        (PageOf<ReceiptSummary> pageOfReceipts, Money total) = await handler.HandleAsync(query, CancellationToken.None);
+        Result<GetReceiptSummariesResponse> result =
+            await getReceiptSummariesQueryHandler.HandleAsync(query, CancellationToken.None);
 
-        return new ReceiptDetailsPage(
-            pageOfReceipts.Items.Select(r => new ReceiptDetails(r.Id.Value, r.Store.Name, r.PurchaseDate.Date, r.Total.Value)),
-            (int)pageOfReceipts.TotalCount,
-            total.Value);
+        return result.Match(
+            failure: _ => new ReceiptDetailsPage([], 0, 0),
+            success: page => new ReceiptDetailsPage(
+                page.Receipts.Items.Select(r => new Models.ReceiptDetails(
+                    r.Id,
+                    r.Store,
+                    r.PurchaseDate,
+                    r.Total)),
+                    (int)page.Receipts.TotalCount,
+                    page.Total));
     }
 
     internal async Task<IEnumerable<string>> GetStoresAsync(string? search = null)
@@ -84,102 +107,81 @@ internal sealed class ReceiptService(
 
     internal async Task<Result<Guid>> CreateReceiptAsync(string store, DateOnly purchaseDate)
     {
-        CreateReceiptCommand command = new(store, purchaseDate, DateOnly.FromDateTime(DateTime.Today));
-        CreateReceiptHandler handler = new(commandRepository);
-        Result<ReceiptId> result = await handler.HandleAsync(command, CancellationToken.None);
-        return result.Map(receiptId => receiptId.Value);
+        CreateReceiptHeaderRequest request = new(store, purchaseDate, DateOnly.FromDateTime(DateTime.Today));
+        return await createReceiptHeaderCommandHandler.HandleAsync(request, CancellationToken.None)
+            .MapAsync(response => response.ReceiptId);
     }
 
-    public async Task<Result<ReceiptWithPurchases>> GetReceiptAsync(Guid id)
+    public async Task<Result<Maybe<ReceiptWithPurchases>>> GetReceiptAsync(Guid id)
     {
         GetReceiptByIdQuery query = new(id);
-        GetReceiptByIdHandler handler = new(applicationReceiptRepository);
-        Result<Application.Receipts.DTO.ReceiptDetails> response = await handler.HandleAsync(query, CancellationToken.None);
-        return response
-            .Map(r =>
-                new ReceiptWithPurchases(
-                    r.Id.Value,
-                    r.Store.Name,
-                    r.PurchaseDate.Date,
-                    r.Items.Select(i =>
-                        new PurchaseDetails(
-                            i.Id.Value,
-                            i.Item.Name,
-                            i.Category.Name,
-                            i.Quantity.Value,
-                            i.UnitPrice.Value,
-                            i.Discount.Match<decimal?>(none: () => null, some: m => m.Value),
-                            i.Description.Match<string?>(none: () => null, some: m => m.Value)))));
+        return await getReceiptByIdQueryHandler.HandleAsync(query, CancellationToken.None)
+            .MapAsync(response =>
+                response.Receipt.Map(r =>
+                    new ReceiptWithPurchases(
+                        r.Id,
+                        r.Store,
+                        r.PurchaseDate,
+                        r.Items.Select(i =>
+                            new PurchaseDetails(
+                                i.Id,
+                                i.Item,
+                                i.Category,
+                                i.Quantity,
+                                i.UnitPrice,
+                                i.Discount.Match<decimal?>(none: () => null, some: m => m),
+                                i.Description.Match<string?>(none: () => null, some: m => m))))));
     }
 
     public async Task<Result<Guid>> DuplicateReceipt(Guid id)
     {
-        ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(id);
-        if (receipt == null)
-        {
-            return Failure.NotFound(message: "Receipt not found");
-        }
-
-        Guid newId = Guid.CreateVersion7();
-        ReceiptDetails duplicate = new(newId, receipt.Store, DateOnly.FromDateTime(DateTime.Today), 0);
-        await receiptRepository.AddAsync(duplicate);
-        foreach (PurchaseDetails purchase in receipt.Purchases)
-        {
-            PurchaseDetails newPurchase = new(
-                Guid.CreateVersion7(),
-                purchase.ItemName,
-                purchase.Category,
-                purchase.Quantity,
-                purchase.UnitPrice,
-                purchase.Discount,
-                purchase.Description);
-
-            await receiptRepository.AddPurchaseAsync(newId, newPurchase);
-        }
-
-        return newId;
+        DuplicateReceiptRequest request = new(id, DateOnly.FromDateTime(DateTime.Today));
+        return await duplicateReceiptCommandHandler.HandleAsync(request, CancellationToken.None)
+            .MapAsync(response => response.ReceiptId);
     }
 
     public async Task<Result<Unit>> DeleteReceiptAsync(Guid receiptId)
     {
-        DeleteReceiptCommand command = new(receiptId);
-        DeleteReceiptHandler handler = new(commandRepository);
-        return await handler.HandleAsync(command, CancellationToken.None);
+        DeleteReceiptHeaderRequest request = new(receiptId);
+        return await deleteReceiptHeaderCommandHandler.HandleAsync(request, CancellationToken.None)
+            .MapAsync(_ => Unit.Instance);
     }
 
-    public async Task<Result<Unit>> AddPurchase(Guid receiptId, PurchaseDetails purchase)
+    public async Task<Result<Guid>> AddPurchase(Guid receiptId, PurchaseDetails purchase)
     {
-        ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(receiptId);
-        if (receipt == null)
-        {
-            return Failure.NotFound(message: "Receipt not found");
-        }
+        AddReceiptItemRequest request = new(
+            receiptId,
+            purchase.ItemName,
+            purchase.Category,
+            purchase.Quantity,
+            purchase.UnitPrice,
+            purchase.Discount,
+            purchase.Description);
 
-        await receiptRepository.AddPurchaseAsync(receiptId, purchase);
-        return Unit.Instance;
+        return await addReceiptItemCommandHandler.HandleAsync(request, CancellationToken.None)
+            .MapAsync(response => response.ReceiptItemId);
     }
 
     public async Task<Result<Unit>> UpdatePurchase(Guid receiptId, PurchaseDetails purchase)
     {
-        ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(receiptId);
-        if (receipt == null)
-        {
-            return Failure.NotFound(message: "Receipt not found");
-        }
+        UpdateReceiptItemRequest request = new(
+            purchase.Id,
+            receiptId,
+            purchase.ItemName,
+            purchase.Category,
+            purchase.Quantity,
+            purchase.UnitPrice,
+            purchase.Discount,
+            purchase.Description);
 
-        await receiptRepository.UpdatePurchaseAsync(receiptId, purchase);
-        return Unit.Instance;
+        return await updateReceiptItemCommandHandler.HandleAsync(request, CancellationToken.None)
+            .MapAsync(_ => Unit.Instance);
     }
 
     public async Task<Result<Unit>> DeletePurchaseAsync(Guid receiptId, Guid purchaseId)
     {
-        ReceiptWithPurchases? receipt = await receiptRepository.GetReceiptAsync(receiptId);
-        if (receipt == null)
-        {
-            return Failure.NotFound(message: "Receipt not found");
-        }
-
-        await receiptRepository.DeletePurchaseAsync(receiptId, purchaseId);
-        return Unit.Instance;
+        DeleteReceiptItemRequest request = new(receiptId, purchaseId);
+        return await deleteReceiptItemCommandHandler.HandleAsync(request, CancellationToken.None)
+            .MapAsync(_ => Unit.Instance);
     }
 }
