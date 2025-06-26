@@ -34,7 +34,7 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
     {
         using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
         string query = """
-                       insert into receipts (id, store_name, purchase_date)
+                       insert into receipts (id, store, purchase_date)
                        values (@Id, @Store, @PurchaseDate)
                        """;
 
