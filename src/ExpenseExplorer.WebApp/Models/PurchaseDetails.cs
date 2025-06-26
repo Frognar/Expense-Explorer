@@ -11,7 +11,7 @@ internal sealed class PurchaseDetails(
 {
     public decimal PriceBeforeDiscount => Quantity * UnitPrice;
     public decimal PriceAfterDiscount => PriceBeforeDiscount - (Discount ?? 0);
-    public Guid Id { get; init; } = id;
+    public Guid Id { get; set; } = id;
     public string ItemName { get; set; } = itemName;
     public string Category { get; set; } = category;
     public decimal Quantity { get; set; } = quantity;
