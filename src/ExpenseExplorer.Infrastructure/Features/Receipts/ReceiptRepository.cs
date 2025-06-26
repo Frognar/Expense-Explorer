@@ -9,6 +9,7 @@ using ExpenseExplorer.Application.Features.Receipts.AddItem;
 using ExpenseExplorer.Application.Features.Receipts.CreateHeader;
 using ExpenseExplorer.Application.Features.Receipts.DeleteHeader;
 using ExpenseExplorer.Application.Features.Receipts.DeleteItem;
+using ExpenseExplorer.Application.Features.Receipts.Duplicate;
 using ExpenseExplorer.Application.Features.Receipts.GetReceipt;
 using ExpenseExplorer.Application.Features.Receipts.GetReceipts;
 using ExpenseExplorer.Application.Features.Receipts.UpdateHeader;
@@ -22,6 +23,7 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
     : ICreateReceiptHeaderPersistence,
         IUpdateReceiptHeaderPersistence,
         IDeleteReceiptHeaderPersistence,
+        IDuplicateReceiptPersistence,
         IAddReceiptItemPersistence,
         IUpdateReceiptItemPersistence,
         IReceiptItemDeletePersistence,
