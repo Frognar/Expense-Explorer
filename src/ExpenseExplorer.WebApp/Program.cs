@@ -1,5 +1,5 @@
-using ExpenseExplorer.Application;
 using ExpenseExplorer.Infrastructure;
+using ExpenseExplorer.WebApp;
 using ExpenseExplorer.WebApp.Components;
 using ExpenseExplorer.WebApp.Services;
 using Radzen;

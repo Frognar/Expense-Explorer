@@ -238,11 +238,7 @@
 
         await result.MatchAsync(
             error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message))),
-            x =>
-            {
-                
-                return Task.FromResult(x);
-            });
+            Task.FromResult);
     }
 
     private async Task OnCreateRow(PurchaseDetails purchase)
