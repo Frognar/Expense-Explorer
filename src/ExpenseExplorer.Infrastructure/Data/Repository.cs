@@ -2,10 +2,8 @@ using System.Collections.Immutable;
 using System.Data;
 using Dapper;
 using DotMaybe;
-using DotResult;
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Receipts.Data;
-using ExpenseExplorer.Application.Receipts.DTO;
 using ExpenseExplorer.Application.Receipts.ValueObjects;
 using ExpenseExplorer.Infrastructure.Database;
 
@@ -14,8 +12,7 @@ namespace ExpenseExplorer.Infrastructure.Data;
 internal sealed class Repository(IDbConnectionFactory connectionFactory)
     : IStoreRepository,
         IItemRepository,
-        ICategoryRepository,
-        IReceiptCommandRepository
+        ICategoryRepository
 {
     public async Task<ImmutableArray<Store>> GetStoresAsync(
         Maybe<string> search,
@@ -76,52 +73,5 @@ internal sealed class Repository(IDbConnectionFactory connectionFactory)
 
         private static string CreateLikeCondition(string columnName, string searchTerm) =>
             $"UPPER({columnName}) LIKE '%{searchTerm.ToUpperInvariant()}%'";
-    }
-
-    public async Task<Result<Unit>> CreateReceipt(CreateReceiptRequest receipt, CancellationToken cancellationToken)
-    {
-        try
-        {
-            using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
-            _ = await connection.ExecuteAsync(
-                "INSERT INTO receipts (id, store, purchase_date) VALUES (@Id, @Store, @PurchaseDate)",
-                new
-                {
-                    Id = receipt.Id.Value,
-                    Store = receipt.Store.Name,
-                    PurchaseDate = receipt.PurchaseDate.Date
-                });
-
-            return Unit.Instance;
-        }
-        catch (Exception ex)
-        {
-            return Failure.Fatal("Receipt.Exception", ex.Message);
-        }
-    }
-
-    public async Task<Result<Unit>> DeleteReceipt(ReceiptId id, CancellationToken cancellationToken)
-    {
-        try
-        {
-            using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
-            IDbTransaction transaction = connection.BeginTransaction();
-            _ = await connection.ExecuteAsync(
-                "DELETE FROM receipt_items WHERE receipt_id = @Id",
-                new { Id = id.Value },
-                transaction: transaction);
-
-            _ = await connection.ExecuteAsync(
-                "DELETE FROM receipts WHERE id = @Id",
-                new { Id = id.Value },
-                transaction: transaction);
-
-            transaction.Commit();
-            return Unit.Instance;
-        }
-        catch (Exception ex)
-        {
-            return Failure.Fatal("Receipt.Exception", ex.Message);
-        }
     }
 }
