@@ -33,7 +33,7 @@ public static class InfrastructureExtensions
             .AddScoped<IDuplicateReceiptPersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
             .AddScoped<IAddReceiptItemPersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
             .AddScoped<IUpdateReceiptItemPersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
-            .AddScoped<IReceiptItemDeletePersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
+            .AddScoped<IDeleteReceiptItemPersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
             .AddScoped<IGetReceiptByIdPersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
             .AddScoped<IGetReceiptSummariesPersistence>(sp => sp.GetRequiredService<ReceiptRepository>());
     }

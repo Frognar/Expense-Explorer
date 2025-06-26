@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Receipts.ValueObjects;
 
 namespace ExpenseExplorer.Application.Features.Receipts.DeleteItem;
 
-public interface IReceiptItemDeletePersistence
+public interface IDeleteReceiptItemPersistence
 {
     Task<Result<Receipt>> GetReceiptByIdAsync(ReceiptId receiptId, CancellationToken cancellationToken);
     Task<Result<Unit>> SaveReceiptAsync(Receipt receipt, CancellationToken cancellationToken);

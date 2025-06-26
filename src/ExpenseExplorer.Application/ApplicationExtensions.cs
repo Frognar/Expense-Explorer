@@ -44,7 +44,7 @@ public static class ApplicationExtensions
             .AddScoped<ICommandHandler<DeleteReceiptItemRequest, DeleteReceiptItemResponse>>(
                 sp => new DeleteReceiptItemCommandValidator(
                     new DeleteReceiptItemCommandHandler(
-                        sp.GetRequiredService<IReceiptItemDeletePersistence>())))
+                        sp.GetRequiredService<IDeleteReceiptItemPersistence>())))
             .AddScoped<IQueryHandler<GetReceiptByIdQuery, GetReceiptByIdResponse>, GetReceiptByIdHandler>()
             .AddScoped<IQueryHandler<GetReceiptSummariesQuery, GetReceiptSummariesResponse>, GetReceiptSummariesQueryHandler>();
     }

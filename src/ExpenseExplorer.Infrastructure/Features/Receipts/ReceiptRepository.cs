@@ -26,7 +26,7 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
         IDuplicateReceiptPersistence,
         IAddReceiptItemPersistence,
         IUpdateReceiptItemPersistence,
-        IReceiptItemDeletePersistence,
+        IDeleteReceiptItemPersistence,
         IGetReceiptByIdPersistence,
         IGetReceiptSummariesPersistence
 {

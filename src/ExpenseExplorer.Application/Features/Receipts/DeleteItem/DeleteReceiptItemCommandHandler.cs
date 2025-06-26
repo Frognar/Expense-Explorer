@@ -5,7 +5,7 @@ using ExpenseExplorer.Application.Domain.Receipts;
 namespace ExpenseExplorer.Application.Features.Receipts.DeleteItem;
 
 public sealed class DeleteReceiptItemCommandHandler(
-    IReceiptItemDeletePersistence persistence)
+    IDeleteReceiptItemPersistence persistence)
     : ICommandHandler<DeleteReceiptItemCommand, DeleteReceiptItemResponse>
 {
     public async Task<Result<DeleteReceiptItemResponse>> HandleAsync(
