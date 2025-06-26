@@ -1,5 +1,5 @@
 using DotMaybe;
-using ExpenseExplorer.Application.Receipts.ValueObjects;
+using ExpenseExplorer.Application.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Application.Domain.Receipts;
 

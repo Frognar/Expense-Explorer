@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 using DotMaybe;
 using DotResult;
-using ExpenseExplorer.Application.Receipts.ValueObjects;
+using ExpenseExplorer.Application.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Application.Domain.Receipts;
 

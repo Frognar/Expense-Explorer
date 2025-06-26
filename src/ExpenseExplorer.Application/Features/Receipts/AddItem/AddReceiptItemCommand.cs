@@ -1,6 +1,6 @@
 using DotMaybe;
 using ExpenseExplorer.Application.Abstractions.Messaging;
-using ExpenseExplorer.Application.Receipts.ValueObjects;
+using ExpenseExplorer.Application.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Application.Features.Receipts.AddItem;
 

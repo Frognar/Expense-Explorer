@@ -3,8 +3,8 @@ using System.Data;
 using Dapper;
 using DotMaybe;
 using ExpenseExplorer.Application;
+using ExpenseExplorer.Application.Domain.ValueObjects;
 using ExpenseExplorer.Application.Receipts.Data;
-using ExpenseExplorer.Application.Receipts.ValueObjects;
 using ExpenseExplorer.Infrastructure.Database;
 
 namespace ExpenseExplorer.Infrastructure.Data;

@@ -2,6 +2,7 @@ using DotMaybe;
 using DotResult;
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Abstractions.Messaging;
+using ExpenseExplorer.Application.Domain.ValueObjects;
 using ExpenseExplorer.Application.Features.Receipts.AddItem;
 using ExpenseExplorer.Application.Features.Receipts.CreateHeader;
 using ExpenseExplorer.Application.Features.Receipts.DeleteHeader;
@@ -13,7 +14,6 @@ using ExpenseExplorer.Application.Features.Receipts.UpdateHeader;
 using ExpenseExplorer.Application.Features.Receipts.UpdateItem;
 using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.Application.Receipts.Queries;
-using ExpenseExplorer.Application.Receipts.ValueObjects;
 using ExpenseExplorer.WebApp.Models;
 using GetReceiptByIdQuery = ExpenseExplorer.Application.Features.Receipts.GetReceipt.GetReceiptByIdQuery;
 

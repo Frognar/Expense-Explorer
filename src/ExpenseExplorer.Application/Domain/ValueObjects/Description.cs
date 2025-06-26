@@ -1,4 +1,4 @@
-namespace ExpenseExplorer.Application.Receipts.ValueObjects;
+namespace ExpenseExplorer.Application.Domain.ValueObjects;
 
 public readonly record struct Description(string? Value)
 {

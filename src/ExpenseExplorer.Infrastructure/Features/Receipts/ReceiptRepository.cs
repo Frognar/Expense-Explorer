@@ -5,6 +5,7 @@ using DotMaybe;
 using DotResult;
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Domain.Receipts;
+using ExpenseExplorer.Application.Domain.ValueObjects;
 using ExpenseExplorer.Application.Features.Receipts.AddItem;
 using ExpenseExplorer.Application.Features.Receipts.CreateHeader;
 using ExpenseExplorer.Application.Features.Receipts.DeleteHeader;
@@ -14,7 +15,6 @@ using ExpenseExplorer.Application.Features.Receipts.GetReceipt;
 using ExpenseExplorer.Application.Features.Receipts.GetReceipts;
 using ExpenseExplorer.Application.Features.Receipts.UpdateHeader;
 using ExpenseExplorer.Application.Features.Receipts.UpdateItem;
-using ExpenseExplorer.Application.Receipts.ValueObjects;
 using ExpenseExplorer.Infrastructure.Database;
 
 namespace ExpenseExplorer.Infrastructure.Features.Receipts;
