@@ -21,9 +21,7 @@ namespace ExpenseExplorer.WebApp.Services;
 
 internal sealed class ReceiptService(
     ICommandHandler<CreateReceiptHeaderRequest, CreateReceiptHeaderResponse> createReceiptHeaderCommandHandler,
-#pragma warning disable CS9113 // Parameter is unread.
     ICommandHandler<UpdateReceiptHeaderRequest, UpdateReceiptHeaderResponse> updateReceiptHeaderCommandHandler,
-#pragma warning restore CS9113 // Parameter is unread.
     ICommandHandler<DeleteReceiptHeaderRequest, DeleteReceiptHeaderResponse> deleteReceiptHeaderCommandHandler,
     ICommandHandler<DuplicateReceiptRequest, DuplicateReceiptResponse> duplicateReceiptCommandHandler,
     ICommandHandler<AddReceiptItemRequest, AddReceiptItemResponse> addReceiptItemCommandHandler,
@@ -81,39 +79,6 @@ internal sealed class ReceiptService(
                     page.Total));
     }
 
-    internal async Task<IEnumerable<string>> GetStoresAsync(string? search = null)
-    {
-        GetStoresRequest request = new(search is not null ? Some.With(search) : None.OfType<string>());
-        Result<GetStoresResponse> response = await getStoresQueryHandler.HandleAsync(request, CancellationToken.None);
-        return response
-            .Match(_ => [], s => s.Stores);
-    }
-
-    internal async Task<IEnumerable<string>> GetItemsAsync(string? search = null)
-    {
-        GetItemsRequest request = new(search is not null ? Some.With(search) : None.OfType<string>());
-        Result<GetItemsResponse> response = await getItemsQueryHandler.HandleAsync(request, CancellationToken.None);
-        return response
-            .Match(_ => [], s => s.Items);
-    }
-
-    internal async Task<IEnumerable<string>> GetCategoriesAsync(string? search = null)
-    {
-        GetCategoriesRequest request = new(search is not null ? Some.With(search) : None.OfType<string>());
-        Result<GetCategoriesResponse> response = await getCategoriesQueryHandler
-            .HandleAsync(request, CancellationToken.None);
-
-        return response
-            .Match(_ => [], s => s.Categories);
-    }
-
-    internal async Task<Result<Guid>> CreateReceiptAsync(string store, DateOnly purchaseDate)
-    {
-        CreateReceiptHeaderRequest request = new(store, purchaseDate, DateOnly.FromDateTime(DateTime.Today));
-        return await createReceiptHeaderCommandHandler.HandleAsync(request, CancellationToken.None)
-            .MapAsync(response => response.ReceiptId);
-    }
-
     public async Task<Result<Maybe<ReceiptWithPurchases>>> GetReceiptAsync(Guid id)
     {
         GetReceiptByIdQuery query = new(id);
@@ -135,11 +100,44 @@ internal sealed class ReceiptService(
                                 i.Description.Match<string?>(none: () => null, some: m => m))))));
     }
 
-    public async Task<Result<Guid>> DuplicateReceipt(Guid id)
+    public async Task<IEnumerable<string>> GetStoresAsync(string? search = null)
     {
-        DuplicateReceiptRequest request = new(id, DateOnly.FromDateTime(DateTime.Today));
-        return await duplicateReceiptCommandHandler.HandleAsync(request, CancellationToken.None)
+        GetStoresRequest request = new(search is not null ? Some.With(search) : None.OfType<string>());
+        Result<GetStoresResponse> response = await getStoresQueryHandler.HandleAsync(request, CancellationToken.None);
+        return response
+            .Match(_ => [], s => s.Stores);
+    }
+
+    public async Task<IEnumerable<string>> GetItemsAsync(string? search = null)
+    {
+        GetItemsRequest request = new(search is not null ? Some.With(search) : None.OfType<string>());
+        Result<GetItemsResponse> response = await getItemsQueryHandler.HandleAsync(request, CancellationToken.None);
+        return response
+            .Match(_ => [], s => s.Items);
+    }
+
+    public async Task<IEnumerable<string>> GetCategoriesAsync(string? search = null)
+    {
+        GetCategoriesRequest request = new(search is not null ? Some.With(search) : None.OfType<string>());
+        Result<GetCategoriesResponse> response = await getCategoriesQueryHandler
+            .HandleAsync(request, CancellationToken.None);
+
+        return response
+            .Match(_ => [], s => s.Categories);
+    }
+
+    public async Task<Result<Guid>> CreateReceiptAsync(string store, DateOnly purchaseDate)
+    {
+        CreateReceiptHeaderRequest request = new(store, purchaseDate, DateOnly.FromDateTime(DateTime.Today));
+        return await createReceiptHeaderCommandHandler.HandleAsync(request, CancellationToken.None)
             .MapAsync(response => response.ReceiptId);
+    }
+
+    public async Task<Result<Unit>> UpdateReceiptAsync(Guid receiptId, string store, DateOnly purchaseDate)
+    {
+        UpdateReceiptHeaderRequest request = new(receiptId, store, purchaseDate, DateOnly.FromDateTime(DateTime.Today));
+        return await updateReceiptHeaderCommandHandler.HandleAsync(request, CancellationToken.None)
+            .MapAsync(_ => Unit.Instance);
     }
 
     public async Task<Result<Unit>> DeleteReceiptAsync(Guid receiptId)
@@ -147,6 +145,13 @@ internal sealed class ReceiptService(
         DeleteReceiptHeaderRequest request = new(receiptId);
         return await deleteReceiptHeaderCommandHandler.HandleAsync(request, CancellationToken.None)
             .MapAsync(_ => Unit.Instance);
+    }
+
+    public async Task<Result<Guid>> DuplicateReceipt(Guid id)
+    {
+        DuplicateReceiptRequest request = new(id, DateOnly.FromDateTime(DateTime.Today));
+        return await duplicateReceiptCommandHandler.HandleAsync(request, CancellationToken.None)
+            .MapAsync(response => response.ReceiptId);
     }
 
     public async Task<Result<Guid>> AddPurchase(Guid receiptId, PurchaseDetails purchase)
