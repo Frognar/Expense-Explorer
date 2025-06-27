@@ -2,7 +2,8 @@ using DotMaybe;
 using DotResult;
 using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Abstractions.Messaging;
-using ExpenseExplorer.Application.Domain.ValueObjects;
+using ExpenseExplorer.Application.Features.Categories.GetCategories;
+using ExpenseExplorer.Application.Features.Items.GetItems;
 using ExpenseExplorer.Application.Features.Receipts.AddItem;
 using ExpenseExplorer.Application.Features.Receipts.CreateHeader;
 using ExpenseExplorer.Application.Features.Receipts.DeleteHeader;
@@ -12,8 +13,7 @@ using ExpenseExplorer.Application.Features.Receipts.GetReceipt;
 using ExpenseExplorer.Application.Features.Receipts.GetReceipts;
 using ExpenseExplorer.Application.Features.Receipts.UpdateHeader;
 using ExpenseExplorer.Application.Features.Receipts.UpdateItem;
-using ExpenseExplorer.Application.Receipts.Data;
-using ExpenseExplorer.Application.Receipts.Queries;
+using ExpenseExplorer.Application.Features.Stores.GetStores;
 using ExpenseExplorer.WebApp.Models;
 using GetReceiptByIdQuery = ExpenseExplorer.Application.Features.Receipts.GetReceipt.GetReceiptByIdQuery;
 
@@ -31,9 +31,9 @@ internal sealed class ReceiptService(
     ICommandHandler<DeleteReceiptItemRequest, DeleteReceiptItemResponse> deleteReceiptItemCommandHandler,
     IQueryHandler<GetReceiptByIdQuery, GetReceiptByIdResponse> getReceiptByIdQueryHandler,
     IQueryHandler<GetReceiptSummariesQuery, GetReceiptSummariesResponse> getReceiptSummariesQueryHandler,
-    IStoreRepository storeRepository,
-    IItemRepository itemRepository,
-    ICategoryRepository categoryRepository)
+    IQueryHandler<GetStoresRequest, GetStoresResponse> getStoresQueryHandler,
+    IQueryHandler<GetItemsRequest, GetItemsResponse> getItemsQueryHandler,
+    IQueryHandler<GetCategoriesRequest, GetCategoriesResponse> getCategoriesQueryHandler)
 {
     public async Task<ReceiptDetailsPage> GetReceiptsAsync(
         int pageSize,
@@ -83,26 +83,28 @@ internal sealed class ReceiptService(
 
     internal async Task<IEnumerable<string>> GetStoresAsync(string? search = null)
     {
-        GetStoresQuery query = new(search is not null ? Some.With(search) : None.OfType<string>());
-        GetStoresHandler handler = new(storeRepository);
-        IEnumerable<Store> stores = await handler.HandleAsync(query, CancellationToken.None);
-        return stores.Select(s => s.Name);
+        GetStoresRequest request = new(search is not null ? Some.With(search) : None.OfType<string>());
+        Result<GetStoresResponse> response = await getStoresQueryHandler.HandleAsync(request, CancellationToken.None);
+        return response
+            .Match(_ => [], s => s.Stores);
     }
 
     internal async Task<IEnumerable<string>> GetItemsAsync(string? search = null)
     {
-        GetItemsQuery query = new(search is not null ? Some.With(search) : None.OfType<string>());
-        GetItemsHandler handler = new(itemRepository);
-        IEnumerable<Item> items = await handler.HandleAsync(query, CancellationToken.None);
-        return items.Select(i => i.Name);
+        GetItemsRequest request = new(search is not null ? Some.With(search) : None.OfType<string>());
+        Result<GetItemsResponse> response = await getItemsQueryHandler.HandleAsync(request, CancellationToken.None);
+        return response
+            .Match(_ => [], s => s.Items);
     }
 
     internal async Task<IEnumerable<string>> GetCategoriesAsync(string? search = null)
     {
-        GetCategoriesQuery query = new(search is not null ? Some.With(search) : None.OfType<string>());
-        GetCategoriesHandler handler = new(categoryRepository);
-        IEnumerable<Category> categories = await handler.HandleAsync(query, CancellationToken.None);
-        return categories.Select(c => c.Name);
+        GetCategoriesRequest request = new(search is not null ? Some.With(search) : None.OfType<string>());
+        Result<GetCategoriesResponse> response = await getCategoriesQueryHandler
+            .HandleAsync(request, CancellationToken.None);
+
+        return response
+            .Match(_ => [], s => s.Categories);
     }
 
     internal async Task<Result<Guid>> CreateReceiptAsync(string store, DateOnly purchaseDate)
