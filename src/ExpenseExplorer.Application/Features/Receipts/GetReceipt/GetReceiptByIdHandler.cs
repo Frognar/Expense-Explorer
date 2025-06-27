@@ -3,7 +3,7 @@ using ExpenseExplorer.Application.Abstractions.Messaging;
 
 namespace ExpenseExplorer.Application.Features.Receipts.GetReceipt;
 
-public sealed class GetReceiptByIdHandler(IGetReceiptByIdPersistence persistence)
+internal sealed class GetReceiptByIdHandler(IGetReceiptByIdPersistence persistence)
     : IQueryHandler<GetReceiptByIdQuery, GetReceiptByIdResponse>
 {
     public async Task<Result<GetReceiptByIdResponse>> HandleAsync(

@@ -1,3 +1,3 @@
 namespace ExpenseExplorer.Application.Features.Receipts.AddItem;
 
-public record AddReceiptItemResponse(Guid ReceiptItemId);
+public sealed record AddReceiptItemResponse(Guid ReceiptItemId);

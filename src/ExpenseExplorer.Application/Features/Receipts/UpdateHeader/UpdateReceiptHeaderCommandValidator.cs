@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Application.Features.Receipts.UpdateHeader;
 
-public sealed class UpdateReceiptHeaderCommandValidator(
+internal sealed class UpdateReceiptHeaderCommandValidator(
     ICommandHandler<UpdateReceiptHeaderCommand, UpdateReceiptHeaderResponse> inner)
     : ICommandHandler<UpdateReceiptHeaderRequest, UpdateReceiptHeaderResponse>
 {

@@ -5,7 +5,7 @@ using ExpenseExplorer.Application.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Application.Features.Receipts.AddItem;
 
-public sealed class AddReceiptItemCommandValidator(
+internal sealed class AddReceiptItemCommandValidator(
     ICommandHandler<AddReceiptItemCommand, AddReceiptItemResponse> inner)
     : ICommandHandler<AddReceiptItemRequest, AddReceiptItemResponse>
 {

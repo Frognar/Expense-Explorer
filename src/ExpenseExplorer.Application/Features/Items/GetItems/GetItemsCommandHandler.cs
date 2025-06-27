@@ -4,7 +4,7 @@ using static ExpenseExplorer.Application.Helpers.Splitter;
 
 namespace ExpenseExplorer.Application.Features.Items.GetItems;
 
-public sealed class GetItemsCommandHandler(IGetItemsPersistence persistence)
+internal sealed class GetItemsCommandHandler(IGetItemsPersistence persistence)
     : IQueryHandler<GetItemsRequest, GetItemsResponse>
 {
     public async Task<Result<GetItemsResponse>> HandleAsync(

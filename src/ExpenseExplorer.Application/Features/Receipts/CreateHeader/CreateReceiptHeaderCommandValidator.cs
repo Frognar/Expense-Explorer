@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Application.Features.Receipts.CreateHeader;
 
-public sealed class CreateReceiptHeaderCommandValidator(
+internal sealed class CreateReceiptHeaderCommandValidator(
     ICommandHandler<CreateReceiptHeaderCommand, CreateReceiptHeaderResponse> inner)
     : ICommandHandler<CreateReceiptHeaderRequest, CreateReceiptHeaderResponse>
 {

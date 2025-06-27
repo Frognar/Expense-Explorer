@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Domain.Receipts;
 
 namespace ExpenseExplorer.Application.Features.Receipts.DeleteHeader;
 
-public sealed class DeleteReceiptHeaderCommandHandler(
+internal sealed class DeleteReceiptHeaderCommandHandler(
     IDeleteReceiptHeaderPersistence persistence)
     : ICommandHandler<DeleteReceiptHeaderCommand, DeleteReceiptHeaderResponse>
 {

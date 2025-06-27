@@ -3,10 +3,10 @@ using ExpenseExplorer.Application.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Application.Features.Receipts.CreateHeader;
 
-public record CreateReceiptHeaderCommand(ReceiptId Id, Store Store, PurchaseDate PurchaseDate)
+internal sealed record CreateReceiptHeaderCommand(ReceiptId Id, Store Store, PurchaseDate PurchaseDate)
     : ICommand<CreateReceiptHeaderResponse>;
 
-public static class CreateReceiptHeaderCommandFactory
+internal static class CreateReceiptHeaderCommandFactory
 {
     public static Func<Store, PurchaseDate, CreateReceiptHeaderCommand> Create => (s, p) =>
         new CreateReceiptHeaderCommand(ReceiptId.Unique(), s, p);

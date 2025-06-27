@@ -2,7 +2,7 @@ using ExpenseExplorer.Application.Abstractions.Messaging;
 
 namespace ExpenseExplorer.Application.Features.Receipts.UpdateItem;
 
-public record UpdateReceiptItemRequest(
+public sealed record UpdateReceiptItemRequest(
     Guid ReceiptItemId,
     Guid ReceiptId,
     string ItemName,

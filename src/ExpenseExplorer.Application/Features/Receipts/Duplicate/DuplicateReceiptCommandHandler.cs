@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Domain.Receipts;
 
 namespace ExpenseExplorer.Application.Features.Receipts.Duplicate;
 
-public sealed class DuplicateReceiptCommandHandler(
+internal sealed class DuplicateReceiptCommandHandler(
     IDuplicateReceiptPersistence persistence)
     : ICommandHandler<DuplicateReceiptCommand, DuplicateReceiptResponse>
 {

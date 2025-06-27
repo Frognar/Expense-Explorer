@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Domain.Receipts;
 
 namespace ExpenseExplorer.Application.Features.Receipts.UpdateItem;
 
-public class UpdateReceiptItemCommandHandler(
+internal sealed class UpdateReceiptItemCommandHandler(
     IUpdateReceiptItemPersistence persistence)
     : ICommandHandler<UpdateReceiptItemCommand, UpdateReceiptItemResponse>
 {

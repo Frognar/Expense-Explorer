@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Application.Features.Receipts.DeleteItem;
 
-public sealed class DeleteReceiptItemCommandValidator(
+internal sealed class DeleteReceiptItemCommandValidator(
     ICommandHandler<DeleteReceiptItemCommand, DeleteReceiptItemResponse> inner)
     : ICommandHandler<DeleteReceiptItemRequest, DeleteReceiptItemResponse>
 {

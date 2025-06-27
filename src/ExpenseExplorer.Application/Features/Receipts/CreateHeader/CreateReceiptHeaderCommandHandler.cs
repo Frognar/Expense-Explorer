@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Domain.Receipts;
 
 namespace ExpenseExplorer.Application.Features.Receipts.CreateHeader;
 
-public sealed class CreateReceiptHeaderCommandHandler(
+internal sealed class CreateReceiptHeaderCommandHandler(
     ICreateReceiptHeaderPersistence persistence)
     : ICommandHandler<CreateReceiptHeaderCommand, CreateReceiptHeaderResponse>
 {

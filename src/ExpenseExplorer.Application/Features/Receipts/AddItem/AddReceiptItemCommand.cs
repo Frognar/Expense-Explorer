@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Application.Features.Receipts.AddItem;
 
-public sealed record AddReceiptItemCommand(
+internal sealed record AddReceiptItemCommand(
     ReceiptItemId Id,
     ReceiptId ReceiptId,
     Item Item,
@@ -15,7 +15,7 @@ public sealed record AddReceiptItemCommand(
     Maybe<Description> Description)
     : ICommand<AddReceiptItemResponse>;
 
-public static class AddReceiptItemCommandFactory
+internal static class AddReceiptItemCommandFactory
 {
     public static Func<ReceiptId, Item, Category, Quantity, Money, Maybe<Money>, Maybe<Description>, AddReceiptItemCommand> Create =>
         (rId, i, c, q, up, d, de) => new AddReceiptItemCommand(ReceiptItemId.Unique(), rId, i, c, q, up, d, de);

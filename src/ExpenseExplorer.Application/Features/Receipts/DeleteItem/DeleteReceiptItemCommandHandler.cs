@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Domain.Receipts;
 
 namespace ExpenseExplorer.Application.Features.Receipts.DeleteItem;
 
-public sealed class DeleteReceiptItemCommandHandler(
+internal sealed class DeleteReceiptItemCommandHandler(
     IDeleteReceiptItemPersistence persistence)
     : ICommandHandler<DeleteReceiptItemCommand, DeleteReceiptItemResponse>
 {

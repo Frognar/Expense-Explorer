@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Domain.ValueObjects;
 
 namespace ExpenseExplorer.Application.Features.Receipts.Duplicate;
 
-public sealed class DuplicateReceiptCommandValidator(
+internal sealed class DuplicateReceiptCommandValidator(
     ICommandHandler<DuplicateReceiptCommand, DuplicateReceiptResponse> inner)
     : ICommandHandler<DuplicateReceiptRequest, DuplicateReceiptResponse>
 {

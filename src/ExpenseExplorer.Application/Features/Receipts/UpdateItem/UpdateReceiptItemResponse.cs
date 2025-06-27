@@ -1,3 +1,3 @@
 namespace ExpenseExplorer.Application.Features.Receipts.UpdateItem;
 
-public record UpdateReceiptItemResponse;
+public sealed record UpdateReceiptItemResponse;

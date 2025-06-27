@@ -3,7 +3,7 @@ using ExpenseExplorer.Application.Abstractions.Messaging;
 
 namespace ExpenseExplorer.Application.Features.Receipts.GetReceipts;
 
-public sealed class GetReceiptSummariesQueryHandler(
+internal sealed class GetReceiptSummariesQueryHandler(
     IGetReceiptSummariesPersistence persistence)
     : IQueryHandler<GetReceiptSummariesQuery, GetReceiptSummariesResponse>
 {

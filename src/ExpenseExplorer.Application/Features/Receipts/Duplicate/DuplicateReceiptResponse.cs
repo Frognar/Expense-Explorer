@@ -1,3 +1,3 @@
 namespace ExpenseExplorer.Application.Features.Receipts.Duplicate;
 
-public record DuplicateReceiptResponse(Guid ReceiptId);
+public sealed record DuplicateReceiptResponse(Guid ReceiptId);

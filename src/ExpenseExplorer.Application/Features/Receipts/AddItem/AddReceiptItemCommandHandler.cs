@@ -4,7 +4,7 @@ using ExpenseExplorer.Application.Domain.Receipts;
 
 namespace ExpenseExplorer.Application.Features.Receipts.AddItem;
 
-public class AddReceiptItemCommandHandler(
+internal sealed class AddReceiptItemCommandHandler(
     IAddReceiptItemPersistence persistence)
     : ICommandHandler<AddReceiptItemCommand, AddReceiptItemResponse>
 {
