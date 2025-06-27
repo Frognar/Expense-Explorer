@@ -257,14 +257,34 @@
     private async Task OnUpdateRow(PurchaseDetails purchase)
     {
         var result = await ReceiptService.UpdatePurchase(ReceiptId, purchase);
-        if (result.Match(_ => true, _ => false))
-        {
-            purchase.Update(_backup!);
-        }
-
         await result.MatchAsync(
-            error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message))),
-            Task.FromResult);
+            error =>
+            {
+                purchase.Update(_backup!);
+                return _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message)));
+            },
+            unit =>
+            {
+                _purchases = ReplaceInline(_purchases, purchase);
+                return Task.FromResult(unit);
+            });
+    }
+
+    private static IEnumerable<PurchaseDetails> ReplaceInline(
+        IEnumerable<PurchaseDetails> purchases,
+        PurchaseDetails purchase)
+    {
+        foreach (PurchaseDetails purchaseDetails in purchases)
+        {
+            if (purchaseDetails.Id == purchase.Id)
+            {
+                yield return purchase;
+            }
+            else
+            {
+                yield return purchaseDetails;
+            }
+        }
     }
 
     private async Task OnCreateRow(PurchaseDetails purchase)
