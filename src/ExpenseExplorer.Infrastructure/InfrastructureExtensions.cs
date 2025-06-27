@@ -10,8 +10,6 @@ using ExpenseExplorer.Application.Features.Receipts.GetReceipt;
 using ExpenseExplorer.Application.Features.Receipts.GetReceipts;
 using ExpenseExplorer.Application.Features.Receipts.UpdateHeader;
 using ExpenseExplorer.Application.Features.Receipts.UpdateItem;
-using ExpenseExplorer.Application.Receipts.Data;
-using ExpenseExplorer.Infrastructure.Data;
 using ExpenseExplorer.Application.Features.Stores.GetStores;
 using ExpenseExplorer.Infrastructure.Database;
 using ExpenseExplorer.Infrastructure.Database.TypeHandlers;
