@@ -13,10 +13,10 @@
 <RadzenCard Variant="Variant.Outlined" class="rz-my-2 rz-mx-auto">
     <RadzenRow JustifyContent="JustifyContent.Center">
         <RadzenFormField Text="@Localizer["Store"]">
-            <RadzenAutoComplete @bind-Value="@_store" Data="_stores" OpenOnFocus="true" LoadData="OnStoresLoadData"/>
+            <RadzenAutoComplete @bind-Value="@_store" Data="_stores" OpenOnFocus="true" LoadData="OnStoresLoadData" @onfocusout="SaveReceipt"/>
         </RadzenFormField>
         <RadzenFormField Text="@Localizer["PurchaseDate"]">
-            <RadzenDatePicker @bind-Value="@_purchaseDate"/>
+            <RadzenDatePicker @bind-Value="@_purchaseDate" @onfocusout="SaveReceipt"/>
         </RadzenFormField>
         <RadzenFormField Text="@Localizer["TotalCost"]">
             <RadzenTextBox Disabled="true" Value="@TotalCost.ToString("C2", new CultureInfo("pl-PL"))"/>
@@ -184,6 +184,32 @@
     private async Task OnCategoriesLoadData(LoadDataArgs args)
     {
         _categories = await ReceiptService.GetCategoriesAsync(args.Filter);
+    }
+
+    private async Task SaveReceipt()
+    {
+        if (_receipt is null)
+        {
+            return;
+        }
+
+        Result<Unit> result = await ReceiptService.UpdateReceiptAsync(_receipt.Id, _store, _purchaseDate);
+        await result.MatchAsync(async error =>
+            {
+                _store = _receipt.Store;
+                _purchaseDate = _receipt.PurchaseDate;
+                return await _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message)));
+            },
+            unit =>
+            {
+                _receipt = _receipt with
+                    {
+                        Store = _store,
+                        PurchaseDate = _purchaseDate
+                    };
+
+                return Task.FromResult(unit);
+            });
     }
 
     private async Task InsertRow()
