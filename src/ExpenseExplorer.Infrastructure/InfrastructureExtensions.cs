@@ -1,4 +1,6 @@
 using Dapper;
+using ExpenseExplorer.Application.Features.Categories.GetCategories;
+using ExpenseExplorer.Application.Features.Items.GetItems;
 using ExpenseExplorer.Application.Features.Receipts.AddItem;
 using ExpenseExplorer.Application.Features.Receipts.CreateHeader;
 using ExpenseExplorer.Application.Features.Receipts.DeleteHeader;
@@ -10,9 +12,13 @@ using ExpenseExplorer.Application.Features.Receipts.UpdateHeader;
 using ExpenseExplorer.Application.Features.Receipts.UpdateItem;
 using ExpenseExplorer.Application.Receipts.Data;
 using ExpenseExplorer.Infrastructure.Data;
+using ExpenseExplorer.Application.Features.Stores.GetStores;
 using ExpenseExplorer.Infrastructure.Database;
 using ExpenseExplorer.Infrastructure.Database.TypeHandlers;
+using ExpenseExplorer.Infrastructure.Features.Categories;
+using ExpenseExplorer.Infrastructure.Features.Items;
 using ExpenseExplorer.Infrastructure.Features.Receipts;
+using ExpenseExplorer.Infrastructure.Features.Stores;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ExpenseExplorer.Infrastructure;
@@ -34,7 +40,10 @@ public static class InfrastructureExtensions
             .AddScoped<IUpdateReceiptItemPersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
             .AddScoped<IDeleteReceiptItemPersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
             .AddScoped<IGetReceiptByIdPersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
-            .AddScoped<IGetReceiptSummariesPersistence>(sp => sp.GetRequiredService<ReceiptRepository>());
+            .AddScoped<IGetReceiptSummariesPersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
+            .AddScoped<IGetStoresPersistence, StoreRepository>()
+            .AddScoped<IGetItemsPersistence, ItemRepository>()
+            .AddScoped<IGetCategoriesPersistence, CategoryRepository>();
     }
 
     public static IServiceCollection AddDatabase(
