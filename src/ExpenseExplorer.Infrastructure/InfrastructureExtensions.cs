@@ -26,9 +26,6 @@ public static class InfrastructureExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         return services
-            .AddScoped<IStoreRepository, Repository>()
-            .AddScoped<IItemRepository, Repository>()
-            .AddScoped<ICategoryRepository, Repository>()
             .AddScoped<ReceiptRepository>()
             .AddScoped<ICreateReceiptHeaderPersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
             .AddScoped<IUpdateReceiptHeaderPersistence>(sp => sp.GetRequiredService<ReceiptRepository>())
