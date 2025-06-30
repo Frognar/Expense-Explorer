@@ -6,21 +6,166 @@ public sealed record ReceiptItemFilter(
     IEnumerable<string> Categories,
     DateOnly? PurchaseDateFrom,
     DateOnly? PurchaseDateTo,
+    decimal? UnitPriceMin,
+    decimal? UnitPriceMax,
+    decimal? QuantityMin,
+    decimal? QuantityMax,
+    decimal? DiscountMin,
+    decimal? DiscountMax,
     decimal? TotalMin,
-    decimal? TotalMax)
+    decimal? TotalMax,
+    string? Description)
 {
     public static ReceiptItemFilter StoresIn(IEnumerable<string> stores) =>
-        new(stores, [], [], null, null, null, null);
+        new(
+            stores,
+            [],
+            [],
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
 
     public static ReceiptItemFilter ItemsIn(IEnumerable<string> items) =>
-        new([], items, [], null, null, null, null);
+        new(
+            [],
+            items,
+            [],
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
 
     public static ReceiptItemFilter CategoriesIn(IEnumerable<string> categories) =>
-        new([], [], categories, null, null, null, null);
+        new(
+            [],
+            [],
+            categories,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
 
     public static ReceiptItemFilter PurchaseDateBetween(DateOnly? from, DateOnly? to) =>
-        new([], [], [], from, to, null, null);
+        new(
+            [],
+            [],
+            [],
+            from,
+            to,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+
+    public static ReceiptItemFilter UnitPriceBetween(decimal? min, decimal? max) =>
+        new(
+            [],
+            [],
+            [],
+            null,
+            null,
+            min,
+            max,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+
+    public static ReceiptItemFilter QuantityBetween(decimal? min, decimal? max) =>
+        new(
+            [],
+            [],
+            [],
+            null,
+            null,
+            null,
+            null,
+            min,
+            max,
+            null,
+            null,
+            null,
+            null,
+            null);
+
+    public static ReceiptItemFilter DiscountBetween(decimal? min, decimal? max) =>
+        new(
+            [],
+            [],
+            [],
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            min,
+            max,
+            null,
+            null,
+            null);
 
     public static ReceiptItemFilter TotalBetween(decimal? min, decimal? max) =>
-        new([], [], [], null, null, min, max);
+        new(
+            [],
+            [],
+            [],
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            min,
+            max,
+            null);
+
+    public static ReceiptItemFilter DescriptionContains(string? description) =>
+        new(
+            [],
+            [],
+            [],
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            description);
 }
