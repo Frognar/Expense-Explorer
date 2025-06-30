@@ -50,8 +50,8 @@ internal sealed class ReceiptService(
             .GetPage(pageSize, skip);
 
         ReceiptOrder order = orderBy?
-                .Replace("desc", "", StringComparison.CurrentCultureIgnoreCase)
-                .Replace("asc", "", StringComparison.CurrentCultureIgnoreCase)
+                .Replace("desc", "", StringComparison.CurrentCulture)
+                .Replace("asc", "", StringComparison.CurrentCulture)
                 .Trim() switch
         {
             nameof(Models.ReceiptDetails.Store) => ReceiptOrder.Store,
@@ -60,7 +60,7 @@ internal sealed class ReceiptService(
             _ => ReceiptOrder.Id
         };
 
-        query = orderBy?.Contains("desc", StringComparison.InvariantCultureIgnoreCase) == true
+        query = orderBy?.Contains("desc", StringComparison.CurrentCulture) == true
             ? query.OrderByDescending(order)
             : query.OrderBy(order);
 
