@@ -2,6 +2,8 @@ using ExpenseExplorer.Application.Features.Categories;
 using ExpenseExplorer.Application.Features.Categories.GetCategories;
 using ExpenseExplorer.Application.Features.Items;
 using ExpenseExplorer.Application.Features.Items.GetItems;
+using ExpenseExplorer.Application.Features.ReceiptItems;
+using ExpenseExplorer.Application.Features.ReceiptItems.GetReceiptItems;
 using ExpenseExplorer.Application.Features.Receipts;
 using ExpenseExplorer.Application.Features.Receipts.AddItem;
 using ExpenseExplorer.Application.Features.Receipts.CreateHeader;
@@ -44,5 +46,7 @@ internal static class ApplicationExtensions
             .AddScoped(sp => ItemsFeatureFactory.CreateGetItemsCommandHandler(
                 sp.GetRequiredService<IGetItemsPersistence>()))
             .AddScoped(sp => CategoriesFeatureFactory.CreateGetCategoriesCommandHandler(
-                sp.GetRequiredService<IGetCategoriesPersistence>()));
+                sp.GetRequiredService<IGetCategoriesPersistence>()))
+            .AddScoped(sp => ReceiptItemsFeatureFactory.CreateGetReceiptItemsQueryHandler(
+                sp.GetRequiredService<IGetReceiptItemsPersistence>()));
 }
