@@ -11,4 +11,5 @@ public sealed record ReceiptItemOrder(string OrderBy, bool Descending)
     public static ReceiptItemOrder Quantity => new("Quantity", false);
     public static ReceiptItemOrder Discount => new("Discount", false);
     public static ReceiptItemOrder Total => new("Total", false);
+    public static ReceiptItemOrder Description => new("Description", false);
 }
