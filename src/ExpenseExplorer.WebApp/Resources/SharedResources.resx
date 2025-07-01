@@ -30,4 +30,16 @@
     <data name="Confirm" xml:space="preserve">
         <value>Potwierdź</value>
     </data>
+    <data name="From" xml:space="preserve">
+        <value>Od</value>
+    </data>
+    <data name="To" xml:space="preserve">
+        <value>Do</value>
+    </data>
+    <data name="Min" xml:space="preserve">
+        <value>Min</value>
+    </data>
+    <data name="Max" xml:space="preserve">
+        <value>Max</value>
+    </data>
 </root>

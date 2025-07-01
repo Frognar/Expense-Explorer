@@ -26,6 +26,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Shared.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Components\Pages\ReceiptItems.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ReceiptItems.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\Components\Pages\Receipts.Designer.cs">
@@ -47,6 +51,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>SharedResources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Components\Pages\ReceiptItems.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ReceiptItems.resx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:element name="root" msdata:IsDataSet="true">
+
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <data name="_Receipts" xml:space="preserve">
+    <value>Pozycje paragonów</value>
+  </data>
+    <data name="PageSizeText" xml:space="preserve">
+    <value>Rozmiar strony</value>
+  </data>
+    <data name="PagingSummaryTemplate" xml:space="preserve">
+    <value>Strona {0} z {1} (łącznie {2} pozycji)</value>
+  </data>
+    <data name="Store" xml:space="preserve">
+    <value>Sklep</value>
+  </data>
+    <data name="SelectedItemsText" xml:space="preserve">
+    <value>{0} wybranych</value>
+  </data>
+    <data name="PurchaseDate" xml:space="preserve">
+    <value>Data zakupu</value>
+  </data>
+    <data name="Item" xml:space="preserve">
+    <value>Nazwa</value>
+  </data>
+    <data name="Category" xml:space="preserve">
+    <value>Kategoria</value>
+  </data>
+    <data name="UnitPrice" xml:space="preserve">
+    <value>Cena jedn.</value>
+  </data>
+    <data name="Quantity" xml:space="preserve">
+    <value>Ilość</value>
+  </data>
+    <data name="Discount" xml:space="preserve">
+    <value>Rabat</value>
+  </data>
+    <data name="TotalCost" xml:space="preserve">
+    <value>Całkowity koszt</value>
+  </data>
+    <data name="Description" xml:space="preserve">
+    <value>Opis</value>
+  </data>
+</root>

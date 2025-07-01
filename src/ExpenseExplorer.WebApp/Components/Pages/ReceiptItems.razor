@@ -1,0 +1,206 @@
+@page "/receipt-items"
+@using ExpenseExplorer.WebApp.Models
+@using ExpenseExplorer.WebApp.Services
+@inject IStringLocalizer<ReceiptItems> Localizer
+@inject ReceiptService ReceiptService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@Localizer["_Receipts"]</PageTitle>
+
+<RadzenDataGrid
+    @ref=_grid
+    Data="@_receiptItemDetails"
+    Count="@_count"
+    LoadData="@LoadData"
+    Density="Density.Compact"
+    PageSize="20"
+    AllowPaging="true"
+    PagerHorizontalAlign="HorizontalAlign.Center"
+    ShowPagingSummary="true"
+    PageSizeOptions="[10, 20]"
+    PageSizeText="@Localizer["PageSizeText"]"
+    AllowFiltering="true"
+    FilterMode="FilterMode.Simple"
+    AllowSorting="true"
+    GotoFirstPageOnSort="true">
+    <PagingSummaryTemplate>
+        @((MarkupString)string.Format(Localizer["PagingSummaryTemplate"], context.CurrentPage, context.NumberOfPages, context.TotalCount))
+    </PagingSummaryTemplate>
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Store)" Title="@Localizer["Store"]">
+            <FilterTemplate>
+                <RadzenDropDown @bind-Value="@_selectedStores" Data="@_stores" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" Style="width:100%"/>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn
+            Property="@nameof(ReceiptItemDetails.PurchaseDate)"
+            FormatString="{0:dd/MM/yyyy}"
+            Title="@Localizer["PurchaseDate"]"
+            SortOrder="SortOrder.Descending">
+            <FilterTemplate>
+                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenLabel Text="@($"{Localizer["From"]}: ")" Component="PurchaseDateFromDatePicker"/>
+                        <RadzenDatePicker TValue="DateOnly?" @bind-Value="@_purchaseDateFrom" AllowClear="true" Name="PurchaseDateFromDatePicker" Change="@Reload"/>
+                        </RadzenStack>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenLabel Text="@($"{Localizer["To"]}: ")" Component="PurchaseDateToDatePicker"/>
+                        <RadzenDatePicker TValue="DateOnly?" @bind-Value="@_purchaseDateTo" AllowClear="true" Name="PurchaseDateToDatePicker" Change="@Reload"/>
+                    </RadzenStack>
+                </RadzenStack>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Item)" Title="@Localizer["Item"]">
+            <FilterTemplate>
+                <RadzenDropDown @bind-Value="@_selectedItems" Data="@_items" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" Style="width:100%"/>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Category)" Title="@Localizer["Category"]">
+            <FilterTemplate>
+                <RadzenDropDown @bind-Value="@_selectedCategories" Data="@_categories" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" Style="width:100%"/>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.UnitPrice)" Title="@Localizer["UnitPrice"]">
+            <Template>
+                @string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", context.UnitPrice)
+            </Template>
+            <FilterTemplate>
+                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenLabel Text="@($"{Localizer["Min"]}: ")" Component="UnitPriceMin"/>
+                        <RadzenNumeric TValue="decimal?" @bind-Value="@_unitPriceMin" ShowUpDown="false" Name="UnitPriceMin" Change="@Reload"/>
+                    </RadzenStack>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenLabel Text="@($"{Localizer["Max"]}: ")" Component="UnitPriceMax"/>
+                        <RadzenNumeric TValue="decimal?" @bind-Value="@_unitPriceMax" ShowUpDown="false" Name="UnitPriceMax" Change="@Reload"/>
+                    </RadzenStack>
+                </RadzenStack>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Quantity)" Title="@Localizer["Quantity"]">
+            <Template>
+                @string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:0.000}", context.Quantity)
+            </Template>
+            <FilterTemplate>
+                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenLabel Text="@($"{Localizer["Min"]}: ")" Component="QuantityMin"/>
+                        <RadzenNumeric TValue="decimal?" @bind-Value="@_quantityMin" ShowUpDown="false" Name="QuantityMin" Change="@Reload"/>
+                    </RadzenStack>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenLabel Text="@($"{Localizer["Max"]}: ")" Component="QuantityMax"/>
+                        <RadzenNumeric TValue="decimal?" @bind-Value="@_quantityMax" ShowUpDown="false" Name="QuantityMax" Change="@Reload"/>
+                    </RadzenStack>
+                </RadzenStack>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Discount)" Title="@Localizer["Discount"]">
+            <Template>
+                @string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", context.Discount)
+            </Template>
+            <FilterTemplate>
+                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenLabel Text="@($"{Localizer["Min"]}: ")" Component="DiscountMin"/>
+                        <RadzenNumeric TValue="decimal?" @bind-Value="@_discountMin" ShowUpDown="false" Name="DiscountMin" Change="@Reload"/>
+                    </RadzenStack>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenLabel Text="@($"{Localizer["Max"]}: ")" Component="DiscountMax"/>
+                        <RadzenNumeric TValue="decimal?" @bind-Value="@_discountMax" ShowUpDown="false" Name="DiscountMax" Change="@Reload"/>
+                    </RadzenStack>
+                </RadzenStack>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Total)" Title="@Localizer["TotalCost"]">
+            <Template>
+                @string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", context.Total)
+            </Template>
+            <FooterTemplate>
+                @Localizer["TotalCost"]: <b>@string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", _totalCost)</b>
+            </FooterTemplate>
+            <FilterTemplate>
+                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenLabel Text="@($"{Localizer["Min"]}: ")" Component="TotalCostMinDatePicker"/>
+                        <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostMin" ShowUpDown="false" Name="TotalCostMinDatePicker" Change="@Reload"/>
+                    </RadzenStack>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenLabel Text="@($"{Localizer["Max"]}: ")" Component="TotalCostMaxDatePicker"/>
+                        <RadzenNumeric TValue="decimal?" @bind-Value="@_totalCostMax" ShowUpDown="false" Name="TotalCostMaxDatePicker" Change="@Reload"/>
+                    </RadzenStack>
+                </RadzenStack>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Description)" Title="@Localizer["Description"]">
+            <FilterTemplate>
+                <RadzenTextBox TValue="string?" @bind-Value="@_description" Name="Description" Change="@Reload" Style="width:100%"/>
+            </FilterTemplate>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.ReceiptId)" Filterable="false" Sortable="false" Width="45px" TextAlign="TextAlign.Center">
+            <Template>
+                <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Click="@(() => OnEdit(context.ReceiptId))"/>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    private RadzenDataGrid<ReceiptItemDetails> _grid = null!;
+    private int _count;
+    private decimal _totalCost = decimal.Zero;
+    private IEnumerable<ReceiptItemDetails> _receiptItemDetails = null!;
+
+    // Filters
+    private IEnumerable<string> _stores = [];
+    private IEnumerable<string>? _selectedStores;
+    private IEnumerable<string> _items = [];
+    private IEnumerable<string>? _selectedItems;
+    private IEnumerable<string> _categories = [];
+    private IEnumerable<string>? _selectedCategories;
+    private DateOnly? _purchaseDateFrom = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1).AddMonths(-1));
+    private DateOnly? _purchaseDateTo;
+    private decimal? _unitPriceMin;
+    private decimal? _unitPriceMax;
+    private decimal? _quantityMin;
+    private decimal? _quantityMax;
+    private decimal? _discountMin;
+    private decimal? _discountMax;
+    private decimal? _totalCostMin;
+    private decimal? _totalCostMax;
+    private string? _description;
+
+    /// <inheritdoc />
+    protected override async Task OnInitializedAsync()
+    {
+        _stores = await ReceiptService.GetStoresAsync();
+        _items = await ReceiptService.GetItemsAsync();
+        _categories = await ReceiptService.GetCategoriesAsync();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task Reload() => await _grid.FirstPage(forceReload: true);
+    
+    private async Task LoadData(LoadDataArgs args)
+    {
+        (_receiptItemDetails, _count, _totalCost) = await ReceiptService.GetReceiptItemsAsync(
+            args.Top.GetValueOrDefault(10),
+            args.Skip.GetValueOrDefault(),
+            args.OrderBy,
+            _selectedStores ?? [],
+            _selectedItems ?? [],
+            _selectedCategories ?? [],
+            _purchaseDateFrom,
+            _purchaseDateTo,
+            _unitPriceMin,
+            _unitPriceMax,
+            _quantityMin,
+            _quantityMax,
+            _discountMin,
+            _discountMax,
+            _totalCostMin,
+            _totalCostMax,
+            _description);
+    }
+
+    private void OnEdit(Guid id) => NavigationManager.NavigateTo($"/receipts/{id}");
+}

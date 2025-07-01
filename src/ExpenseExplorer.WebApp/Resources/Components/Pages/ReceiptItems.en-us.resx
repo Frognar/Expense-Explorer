@@ -1,0 +1,53 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="_Receipts" xml:space="preserve">
+    <value>Receipt Items</value>
+  </data>
+    <data name="PageSizeText" xml:space="preserve">
+    <value>Page Size</value>
+  </data>
+    <data name="PagingSummaryTemplate" xml:space="preserve">
+    <value>Page {0} of {1} ({2} items total)</value>
+  </data>
+    <data name="Store" xml:space="preserve">
+    <value>Store</value>
+  </data>
+    <data name="SelectedItemsText" xml:space="preserve">
+    <value>{0} selected</value>
+  </data>
+    <data name="PurchaseDate" xml:space="preserve">
+    <value>Purchase Date</value>
+  </data>
+    <data name="Item" xml:space="preserve">
+    <value>Item</value>
+  </data>
+    <data name="Category" xml:space="preserve">
+    <value>Category</value>
+  </data>
+    <data name="UnitPrice" xml:space="preserve">
+    <value>Unit Price</value>
+  </data>
+    <data name="Quantity" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+    <data name="Discount" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+    <data name="TotalCost" xml:space="preserve">
+    <value>Total Cost</value>
+  </data>
+    <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+</root>
