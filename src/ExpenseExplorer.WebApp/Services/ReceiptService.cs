@@ -4,6 +4,7 @@ using ExpenseExplorer.Application;
 using ExpenseExplorer.Application.Abstractions.Messaging;
 using ExpenseExplorer.Application.Features.Categories.GetCategories;
 using ExpenseExplorer.Application.Features.Items.GetItems;
+using ExpenseExplorer.Application.Features.ReceiptItems.GetReceiptItems;
 using ExpenseExplorer.Application.Features.Receipts.AddItem;
 using ExpenseExplorer.Application.Features.Receipts.CreateHeader;
 using ExpenseExplorer.Application.Features.Receipts.DeleteHeader;
@@ -31,8 +32,83 @@ internal sealed class ReceiptService(
     IQueryHandler<GetReceiptSummariesQuery, GetReceiptSummariesResponse> getReceiptSummariesQueryHandler,
     IQueryHandler<GetStoresRequest, GetStoresResponse> getStoresQueryHandler,
     IQueryHandler<GetItemsRequest, GetItemsResponse> getItemsQueryHandler,
-    IQueryHandler<GetCategoriesRequest, GetCategoriesResponse> getCategoriesQueryHandler)
+    IQueryHandler<GetCategoriesRequest, GetCategoriesResponse> getCategoriesQueryHandler,
+    IQueryHandler<GetReceiptItemsQuery, GetReceiptItemsResponse> getReceiptItemsQueryHandler)
 {
+    public async Task<ReceiptItemDetailsPage> GetReceiptItemsAsync(
+        int pageSize,
+        int skip,
+        string? orderBy,
+        IEnumerable<string> stores,
+        IEnumerable<string> items,
+        IEnumerable<string> categories,
+        DateOnly? purchaseDateFrom,
+        DateOnly? purchaseDateTo,
+        decimal? unitPriceMin,
+        decimal? unitPriceMax,
+        decimal? quantityMin,
+        decimal? quantityMax,
+        decimal? discountMin,
+        decimal? discountMax,
+        decimal? totalCostMin,
+        decimal? totalCostMax,
+        string? description)
+    {
+        GetReceiptItemsQuery query = GetReceiptItemsQuery.Default
+            .Where(ReceiptItemFilter.StoresIn(stores))
+            .Where(ReceiptItemFilter.ItemsIn(items))
+            .Where(ReceiptItemFilter.CategoriesIn(categories))
+            .Where(ReceiptItemFilter.PurchaseDateBetween(purchaseDateFrom, purchaseDateTo))
+            .Where(ReceiptItemFilter.UnitPriceBetween(unitPriceMin, unitPriceMax))
+            .Where(ReceiptItemFilter.QuantityBetween(quantityMin, quantityMax))
+            .Where(ReceiptItemFilter.DiscountBetween(discountMin, discountMax))
+            .Where(ReceiptItemFilter.TotalBetween(totalCostMin, totalCostMax))
+            .Where(ReceiptItemFilter.DescriptionContains(description))
+            .GetPage(pageSize, skip);
+
+        ReceiptItemOrder order = orderBy?
+                .Replace("desc", "", StringComparison.CurrentCulture)
+                .Replace("asc", "", StringComparison.CurrentCulture)
+                .Trim() switch
+        {
+            nameof(Models.ReceiptItemDetails.Store) => ReceiptItemOrder.Store,
+            nameof(Models.ReceiptItemDetails.PurchaseDate) => ReceiptItemOrder.PurchaseDate,
+            nameof(Models.ReceiptItemDetails.Item) => ReceiptItemOrder.Item,
+            nameof(Models.ReceiptItemDetails.Category) => ReceiptItemOrder.Category,
+            nameof(Models.ReceiptItemDetails.UnitPrice) => ReceiptItemOrder.UnitPrice,
+            nameof(Models.ReceiptItemDetails.Quantity) => ReceiptItemOrder.Quantity,
+            nameof(Models.ReceiptItemDetails.Discount) => ReceiptItemOrder.Discount,
+            nameof(Models.ReceiptItemDetails.Total) => ReceiptItemOrder.Total,
+            nameof(Models.ReceiptItemDetails.Description) => ReceiptItemOrder.Description,
+            _ => ReceiptItemOrder.Id
+        };
+
+        query = orderBy?.EndsWith("desc", StringComparison.CurrentCulture) == true
+            ? query.OrderByDescending(order)
+            : query.OrderBy(order);
+
+        Result<GetReceiptItemsResponse> result =
+            await getReceiptItemsQueryHandler.HandleAsync(query, CancellationToken.None);
+
+        return result.Match(
+            failure: _ => new ReceiptItemDetailsPage([], 0, 0),
+            success: page => new ReceiptItemDetailsPage(
+                page.Items.Items.Select(r => new Models.ReceiptItemDetails(
+                    r.Id,
+                    r.ReceiptId,
+                    r.Store,
+                    r.PurchaseDate,
+                    r.Item,
+                    r.Category,
+                    r.UnitPrice,
+                    r.Quantity,
+                    r.Discount.Match<decimal?>(() => null, d => d),
+                    r.UnitPrice * r.Quantity - r.Discount.OrDefault(0m),
+                    r.Description.Match<string?>(() => null, d => d))),
+                    (int)page.Items.TotalCount,
+                    page.Total));
+    }
+
     public async Task<ReceiptDetailsPage> GetReceiptsAsync(
         int pageSize,
         int skip,
