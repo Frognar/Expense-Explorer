@@ -21,4 +21,7 @@
     <data name="Receipts" xml:space="preserve">
         <value>Paragony</value>
     </data>
+    <data name="Receipt items" xml:space="preserve">
+        <value>Przedmioty</value>
+    </data>
 </root>

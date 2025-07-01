@@ -28,7 +28,7 @@ namespace ExpenseExplorer.WebApp.Resources.Layout {
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("ExpenseExplorer.WebApp.Resources.Layout.NavMenu", typeof(NavMenu).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("ExpenseExplorer.WebApp.Resources.Components.Layout.NavMenu", typeof(NavMenu).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -48,6 +48,12 @@ namespace ExpenseExplorer.WebApp.Resources.Layout {
         internal static string Receipts {
             get {
                 return ResourceManager.GetString("Receipts", resourceCulture);
+            }
+        }
+        
+        internal static string Receipt_items {
+            get {
+                return ResourceManager.GetString("Receipt items", resourceCulture);
             }
         }
     }
