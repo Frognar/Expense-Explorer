@@ -32,4 +32,7 @@
     <data name="INVALID_PURCHASE_DATE" xml:space="preserve">
     <value>Invalid purchase date.</value>
   </data>
+    <data name="_Title" xml:space="preserve">
+        <value>New receipt</value>
+    </data>
 </root>

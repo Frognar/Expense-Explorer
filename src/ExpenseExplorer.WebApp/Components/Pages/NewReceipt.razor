@@ -6,6 +6,8 @@
 @inject IStringLocalizer<NewReceipt> Localizer
 @inject NavigationManager NavigationManager
 
+<PageTitle>@Localizer["_Title"]</PageTitle>
+
 <RadzenCard class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
     <RadzenStack Orientation="Orientation.Vertical">
         <RadzenFormField Text="@Localizer["Store"]">

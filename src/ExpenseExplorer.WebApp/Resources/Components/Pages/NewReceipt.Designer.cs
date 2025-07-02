@@ -86,5 +86,11 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("INVALID_PURCHASE_DATE", resourceCulture);
             }
         }
+        
+        internal static string _Title {
+            get {
+                return ResourceManager.GetString("_Title", resourceCulture);
+            }
+        }
     }
 }

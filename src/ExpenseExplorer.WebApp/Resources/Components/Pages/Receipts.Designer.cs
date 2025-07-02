@@ -45,9 +45,9 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string _Receipts {
+        internal static string _Title {
             get {
-                return ResourceManager.GetString("_Receipts", resourceCulture);
+                return ResourceManager.GetString("_Title", resourceCulture);
             }
         }
         

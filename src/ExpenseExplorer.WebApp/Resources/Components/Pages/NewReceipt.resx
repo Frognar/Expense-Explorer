@@ -39,4 +39,7 @@
     <data name="INVALID_PURCHASE_DATE" xml:space="preserve">
     <value>Nieprawidłowa data zakupu.</value>
   </data>
+    <data name="_Title" xml:space="preserve">
+        <value>Nowy paragon</value>
+    </data>
 </root>
