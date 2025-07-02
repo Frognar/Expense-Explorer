@@ -7,28 +7,28 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ExpenseExplorer.WebApp.Resources {
+namespace ExpenseExplorer.WebApp.Resources.Components {
     using System;
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class SharedResources {
+    internal class ConfirmationDialog {
         
         private static System.Resources.ResourceManager resourceMan;
         
         private static System.Globalization.CultureInfo resourceCulture;
         
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal SharedResources() {
+        internal ConfirmationDialog() {
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("ExpenseExplorer.WebApp.Resources.SharedResources", typeof(SharedResources).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("ExpenseExplorer.WebApp.Resources.Components.ConfirmationDialog", typeof(ConfirmationDialog).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

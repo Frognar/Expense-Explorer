@@ -22,13 +22,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>NewReceipt.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Update="Resources\SharedResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Shared.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Components\Pages\ReceiptItems.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ReceiptItems.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Components\ConfirmationDialog.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ConfirmationDialog.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -47,15 +47,15 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>NewReceipt.resx</DependentUpon>
     </Compile>
-    <Compile Update="Resources\SharedResources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>SharedResources.resx</DependentUpon>
-    </Compile>
     <Compile Update="Resources\Components\Pages\ReceiptItems.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>ReceiptItems.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Components\ConfirmationDialog.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConfirmationDialog.resx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

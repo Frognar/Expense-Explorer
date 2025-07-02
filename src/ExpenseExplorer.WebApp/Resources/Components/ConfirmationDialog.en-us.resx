@@ -14,25 +14,13 @@
     <data name="Are you sure?" xml:space="preserve">
         <value>Are you sure?</value>
     </data>
+    <data name="Confirm" xml:space="preserve">
+        <value>Confirm</value>
+    </data>
     <data name="No" xml:space="preserve">
         <value>No</value>
     </data>
     <data name="Yes" xml:space="preserve">
         <value>Yes</value>
-    </data>
-    <data name="Confirm" xml:space="preserve">
-        <value>Confirm</value>
-    </data>
-    <data name="From" xml:space="preserve">
-        <value>From</value>
-    </data>
-    <data name="To" xml:space="preserve">
-        <value>To</value>
-    </data>
-    <data name="Min" xml:space="preserve">
-        <value>Min</value>
-    </data>
-    <data name="Max" xml:space="preserve">
-        <value>Max</value>
     </data>
 </root>

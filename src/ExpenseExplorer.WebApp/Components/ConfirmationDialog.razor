@@ -1,4 +1,4 @@
-@inject IStringLocalizer<SharedResources> SharedLocalizer
+@inject IStringLocalizer<ConfirmationDialog> Localizer
 @inject DialogService DialogService
 
 @code {
@@ -6,12 +6,12 @@
     internal async Task<bool> IsConfirmed()
     {
         return await DialogService.Confirm(
-            SharedLocalizer["Are you sure?"],
-            SharedLocalizer["Confirm"],
+            Localizer["Are you sure?"],
+            Localizer["Confirm"],
             new ConfirmOptions
             {
-                CancelButtonText = SharedLocalizer["No"],
-                OkButtonText = SharedLocalizer["Yes"]
+                CancelButtonText = Localizer["No"],
+                OkButtonText = Localizer["Yes"]
             }) is true;
     }
 
