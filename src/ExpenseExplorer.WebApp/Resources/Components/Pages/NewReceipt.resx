@@ -30,4 +30,13 @@
     <data name="Cancel" xml:space="preserve">
         <value>Anuluj</value>
     </data>
+    <data name="EMPTY_STORE_NAME" xml:space="preserve">
+    <value>Nazwa sklepu nie może być pusta.</value>
+  </data>
+    <data name="PURCHASE_DATE_IN_FUTURE" xml:space="preserve">
+    <value>Data zakupu nie może być w przyszłości.</value>
+  </data>
+    <data name="INVALID_PURCHASE_DATE" xml:space="preserve">
+    <value>Nieprawidłowa data zakupu.</value>
+  </data>
 </root>
