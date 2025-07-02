@@ -26,8 +26,8 @@
     <data name="_Title" xml:space="preserve">
     <value>Pozycje paragonów</value>
   </data>
-    <data name="Page size" xml:space="preserve">
-    <value>Rozmiar strony</value>
+  <data name="Items per page" xml:space="preserve">
+    <value>Wierszy na stronę</value>
   </data>
     <data name="Page x of y (z items total)" xml:space="preserve">
     <value>Strona {0} z {1} (łącznie {2} pozycji)</value>

@@ -27,10 +27,10 @@
     <data name="Store" xml:space="preserve">
         <value>Sklep</value>
     </data>
-    <data name="PurchaseDate" xml:space="preserve">
+    <data name="Purchase date" xml:space="preserve">
         <value>Data zakupu</value>
     </data>
-    <data name="TotalCost" xml:space="preserve">
+    <data name="Total cost" xml:space="preserve">
         <value>Koszt całkowity</value>
     </data>
     <data name="From" xml:space="preserve">
@@ -48,16 +48,13 @@
     <data name="Search" xml:space="preserve">
         <value>Szukaj</value>
     </data>
-    <data name="PagingSummaryTemplate" xml:space="preserve">
-        <value>Wyświetlana strona {0} z {1} &lt;b&gt;(razem {2} rekordów)&lt;/b&gt;</value>
+    <data name="Page x of y (z items total)" xml:space="preserve">
+        <value>Strona {0} z {1} (łącznie {2} pozycji)</value>
     </data>
-    <data name="PageSizeText" xml:space="preserve">
-        <value>wierszy na stronę</value>
+    <data name="Items per page" xml:space="preserve">
+        <value>Wierszy na stronę</value>
     </data>
-    <data name="SelectedItemsText" xml:space="preserve">
-        <value>wybranych wierszy</value>
-    </data>
-    <data name="NewReceipt" xml:space="preserve">
+    <data name="New receipt" xml:space="preserve">
         <value>Nowy paragon</value>
     </data>
 </root>

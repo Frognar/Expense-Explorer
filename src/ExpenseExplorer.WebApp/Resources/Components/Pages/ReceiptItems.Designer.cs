@@ -51,9 +51,9 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string Page_size {
+        internal static string Items_per_page {
             get {
-                return ResourceManager.GetString("Page size", resourceCulture);
+                return ResourceManager.GetString("Items per page", resourceCulture);
             }
         }
         

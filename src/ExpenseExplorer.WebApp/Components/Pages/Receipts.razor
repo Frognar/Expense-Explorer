@@ -20,13 +20,13 @@
     PagerHorizontalAlign="HorizontalAlign.Center"
     ShowPagingSummary="true"
     PageSizeOptions="[10, 20]"
-    PageSizeText="@Localizer["PageSizeText"]"
+    PageSizeText="@Localizer["Items per page"]"
     AllowFiltering="true"
     FilterMode="FilterMode.Simple"
     AllowSorting="true"
     GotoFirstPageOnSort="true">
     <PagingSummaryTemplate>
-        @((MarkupString)string.Format(Localizer["PagingSummaryTemplate"], context.CurrentPage, context.NumberOfPages, context.TotalCount))
+        @((MarkupString)string.Format(Localizer["Page x of y (z items total)"], context.CurrentPage, context.NumberOfPages, context.TotalCount))
     </PagingSummaryTemplate>
     <Columns>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Store)" Title="@Localizer["Store"]">
@@ -37,7 +37,7 @@
         <RadzenDataGridColumn
             Property="@nameof(ReceiptDetails.PurchaseDate)"
             FormatString="{0:dd/MM/yyyy}"
-            Title="@Localizer["PurchaseDate"]"
+            Title="@Localizer["Purchase date"]"
             SortOrder="SortOrder.Descending">
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
@@ -48,12 +48,12 @@
                 </RadzenStack>
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(ReceiptDetails.TotalCost)" Title="@Localizer["TotalCost"]">
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetails.TotalCost)" Title="@Localizer["Total cost"]">
             <Template>
                 @string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", context.TotalCost)
             </Template>
             <FooterTemplate>
-                @Localizer["TotalCost"]: <b>@string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", _totalCost)</b>
+                @Localizer["Total cost"]: <b>@string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", _totalCost)</b>
             </FooterTemplate>
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
@@ -66,7 +66,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Id)" Filterable="false" Sortable="false" Width="145px" TextAlign="TextAlign.Center">
             <HeaderTemplate>
-                <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Text="@Localizer["NewReceipt"]" Click="@OnCreate" />
+                <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Text="@Localizer["New receipt"]" Click="@OnCreate" />
             </HeaderTemplate>
             <Template>
                 <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Click="@(() => OnEdit(context.Id))"/>

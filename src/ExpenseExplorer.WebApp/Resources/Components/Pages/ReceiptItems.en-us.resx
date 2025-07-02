@@ -14,8 +14,8 @@
     <data name="_Title" xml:space="preserve">
     <value>Receipt Items</value>
   </data>
-  <data name="Page size" xml:space="preserve">
-    <value>Page size</value>
+  <data name="Items per page" xml:space="preserve">
+    <value>Items per page</value>
   </data>
     <data name="Page x of y (z items total)" xml:space="preserve">
     <value>Page {0} of {1} ({2} items total)</value>

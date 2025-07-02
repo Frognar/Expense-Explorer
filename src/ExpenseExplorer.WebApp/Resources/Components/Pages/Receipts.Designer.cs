@@ -63,15 +63,15 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string PurchaseDate {
+        internal static string Purchase_date {
             get {
-                return ResourceManager.GetString("PurchaseDate", resourceCulture);
+                return ResourceManager.GetString("Purchase date", resourceCulture);
             }
         }
         
-        internal static string TotalCost {
+        internal static string Total_cost {
             get {
-                return ResourceManager.GetString("TotalCost", resourceCulture);
+                return ResourceManager.GetString("Total cost", resourceCulture);
             }
         }
         
@@ -105,27 +105,21 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string PagingSummaryTemplate {
+        internal static string Page_x_of_y__z_items_total_ {
             get {
-                return ResourceManager.GetString("PagingSummaryTemplate", resourceCulture);
+                return ResourceManager.GetString("Page x of y (z items total)", resourceCulture);
             }
         }
         
-        internal static string PageSizeText {
+        internal static string Items_per_page {
             get {
-                return ResourceManager.GetString("PageSizeText", resourceCulture);
+                return ResourceManager.GetString("Items per page", resourceCulture);
             }
         }
         
-        internal static string SelectedItemsText {
+        internal static string New_receipt {
             get {
-                return ResourceManager.GetString("SelectedItemsText", resourceCulture);
-            }
-        }
-        
-        internal static string NewReceipt {
-            get {
-                return ResourceManager.GetString("NewReceipt", resourceCulture);
+                return ResourceManager.GetString("New receipt", resourceCulture);
             }
         }
     }

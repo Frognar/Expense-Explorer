@@ -17,13 +17,13 @@
     <data name="Id" xml:space="preserve">
         <value>Id</value>
     </data>
-    <data name="PurchaseDate" xml:space="preserve">
+    <data name="Purchase date" xml:space="preserve">
         <value>Purchase date</value>
     </data>
     <data name="Store" xml:space="preserve">
         <value>Store</value>
     </data>
-    <data name="TotalCost" xml:space="preserve">
+    <data name="Total cost" xml:space="preserve">
         <value>Total cost</value>
     </data>
     <data name="From" xml:space="preserve">
@@ -41,16 +41,13 @@
     <data name="Search" xml:space="preserve">
         <value>Search</value>
     </data>
-    <data name="PagingSummaryTemplate" xml:space="preserve">
-        <value>Displaying page{0} of {1} &lt;b&gt;(total {2} records)&lt;/b&gt;</value>
+    <data name="Page x of y (z items total)" xml:space="preserve">
+        <value>Page {0} of {1} ({2} items total)</value>
     </data>
-    <data name="PageSizeText" xml:space="preserve">
-        <value>items per page</value>
+    <data name="Items per page" xml:space="preserve">
+        <value>Items per page</value>
     </data>
-    <data name="SelectedItemsText" xml:space="preserve">
-        <value>selected items</value>
-    </data>
-    <data name="NewReceipt" xml:space="preserve">
+    <data name="New receipt" xml:space="preserve">
         <value>New receipt</value>
     </data>
 </root>
