@@ -1,5 +1,6 @@
 using DotMaybe;
 using DotResult;
+using DotValid;
 
 namespace ExpenseExplorer.Application;
 

@@ -1,4 +1,5 @@
 using DotResult;
+using DotValid;
 using ExpenseExplorer.Application.Abstractions.Messaging;
 using ExpenseExplorer.Application.Domain.ValueObjects;
 
