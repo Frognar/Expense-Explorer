@@ -57,21 +57,21 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string PurchaseDate {
+        internal static string Purchase_date {
             get {
-                return ResourceManager.GetString("PurchaseDate", resourceCulture);
+                return ResourceManager.GetString("Purchase date", resourceCulture);
             }
         }
         
-        internal static string TotalCost {
+        internal static string Total_cost {
             get {
-                return ResourceManager.GetString("TotalCost", resourceCulture);
+                return ResourceManager.GetString("Total cost", resourceCulture);
             }
         }
         
-        internal static string ItemName {
+        internal static string Item_name {
             get {
-                return ResourceManager.GetString("ItemName", resourceCulture);
+                return ResourceManager.GetString("Item name", resourceCulture);
             }
         }
         
@@ -87,9 +87,9 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string UnitPrice {
+        internal static string Unit_price {
             get {
-                return ResourceManager.GetString("UnitPrice", resourceCulture);
+                return ResourceManager.GetString("Unit price", resourceCulture);
             }
         }
         
@@ -99,9 +99,9 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string PriceBeforeDiscount {
+        internal static string Price_before_discount {
             get {
-                return ResourceManager.GetString("PriceBeforeDiscount", resourceCulture);
+                return ResourceManager.GetString("Price before discount", resourceCulture);
             }
         }
         
@@ -111,15 +111,15 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string AddItem {
+        internal static string Add_item {
             get {
-                return ResourceManager.GetString("AddItem", resourceCulture);
+                return ResourceManager.GetString("Add item", resourceCulture);
             }
         }
         
-        internal static string PriceAfterDiscount {
+        internal static string Price_after_discount {
             get {
-                return ResourceManager.GetString("PriceAfterDiscount", resourceCulture);
+                return ResourceManager.GetString("Price after discount", resourceCulture);
             }
         }
     }

@@ -13,12 +13,12 @@
 <RadzenCard Variant="Variant.Outlined" class="rz-my-2 rz-mx-auto">
     <RadzenRow JustifyContent="JustifyContent.Center">
         <RadzenFormField Text="@Localizer["Store"]">
-            <RadzenAutoComplete @bind-Value="@_store" Data="_stores" OpenOnFocus="true" LoadData="OnStoresLoadData" @onfocusout="SaveReceipt"/>
+            <RadzenAutoComplete @bind-Value="@_store" Data="_stores" OpenOnFocus="true" LoadData="OnStoresLoadData" @onfocusout="@SaveReceipt"/>
         </RadzenFormField>
-        <RadzenFormField Text="@Localizer["PurchaseDate"]">
-            <RadzenDatePicker @bind-Value="@_purchaseDate" @onfocusout="SaveReceipt"/>
+        <RadzenFormField Text="@Localizer["Purchase date"]">
+            <RadzenDatePicker @bind-Value="@_purchaseDate" @onfocusout="@SaveReceipt"/>
         </RadzenFormField>
-        <RadzenFormField Text="@Localizer["TotalCost"]">
+        <RadzenFormField Text="@Localizer["Total cost"]">
             <RadzenTextBox Disabled="true" Value="@TotalCost.ToString("C2", new CultureInfo("pl-PL"))"/>
         </RadzenFormField>
     </RadzenRow>
@@ -36,7 +36,7 @@
     RowUpdate="@OnUpdateRow"
     RowCreate="@OnCreateRow">
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["ItemName"]">
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["Item name"]">
             <EditTemplate Context="purchase">
                 <RadzenAutoComplete @bind-Value="@purchase.ItemName" Data="_items" OpenOnFocus="true"
                                     LoadData="OnItemsLoadData"/>
@@ -56,7 +56,7 @@
                 <RadzenNumeric @bind-Value="@context.Quantity" ShowUpDown="false"/>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.UnitPrice)" Title="@Localizer["UnitPrice"]">
+        <RadzenDataGridColumn Property="@nameof(PurchaseDetails.UnitPrice)" Title="@Localizer["Unit price"]">
             <Template>
                 @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.UnitPrice)
             </Template>
@@ -65,7 +65,7 @@
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceBeforeDiscount)"
-                              Title="@Localizer["PriceBeforeDiscount"]">
+                              Title="@Localizer["Price before discount"]">
             <Template>
                 @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.PriceBeforeDiscount)
             </Template>
@@ -79,7 +79,7 @@
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceAfterDiscount)"
-                              Title="@Localizer["PriceAfterDiscount"]">
+                              Title="@Localizer["Price after discount"]">
             <Template>
                 @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.PriceAfterDiscount)
             </Template>
@@ -93,7 +93,7 @@
                               TextAlign="TextAlign.Center">
             <HeaderTemplate>
                 <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
-                              ButtonStyle="ButtonStyle.Success" Text="@Localizer["AddItem"]" Click="@InsertRow"/>
+                              ButtonStyle="ButtonStyle.Success" Text="@Localizer["Add item"]" Click="@InsertRow"/>
             </HeaderTemplate>
             <Template Context="purchase">
                 <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"

@@ -24,13 +24,13 @@
     <data name="Store" xml:space="preserve">
         <value>Sklep</value>
     </data>
-    <data name="PurchaseDate" xml:space="preserve">
+    <data name="Purchase date" xml:space="preserve">
         <value>Data zakupu</value>
     </data>
-    <data name="TotalCost" xml:space="preserve">
+    <data name="Total cost" xml:space="preserve">
         <value>Koszt całkowity</value>
     </data>
-    <data name="ItemName" xml:space="preserve">
+    <data name="Item name" xml:space="preserve">
         <value>Przedmiot</value>
     </data>
     <data name="Category" xml:space="preserve">
@@ -39,22 +39,22 @@
     <data name="Quantity" xml:space="preserve">
         <value>Ilość</value>
     </data>
-    <data name="UnitPrice" xml:space="preserve">
+    <data name="Unit price" xml:space="preserve">
         <value>Cena jednostkowa</value>
     </data>
     <data name="Discount" xml:space="preserve">
         <value>Zniżka</value>
     </data>
-    <data name="PriceBeforeDiscount" xml:space="preserve">
+    <data name="Price before discount" xml:space="preserve">
         <value>Cena przed rabatem</value>
     </data>
     <data name="Description" xml:space="preserve">
         <value>Opis</value>
     </data>
-    <data name="AddItem" xml:space="preserve">
+    <data name="Add item" xml:space="preserve">
         <value>Dodaj przedmiot</value>
     </data>
-    <data name="PriceAfterDiscount" xml:space="preserve">
+    <data name="Price after discount" xml:space="preserve">
         <value>Cena po rabacie</value>
     </data>
 </root>
