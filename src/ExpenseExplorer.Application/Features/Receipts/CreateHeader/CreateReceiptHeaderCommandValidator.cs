@@ -21,9 +21,13 @@ internal sealed class CreateReceiptHeaderCommandValidator(
 
     private static Validated<Store> ValidateStore(string storeName) =>
         Store.TryCreate(storeName)
-            .ToValidated(() => new ValidationError(nameof(storeName), "Store name cannot be empty"));
+            .ToValidated(() => new ValidationError(nameof(storeName), ErrorCodes.EmptyStoreName));
 
     private static Validated<PurchaseDate> ValidatePurchaseDate(DateOnly purchaseDate, DateOnly today) =>
-        PurchaseDate.TryCreate(purchaseDate, today)
-            .ToValidated(() => new ValidationError(nameof(purchaseDate), "Purchase date cannot be in the future"));
+        purchaseDate == DateOnly.MinValue
+            ? Validation.Failed<PurchaseDate>([
+                new ValidationError(nameof(purchaseDate), ErrorCodes.InvalidPurchaseDate)
+            ])
+            : PurchaseDate.TryCreate(purchaseDate, today)
+                .ToValidated(() => new ValidationError(nameof(purchaseDate), ErrorCodes.PurchaseDateInFuture));
 }
