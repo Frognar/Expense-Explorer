@@ -45,21 +45,21 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string _Receipts {
+        internal static string _Title {
             get {
-                return ResourceManager.GetString("_Receipts", resourceCulture);
+                return ResourceManager.GetString("_Title", resourceCulture);
             }
         }
         
-        internal static string PageSizeText {
+        internal static string Page_size {
             get {
-                return ResourceManager.GetString("PageSizeText", resourceCulture);
+                return ResourceManager.GetString("Page size", resourceCulture);
             }
         }
         
-        internal static string PagingSummaryTemplate {
+        internal static string Page_x_of_y__z_items_total_ {
             get {
-                return ResourceManager.GetString("PagingSummaryTemplate", resourceCulture);
+                return ResourceManager.GetString("Page x of y (z items total)", resourceCulture);
             }
         }
         
@@ -69,15 +69,9 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string SelectedItemsText {
+        internal static string Purchase_date {
             get {
-                return ResourceManager.GetString("SelectedItemsText", resourceCulture);
-            }
-        }
-        
-        internal static string PurchaseDate {
-            get {
-                return ResourceManager.GetString("PurchaseDate", resourceCulture);
+                return ResourceManager.GetString("Purchase date", resourceCulture);
             }
         }
         
@@ -93,9 +87,9 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string UnitPrice {
+        internal static string Unit_price {
             get {
-                return ResourceManager.GetString("UnitPrice", resourceCulture);
+                return ResourceManager.GetString("Unit price", resourceCulture);
             }
         }
         
@@ -111,9 +105,9 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string TotalCost {
+        internal static string Total_cost {
             get {
-                return ResourceManager.GetString("TotalCost", resourceCulture);
+                return ResourceManager.GetString("Total cost", resourceCulture);
             }
         }
         

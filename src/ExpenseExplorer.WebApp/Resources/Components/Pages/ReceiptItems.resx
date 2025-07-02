@@ -23,22 +23,19 @@
             PublicKeyToken=b77a5c561934e089
         </value>
     </resheader>
-    <data name="_Receipts" xml:space="preserve">
+    <data name="_Title" xml:space="preserve">
     <value>Pozycje paragonów</value>
   </data>
-    <data name="PageSizeText" xml:space="preserve">
+    <data name="Page size" xml:space="preserve">
     <value>Rozmiar strony</value>
   </data>
-    <data name="PagingSummaryTemplate" xml:space="preserve">
+    <data name="Page x of y (z items total)" xml:space="preserve">
     <value>Strona {0} z {1} (łącznie {2} pozycji)</value>
   </data>
     <data name="Store" xml:space="preserve">
     <value>Sklep</value>
   </data>
-    <data name="SelectedItemsText" xml:space="preserve">
-    <value>{0} wybranych</value>
-  </data>
-    <data name="PurchaseDate" xml:space="preserve">
+  <data name="Purchase date" xml:space="preserve">
     <value>Data zakupu</value>
   </data>
     <data name="Item" xml:space="preserve">
@@ -47,7 +44,7 @@
     <data name="Category" xml:space="preserve">
     <value>Kategoria</value>
   </data>
-    <data name="UnitPrice" xml:space="preserve">
+    <data name="Unit price" xml:space="preserve">
     <value>Cena jedn.</value>
   </data>
     <data name="Quantity" xml:space="preserve">
@@ -56,7 +53,7 @@
     <data name="Discount" xml:space="preserve">
     <value>Rabat</value>
   </data>
-    <data name="TotalCost" xml:space="preserve">
+    <data name="Total cost" xml:space="preserve">
     <value>Całkowity koszt</value>
   </data>
     <data name="Description" xml:space="preserve">

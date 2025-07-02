@@ -11,23 +11,20 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
-    <data name="_Receipts" xml:space="preserve">
+    <data name="_Title" xml:space="preserve">
     <value>Receipt Items</value>
   </data>
-    <data name="PageSizeText" xml:space="preserve">
-    <value>Page Size</value>
+  <data name="Page size" xml:space="preserve">
+    <value>Page size</value>
   </data>
-    <data name="PagingSummaryTemplate" xml:space="preserve">
+    <data name="Page x of y (z items total)" xml:space="preserve">
     <value>Page {0} of {1} ({2} items total)</value>
   </data>
     <data name="Store" xml:space="preserve">
     <value>Store</value>
   </data>
-    <data name="SelectedItemsText" xml:space="preserve">
-    <value>{0} selected</value>
-  </data>
-    <data name="PurchaseDate" xml:space="preserve">
-    <value>Purchase Date</value>
+  <data name="Purchase date" xml:space="preserve">
+    <value>Purchase date</value>
   </data>
     <data name="Item" xml:space="preserve">
     <value>Item</value>
@@ -35,7 +32,7 @@
     <data name="Category" xml:space="preserve">
     <value>Category</value>
   </data>
-    <data name="UnitPrice" xml:space="preserve">
+    <data name="Unit price" xml:space="preserve">
     <value>Unit Price</value>
   </data>
     <data name="Quantity" xml:space="preserve">
@@ -44,7 +41,7 @@
     <data name="Discount" xml:space="preserve">
     <value>Discount</value>
   </data>
-    <data name="TotalCost" xml:space="preserve">
+    <data name="Total cost" xml:space="preserve">
     <value>Total Cost</value>
   </data>
     <data name="Description" xml:space="preserve">
