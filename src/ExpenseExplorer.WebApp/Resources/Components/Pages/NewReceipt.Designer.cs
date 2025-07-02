@@ -51,9 +51,9 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
             }
         }
         
-        internal static string PurchaseDate {
+        internal static string Purchase_date {
             get {
-                return ResourceManager.GetString("PurchaseDate", resourceCulture);
+                return ResourceManager.GetString("Purchase date", resourceCulture);
             }
         }
         
