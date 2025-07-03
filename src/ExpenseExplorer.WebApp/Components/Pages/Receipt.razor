@@ -51,7 +51,9 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Quantity)" Title="@Localizer["Quantity"]">
             <Template>
-                @string.Format(new CultureInfo("pl-PL"), "{0:F3}", context.Quantity)
+                @(context.Quantity == Math.Truncate(context.Quantity)
+                    ? string.Format(new CultureInfo("pl-PL"), "{0:N0}", context.Quantity)
+                    : string.Format(new CultureInfo("pl-PL"), "{0:F3}", context.Quantity))
             </Template>
             <EditTemplate>
                 <RadzenNumeric ConvertValue="ConvertDecimal" @bind-Value="@context.Quantity" ShowUpDown="false"/>
