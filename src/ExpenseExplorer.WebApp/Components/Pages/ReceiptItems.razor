@@ -1,4 +1,5 @@
 @page "/receipt-items"
+@using System.Globalization
 @using ExpenseExplorer.WebApp.Models
 @using ExpenseExplorer.WebApp.Services
 @inject IStringLocalizer<ReceiptItems> Localizer
@@ -62,7 +63,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.UnitPrice)" Title="@Localizer["Unit price"]">
             <Template>
-                @string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", context.UnitPrice)
+                @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.UnitPrice)
             </Template>
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
@@ -79,7 +80,9 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Quantity)" Title="@Localizer["Quantity"]">
             <Template>
-                @string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:0.000}", context.Quantity)
+                @(context.Quantity == Math.Truncate(context.Quantity)
+                    ? string.Format(new CultureInfo("pl-PL"), "{0:N0}", context.Quantity)
+                    : string.Format(new CultureInfo("pl-PL"), "{0:F3}", context.Quantity))
             </Template>
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
@@ -96,7 +99,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Discount)" Title="@Localizer["Discount"]">
             <Template>
-                @string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", context.Discount)
+                @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.Discount)
             </Template>
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
@@ -113,10 +116,10 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Total)" Title="@Localizer["Total cost"]">
             <Template>
-                @string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", context.Total)
+                @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.Total)
             </Template>
             <FooterTemplate>
-                @Localizer["Total cost"]: <b>@string.Format(new System.Globalization.CultureInfo("pl-PL"), "{0:C}", _totalCost)</b>
+                @Localizer["Total cost"]: <b>@string.Format(new CultureInfo("pl-PL"), "{0:C}", _totalCost)</b>
             </FooterTemplate>
             <FilterTemplate>
                 <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
