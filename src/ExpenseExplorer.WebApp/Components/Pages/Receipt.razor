@@ -54,7 +54,7 @@
                 @string.Format(new CultureInfo("pl-PL"), "{0:F3}", context.Quantity)
             </Template>
             <EditTemplate>
-                <RadzenNumeric @bind-Value="@context.Quantity" ShowUpDown="false"/>
+                <RadzenNumeric ConvertValue="ConvertDecimal" @bind-Value="@context.Quantity" ShowUpDown="false"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.UnitPrice)" Title="@Localizer["Unit price"]">
@@ -62,7 +62,7 @@
                 @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.UnitPrice)
             </Template>
             <EditTemplate>
-                <RadzenNumeric @bind-Value="@context.UnitPrice" ShowUpDown="false"/>
+                <RadzenNumeric ConvertValue="ConvertDecimal" @bind-Value="@context.UnitPrice" ShowUpDown="false"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceBeforeDiscount)"
@@ -76,7 +76,7 @@
                 @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.Discount)
             </Template>
             <EditTemplate>
-                <RadzenNumeric @bind-Value="@context.Discount" ShowUpDown="false"/>
+                <RadzenNumeric ConvertValue="ConvertOptionalDecimal" @bind-Value="@context.Discount" ShowUpDown="false"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceAfterDiscount)"
@@ -318,5 +318,17 @@
                 _purchases = _purchases.Where(p => p.Id != purchase.Id);
                 return Task.FromResult(unit);
             });
+    }
+
+    private static decimal ConvertDecimal(string arg)
+    {
+        return decimal.TryParse(arg.Replace(",", "."), CultureInfo.InvariantCulture, out decimal result)
+            ? result
+            : Decimal.Zero;
+    }
+
+    private static decimal? ConvertOptionalDecimal(string? arg)
+    {
+        return arg is null ? null : ConvertDecimal(arg);
     }
 }
