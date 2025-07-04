@@ -200,7 +200,7 @@
             {
                 _store = _receipt.Store;
                 _purchaseDate = _receipt.PurchaseDate;
-                return await _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message)));
+                return await _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Message])));
             },
             unit =>
             {
