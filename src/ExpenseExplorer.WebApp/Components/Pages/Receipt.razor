@@ -296,7 +296,7 @@
         await result.MatchAsync(error =>
         {
             _grid.CancelEditRow(purchase);
-            return _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message)));
+            return _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Message])));
         }, purchaseId =>
         {
             purchase.Id = purchaseId;
