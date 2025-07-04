@@ -31,9 +31,9 @@
     TItem="PurchaseDetails"
     Count="@_count"
     Density="Density.Compact"
-    PagerHorizontalAlign="HorizontalAlign.Center"
     AllowSorting="true"
     EditMode="DataGridEditMode.Single"
+    EmptyText="@Localizer["No receipt items to display"]"
     RowUpdate="@OnUpdateRow">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["Item name"]">
