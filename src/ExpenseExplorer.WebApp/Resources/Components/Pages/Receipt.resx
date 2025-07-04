@@ -57,4 +57,22 @@
     <data name="Price after discount" xml:space="preserve">
         <value>Cena po rabacie</value>
     </data>
+    <data name="INVALID_RECEIPT_ID" xml:space="preserve">
+        <value>Nieprawidłowe id paragonu.</value>
+    </data>
+    <data name="EMPTY_ITEM_NAME" xml:space="preserve">
+        <value>Nazwa przedmiotu nie może być pusta.</value>
+    </data>
+    <data name="EMPTY_CATEGORY_NAME" xml:space="preserve">
+        <value>Nazwa kategorii nie może być pusta.</value>
+    </data>
+    <data name="INVALID_QUANTITY" xml:space="preserve">
+        <value>Ilość musi być większa niż zero.</value>
+    </data>
+    <data name="INVALID_UNIT_PRICE" xml:space="preserve">
+        <value>Cena musi być większa niż zero.</value>
+    </data>
+    <data name="INVALID_DISCOUNT" xml:space="preserve">
+        <value>Zniżka musi być większa niż zero.</value>
+    </data>
 </root>

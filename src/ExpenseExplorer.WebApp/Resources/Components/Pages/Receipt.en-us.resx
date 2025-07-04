@@ -50,4 +50,22 @@
     <data name="Price after discount" xml:space="preserve">
         <value>Price After Discount</value>
     </data>
+    <data name="INVALID_RECEIPT_ID" xml:space="preserve">
+        <value>Invalid receipt id.</value>
+    </data>
+    <data name="INVALID_UNIT_PRICE" xml:space="preserve">
+        <value>Unit price must be greater than zero.</value>
+    </data>
+    <data name="INVALID_QUANTITY" xml:space="preserve">
+        <value>Quantity must be greater than zero.</value>
+    </data>
+    <data name="EMPTY_CATEGORY_NAME" xml:space="preserve">
+        <value>Category name cannot be empty.</value>
+    </data>
+    <data name="EMPTY_ITEM_NAME" xml:space="preserve">
+        <value>Item name cannot be empty.</value>
+    </data>
+    <data name="INVALID_DISCOUNT" xml:space="preserve">
+        <value>Discount must be greater than zero.</value>
+    </data>
 </root>

@@ -122,5 +122,41 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("Price after discount", resourceCulture);
             }
         }
+        
+        internal static string INVALID_RECEIPT_ID {
+            get {
+                return ResourceManager.GetString("INVALID_RECEIPT_ID", resourceCulture);
+            }
+        }
+        
+        internal static string EMPTY_ITEM_NAME {
+            get {
+                return ResourceManager.GetString("EMPTY_ITEM_NAME", resourceCulture);
+            }
+        }
+        
+        internal static string EMPTY_CATEGORY_NAME {
+            get {
+                return ResourceManager.GetString("EMPTY_CATEGORY_NAME", resourceCulture);
+            }
+        }
+        
+        internal static string INVALID_QUANTITY {
+            get {
+                return ResourceManager.GetString("INVALID_QUANTITY", resourceCulture);
+            }
+        }
+        
+        internal static string INVALID_UNIT_PRICE {
+            get {
+                return ResourceManager.GetString("INVALID_UNIT_PRICE", resourceCulture);
+            }
+        }
+        
+        internal static string INVALID_DISCOUNT {
+            get {
+                return ResourceManager.GetString("INVALID_DISCOUNT", resourceCulture);
+            }
+        }
     }
 }
