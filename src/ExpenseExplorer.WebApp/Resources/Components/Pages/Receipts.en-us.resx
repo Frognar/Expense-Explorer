@@ -50,4 +50,7 @@
     <data name="New receipt" xml:space="preserve">
         <value>New receipt</value>
     </data>
+    <data name="No receipts to display" xml:space="preserve">
+        <value>No receipts to display</value>
+    </data>
 </root>

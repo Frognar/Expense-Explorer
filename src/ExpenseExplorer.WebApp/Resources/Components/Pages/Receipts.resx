@@ -57,4 +57,7 @@
     <data name="New receipt" xml:space="preserve">
         <value>Nowy paragon</value>
     </data>
+    <data name="No receipts to display" xml:space="preserve">
+        <value>Brak paragonów do wyświetlenia</value>
+    </data>
 </root>

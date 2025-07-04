@@ -122,5 +122,11 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("New receipt", resourceCulture);
             }
         }
+        
+        internal static string No_receipts_to_display {
+            get {
+                return ResourceManager.GetString("No receipts to display", resourceCulture);
+            }
+        }
     }
 }
