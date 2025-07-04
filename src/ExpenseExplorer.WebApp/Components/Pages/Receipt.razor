@@ -289,7 +289,7 @@
             await result.MatchAsync(
                 async error =>
                 {
-                    await _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message)));
+                    await _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Message])));
                     await _grid.EditRow(purchase);
                     return Unit.Instance;
                 },
