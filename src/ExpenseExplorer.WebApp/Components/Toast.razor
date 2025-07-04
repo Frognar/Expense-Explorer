@@ -10,6 +10,7 @@
             DialogService.Close();
         });
 
+        MarkupString content = (MarkupString)$"<p class='markup'>{message.Replace(Environment.NewLine, "<br>")}</p>";
         await DialogService.OpenAsync("", _ =>
         {
             return b =>
@@ -17,7 +18,7 @@
                 b.OpenElement(0, "RadzenRow");
                 b.OpenElement(1, "RadzenColumn");
                 b.AddAttribute(2, "Size", "12");
-                b.AddContent(3, message);
+                b.AddContent(3, content);
                 b.CloseElement();
                 b.CloseElement();
             };
