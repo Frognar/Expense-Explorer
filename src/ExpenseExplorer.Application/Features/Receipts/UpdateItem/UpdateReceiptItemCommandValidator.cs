@@ -29,30 +29,30 @@ internal sealed class UpdateReceiptItemCommandValidator(
     private static Validated<ReceiptItemId> ValidateReceiptItemId(Guid receiptItemId)
     {
         return ReceiptItemId.TryCreate(receiptItemId)
-            .ToValidated(() => new ValidationError(nameof(receiptItemId), "Receipt item ID cannot be empty"));
+            .ToValidated(() => new ValidationError(nameof(receiptItemId), ErrorCodes.InvalidReceiptItemId));
     }
 
     private static Validated<ReceiptId> ValidateReceiptId(Guid receiptId)
     {
         return ReceiptId.TryCreate(receiptId)
-            .ToValidated(() => new ValidationError(nameof(receiptId), "Receipt ID cannot be empty"));
+            .ToValidated(() => new ValidationError(nameof(receiptId), ErrorCodes.InvalidReceiptId));
     }
 
     private static Validated<Item> ValidateItem(string itemName) =>
         Item.TryCreate(itemName)
-            .ToValidated(() => new ValidationError(nameof(itemName), "Item name cannot be empty"));
+            .ToValidated(() => new ValidationError(nameof(itemName), ErrorCodes.EmptyItemName));
 
     private static Validated<Category> ValidateCategory(string categoryName) =>
         Category.TryCreate(categoryName)
-            .ToValidated(() => new ValidationError(nameof(categoryName), "Category name cannot be empty"));
+            .ToValidated(() => new ValidationError(nameof(categoryName), ErrorCodes.EmptyCategoryName));
 
     private static Validated<Quantity> ValidateQuantity(decimal quantity) =>
         Quantity.TryCreate(quantity)
-            .ToValidated(() => new ValidationError(nameof(quantity), "Quantity must be greater than zero"));
+            .ToValidated(() => new ValidationError(nameof(quantity), ErrorCodes.InvalidQuantity));
 
     private static Validated<Money> ValidateUnitPrice(decimal unitPrice) =>
         Money.TryCreate(unitPrice)
-            .ToValidated(() => new ValidationError(nameof(unitPrice), "Unit price must be greater than zero"));
+            .ToValidated(() => new ValidationError(nameof(unitPrice), ErrorCodes.InvalidUnitPrice));
 
     private static Validated<Maybe<Money>> ValidateDiscount(decimal? discount) =>
         discount is null
@@ -60,7 +60,7 @@ internal sealed class UpdateReceiptItemCommandValidator(
             : Money.TryCreate(discount.Value)
                 .Match(
                     none: () => Validation.Failed<Maybe<Money>>([
-                        new ValidationError(nameof(discount), "Discount must be greater than zero")
+                        new ValidationError(nameof(discount), ErrorCodes.InvalidDiscount)
                     ]),
                     some: money => Validation.Succeed(Some.With(money)));
 
