@@ -327,7 +327,7 @@
 
         Result<Unit> result = await ReceiptService.DeletePurchaseAsync(ReceiptId, purchase.Id);
         await result.MatchAsync(
-            error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message))),
+            error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Message]))),
             unit =>
             {
                 _purchases = _purchases.Where(p => p.Id != purchase.Id);
