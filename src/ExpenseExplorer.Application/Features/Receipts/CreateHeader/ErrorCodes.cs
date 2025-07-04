@@ -1,6 +1,6 @@
-namespace ExpenseExplorer.Application;
+namespace ExpenseExplorer.Application.Features.Receipts.CreateHeader;
 
-public static class ErrorCodes
+internal static class ErrorCodes
 {
     public const string EmptyStoreName = "EMPTY_STORE_NAME";
     public const string PurchaseDateInFuture = "PURCHASE_DATE_IN_FUTURE";
