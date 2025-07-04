@@ -71,4 +71,13 @@
     <data name="INVALID_RECEIPT_ITEM_ID" xml:space="preserve">
         <value>Invalid receipt item id.</value>
     </data>
+    <data name="EMPTY_STORE_NAME" xml:space="preserve">
+        <value>Store name cannot be empty.</value>
+    </data>
+    <data name="PURCHASE_DATE_IN_FUTURE" xml:space="preserve">
+        <value>Purchase date cannot be in the future.</value>
+    </data>
+    <data name="INVALID_PURCHASE_DATE" xml:space="preserve">
+        <value>Invalid purchase date.</value>
+    </data>
 </root>

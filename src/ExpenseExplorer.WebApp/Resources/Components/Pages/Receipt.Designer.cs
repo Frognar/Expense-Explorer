@@ -164,5 +164,23 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("INVALID_RECEIPT_ITEM_ID", resourceCulture);
             }
         }
+        
+        internal static string EMPTY_STORE_NAME {
+            get {
+                return ResourceManager.GetString("EMPTY_STORE_NAME", resourceCulture);
+            }
+        }
+        
+        internal static string PURCHASE_DATE_IN_FUTURE {
+            get {
+                return ResourceManager.GetString("PURCHASE_DATE_IN_FUTURE", resourceCulture);
+            }
+        }
+        
+        internal static string INVALID_PURCHASE_DATE {
+            get {
+                return ResourceManager.GetString("INVALID_PURCHASE_DATE", resourceCulture);
+            }
+        }
     }
 }
