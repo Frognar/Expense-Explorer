@@ -34,8 +34,7 @@
     PagerHorizontalAlign="HorizontalAlign.Center"
     AllowSorting="true"
     EditMode="DataGridEditMode.Single"
-    RowUpdate="@OnUpdateRow"
-    RowCreate="@OnCreateRow">
+    RowUpdate="@OnUpdateRow">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["Item name"]">
             <EditTemplate Context="purchase">
@@ -222,9 +221,15 @@
             return;
         }
 
-        PurchaseDetails purchase = new(Guid.CreateVersion7(), "", "", 0, 0, null, null);
-        _count++;
-        await _grid.InsertRow(purchase);
+        if (_purchases.Any(p => p.Id == Guid.Empty))
+        {
+            return;
+        }
+
+        PurchaseDetails purchase = new(Guid.Empty, "", "", 0, 0, null, null);
+        _purchases = _purchases.Prepend(purchase);
+        _count = _purchases.Count();
+        await _grid.EditRow(purchase);
     }
 
     private async Task EditRow(PurchaseDetails purchase)
@@ -245,32 +250,55 @@
 
     private void CancelEdit(PurchaseDetails purchase)
     {
-        if (_backup is not null)
+        _grid.CancelEditRow(purchase);
+
+        if (purchase.Id == Guid.Empty)
+        {
+            _purchases = _purchases.Where(p => p.Id != Guid.Empty).ToList();
+            _count = _purchases.Count();
+        }
+        else if (_backup is not null)
         {
             purchase.Update(_backup);
         }
-        else
-        {
-            _count--;
-        }
-
-        _grid.CancelEditRow(purchase);
+        
+        StateHasChanged();
     }
 
     private async Task OnUpdateRow(PurchaseDetails purchase)
     {
-        var result = await ReceiptService.UpdatePurchase(ReceiptId, purchase);
-        await result.MatchAsync(
-            error =>
-            {
-                purchase.Update(_backup!);
-                return _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message)));
-            },
-            unit =>
-            {
-                _purchases = ReplaceInline(_purchases, purchase);
-                return Task.FromResult(unit);
-            });
+        if (purchase.Id == Guid.Empty)
+        {
+            var result = await ReceiptService.AddPurchase(ReceiptId, purchase);
+            await result.MatchAsync(
+                async error =>
+                {
+                    await _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Message])));
+                    await _grid.EditRow(purchase);
+                    return Unit.Instance;
+                },
+                purchaseId =>
+                {
+                    purchase.Id = purchaseId;
+                    return Task.FromResult(Unit.Instance);
+                });
+        }
+        else
+        {
+            var result = await ReceiptService.UpdatePurchase(ReceiptId, purchase);
+            await result.MatchAsync(
+                async error =>
+                {
+                    await _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => e.Message)));
+                    await _grid.EditRow(purchase);
+                    return Unit.Instance;
+                },
+                unit =>
+                {
+                    _purchases = ReplaceInline(_purchases, purchase);
+                    return Task.FromResult(unit);
+                });
+        }
     }
 
     private static IEnumerable<PurchaseDetails> ReplaceInline(
@@ -288,21 +316,6 @@
                 yield return purchaseDetails;
             }
         }
-    }
-
-    private async Task OnCreateRow(PurchaseDetails purchase)
-    {
-        var result = await ReceiptService.AddPurchase(ReceiptId, purchase);
-        await result.MatchAsync(error =>
-        {
-            _grid.CancelEditRow(purchase);
-            return _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Message])));
-        }, purchaseId =>
-        {
-            purchase.Id = purchaseId;
-            _purchases = _purchases.Append(purchase);
-            return Task.FromResult(Unit.Instance);
-        });
     }
 
     private async Task Delete(PurchaseDetails purchase)
