@@ -87,4 +87,7 @@
     <data name="INVALID_PURCHASE_DATE" xml:space="preserve">
       <value>Nieprawidłowa data zakupu.</value>
     </data>
+    <data name="No receipt items to display" xml:space="preserve">
+        <value>Brak przedmiotów do wyświetlenia</value>
+    </data>
 </root>

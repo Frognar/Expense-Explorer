@@ -182,5 +182,11 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("INVALID_PURCHASE_DATE", resourceCulture);
             }
         }
+        
+        internal static string No_receipt_items_to_display {
+            get {
+                return ResourceManager.GetString("No receipt items to display", resourceCulture);
+            }
+        }
     }
 }
