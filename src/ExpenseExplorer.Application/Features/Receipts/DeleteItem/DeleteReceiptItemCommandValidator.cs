@@ -23,12 +23,12 @@ internal sealed class DeleteReceiptItemCommandValidator(
     private static Validated<ReceiptId> ValidateReceiptId(Guid receiptId)
     {
         return ReceiptId.TryCreate(receiptId)
-            .ToValidated(() => new ValidationError(nameof(receiptId), "Receipt ID cannot be empty"));
+            .ToValidated(() => new ValidationError(nameof(receiptId), ErrorCodes.InvalidReceiptId));
     }
 
     private static Validated<ReceiptItemId> ValidateReceiptItemId(Guid receiptItemId)
     {
         return ReceiptItemId.TryCreate(receiptItemId)
-            .ToValidated(() => new ValidationError(nameof(receiptItemId), "Receipt Item ID cannot be empty"));
+            .ToValidated(() => new ValidationError(nameof(receiptItemId), ErrorCodes.InvalidReceiptItemId));
     }
 }
