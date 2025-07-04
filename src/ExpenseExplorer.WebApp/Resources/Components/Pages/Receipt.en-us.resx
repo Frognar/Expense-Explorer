@@ -68,4 +68,7 @@
     <data name="INVALID_DISCOUNT" xml:space="preserve">
         <value>Discount must be greater than zero.</value>
     </data>
+    <data name="INVALID_RECEIPT_ITEM_ID" xml:space="preserve">
+        <value>Invalid receipt item id.</value>
+    </data>
 </root>

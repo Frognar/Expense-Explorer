@@ -75,4 +75,7 @@
     <data name="INVALID_DISCOUNT" xml:space="preserve">
         <value>Zniżka musi być większa niż zero.</value>
     </data>
+    <data name="INVALID_RECEIPT_ITEM_ID" xml:space="preserve">
+        <value>Nieprawidłowe id pozycji paragonu.</value>
+    </data>
 </root>

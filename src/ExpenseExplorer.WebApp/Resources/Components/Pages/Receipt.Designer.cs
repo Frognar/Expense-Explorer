@@ -158,5 +158,11 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("INVALID_DISCOUNT", resourceCulture);
             }
         }
+        
+        internal static string INVALID_RECEIPT_ITEM_ID {
+            get {
+                return ResourceManager.GetString("INVALID_RECEIPT_ITEM_ID", resourceCulture);
+            }
+        }
     }
 }
