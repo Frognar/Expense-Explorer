@@ -359,7 +359,7 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
             limit @pageSize offset @skip
         ";
 
-        DynamicParameters fullParameters = new(whereClauses);
+        DynamicParameters fullParameters = new(whereParameters);
         fullParameters.Add("pageSize", pageSize);
         fullParameters.Add("skip", skip);
         try

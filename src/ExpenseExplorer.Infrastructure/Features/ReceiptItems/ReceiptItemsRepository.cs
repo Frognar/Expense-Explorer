@@ -61,7 +61,7 @@ internal sealed class ReceiptItemsRepository(IDbConnectionFactory connectionFact
                           limit @pageSize offset @skip
                           """;
 
-        DynamicParameters fullParameters = new(whereClauses);
+        DynamicParameters fullParameters = new(whereParameters);
         fullParameters.Add("pageSize", pageSize);
         fullParameters.Add("skip", skip);
 
