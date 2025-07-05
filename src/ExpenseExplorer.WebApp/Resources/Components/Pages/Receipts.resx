@@ -60,4 +60,13 @@
     <data name="No receipts to display" xml:space="preserve">
         <value>Brak paragonów do wyświetlenia</value>
     </data>
+    <data name="INVALID_RECEIPT_ID" xml:space="preserve">
+        <value>Nieprawidłowe id paragonu.</value>
+    </data>
+    <data name="PURCHASE_DATE_IN_FUTURE" xml:space="preserve">
+        <value>Data zakupu nie może być w przyszłości.</value>
+    </data>
+    <data name="INVALID_PURCHASE_DATE" xml:space="preserve">
+        <value>Nieprawidłowa data zakupu.</value>
+    </data>
 </root>

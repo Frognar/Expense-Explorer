@@ -128,5 +128,23 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("No receipts to display", resourceCulture);
             }
         }
+        
+        internal static string INVALID_RECEIPT_ID {
+            get {
+                return ResourceManager.GetString("INVALID_RECEIPT_ID", resourceCulture);
+            }
+        }
+        
+        internal static string PURCHASE_DATE_IN_FUTURE {
+            get {
+                return ResourceManager.GetString("PURCHASE_DATE_IN_FUTURE", resourceCulture);
+            }
+        }
+        
+        internal static string INVALID_PURCHASE_DATE {
+            get {
+                return ResourceManager.GetString("INVALID_PURCHASE_DATE", resourceCulture);
+            }
+        }
     }
 }
