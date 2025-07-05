@@ -87,7 +87,7 @@ internal sealed class ReceiptItemsRepository(IDbConnectionFactory connectionFact
         catch (Exception ex)
         {
             return Failure.Fatal(
-                code: "DB_EXCEPTION",
+                code: ErrorCodes.DbException,
                 message: ex.Message,
                 metadata: new Dictionary<string, object> { { "StackTrace", ex.StackTrace ?? "" } });
         }
@@ -114,7 +114,7 @@ internal sealed class ReceiptItemsRepository(IDbConnectionFactory connectionFact
         catch (Exception ex)
         {
             return Failure.Fatal(
-                code: "DB_EXCEPTION",
+                code: ErrorCodes.DbException,
                 message: ex.Message,
                 metadata: new Dictionary<string, object> { { "StackTrace", ex.StackTrace ?? "" } });
         }

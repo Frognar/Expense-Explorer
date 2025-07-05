@@ -54,7 +54,7 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
         catch (Exception ex)
         {
             return Failure.Fatal(
-                code: "DB_EXCEPTION",
+                code: ErrorCodes.DbException,
                 message: ex.Message,
                 metadata: new Dictionary<string, object>
                 {
@@ -94,7 +94,10 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
 
             if (receiptDto is null)
             {
-                return Failure.NotFound(code: "RECEIPT_NOT_FOUND", message: "Receipt not found");
+                return Failure.NotFound(
+                    code: ErrorCodes.ReceiptNotFound,
+                    message: "Receipt not found",
+                    metadata: new Dictionary<string, object> { { "ReceiptId", receiptId.Value.ToString() } });
             }
 
             IEnumerable<ReceiptItemDto> receiptItemDtos = await connection
@@ -133,14 +136,14 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
                         .Map(items => r with { Items = items }))
                 .ToResult(() =>
                     Failure.Fatal(
-                        code: "DB_EXCEPTION",
+                        code: ErrorCodes.DbException,
                         message: "Invalid data stored in the database",
                         metadata: new Dictionary<string, object> { { "ReceiptId", receiptId.Value.ToString() } }));
         }
         catch (Exception ex)
         {
             return Failure.Fatal(
-                code: "DB_EXCEPTION",
+                code: ErrorCodes.DbException,
                 message: ex.Message,
                 metadata: new Dictionary<string, object>
                 {
@@ -204,7 +207,7 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
         catch (Exception ex)
         {
             return Failure.Fatal(
-                code: "DB_EXCEPTION",
+                code: ErrorCodes.DbException,
                 message: ex.Message,
                 metadata: new Dictionary<string, object>
                 {
@@ -302,7 +305,7 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
         {
             transaction.Rollback();
             return Failure.Fatal(
-                code: "DB_EXCEPTION",
+                code: ErrorCodes.DbException,
                 message: ex.Message,
                 metadata: new Dictionary<string, object>
                 {
@@ -369,7 +372,7 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
         catch (Exception ex)
         {
             return Failure.Fatal(
-                code: "DB_EXCEPTION",
+                code: ErrorCodes.DbException,
                 message: ex.Message,
                 metadata: new Dictionary<string, object>
                 {
@@ -404,7 +407,7 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
         catch (Exception ex)
         {
             return Failure.Fatal(
-                code: "DB_EXCEPTION",
+                code: ErrorCodes.DbException,
                 message: ex.Message,
                 metadata: new Dictionary<string, object>
                 {

@@ -26,7 +26,7 @@ internal sealed class CategoryRepository(IDbConnectionFactory connectionFactory)
         catch (Exception ex)
         {
             return Failure.Fatal(
-                code: "DB_EXCEPTION",
+                code: ErrorCodes.DbException,
                 message: ex.Message,
                 metadata: new Dictionary<string, object>
                 {
