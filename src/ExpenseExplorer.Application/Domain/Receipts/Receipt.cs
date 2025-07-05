@@ -118,8 +118,9 @@ public static class ReceiptExtensions
         if (isDiscountExceeding)
         {
             return Failure.Validation(
-                code: nameof(discount),
-                message: "Discount cannot be greater than the item's total value before discount.");
+                code: ErrorCodes.DiscountExceedsTotal,
+                message: "Discount cannot be greater than the item's total value before discount.",
+                metadata: new Dictionary<string, object> { { "PropertyName", nameof(discount) } });
         }
 
         return receipt with
