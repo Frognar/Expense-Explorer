@@ -89,4 +89,13 @@
     <data name="RECEIPT_NOT_FOUND" xml:space="preserve">
         <value>Receipt not found.</value>
     </data>
+    <data name="RECEIPT_DELETED" xml:space="preserve">
+        <value>Paragon is deleted. Cannot be modified.</value>
+    </data>
+    <data name="RECEIPT_ITEM_NOT_FOUND" xml:space="preserve">
+        <value>Receipt item not found.</value>
+    </data>
+    <data name="DISCOUNT_EXCEEDS_TOTAL" xml:space="preserve">
+        <value>Discount exceeds total.</value>
+    </data>
 </root>

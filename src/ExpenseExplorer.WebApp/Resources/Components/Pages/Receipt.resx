@@ -96,4 +96,13 @@
     <data name="RECEIPT_NOT_FOUND" xml:space="preserve">
         <value>Nie znaleziono paragonu.</value>
     </data>
+    <data name="RECEIPT_DELETED" xml:space="preserve">
+        <value>Paragon jest usunięty. Nie można modyfikować.</value>
+    </data>
+    <data name="RECEIPT_ITEM_NOT_FOUND" xml:space="preserve">
+        <value>Nie znaleziono przedmiotu paragonu.</value>
+    </data>
+    <data name="DISCOUNT_EXCEEDS_TOTAL" xml:space="preserve">
+        <value>Zniżka przekracza łączną kwotę.</value>
+    </data>
 </root>

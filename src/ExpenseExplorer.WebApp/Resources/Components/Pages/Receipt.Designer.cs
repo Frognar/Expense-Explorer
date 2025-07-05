@@ -200,5 +200,23 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("RECEIPT_NOT_FOUND", resourceCulture);
             }
         }
+        
+        internal static string RECEIPT_DELETED {
+            get {
+                return ResourceManager.GetString("RECEIPT_DELETED", resourceCulture);
+            }
+        }
+        
+        internal static string RECEIPT_ITEM_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("RECEIPT_ITEM_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        internal static string DISCOUNT_EXCEEDS_TOTAL {
+            get {
+                return ResourceManager.GetString("DISCOUNT_EXCEEDS_TOTAL", resourceCulture);
+            }
+        }
     }
 }
