@@ -18,9 +18,7 @@ internal sealed class DeleteReceiptHeaderCommandValidator(
             .BindAsync(cmd => inner.HandleAsync(cmd, cancellationToken));
     }
 
-    private static Validated<ReceiptId> ValidateReceiptId(Guid receiptId)
-    {
-        return ReceiptId.TryCreate(receiptId)
+    private static Validated<ReceiptId> ValidateReceiptId(Guid receiptId) =>
+        ReceiptId.TryCreate(receiptId)
             .ToValidated(() => new ValidationError(nameof(receiptId), ErrorCodes.InvalidReceiptId));
-    }
 }

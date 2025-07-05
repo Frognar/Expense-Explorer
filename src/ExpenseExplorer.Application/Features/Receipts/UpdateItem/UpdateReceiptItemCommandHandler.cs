@@ -17,9 +17,8 @@ internal sealed class UpdateReceiptItemCommandHandler(
             .MapAsync(_ => new UpdateReceiptItemResponse());
     }
 
-    private static Result<Receipt> UpdateItemToReceipt(Receipt receipt, UpdateReceiptItemCommand command)
-    {
-        return receipt.UpdateItem(new ReceiptItem(
+    private static Result<Receipt> UpdateItemToReceipt(Receipt receipt, UpdateReceiptItemCommand command) =>
+        receipt.UpdateItem(new ReceiptItem(
             command.ReceiptItemId,
             command.ReceiptId,
             command.Item,
@@ -28,5 +27,4 @@ internal sealed class UpdateReceiptItemCommandHandler(
             command.UnitPrice,
             command.Discount,
             command.Description));
-    }
 }

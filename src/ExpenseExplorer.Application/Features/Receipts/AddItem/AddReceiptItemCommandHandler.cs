@@ -16,9 +16,8 @@ internal sealed class AddReceiptItemCommandHandler(
                 .MapAsync(_ => new AddReceiptItemResponse(command.Id.Value));
     }
 
-    private static Result<Receipt> AddItemToReceipt(Receipt receipt, AddReceiptItemCommand command)
-    {
-        return receipt.AddItem(
+    private static Result<Receipt> AddItemToReceipt(Receipt receipt, AddReceiptItemCommand command) =>
+        receipt.AddItem(
             command.Id,
             command.Item,
             command.Category,
@@ -26,5 +25,4 @@ internal sealed class AddReceiptItemCommandHandler(
             command.UnitPrice,
             command.Discount,
             command.Description);
-    }
 }

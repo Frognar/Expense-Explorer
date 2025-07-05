@@ -26,17 +26,13 @@ internal sealed class UpdateReceiptItemCommandValidator(
             .BindAsync(cmd => inner.HandleAsync(cmd, cancellationToken));
     }
 
-    private static Validated<ReceiptItemId> ValidateReceiptItemId(Guid receiptItemId)
-    {
-        return ReceiptItemId.TryCreate(receiptItemId)
+    private static Validated<ReceiptItemId> ValidateReceiptItemId(Guid receiptItemId) =>
+        ReceiptItemId.TryCreate(receiptItemId)
             .ToValidated(() => new ValidationError(nameof(receiptItemId), ErrorCodes.InvalidReceiptItemId));
-    }
 
-    private static Validated<ReceiptId> ValidateReceiptId(Guid receiptId)
-    {
-        return ReceiptId.TryCreate(receiptId)
+    private static Validated<ReceiptId> ValidateReceiptId(Guid receiptId) =>
+        ReceiptId.TryCreate(receiptId)
             .ToValidated(() => new ValidationError(nameof(receiptId), ErrorCodes.InvalidReceiptId));
-    }
 
     private static Validated<Item> ValidateItem(string itemName) =>
         Item.TryCreate(itemName)

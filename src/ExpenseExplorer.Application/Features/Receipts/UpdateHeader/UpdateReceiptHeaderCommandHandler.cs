@@ -17,10 +17,8 @@ internal sealed class UpdateReceiptHeaderCommandHandler(
             .MapAsync(_ => new UpdateReceiptHeaderResponse());
     }
 
-    private static Result<Receipt> UpdateReceipt(Receipt receipt, UpdateReceiptHeaderCommand command)
-    {
-        return receipt.ToResult()
+    private static Result<Receipt> UpdateReceipt(Receipt receipt, UpdateReceiptHeaderCommand command) =>
+        receipt.ToResult()
             .Bind(r => r.UpdateStore(command.Store))
             .Bind(r => r.UpdatePurchaseDate(command.PurchaseDate));
-    }
 }

@@ -19,19 +19,15 @@ internal sealed class DuplicateReceiptCommandValidator(
             .BindAsync(cmd => inner.HandleAsync(cmd, cancellationToken));
     }
 
-    private static Validated<ReceiptId> ValidateReceiptId(Guid receiptId)
-    {
-        return ReceiptId.TryCreate(receiptId)
+    private static Validated<ReceiptId> ValidateReceiptId(Guid receiptId) =>
+        ReceiptId.TryCreate(receiptId)
             .ToValidated(() => new ValidationError(nameof(receiptId), ErrorCodes.InvalidReceiptId));
-    }
 
-    private static Validated<PurchaseDate> ValidatePurchaseDate(DateOnly purchaseDate, DateOnly today)
-    {
-        return purchaseDate == DateOnly.MinValue
+    private static Validated<PurchaseDate> ValidatePurchaseDate(DateOnly purchaseDate, DateOnly today) =>
+        purchaseDate == DateOnly.MinValue
             ? Validation.Failed<PurchaseDate>([
                 new ValidationError(nameof(purchaseDate), ErrorCodes.InvalidPurchaseDate)
             ])
             : PurchaseDate.TryCreate(purchaseDate, today)
                 .ToValidated(() => new ValidationError(nameof(purchaseDate), ErrorCodes.PurchaseDateInFuture));
-    }
 }
