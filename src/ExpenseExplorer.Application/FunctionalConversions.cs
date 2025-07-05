@@ -19,6 +19,9 @@ public static class FunctionalConversions
     public static Result<T> ToResult<T>(this Validated<T> source) =>
         source.Match(
             errors: errors => Fail.OfType<T>(
-                errors.Select(e => Failure.Validation(e.PropertyName, e.Error))),
+                errors.Select(e => Failure.Validation(
+                    code: e.Error,
+                    message: $"Validation failed for {e.PropertyName}",
+                    metadata: new Dictionary<string, object> { { "PropertyName", e.PropertyName } }))),
             value: Success.From);
 }
