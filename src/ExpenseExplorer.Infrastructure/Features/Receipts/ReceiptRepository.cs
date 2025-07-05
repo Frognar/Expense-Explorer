@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Data;
+using System.Globalization;
 using Dapper;
 using DotMaybe;
 using DotResult;
@@ -32,11 +33,10 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
 {
     public async Task<Result<Unit>> SaveNewReceiptHeaderAsync(Receipt receipt, CancellationToken cancellationToken)
     {
-        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
-        string query = """
-                       insert into receipts (id, store, purchase_date)
-                       values (@Id, @Store, @PurchaseDate)
-                       """;
+        const string query = """
+                             insert into receipts (id, store, purchase_date)
+                             values (@Id, @Store, @PurchaseDate)
+                             """;
 
         object parameters = new
         {
@@ -45,127 +45,173 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
             PurchaseDate = receipt.PurchaseDate.Date
         };
 
-        int result = await connection.ExecuteAsync(query, parameters);
-        return result > 0 ? Unit.Instance : Failure.Fatal("Receipt.SaveNewReceiptHeader.Failed");
+        try
+        {
+            using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+            await connection.ExecuteAsync(query, parameters);
+            return Unit.Instance ;
+        }
+        catch (Exception ex)
+        {
+            return Failure.Fatal(
+                code: "DB_EXCEPTION",
+                message: ex.Message,
+                metadata: new Dictionary<string, object>
+                {
+                    { "StackTrace", ex.StackTrace ?? "" },
+                    { "Receipt", receipt.ToString() }
+                });
+        }
     }
 
     public async Task<Result<Receipt>> GetReceiptByIdAsync(ReceiptId receiptId, CancellationToken cancellationToken)
     {
-        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
-        string receiptQuery = """
-                              select id as "Id", store as "Store", purchase_date as "PurchaseDate"
-                              from receipts
-                              where id = @Id
-                              """;
+        const string receiptQuery = """
+                                    select id as "Id", store as "Store", purchase_date as "PurchaseDate"
+                                    from receipts
+                                    where id = @Id
+                                    """;
 
-        ReceiptDto? receiptDto = await connection
-            .QueryFirstOrDefaultAsync<ReceiptDto>(receiptQuery, new { Id = receiptId.Value });
+        const string receiptItemsQuery = """
+                                         select
+                                            id as "Id"
+                                          , receipt_id as "ReceiptId"
+                                          , item as "Item"
+                                          , category as "Category"
+                                          , unit_price as "UnitPrice"
+                                          , quantity as "Quantity"
+                                          , discount as "Discount"
+                                          , description as "Description"
+                                         from receipt_items
+                                         where receipt_id = @ReceiptId
+                                         """;
 
-        if (receiptDto is null)
+        try
         {
-            return Failure.NotFound(code: "Receipt.GetById.NotFound", message: "Receipt not found");
+            using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+            ReceiptDto? receiptDto = await connection
+                .QueryFirstOrDefaultAsync<ReceiptDto>(receiptQuery, new { Id = receiptId.Value });
+
+            if (receiptDto is null)
+            {
+                return Failure.NotFound(code: "RECEIPT_NOT_FOUND", message: "Receipt not found");
+            }
+
+            IEnumerable<ReceiptItemDto> receiptItemDtos = await connection
+                .QueryAsync<ReceiptItemDto>(receiptItemsQuery, new { ReceiptId = receiptId.Value });
+
+            return (
+                    from rId in ReceiptId.TryCreate(receiptDto.Id)
+                    from store in Store.TryCreate(receiptDto.Store)
+                    from purchaseDate in PurchaseDate.TryCreate(receiptDto.PurchaseDate, receiptDto.PurchaseDate)
+                    select new Receipt(rId, store, purchaseDate, []))
+                .Bind(r =>
+                    receiptItemDtos.Select(receiptItem =>
+                            from id in ReceiptItemId.TryCreate(receiptItem.Id)
+                            from relatedReceiptId in ReceiptId.TryCreate(receiptItem.ReceiptId)
+                            from item in Item.TryCreate(receiptItem.Item)
+                            from category in Category.TryCreate(receiptItem.Category)
+                            from unitPrice in Money.TryCreate(receiptItem.UnitPrice)
+                            from quantity in Quantity.TryCreate(receiptItem.Quantity)
+                            from discount in receiptItem.Discount.HasValue
+                                ? Some.With(Money.TryCreate(receiptItem.Discount.Value))
+                                : Some.With(None.OfType<Money>())
+                            from description in receiptItem.Description is not null
+                                ? Some.With(new Description(receiptItem.Description))
+                                : Some.With(None.OfType<Description>())
+                            select new ReceiptItem(
+                                id,
+                                relatedReceiptId,
+                                item,
+                                category,
+                                quantity,
+                                unitPrice,
+                                discount,
+                                description)
+                        )
+                        .TraverseMaybeToImmutableList()
+                        .Map(items => r with { Items = items }))
+                .ToResult(() =>
+                    Failure.Fatal(
+                        code: "DB_EXCEPTION",
+                        message: "Invalid data stored in the database",
+                        metadata: new Dictionary<string, object> { { "ReceiptId", receiptId.Value.ToString() } }));
         }
-
-        string receiptItemsQuery = """
-                                   select
-                                      id as "Id"
-                                    , receipt_id as "ReceiptId"
-                                    , item as "Item"
-                                    , category as "Category"
-                                    , unit_price as "UnitPrice"
-                                    , quantity as "Quantity"
-                                    , discount as "Discount"
-                                    , description as "Description"
-                                   from receipt_items
-                                   where receipt_id = @ReceiptId
-                                   """;
-
-        IEnumerable<ReceiptItemDto> receiptItemDtos = await connection
-            .QueryAsync<ReceiptItemDto>(receiptItemsQuery, new { ReceiptId = receiptId.Value });
-
-        return (
-                from rId in ReceiptId.TryCreate(receiptDto.Id)
-                from store in Store.TryCreate(receiptDto.Store)
-                from purchaseDate in PurchaseDate.TryCreate(receiptDto.PurchaseDate, receiptDto.PurchaseDate)
-                select new Receipt(rId, store, purchaseDate, []))
-            .Bind(r =>
-                receiptItemDtos.Select(receiptItem =>
-                        from id in ReceiptItemId.TryCreate(receiptItem.Id)
-                        from relatedReceiptId in ReceiptId.TryCreate(receiptItem.ReceiptId)
-                        from item in Item.TryCreate(receiptItem.Item)
-                        from category in Category.TryCreate(receiptItem.Category)
-                        from unitPrice in Money.TryCreate(receiptItem.UnitPrice)
-                        from quantity in Quantity.TryCreate(receiptItem.Quantity)
-                        from discount in receiptItem.Discount.HasValue
-                            ? Some.With(Money.TryCreate(receiptItem.Discount.Value))
-                            : Some.With(None.OfType<Money>())
-                        from description in receiptItem.Description is not null
-                            ? Some.With(new Description(receiptItem.Description))
-                            : Some.With(None.OfType<Description>())
-                        select new ReceiptItem(
-                            id,
-                            relatedReceiptId,
-                            item,
-                            category,
-                            quantity,
-                            unitPrice,
-                            discount,
-                            description)
-                    )
-                    .TraverseMaybeToImmutableList()
-                    .Map(items => r with { Items = items }))
-            .ToResult(() =>
-                Failure.Custom(code: "Receipt.GetById.Invalid", message: "Invalid receipt", type: "InvalidReceipt"));
+        catch (Exception ex)
+        {
+            return Failure.Fatal(
+                code: "DB_EXCEPTION",
+                message: ex.Message,
+                metadata: new Dictionary<string, object>
+                {
+                    { "StackTrace", ex.StackTrace ?? "" },
+                    { "ReceiptId", receiptId.Value.ToString() }
+                });
+        }
     }
 
     public async Task<Result<Maybe<ReceiptDetails>>> GetReceiptByIdAsync(
         Guid receiptId,
         CancellationToken cancellationToken)
     {
-        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
-        string receiptQuery = """
+        const string receiptQuery = """
                               select id as "Id", store as "Store", purchase_date as "PurchaseDate"
                               from receipts
                               where id = @Id
                               """;
 
-        ReceiptDto? receiptDto = await connection
-            .QueryFirstOrDefaultAsync<ReceiptDto>(receiptQuery, new { Id = receiptId });
+        const string receiptItemsQuery = """
+                                         select
+                                            id as "Id"
+                                          , receipt_id as "ReceiptId"
+                                          , item as "Item"
+                                          , category as "Category"
+                                          , unit_price as "UnitPrice"
+                                          , quantity as "Quantity"
+                                          , discount as "Discount"
+                                          , description as "Description"
+                                         from receipt_items
+                                         where receipt_id = @ReceiptId
+                                         """;
 
-        if (receiptDto is null)
+        try
         {
-            return None.OfType<ReceiptDetails>();
+            using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+            ReceiptDto? receiptDto = await connection
+                .QueryFirstOrDefaultAsync<ReceiptDto>(receiptQuery, new { Id = receiptId });
+
+            if (receiptDto is null)
+            {
+                return None.OfType<ReceiptDetails>();
+            }
+
+            IEnumerable<ReceiptItemDto> receiptItemDtos = await connection
+                .QueryAsync<ReceiptItemDto>(receiptItemsQuery, new { ReceiptId = receiptId });
+
+            return Some.With(new ReceiptDetails(
+                receiptDto.Id,
+                receiptDto.Store,
+                receiptDto.PurchaseDate,
+                receiptItemDtos.Select(rItem => new ReceiptItemDetails(
+                    rItem.Id,
+                    rItem.Item,
+                    rItem.Category,
+                    rItem.UnitPrice,
+                    rItem.Quantity,
+                    rItem.Discount.HasValue ? Some.With(rItem.Discount.Value) : None.OfType<decimal>(),
+                    rItem.Description is not null ? Some.With(rItem.Description) : None.OfType<string>()))));
         }
-
-        string receiptItemsQuery = """
-                                   select
-                                      id as "Id"
-                                    , receipt_id as "ReceiptId"
-                                    , item as "Item"
-                                    , category as "Category"
-                                    , unit_price as "UnitPrice"
-                                    , quantity as "Quantity"
-                                    , discount as "Discount"
-                                    , description as "Description"
-                                   from receipt_items
-                                   where receipt_id = @ReceiptId
-                                   """;
-
-        IEnumerable<ReceiptItemDto> receiptItemDtos = await connection
-            .QueryAsync<ReceiptItemDto>(receiptItemsQuery, new { ReceiptId = receiptId });
-
-        return Some.With(new ReceiptDetails(
-            receiptDto.Id,
-            receiptDto.Store,
-            receiptDto.PurchaseDate,
-            receiptItemDtos.Select(rItem => new ReceiptItemDetails(
-                rItem.Id,
-                rItem.Item,
-                rItem.Category,
-                rItem.UnitPrice,
-                rItem.Quantity,
-                rItem.Discount.HasValue ? Some.With(rItem.Discount.Value) : None.OfType<decimal>(),
-                rItem.Description is not null ? Some.With(rItem.Description) : None.OfType<string>()))));
+        catch (Exception ex)
+        {
+            return Failure.Fatal(
+                code: "DB_EXCEPTION",
+                message: ex.Message,
+                metadata: new Dictionary<string, object>
+                {
+                    { "StackTrace", ex.StackTrace ?? "" },
+                    { "ReceiptId", receiptId.ToString() }
+                });
+        }
     }
 
     public async Task<Result<Unit>> SaveReceiptAsync(Receipt receipt, CancellationToken cancellationToken)
@@ -255,7 +301,14 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
         catch (Exception ex)
         {
             transaction.Rollback();
-            return Failure.Fatal("Receipt.Save.Failed", ex.Message);
+            return Failure.Fatal(
+                code: "DB_EXCEPTION",
+                message: ex.Message,
+                metadata: new Dictionary<string, object>
+                {
+                    { "StackTrace", ex.StackTrace ?? "" },
+                    { "Receipt", receipt.ToString() }
+                });
         }
     }
 
@@ -266,46 +319,8 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
         IEnumerable<ReceiptFilter> filters,
         CancellationToken cancellationToken)
     {
-        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
-        List<string> whereClauses = [];
-        DynamicParameters parameters = new();
-
-        int idx = 0;
-        foreach (ReceiptFilter f in filters)
-        {
-            if (f.Stores.Any())
-            {
-                whereClauses.Add($"r.store = any(@stores{idx})");
-                parameters.Add($"stores{idx}", f.Stores.ToArray());
-            }
-
-            if (f.PurchaseDateFrom.HasValue)
-            {
-                whereClauses.Add($"r.purchase_date >= @pdateFrom{idx}");
-                parameters.Add($"pdateFrom{idx}", f.PurchaseDateFrom.Value);
-            }
-
-            if (f.PurchaseDateTo.HasValue)
-            {
-                whereClauses.Add($"r.purchase_date <= @pdateTo{idx}");
-                parameters.Add($"pdateTo{idx}", f.PurchaseDateTo.Value);
-            }
-
-            if (f.TotalMin.HasValue)
-            {
-                whereClauses.Add($"total >= @tmin{idx}");
-                parameters.Add($"tmin{idx}", f.TotalMin.Value);
-            }
-
-            if (f.TotalMax.HasValue)
-            {
-                whereClauses.Add($"total <= @tmax{idx}");
-                parameters.Add($"tmax{idx}", f.TotalMax.Value);
-            }
-
-            idx++;
-        }
-
+        filters = filters.ToList();
+        (List<string> whereClauses, DynamicParameters whereParameters) = BuildWhereClausesAndParameters(filters);
         string where = whereClauses.Count != 0 ? $"where {string.Join(" and ", whereClauses)}" : "";
         string sqlBase = $"""
             from receipts r
@@ -320,7 +335,6 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
             """;
 
         string sqlCount = $"SELECT COUNT(*) {sqlBase}";
-        int totalCount = await connection.ExecuteScalarAsync<int>(sqlCount, parameters);
         string orderDir = order.Descending ? "DESC" : "ASC";
         string orderBy = order.OrderBy.ToUpperInvariant() switch
         {
@@ -341,18 +355,68 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
             order by {orderBy} {orderDir}
             limit @pageSize offset @skip
         ";
-        parameters.Add("pageSize", pageSize);
-        parameters.Add("skip", skip);
 
-        IEnumerable<ReceiptSummary> list = await connection.QueryAsync<ReceiptSummary>(sqlList, parameters);
-        return Page.Of(list.ToImmutableList(), (uint)totalCount);
+        DynamicParameters fullParameters = new(whereClauses);
+        fullParameters.Add("pageSize", pageSize);
+        fullParameters.Add("skip", skip);
+        try
+        {
+            using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+            int totalCount = await connection.ExecuteScalarAsync<int>(sqlCount, whereParameters);
+            IEnumerable<ReceiptSummary> list = await connection.QueryAsync<ReceiptSummary>(sqlList, fullParameters);
+            return Page.Of(list.ToImmutableList(), (uint)totalCount);
+        }
+        catch (Exception ex)
+        {
+            return Failure.Fatal(
+                code: "DB_EXCEPTION",
+                message: ex.Message,
+                metadata: new Dictionary<string, object>
+                {
+                    { "StackTrace", ex.StackTrace ?? "" },
+                    { "PageSize", pageSize.ToString(CultureInfo.InvariantCulture) },
+                    { "Skip", skip.ToString(CultureInfo.InvariantCulture) },
+                    { "Order", order.ToString() },
+                    { "Filters", string.Join(", ", filters.Select(f => f.ToString())) }
+                });
+        }
     }
 
     public async Task<Result<decimal>> GetTotalCostAsync(
         IEnumerable<ReceiptFilter> filters,
         CancellationToken cancellationToken)
     {
-        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+        filters = filters.ToList();
+        (List<string> whereClauses, DynamicParameters parameters) = BuildWhereClausesAndParameters(filters);
+        string where = whereClauses.Count != 0 ? $"where {string.Join(" and ", whereClauses)}" : "";
+        string sql = $@"
+            select coalesce(sum(ri.unit_price * ri.quantity - coalesce(ri.discount,0)), 0) as TotalCost
+            from receipts r
+            join receipt_items ri on ri.receipt_id = r.id
+            {where}
+        ";
+
+        try
+        {
+            using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+            return await connection.ExecuteScalarAsync<decimal>(sql, parameters);
+        }
+        catch (Exception ex)
+        {
+            return Failure.Fatal(
+                code: "DB_EXCEPTION",
+                message: ex.Message,
+                metadata: new Dictionary<string, object>
+                {
+                    { "StackTrace", ex.StackTrace ?? "" },
+                    { "Filters", string.Join(", ", filters.Select(f => f.ToString())) }
+                });
+        }
+    }
+
+    private static (List<string> whereClauses, DynamicParameters parameters) BuildWhereClausesAndParameters(
+        IEnumerable<ReceiptFilter> filters)
+    {
         List<string> whereClauses = [];
         DynamicParameters parameters = new();
 
@@ -392,15 +456,7 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
             idx++;
         }
 
-        string where = whereClauses.Count != 0 ? $"where {string.Join(" and ", whereClauses)}" : "";
-        string sql = $@"
-            select coalesce(sum(ri.unit_price * ri.quantity - coalesce(ri.discount,0)), 0) as TotalCost
-            from receipts r
-            join receipt_items ri on ri.receipt_id = r.id
-            {where}
-        ";
-
-        return await connection.ExecuteScalarAsync<decimal>(sql, parameters);
+        return (whereClauses, parameters);
     }
 
     private sealed record ReceiptDto(
