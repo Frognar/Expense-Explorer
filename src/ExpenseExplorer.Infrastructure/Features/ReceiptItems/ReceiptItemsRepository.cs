@@ -19,8 +19,7 @@ internal sealed class ReceiptItemsRepository(IDbConnectionFactory connectionFact
         IEnumerable<ReceiptItemFilter> filters,
         CancellationToken cancellationToken)
     {
-        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
-        (List<string> whereClauses, DynamicParameters parameters) = BuildWhereClausesAndParameters(filters);
+        (List<string> whereClauses, DynamicParameters whereParameters) = BuildWhereClausesAndParameters(filters);
         string where = whereClauses.Count != 0 ? $"where {string.Join(" and ", whereClauses)}" : "";
         string sqlBase = $"""
                           from receipt_items ri
@@ -29,7 +28,6 @@ internal sealed class ReceiptItemsRepository(IDbConnectionFactory connectionFact
                           """;
 
         string sqlCount = $"SELECT COUNT(*) {sqlBase}";
-        int totalCount = await connection.ExecuteScalarAsync<int>(sqlCount, parameters);
         string orderDir = order.Descending ? "DESC" : "ASC";
         string orderBy = order.OrderBy.ToUpperInvariant() switch
         {
@@ -63,30 +61,42 @@ internal sealed class ReceiptItemsRepository(IDbConnectionFactory connectionFact
                           limit @pageSize offset @skip
                           """;
 
-        parameters.Add("pageSize", pageSize);
-        parameters.Add("skip", skip);
+        DynamicParameters fullParameters = new(whereClauses);
+        fullParameters.Add("pageSize", pageSize);
+        fullParameters.Add("skip", skip);
 
-        IEnumerable<ReceiptItemDto> list = await connection.QueryAsync<ReceiptItemDto>(sqlList, parameters);
-        return Page.Of(list
-            .Select(i => new ReceiptItemDetails(
-                i.Id,
-                i.ReceiptId,
-                i.Store,
-                i.PurchaseDate,
-                i.Item,
-                i.Category,
-                i.UnitPrice,
-                i.Quantity,
-                i.Discount.HasValue ? Some.With(i.Discount.Value) : None.OfType<decimal>(),
-                i.Description is not null ? Some.With(i.Description) : None.OfType<string>()))
-            .ToImmutableList(), (uint)totalCount);
+        try
+        {
+            using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+            int totalCount = await connection.ExecuteScalarAsync<int>(sqlCount, whereParameters);
+            IEnumerable<ReceiptItemDto> list = await connection.QueryAsync<ReceiptItemDto>(sqlList, fullParameters);
+            return Page.Of(list
+                .Select(i => new ReceiptItemDetails(
+                    i.Id,
+                    i.ReceiptId,
+                    i.Store,
+                    i.PurchaseDate,
+                    i.Item,
+                    i.Category,
+                    i.UnitPrice,
+                    i.Quantity,
+                    i.Discount.HasValue ? Some.With(i.Discount.Value) : None.OfType<decimal>(),
+                    i.Description is not null ? Some.With(i.Description) : None.OfType<string>()))
+                .ToImmutableList(), (uint)totalCount);
+        }
+        catch (Exception ex)
+        {
+            return Failure.Fatal(
+                code: "DB_EXCEPTION",
+                message: ex.Message,
+                metadata: new Dictionary<string, object> { { "StackTrace", ex.StackTrace ?? "" } });
+        }
     }
 
     public async Task<Result<decimal>> GetTotalCostAsync(
         IEnumerable<ReceiptItemFilter> filters,
         CancellationToken cancellationToken)
     {
-        using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
         (List<string> whereClauses, DynamicParameters parameters) = BuildWhereClausesAndParameters(filters);
         string where = whereClauses.Count != 0 ? $"where {string.Join(" and ", whereClauses)}" : "";
         string sql = $"""
@@ -96,10 +106,22 @@ internal sealed class ReceiptItemsRepository(IDbConnectionFactory connectionFact
                       {where}
                       """;
 
-        return await connection.ExecuteScalarAsync<decimal>(sql, parameters);
+        try
+        {
+            using IDbConnection connection = await connectionFactory.CreateConnectionAsync(cancellationToken);
+            return await connection.ExecuteScalarAsync<decimal>(sql, parameters);
+        }
+        catch (Exception ex)
+        {
+            return Failure.Fatal(
+                code: "DB_EXCEPTION",
+                message: ex.Message,
+                metadata: new Dictionary<string, object> { { "StackTrace", ex.StackTrace ?? "" } });
+        }
     }
 
-    private static (List<string> whereClauses, DynamicParameters parameters) BuildWhereClausesAndParameters(IEnumerable<ReceiptItemFilter> filters)
+    private static (List<string> whereClauses, DynamicParameters parameters) BuildWhereClausesAndParameters(
+        IEnumerable<ReceiptItemFilter> filters)
     {
         List<string> whereClauses = [];
         DynamicParameters parameters = new();
