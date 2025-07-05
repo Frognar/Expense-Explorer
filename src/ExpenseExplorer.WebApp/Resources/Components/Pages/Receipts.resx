@@ -69,4 +69,10 @@
     <data name="INVALID_PURCHASE_DATE" xml:space="preserve">
         <value>Nieprawidłowa data zakupu.</value>
     </data>
+    <data name="DB_EXCEPTION" xml:space="preserve">
+        <value>Wystąpił nieoczekiwany błąd.</value>
+    </data>
+    <data name="RECEIPT_NOT_FOUND" xml:space="preserve">
+        <value>Nie znaleziono paragonu.</value>
+    </data>
 </root>

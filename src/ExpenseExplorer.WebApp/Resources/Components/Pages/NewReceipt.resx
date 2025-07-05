@@ -42,4 +42,7 @@
     <data name="_Title" xml:space="preserve">
         <value>Nowy paragon</value>
     </data>
+    <data name="DB_EXCEPTION" xml:space="preserve">
+        <value>Wystąpił nieoczekiwany błąd.</value>
+    </data>
 </root>

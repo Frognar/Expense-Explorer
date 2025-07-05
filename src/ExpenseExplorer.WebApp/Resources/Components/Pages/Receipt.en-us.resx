@@ -83,4 +83,10 @@
     <data name="No receipt items to display" xml:space="preserve">
         <value>No receipt items to display</value>
     </data>
+    <data name="DB_EXCEPTION" xml:space="preserve">
+        <value>An unexpected error has occurred.</value>
+    </data>
+    <data name="RECEIPT_NOT_FOUND" xml:space="preserve">
+        <value>Receipt not found.</value>
+    </data>
 </root>

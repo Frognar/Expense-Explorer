@@ -92,5 +92,11 @@ namespace ExpenseExplorer.WebApp.Resources.Components.Pages {
                 return ResourceManager.GetString("_Title", resourceCulture);
             }
         }
+        
+        internal static string DB_EXCEPTION {
+            get {
+                return ResourceManager.GetString("DB_EXCEPTION", resourceCulture);
+            }
+        }
     }
 }

@@ -35,4 +35,7 @@
     <data name="_Title" xml:space="preserve">
         <value>New receipt</value>
     </data>
+    <data name="DB_EXCEPTION" xml:space="preserve">
+        <value>An unexpected error has occurred.</value>
+    </data>
 </root>

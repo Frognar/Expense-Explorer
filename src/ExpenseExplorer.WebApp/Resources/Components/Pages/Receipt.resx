@@ -90,4 +90,10 @@
     <data name="No receipt items to display" xml:space="preserve">
         <value>Brak przedmiotów do wyświetlenia</value>
     </data>
+    <data name="DB_EXCEPTION" xml:space="preserve">
+        <value>Wystąpił nieoczekiwany błąd.</value>
+    </data>
+    <data name="RECEIPT_NOT_FOUND" xml:space="preserve">
+        <value>Nie znaleziono paragonu.</value>
+    </data>
 </root>

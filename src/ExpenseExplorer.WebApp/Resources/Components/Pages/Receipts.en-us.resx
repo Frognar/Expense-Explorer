@@ -62,4 +62,10 @@
     <data name="INVALID_PURCHASE_DATE" xml:space="preserve">
         <value>Invalid purchase date.</value>
     </data>
+    <data name="DB_EXCEPTION" xml:space="preserve">
+        <value>An unexpected error has occurred.</value>
+    </data>
+    <data name="RECEIPT_NOT_FOUND" xml:space="preserve">
+        <value>Receipt not found.</value>
+    </data>
 </root>
