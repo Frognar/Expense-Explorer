@@ -21,6 +21,6 @@ internal sealed class DeleteReceiptHeaderCommandValidator(
     private static Validated<ReceiptId> ValidateReceiptId(Guid receiptId)
     {
         return ReceiptId.TryCreate(receiptId)
-            .ToValidated(() => new ValidationError(nameof(receiptId), "Receipt ID cannot be empty"));
+            .ToValidated(() => new ValidationError(nameof(receiptId), ErrorCodes.InvalidReceiptId));
     }
 }
