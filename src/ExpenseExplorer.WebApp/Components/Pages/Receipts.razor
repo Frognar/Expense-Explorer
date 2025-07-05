@@ -127,7 +127,7 @@
     {
         Result<Guid> result = await ReceiptService.DuplicateReceipt(id);
         await result.MatchAsync(
-            error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Message]))),
+            error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Code]))),
             async receiptId =>
         {
             await _toast.OpenAsync("Copied");
@@ -145,7 +145,7 @@
 
         Result<Unit> result = await ReceiptService.DeleteReceiptAsync(receipt.Id);
         await result.MatchAsync(
-            error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Message]))),
+            error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Code]))),
             unit =>
         {
             _grid.Reload();

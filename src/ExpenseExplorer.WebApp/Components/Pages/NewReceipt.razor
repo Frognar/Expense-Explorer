@@ -50,7 +50,7 @@
         Result<Guid> result = await ReceiptService.CreateReceiptAsync(_store, _purchaseDate);
         await result
             .MatchAsync(
-                error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Message]))),
+                error => _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Code]))),
                 id => Task.FromResult(NavigateTo($"/receipts/{id}")));
     }
 
