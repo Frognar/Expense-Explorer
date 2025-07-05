@@ -16,156 +16,46 @@ public sealed record ReceiptItemFilter(
     decimal? TotalMax,
     string? Description)
 {
+    private static readonly ReceiptItemFilter Empty = new(
+        [],
+        [],
+        [],
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null);
+
     public static ReceiptItemFilter StoresIn(IEnumerable<string> stores) =>
-        new(
-            stores,
-            [],
-            [],
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null);
+        Empty with { Stores = stores };
 
     public static ReceiptItemFilter ItemsIn(IEnumerable<string> items) =>
-        new(
-            [],
-            items,
-            [],
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null);
+        Empty with { Items = items };
 
     public static ReceiptItemFilter CategoriesIn(IEnumerable<string> categories) =>
-        new(
-            [],
-            [],
-            categories,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null);
+        Empty with { Categories = categories };
 
     public static ReceiptItemFilter PurchaseDateBetween(DateOnly? from, DateOnly? to) =>
-        new(
-            [],
-            [],
-            [],
-            from,
-            to,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null);
+        Empty with { PurchaseDateFrom = from, PurchaseDateTo = to };
 
     public static ReceiptItemFilter UnitPriceBetween(decimal? min, decimal? max) =>
-        new(
-            [],
-            [],
-            [],
-            null,
-            null,
-            min,
-            max,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null);
+        Empty with { UnitPriceMin = min, UnitPriceMax = max };
 
     public static ReceiptItemFilter QuantityBetween(decimal? min, decimal? max) =>
-        new(
-            [],
-            [],
-            [],
-            null,
-            null,
-            null,
-            null,
-            min,
-            max,
-            null,
-            null,
-            null,
-            null,
-            null);
+        Empty with { QuantityMin = min, QuantityMax = max };
 
     public static ReceiptItemFilter DiscountBetween(decimal? min, decimal? max) =>
-        new(
-            [],
-            [],
-            [],
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            min,
-            max,
-            null,
-            null,
-            null);
+        Empty with { DiscountMin = min, DiscountMax = max };
 
     public static ReceiptItemFilter TotalBetween(decimal? min, decimal? max) =>
-        new(
-            [],
-            [],
-            [],
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            min,
-            max,
-            null);
+        Empty with { TotalMin = min, TotalMax = max };
 
     public static ReceiptItemFilter DescriptionContains(string? description) =>
-        new(
-            [],
-            [],
-            [],
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            description);
+        Empty with { Description = description };
 }
