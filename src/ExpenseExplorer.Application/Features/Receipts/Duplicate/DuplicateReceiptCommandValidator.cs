@@ -22,12 +22,16 @@ internal sealed class DuplicateReceiptCommandValidator(
     private static Validated<ReceiptId> ValidateReceiptId(Guid receiptId)
     {
         return ReceiptId.TryCreate(receiptId)
-            .ToValidated(() => new ValidationError(nameof(receiptId), "Receipt ID cannot be empty"));
+            .ToValidated(() => new ValidationError(nameof(receiptId), ErrorCodes.InvalidReceiptId));
     }
 
     private static Validated<PurchaseDate> ValidatePurchaseDate(DateOnly purchaseDate, DateOnly today)
     {
-        return PurchaseDate.TryCreate(purchaseDate, today)
-            .ToValidated(() => new ValidationError(nameof(purchaseDate), "Purchase date cannot be in the future"));
+        return purchaseDate == DateOnly.MinValue
+            ? Validation.Failed<PurchaseDate>([
+                new ValidationError(nameof(purchaseDate), ErrorCodes.InvalidPurchaseDate)
+            ])
+            : PurchaseDate.TryCreate(purchaseDate, today)
+                .ToValidated(() => new ValidationError(nameof(purchaseDate), ErrorCodes.PurchaseDateInFuture));
     }
 }
