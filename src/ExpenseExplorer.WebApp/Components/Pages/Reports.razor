@@ -14,7 +14,7 @@
     <RadzenDatePicker TValue="DateOnly?" @bind-Value="_dateTo" Change="DataChanged"/>
 </RadzenStack>
 
-@if (_categoryExpenses.Any() == false)
+@if (!_categoryExpenses.Any())
 {
     <p>@Localizer["No data to display"]</p>
 }
