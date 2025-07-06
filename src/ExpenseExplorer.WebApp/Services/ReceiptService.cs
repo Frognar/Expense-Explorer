@@ -14,6 +14,7 @@ using ExpenseExplorer.Application.Features.Receipts.GetReceipt;
 using ExpenseExplorer.Application.Features.Receipts.GetReceipts;
 using ExpenseExplorer.Application.Features.Receipts.UpdateHeader;
 using ExpenseExplorer.Application.Features.Receipts.UpdateItem;
+using ExpenseExplorer.Application.Features.Reports.GetCategoryReport;
 using ExpenseExplorer.Application.Features.Stores.GetStores;
 using ExpenseExplorer.WebApp.Models;
 using GetReceiptByIdQuery = ExpenseExplorer.Application.Features.Receipts.GetReceipt.GetReceiptByIdQuery;
@@ -33,8 +34,18 @@ internal sealed class ReceiptService(
     IQueryHandler<GetStoresRequest, GetStoresResponse> getStoresQueryHandler,
     IQueryHandler<GetItemsRequest, GetItemsResponse> getItemsQueryHandler,
     IQueryHandler<GetCategoriesRequest, GetCategoriesResponse> getCategoriesQueryHandler,
-    IQueryHandler<GetReceiptItemsQuery, GetReceiptItemsResponse> getReceiptItemsQueryHandler)
+    IQueryHandler<GetReceiptItemsQuery, GetReceiptItemsResponse> getReceiptItemsQueryHandler,
+    IQueryHandler<GetCategoryReportQuery, GetCategoryReportResponse> getCategoryReportQueryHandler)
 {
+    public async Task<IEnumerable<CategoryExpense>> GetCategoryReportAsync(DateOnly? from, DateOnly? to)
+    {
+        GetCategoryReportQuery query = new(from ?? DateOnly.MinValue, to ?? DateOnly.MaxValue);
+        Result<GetCategoryReportResponse> result = await getCategoryReportQueryHandler.HandleAsync(query, CancellationToken.None);
+        return result.Match(
+            failure: _ => [],
+            success: response => response.Categories);
+    }
+
     public async Task<ReceiptItemDetailsPage> GetReceiptItemsAsync(
         int pageSize,
         int skip,
