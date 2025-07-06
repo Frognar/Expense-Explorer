@@ -1,0 +1,65 @@
+@page "/reports"
+@using System.Globalization
+@using ExpenseExplorer.Application.Features.Reports.GetCategoryReport
+@using ExpenseExplorer.WebApp.Services
+@inject IStringLocalizer<Reports> Localizer
+@inject ReceiptService ReceiptService
+
+<PageTitle>@Localizer["_Title"]</PageTitle>
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+    <RadzenLabel Text="@($"{Localizer["From"]}:")"/>
+    <RadzenDatePicker TValue="DateOnly?" @bind-Value="_dateFrom" Change="DataChanged"/>
+    <RadzenLabel Text="@($"{Localizer["To"]}:")"/>
+    <RadzenDatePicker TValue="DateOnly?" @bind-Value="_dateTo" Change="DataChanged"/>
+</RadzenStack>
+
+@if (_categoryExpenses.Any() == false)
+{
+    <p>@Localizer["No data to display"]</p>
+}
+else
+{
+    <RadzenChart>
+        <RadzenPieSeries
+            Data="_categoryExpenses"
+            CategoryProperty="Category"
+            ValueProperty="Total"
+            TooltipTemplate="@_tooltipTemplate">
+            <RadzenSeriesDataLabels Visible="@true"/>
+            <RadzenValueAxis Formatter="@(o => ((double)o).ToString("c", new CultureInfo("pl-PL")))"/>
+            <RadzenLegend Position="LegendPosition.Left"/>
+        </RadzenPieSeries>
+    </RadzenChart>
+}
+
+@code {
+
+    readonly RenderFragment<CategoryExpense> _tooltipTemplate =
+        ce => @<div>
+                  <span>@ce.Category</span>:
+                  <strong>@ce.Total.ToString("c", new CultureInfo("pl-PL"))</strong>
+              </div>;
+
+    private DateOnly? _dateFrom = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1));
+    private DateOnly? _dateTo;
+    private IEnumerable<CategoryExpense> _categoryExpenses = [];
+
+    /// <inheritdoc />
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _categoryExpenses = await ReceiptService.GetCategoryReportAsync(_dateFrom, _dateTo);
+        StateHasChanged();
+    }
+
+    private async Task DataChanged()
+    {
+        await LoadData();
+    }
+
+}
