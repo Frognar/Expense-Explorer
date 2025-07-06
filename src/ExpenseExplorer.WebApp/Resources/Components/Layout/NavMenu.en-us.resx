@@ -17,4 +17,7 @@
     <data name="Receipt items" xml:space="preserve">
         <value>Receipt items</value>
     </data>
+    <data name="Reports" xml:space="preserve">
+        <value>Reports</value>
+    </data>
 </root>

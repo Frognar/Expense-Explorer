@@ -56,5 +56,11 @@ namespace ExpenseExplorer.WebApp.Resources.Layout {
                 return ResourceManager.GetString("Receipt items", resourceCulture);
             }
         }
+        
+        internal static string Reports {
+            get {
+                return ResourceManager.GetString("Reports", resourceCulture);
+            }
+        }
     }
 }
