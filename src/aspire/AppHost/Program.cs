@@ -4,7 +4,8 @@ IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(ar
 
 IResourceBuilder<PostgresServerResource> postgres = builder
     .AddPostgres("postgres")
-    .WithLifetime(ContainerLifetime.Persistent);
+    .WithLifetime(ContainerLifetime.Persistent)
+    .WithDataVolume();
 
 IResourceBuilder<PostgresDatabaseResource> db = postgres
     .CreateDatabase("expense-explorer");
