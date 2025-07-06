@@ -11,6 +11,7 @@ using ExpenseExplorer.Application.Features.Receipts.GetReceipt;
 using ExpenseExplorer.Application.Features.Receipts.GetReceipts;
 using ExpenseExplorer.Application.Features.Receipts.UpdateHeader;
 using ExpenseExplorer.Application.Features.Receipts.UpdateItem;
+using ExpenseExplorer.Application.Features.Reports.GetCategoryReport;
 using ExpenseExplorer.Application.Features.Stores.GetStores;
 using ExpenseExplorer.Infrastructure.Database;
 using ExpenseExplorer.Infrastructure.Database.TypeHandlers;
@@ -18,6 +19,7 @@ using ExpenseExplorer.Infrastructure.Features.Categories;
 using ExpenseExplorer.Infrastructure.Features.Items;
 using ExpenseExplorer.Infrastructure.Features.ReceiptItems;
 using ExpenseExplorer.Infrastructure.Features.Receipts;
+using ExpenseExplorer.Infrastructure.Features.Reports;
 using ExpenseExplorer.Infrastructure.Features.Stores;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -41,7 +43,8 @@ public static class InfrastructureExtensions
             .AddScoped<IGetStoresPersistence, StoreRepository>()
             .AddScoped<IGetItemsPersistence, ItemRepository>()
             .AddScoped<IGetCategoriesPersistence, CategoryRepository>()
-            .AddScoped<IGetReceiptItemsPersistence, ReceiptItemsRepository>();
+            .AddScoped<IGetReceiptItemsPersistence, ReceiptItemsRepository>()
+            .AddScoped<IGetCategoryReportPersistence, ReportRepository>();
     }
 
     public static IServiceCollection AddDatabase(
