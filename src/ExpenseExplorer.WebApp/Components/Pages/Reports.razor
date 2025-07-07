@@ -2,8 +2,10 @@
 @using System.Globalization
 @using ExpenseExplorer.Application.Features.Reports.GetCategoryReport
 @using ExpenseExplorer.WebApp.Services
+@using Microsoft.AspNetCore.WebUtilities
 @inject IStringLocalizer<Reports> Localizer
 @inject ReceiptService ReceiptService
+@inject IJSRuntime JsRuntime
 
 <PageTitle>@Localizer["_Title"]</PageTitle>
 
@@ -20,7 +22,7 @@
 }
 else
 {
-    <RadzenChart>
+    <RadzenChart Style="height: 600px; width: 100%" SeriesClick="@SeriesClicked">
         <RadzenPieSeries
             Data="_categoryExpenses"
             CategoryProperty="Category"
@@ -60,6 +62,28 @@ else
     private async Task DataChanged()
     {
         await LoadData();
+    }
+
+    private async Task SeriesClicked(SeriesClickEventArgs args)
+    {
+        Dictionary<string, string?> query = [];
+        query.Add(nameof(ReceiptItems.Category), args.Category.ToString()!);
+        if (_dateFrom.HasValue)
+        {
+            query.Add(nameof(ReceiptItems.PurchaseDateFrom), new DateTime(
+                    _dateFrom.Value, TimeOnly.MinValue, DateTimeKind.Local)
+                .ToString(CultureInfo.InvariantCulture));
+        }
+
+        if (_dateTo.HasValue)
+        {
+            query.Add(nameof(ReceiptItems.PurchaseDateTo), new DateTime(
+                    _dateTo.Value, TimeOnly.MinValue, DateTimeKind.Local)
+                .ToString(CultureInfo.InvariantCulture));
+        }
+
+        string url = QueryHelpers.AddQueryString("/receipt-items", query);
+        await JsRuntime.InvokeAsync<object>("open", url, "_blank");
     }
 
 }
