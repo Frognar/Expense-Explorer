@@ -148,6 +148,28 @@
 </RadzenDataGrid>
 
 @code {
+
+    /// <summary>
+    /// The category name to filter receipt items by. When specified, only items matching this category will be displayed.
+    /// </summary>
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Category { get; set; }
+
+    /// <summary>
+    /// The starting date for filtering receipt items by purchase date. When specified, only items purchased on or after this date will be displayed.
+    /// </summary>
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public DateTime? PurchaseDateFrom { get; set; }
+
+    /// <summary>
+    /// The ending date for filtering receipt items by purchase date. When specified, only items purchased on or before this date will be displayed.
+    /// </summary>
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public DateTime? PurchaseDateTo { get; set; }
+    
     private RadzenDataGrid<ReceiptItemDetails> _grid = null!;
     private int _count;
     private decimal _totalCost = decimal.Zero;
@@ -178,6 +200,9 @@
         _stores = await ReceiptService.GetStoresAsync();
         _items = await ReceiptService.GetItemsAsync();
         _categories = await ReceiptService.GetCategoriesAsync();
+        _selectedCategories = _categories.Where(c => c == Category);
+        _purchaseDateFrom = PurchaseDateFrom.HasValue ? DateOnly.FromDateTime(PurchaseDateFrom.Value) : _purchaseDateFrom;
+        _purchaseDateTo = PurchaseDateTo.HasValue ? DateOnly.FromDateTime(PurchaseDateTo.Value) : _purchaseDateTo;
         await base.OnInitializedAsync();
     }
 
