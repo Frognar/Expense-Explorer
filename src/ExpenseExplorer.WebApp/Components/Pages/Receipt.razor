@@ -8,6 +8,7 @@
 @inject IStringLocalizer<Receipt> Localizer
 @inject ReceiptService ReceiptService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
 
 <PageTitle>@Localizer["_Title"]</PageTitle>
 
@@ -94,8 +95,12 @@
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Id)" Filterable="false" Sortable="false" Width="150px"
                               TextAlign="TextAlign.Center">
             <HeaderTemplate>
-                <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
-                              ButtonStyle="ButtonStyle.Success" Text="@Localizer["Add item"]" Click="@InsertRow"/>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" JustifyContent="JustifyContent.Center">
+                    <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
+                                  ButtonStyle="ButtonStyle.Success" Text="@Localizer["Add item"]" Click="@InsertRow"/>
+                    <RadzenButton Icon="download" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
+                                  ButtonStyle="ButtonStyle.Primary" Text="@Localizer["Export"]" Click="@ExportReceipt"/>
+                </RadzenStack>
             </HeaderTemplate>
             <Template Context="purchase">
                 <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
@@ -345,5 +350,32 @@
     private static decimal? ConvertOptionalDecimal(string? arg)
     {
         return arg is null ? null : ConvertDecimal(arg);
+    }
+
+    private async Task ExportReceipt()
+    {
+        var result = await ReceiptService.GetReceiptAsync(ReceiptId);
+        await result.MatchAsync(
+            async error =>
+            {
+                await _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Code])));
+                return Unit.Instance;
+            },
+            async maybe =>
+            {
+                return await maybe.MatchAsync(
+                    none: async () =>
+                    {
+                        await _toast.OpenAsync(string.Join(Environment.NewLine, Localizer["RECEIPT_NOT_FOUND"]));
+                        return Unit.Instance;
+                    },
+                    some: async receipt =>
+                    {
+                        var csv = receipt.ToCsv();
+                        var fileName = $"{receipt.Store}-{receipt.PurchaseDate:yyyy-MM-dd}.csv";
+                        await JsRuntime.InvokeVoidAsync("downloadFile", fileName, "text/csv", csv);
+                        return Unit.Instance;
+                    });
+            });
     }
 }
