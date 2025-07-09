@@ -6,6 +6,8 @@
     <File Path="LICENSE" />
     <File Path="README.md" />
     <File Path=".editorconfig" />
+    <File Path="Dockerfile" />
+    <File Path="docker-compose.yaml" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src\ExpenseExplorer.Application\ExpenseExplorer.Application.csproj" Type="Classic C#" />
