@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: expense-explorer-db
+    environment:
+      - POSTGRES_DB=expense_explorer
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  webapp:
+    container_name: expense-explorer-webapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__expense-explorer=Host=db;Port=5432;Database=expense_explorer;Username=user;Password=password
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
