@@ -8,6 +8,7 @@ COPY ["src/ExpenseExplorer.Infrastructure/ExpenseExplorer.Infrastructure.csproj"
 COPY ["src/aspire/AppHost/AppHost.csproj", "src/aspire/AppHost/"]
 COPY ["Directory.Packages.props", "./"]
 COPY ["Directory.Build.props", "./"]
+COPY [".editorconfig", "./"]
 
 RUN dotnet restore "ExpenseExplorer.slnx"
 
