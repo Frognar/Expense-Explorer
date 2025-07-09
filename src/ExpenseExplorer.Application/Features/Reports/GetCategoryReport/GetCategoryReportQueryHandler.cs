@@ -11,6 +11,7 @@ public sealed class GetCategoryReportQueryHandler(IGetCategoryReportPersistence 
         CancellationToken cancellationToken)
     {
         return await persistence.GetCategoryReportAsync(query.From, query.To, cancellationToken)
+            .MapAsync(expenses => expenses.OrderByDescending(e => e.Total))
             .MapAsync(expenses => new GetCategoryReportResponse(expenses));
     }
 }
