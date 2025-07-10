@@ -25,7 +25,8 @@
     AllowFiltering="true"
     FilterMode="FilterMode.Simple"
     AllowSorting="true"
-    GotoFirstPageOnSort="true">
+    GotoFirstPageOnSort="true"
+    Responsive="true">
     <PagingSummaryTemplate>
         @((MarkupString)string.Format(Localizer["Page x of y (z items total)"], context.CurrentPage, context.NumberOfPages, context.TotalCount))
     </PagingSummaryTemplate>

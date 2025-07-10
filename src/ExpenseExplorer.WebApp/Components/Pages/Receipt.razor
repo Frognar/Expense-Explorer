@@ -35,7 +35,8 @@
     AllowSorting="true"
     EditMode="DataGridEditMode.Single"
     EmptyText="@Localizer["No receipt items to display"]"
-    RowUpdate="@OnUpdateRow">
+    RowUpdate="@OnUpdateRow"
+    Responsive="true">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["Item name"]">
             <EditTemplate Context="purchase">
