@@ -30,7 +30,7 @@
     <Columns>
         <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Store)" Title="@Localizer["Store"]">
             <FilterTemplate>
-                <RadzenDropDown @bind-Value="@_selectedStores" Data="@_stores" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" Style="width:100%"/>
+                <RadzenDropDown @bind-Value="@_selectedStores" Data="@_stores" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Style="width:100%"/>
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn
@@ -53,12 +53,12 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Item)" Title="@Localizer["Item"]">
             <FilterTemplate>
-                <RadzenDropDown @bind-Value="@_selectedItems" Data="@_items" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" Style="width:100%"/>
+                <RadzenDropDown @bind-Value="@_selectedItems" Data="@_items" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Style="width:100%"/>
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.Category)" Title="@Localizer["Category"]">
             <FilterTemplate>
-                <RadzenDropDown @bind-Value="@_selectedCategories" Data="@_categories" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" Style="width:100%"/>
+                <RadzenDropDown @bind-Value="@_selectedCategories" Data="@_categories" AllowVirtualization="true" AllowFiltering="true" AllowClear="true" Multiple="true" Chips="true" SelectedItemsText="@Localizer["SelectedItemsText"]" Change="@Reload" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Style="width:100%"/>
             </FilterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(ReceiptItemDetails.UnitPrice)" Title="@Localizer["Unit price"]">
