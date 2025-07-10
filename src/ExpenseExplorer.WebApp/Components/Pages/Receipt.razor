@@ -40,13 +40,13 @@
     <Columns>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["Item name"]">
             <EditTemplate Context="purchase">
-                <RadzenAutoComplete @bind-Value="@purchase.ItemName" Data="_items" OpenOnFocus="true"
+                <RadzenAutoComplete @ref="_itemAutoComplete" SelectedItemChanged="_ => FocusOn(_itemAutoComplete)" TabIndex="1" @bind-Value="@purchase.ItemName" Data="_items" OpenOnFocus="true"
                                     LoadData="OnItemsLoadData" class="w-100"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Category)" Title="@Localizer["Category"]">
             <EditTemplate Context="purchase">
-                <RadzenAutoComplete @bind-Value="@purchase.Category" Data="_categories" OpenOnFocus="true"
+                <RadzenAutoComplete @ref="_categoryAutoComplete" SelectedItemChanged="_ => FocusOn(_categoryAutoComplete)" TabIndex="2" @bind-Value="@purchase.Category" Data="_categories" OpenOnFocus="true"
                                     LoadData="OnCategoriesLoadData" class="w-100"/>
             </EditTemplate>
         </RadzenDataGridColumn>
@@ -57,7 +57,7 @@
                     : string.Format(new CultureInfo("pl-PL"), "{0:F3}", context.Quantity))
             </Template>
             <EditTemplate>
-                <RadzenNumeric ConvertValue="ConvertDecimal" @bind-Value="@context.Quantity" ShowUpDown="false" class="w-100"/>
+                <RadzenNumeric TabIndex="3" ConvertValue="ConvertDecimal" @bind-Value="@context.Quantity" ShowUpDown="false" class="w-100"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.UnitPrice)" Title="@Localizer["Unit price"]">
@@ -65,7 +65,7 @@
                 @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.UnitPrice)
             </Template>
             <EditTemplate>
-                <RadzenNumeric ConvertValue="ConvertDecimal" @bind-Value="@context.UnitPrice" ShowUpDown="false" class="w-100"/>
+                <RadzenNumeric TabIndex="4" ConvertValue="ConvertDecimal" @bind-Value="@context.UnitPrice" ShowUpDown="false" class="w-100"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceBeforeDiscount)"
@@ -79,7 +79,7 @@
                 @string.Format(new CultureInfo("pl-PL"), "{0:C}", context.Discount)
             </Template>
             <EditTemplate>
-                <RadzenNumeric ConvertValue="ConvertOptionalDecimal" @bind-Value="@context.Discount" ShowUpDown="false" class="w-100"/>
+                <RadzenNumeric TabIndex="5" ConvertValue="ConvertOptionalDecimal" @bind-Value="@context.Discount" ShowUpDown="false" class="w-100"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.PriceAfterDiscount)"
@@ -90,7 +90,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Description)" Title="@Localizer["Description"]">
             <EditTemplate>
-                <RadzenTextArea @bind-Value="@context.Description" class="w-100"/>
+                <RadzenTextArea TabIndex="6" @bind-Value="@context.Description" class="w-100"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Id)" Filterable="false" Sortable="false" Width="150px"
@@ -110,9 +110,9 @@
                               ButtonStyle="ButtonStyle.Danger" Click="@(_ => Delete(purchase))"/>
             </Template>
             <EditTemplate Context="purchase">
-                <RadzenButton Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
+                <RadzenButton TabIndex="7" Icon="check" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
                               ButtonStyle="ButtonStyle.Success" Click="@(_ => SaveRow(purchase))"/>
-                <RadzenButton Icon="close" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
+                <RadzenButton TabIndex="8" Icon="close" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter"
                               ButtonStyle="ButtonStyle.Light" Click="@(_ => CancelEdit(purchase))"/>
             </EditTemplate>
         </RadzenDataGridColumn>
@@ -135,6 +135,8 @@
     public required Guid ReceiptId { get; set; }
 
     private RadzenDataGrid<PurchaseDetails> _grid = null!;
+    private RadzenAutoComplete _itemAutoComplete = null!;
+    private RadzenAutoComplete _categoryAutoComplete = null!;
 
     private ReceiptWithPurchases? _receipt;
     private string _store = "";
@@ -379,4 +381,6 @@
                     });
             });
     }
+
+    private static async Task FocusOn(RadzenAutoComplete ac) => await ac.FocusAsync();
 }
