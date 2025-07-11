@@ -10,11 +10,12 @@ env:
   DOTNET_VERSION: "9.x"
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repo
+      uses: actions/checkout@v4
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -30,5 +31,14 @@ jobs:
     - name: Test
       run: dotnet test ExpenseExplorer.slnx --configuration Release --no-restore --no-build
 
-    - name: Publish
-      run: dotnet publish ExpenseExplorer.slnx --configuration Release --no-restore --no-build
+  deploy-to-pi:
+    needs: build-and-test
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Deploy with Docker Compose
+      run: docker-compose up -d --build
+
