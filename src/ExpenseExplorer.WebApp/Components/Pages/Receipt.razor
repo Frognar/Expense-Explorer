@@ -162,8 +162,8 @@
     public required Guid ReceiptId { get; set; }
 
     private RadzenDataGrid<PurchaseDetails> _grid = null!;
-    private RadzenAutoComplete _itemAutoComplete = null!;
-    private RadzenAutoComplete _categoryAutoComplete = null!;
+    private RadzenAutoComplete? _itemAutoComplete;
+    private RadzenAutoComplete? _categoryAutoComplete;
 
     private ReceiptWithPurchases? _receipt;
     private string _store = "";
@@ -265,6 +265,8 @@
         _purchases = _purchases.Prepend(purchase);
         _count = _purchases.Count();
         await _grid.EditRow(purchase);
+        await Task.Delay(100);
+        await FocusOn(_itemAutoComplete);
     }
 
     private async Task EditRow(PurchaseDetails purchase)
@@ -276,6 +278,8 @@
 
         _backup = purchase.MakeCopy();
         await _grid.EditRow(purchase);
+        await Task.Delay(100);
+        await FocusOn(_itemAutoComplete);
     }
 
     async Task SaveRow(PurchaseDetails purchase)
@@ -409,5 +413,11 @@
             });
     }
 
-    private static async Task FocusOn(RadzenAutoComplete ac) => await ac.FocusAsync();
+    private static async Task FocusOn(RadzenAutoComplete? ac)
+    {
+        if (ac is not null)
+        {
+            await ac.FocusAsync();
+        }
+    }
 }
