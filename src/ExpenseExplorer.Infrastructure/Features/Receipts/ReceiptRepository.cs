@@ -355,7 +355,7 @@ internal sealed class ReceiptRepository(IDbConnectionFactory connectionFactory)
                 r.purchase_date as PurchaseDate,
                 COALESCE(total, 0) as Total
             {sqlBase}
-            order by {orderBy} {orderDir}
+            order by {orderBy} {orderDir}, id desc
             limit @pageSize offset @skip
         ";
 
