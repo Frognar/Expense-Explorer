@@ -23,4 +23,7 @@
     <data name="No data to display" xml:space="preserve">
         <value>No data to display</value>
     </data>
+    <data name="All" xml:space="preserve">
+        <value>All</value>
+    </data>
 </root>

@@ -30,4 +30,7 @@
     <data name="No data to display" xml:space="preserve">
         <value>Brak danych do wyświetlenia</value>
     </data>
+    <data name="All" xml:space="preserve">
+        <value>Wszystkie</value>
+    </data>
 </root>

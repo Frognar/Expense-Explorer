@@ -9,16 +9,21 @@
 
 <PageTitle>@Localizer["_Title"]</PageTitle>
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-    <RadzenLabel Text="@($"{Localizer["From"]}:")"/>
-    <RadzenDatePicker TValue="DateOnly?" @bind-Value="_dateFrom" Change="DataChanged"/>
-    <RadzenLabel Text="@($"{Localizer["To"]}:")"/>
-    <RadzenDatePicker TValue="DateOnly?" @bind-Value="_dateTo" Change="DataChanged"/>
-</RadzenStack>
+<RadzenCard class="rz-my-1 p-2 w-100">
+    <RadzenStack
+        Orientation="Orientation.Horizontal"
+        AlignItems="AlignItems.Center"
+        JustifyContent="JustifyContent.Center">
+        <RadzenLabel Text="@($"{Localizer["From"]}:")"/>
+        <RadzenDatePicker TValue="DateOnly?" @bind-Value="_dateFrom" Change="DataChanged"/>
+        <RadzenLabel Text="@($"{Localizer["To"]}:")"/>
+        <RadzenDatePicker TValue="DateOnly?" @bind-Value="_dateTo" Change="DataChanged"/>
+    </RadzenStack>
+</RadzenCard>
 
 <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" class="w-100">
     <RadzenText TextStyle="TextStyle.H6" TextAlign="TextAlign.Center">
-        @Total.ToString("c", new CultureInfo("pl-PL"))
+        @Localizer["All"]: @Total.ToString("c", new CultureInfo("pl-PL"))
     </RadzenText>
 </RadzenRow>
 
