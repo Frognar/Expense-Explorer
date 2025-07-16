@@ -16,6 +16,12 @@
     <RadzenDatePicker TValue="DateOnly?" @bind-Value="_dateTo" Change="DataChanged"/>
 </RadzenStack>
 
+<RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" class="w-100">
+    <RadzenText TextStyle="TextStyle.H6" TextAlign="TextAlign.Center">
+        @Total.ToString("c", new CultureInfo("pl-PL"))
+    </RadzenText>
+</RadzenRow>
+
 @if (!_categoryExpenses.Any())
 {
     <p>@Localizer["No data to display"]</p>
@@ -46,6 +52,7 @@ else
     private DateOnly? _dateFrom = DateOnly.FromDateTime(DateTime.Today.AddDays(-DateTime.Today.Day + 1));
     private DateOnly? _dateTo;
     private IEnumerable<CategoryExpense> _categoryExpenses = [];
+    private decimal Total => _categoryExpenses.Select(c => c.Total).DefaultIfEmpty(Decimal.Zero).Sum();
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
