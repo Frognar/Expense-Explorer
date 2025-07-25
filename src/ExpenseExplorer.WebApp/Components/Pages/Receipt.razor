@@ -75,13 +75,13 @@
     <Columns>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.ItemName)" Title="@Localizer["Item name"]">
             <EditTemplate Context="purchase">
-                <RadzenAutoComplete @ref="_itemAutoComplete" SelectedItemChanged="_ => FocusOn(_itemAutoComplete)" TabIndex="1" @bind-Value="@purchase.ItemName" Data="_items" OpenOnFocus="true"
+                <RadzenAutoComplete @ref="_itemAutoComplete" SelectedItemChanged="_ => FocusOn(_categoryAutoComplete)" TabIndex="1" @bind-Value="@purchase.ItemName" Data="_items" OpenOnFocus="true"
                                     LoadData="OnItemsLoadData" class="w-100"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.Category)" Title="@Localizer["Category"]">
             <EditTemplate Context="purchase">
-                <RadzenAutoComplete @ref="_categoryAutoComplete" SelectedItemChanged="_ => FocusOn(_categoryAutoComplete)" TabIndex="2" @bind-Value="@purchase.Category" Data="_categories" OpenOnFocus="true"
+                <RadzenAutoComplete @ref="_categoryAutoComplete" SelectedItemChanged="_ => FocusOn(_quantityNumeric)" TabIndex="2" @bind-Value="@purchase.Category" Data="_categories" OpenOnFocus="true"
                                     LoadData="OnCategoriesLoadData" class="w-100"/>
             </EditTemplate>
         </RadzenDataGridColumn>
@@ -92,7 +92,7 @@
                     : string.Format(new CultureInfo("pl-PL"), "{0:F3}", context.Quantity))
             </Template>
             <EditTemplate>
-                <RadzenNumeric TabIndex="3" ConvertValue="ConvertDecimal" @bind-Value="@context.Quantity" ShowUpDown="false" class="w-100"/>
+                <RadzenNumeric @ref="_quantityNumeric" TabIndex="3" ConvertValue="ConvertDecimal" @bind-Value="@context.Quantity" ShowUpDown="false" class="w-100"/>
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(PurchaseDetails.UnitPrice)" Title="@Localizer["Unit price"]">
@@ -164,6 +164,7 @@
     private RadzenDataGrid<PurchaseDetails> _grid = null!;
     private RadzenAutoComplete? _itemAutoComplete;
     private RadzenAutoComplete? _categoryAutoComplete;
+    private RadzenNumeric<decimal>? _quantityNumeric;
 
     private ReceiptWithPurchases? _receipt;
     private string _store = "";
@@ -413,7 +414,7 @@
             });
     }
 
-    private static async Task FocusOn(RadzenAutoComplete? ac)
+    private static async Task FocusOn(IRadzenFormComponent? ac)
     {
         if (ac is not null)
         {
