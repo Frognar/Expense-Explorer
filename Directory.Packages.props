@@ -8,7 +8,7 @@
     <PackageVersion Include="dotResult" Version="1.2.0" />
     <PackageVersion Include="dotValid" Version="0.5.0" />
     <PackageVersion Include="Npgsql" Version="10.0.0" />
-    <PackageVersion Include="Radzen.Blazor" Version="6.6.1" />
+    <PackageVersion Include="Radzen.Blazor" Version="8.3.4" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.16.0.128591" />
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.0.1" />
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.0.1" />
