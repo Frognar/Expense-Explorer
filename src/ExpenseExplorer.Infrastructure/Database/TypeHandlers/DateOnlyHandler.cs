@@ -13,6 +13,16 @@ internal sealed class DateOnlyHandler : SqlMapper.TypeHandler<DateOnly>
 
     public override DateOnly Parse(object value)
     {
-        return DateOnly.FromDateTime((DateTime)value);
+        if (value is DateOnly dateOnly)
+        {
+            return dateOnly;
+        }
+
+        if (value is DateTime dateTime)
+        {
+            return DateOnly.FromDateTime(dateTime);
+        }
+
+        throw new DataException($"Cannot convert {value.GetType()} to DateOnly");
     }
 }
