@@ -241,6 +241,44 @@ internal sealed class ReceiptService(
             .MapAsync(response => response.ReceiptId);
     }
 
+    public async Task<Result<Guid>> ImportBiedronkaReceiptAsync(BiedronkaReceiptImport import)
+    {
+        Result<Guid> headerResult = await CreateReceiptAsync("Biedronka", import.PurchaseDate);
+        return await headerResult.MatchAsync(
+            failure => Task.FromResult(Fail.OfType<Guid>(failure)),
+            async receiptId =>
+            {
+                IEnumerable<Failure>? addFailures = null;
+
+                foreach (PurchaseDetails purchase in import.Purchases)
+                {
+                    Result<Guid> addResult = await AddPurchase(receiptId, purchase);
+                    addResult.Match(
+                        failure =>
+                        {
+                            addFailures = failure;
+                            return Unit.Instance;
+                        },
+                        success => Unit.Instance);
+
+                    if (addFailures is not null)
+                    {
+                        break;
+                    }
+                }
+
+                if (addFailures is not null)
+                {
+                    Result<Unit> deleteResult = await DeleteReceiptAsync(receiptId);
+                    return deleteResult.Match(
+                        failure => Fail.OfType<Guid>(failure),
+                        success => Fail.OfType<Guid>(addFailures));
+                }
+
+                return Success.From(receiptId);
+            });
+    }
+
     public async Task<Result<Guid>> AddPurchase(Guid receiptId, PurchaseDetails purchase)
     {
         AddReceiptItemRequest request = new(

@@ -50,11 +50,80 @@
     <data name="New receipt" xml:space="preserve">
         <value>New receipt</value>
     </data>
+    <data name="Import Biedronka" xml:space="preserve">
+        <value>Import Biedronka</value>
+    </data>
     <data name="No receipts to display" xml:space="preserve">
         <value>No receipts to display</value>
     </data>
+    <data name="IMPORT_SUCCESS" xml:space="preserve">
+        <value>Receipt imported.</value>
+    </data>
+    <data name="IMPORT_INVALID_JSON" xml:space="preserve">
+        <value>Invalid JSON file.</value>
+    </data>
+    <data name="IMPORT_READ_FAILED" xml:space="preserve">
+        <value>Failed to read import file.</value>
+    </data>
+    <data name="IMPORT_EMPTY_FILE" xml:space="preserve">
+        <value>Import file is empty.</value>
+    </data>
+    <data name="IMPORT_MISSING_HEADER_DATE" xml:space="preserve">
+        <value>Missing purchase date in file.</value>
+    </data>
+    <data name="IMPORT_MISSING_BODY" xml:space="preserve">
+        <value>Missing receipt lines in file.</value>
+    </data>
+    <data name="IMPORT_NO_ITEMS" xml:space="preserve">
+        <value>No items to import.</value>
+    </data>
+    <data name="IMPORT_DISCOUNT_WITHOUT_ITEM" xml:space="preserve">
+        <value>Discount line without an item.</value>
+    </data>
+    <data name="IMPORT_INVALID_QUANTITY" xml:space="preserve">
+        <value>Invalid quantity in import file.</value>
+    </data>
+    <data name="IMPORT_INVALID_UNIT_PRICE" xml:space="preserve">
+        <value>Invalid unit price in import file.</value>
+    </data>
+    <data name="IMPORT_INVALID_DISCOUNT" xml:space="preserve">
+        <value>Invalid discount in import file.</value>
+    </data>
+    <data name="IMPORT_DISCOUNT_EXCEEDS_TOTAL" xml:space="preserve">
+        <value>Discount exceeds item total.</value>
+    </data>
+    <data name="IMPORT_VOUCHER_DISTRIBUTION_FAILED" xml:space="preserve">
+        <value>Failed to distribute voucher across items.</value>
+    </data>
+    <data name="IMPORT_SURCHARGE_NOT_SUPPORTED" xml:space="preserve">
+        <value>Surcharges are not supported by the import.</value>
+    </data>
+    <data name="IMPORT_STORNO_NOT_SUPPORTED" xml:space="preserve">
+        <value>Storno lines are not supported by the import.</value>
+    </data>
     <data name="INVALID_RECEIPT_ID" xml:space="preserve">
         <value>Invalid receipt id.</value>
+    </data>
+    <data name="EMPTY_ITEM_NAME" xml:space="preserve">
+        <value>Item name cannot be empty.</value>
+    </data>
+    <data name="EMPTY_CATEGORY_NAME" xml:space="preserve">
+        <value>Category name cannot be empty.</value>
+    </data>
+    <data name="INVALID_QUANTITY" xml:space="preserve">
+        <value>Quantity must be greater than zero.</value>
+    </data>
+    <data name="INVALID_UNIT_PRICE" xml:space="preserve">
+        <value>Unit price must be greater than zero.</value>
+    </data>
+    <data name="INVALID_DISCOUNT" xml:space="preserve">
+        <value>Discount must be greater than zero.</value>
+    </data>
+    <data name="DISCOUNT_EXCEEDS_TOTAL" xml:space="preserve">
+        <value>Discount exceeds total amount.</value>
+    </data>
+    <data name="EMPTY_STORE_NAME" xml:space="preserve">
+        <value>Store name cannot be empty.</value>
     </data>
     <data name="PURCHASE_DATE_IN_FUTURE" xml:space="preserve">
         <value>Purchase date cannot be in the future.</value>

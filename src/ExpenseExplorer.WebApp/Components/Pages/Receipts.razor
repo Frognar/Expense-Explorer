@@ -1,4 +1,6 @@
 @page "/"
+@using System.IO
+@using System.Text
 @using DotResult
 @using ExpenseExplorer.Application
 @using ExpenseExplorer.WebApp.Models
@@ -6,6 +8,7 @@
 @inject IStringLocalizer<Receipts> Localizer
 @inject ReceiptService ReceiptService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
 
 <PageTitle>@Localizer["_Title"]</PageTitle>
 
@@ -66,9 +69,12 @@
                 </RadzenStack>
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Id)" Filterable="false" Sortable="false" Width="145px" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn Property="@nameof(ReceiptDetails.Id)" Filterable="false" Sortable="false" Width="260px" TextAlign="TextAlign.Center">
             <HeaderTemplate>
-                <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Text="@Localizer["New receipt"]" Click="@OnCreate" />
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                    <RadzenButton Icon="add" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Success" Text="@Localizer["New receipt"]" Click="@OnCreate" />
+                    <RadzenButton Icon="upload_file" Size="ButtonSize.Small" Variant="Variant.Flat" Shade="Shade.Lighter" ButtonStyle="ButtonStyle.Primary" Text="@Localizer["Import Biedronka"]" Click="@TriggerBiedronkaImport" />
+                </RadzenStack>
             </HeaderTemplate>
             <Template>
                 <RadzenButton Icon="edit" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Light" Click="@(() => OnEdit(context.Id))"/>
@@ -78,6 +84,8 @@
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
+
+<InputFile id="@BiedronkaImportInputId" OnChange="@OnBiedronkaImport" accept=".json,application/json" style="display:none" />
 
 <Toast @ref="@_toast"/>
 <ConfirmationDialog @ref="@_confirmationDialog"/>
@@ -98,6 +106,8 @@
 
     private Toast _toast = null!;
     private ConfirmationDialog _confirmationDialog = null!;
+    private const string BiedronkaImportInputId = "biedronkaImportInput";
+    private const long MaxImportFileSize = 5 * 1024 * 1024;
 
     /// <inheritdoc />
     protected override async Task OnInitializedAsync()
@@ -123,6 +133,64 @@
 
     private void OnCreate() => NavigationManager.NavigateTo("/receipts/new");
     private void OnEdit(Guid id) => NavigationManager.NavigateTo($"/receipts/{id}");
+
+    private async Task TriggerBiedronkaImport()
+    {
+        await JsRuntime.InvokeVoidAsync("triggerClick", BiedronkaImportInputId);
+    }
+
+    private async Task OnBiedronkaImport(InputFileChangeEventArgs args)
+    {
+        if (args.FileCount == 0)
+        {
+            return;
+        }
+
+        IBrowserFile file = args.File;
+        if (!file.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+        {
+            await _toast.OpenAsync(Localizer["IMPORT_INVALID_JSON"]);
+            return;
+        }
+
+        string json;
+        try
+        {
+            await using Stream stream = file.OpenReadStream(MaxImportFileSize);
+            using StreamReader reader = new(stream, Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+            json = await reader.ReadToEndAsync();
+        }
+        catch (Exception)
+        {
+            await _toast.OpenAsync(Localizer["IMPORT_READ_FAILED"]);
+            return;
+        }
+
+        Result<BiedronkaReceiptImport> parseResult = BiedronkaReceiptImporter.Parse(json);
+        await parseResult.MatchAsync(
+            async error =>
+            {
+                await _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Code])));
+                return Unit.Instance;
+            },
+            async import =>
+            {
+                Result<Guid> importResult = await ReceiptService.ImportBiedronkaReceiptAsync(import);
+                return await importResult.MatchAsync(
+                    async error =>
+                    {
+                        await _toast.OpenAsync(string.Join(Environment.NewLine, error.Select(e => Localizer[e.Code])));
+                        return Unit.Instance;
+                    },
+                    async receiptId =>
+                    {
+                        await _toast.OpenAsync(Localizer["IMPORT_SUCCESS"]);
+                        NavigationManager.NavigateTo($"/receipts/{receiptId}");
+                        await _grid.FirstPage(forceReload: true);
+                        return Unit.Instance;
+                    });
+            });
+    }
 
     private async Task OnCopy(Guid id)
     {

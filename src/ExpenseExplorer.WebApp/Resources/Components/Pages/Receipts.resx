@@ -57,11 +57,80 @@
     <data name="New receipt" xml:space="preserve">
         <value>Nowy paragon</value>
     </data>
+    <data name="Import Biedronka" xml:space="preserve">
+        <value>Import Biedronka</value>
+    </data>
     <data name="No receipts to display" xml:space="preserve">
         <value>Brak paragonów do wyświetlenia</value>
     </data>
+    <data name="IMPORT_SUCCESS" xml:space="preserve">
+        <value>Paragon został zaimportowany.</value>
+    </data>
+    <data name="IMPORT_INVALID_JSON" xml:space="preserve">
+        <value>Nieprawidłowy plik JSON.</value>
+    </data>
+    <data name="IMPORT_READ_FAILED" xml:space="preserve">
+        <value>Nie udało się odczytać pliku importu.</value>
+    </data>
+    <data name="IMPORT_EMPTY_FILE" xml:space="preserve">
+        <value>Plik importu jest pusty.</value>
+    </data>
+    <data name="IMPORT_MISSING_HEADER_DATE" xml:space="preserve">
+        <value>Brak daty zakupu w pliku.</value>
+    </data>
+    <data name="IMPORT_MISSING_BODY" xml:space="preserve">
+        <value>Brak pozycji paragonu w pliku.</value>
+    </data>
+    <data name="IMPORT_NO_ITEMS" xml:space="preserve">
+        <value>Brak pozycji do zaimportowania.</value>
+    </data>
+    <data name="IMPORT_DISCOUNT_WITHOUT_ITEM" xml:space="preserve">
+        <value>Rabat nie jest przypisany do pozycji.</value>
+    </data>
+    <data name="IMPORT_INVALID_QUANTITY" xml:space="preserve">
+        <value>Nieprawidłowa ilość w pliku importu.</value>
+    </data>
+    <data name="IMPORT_INVALID_UNIT_PRICE" xml:space="preserve">
+        <value>Nieprawidłowa cena jednostkowa w pliku importu.</value>
+    </data>
+    <data name="IMPORT_INVALID_DISCOUNT" xml:space="preserve">
+        <value>Nieprawidłowy rabat w pliku importu.</value>
+    </data>
+    <data name="IMPORT_DISCOUNT_EXCEEDS_TOTAL" xml:space="preserve">
+        <value>Rabat przekracza wartość pozycji.</value>
+    </data>
+    <data name="IMPORT_VOUCHER_DISTRIBUTION_FAILED" xml:space="preserve">
+        <value>Nie udało się rozdzielić vouchera na pozycje.</value>
+    </data>
+    <data name="IMPORT_SURCHARGE_NOT_SUPPORTED" xml:space="preserve">
+        <value>Dopłaty nie są obsługiwane w imporcie.</value>
+    </data>
+    <data name="IMPORT_STORNO_NOT_SUPPORTED" xml:space="preserve">
+        <value>Pozycje storno nie są obsługiwane w imporcie.</value>
+    </data>
     <data name="INVALID_RECEIPT_ID" xml:space="preserve">
         <value>Nieprawidłowe id paragonu.</value>
+    </data>
+    <data name="EMPTY_ITEM_NAME" xml:space="preserve">
+        <value>Nazwa przedmiotu nie może być pusta.</value>
+    </data>
+    <data name="EMPTY_CATEGORY_NAME" xml:space="preserve">
+        <value>Nazwa kategorii nie może być pusta.</value>
+    </data>
+    <data name="INVALID_QUANTITY" xml:space="preserve">
+        <value>Ilość musi być większa niż zero.</value>
+    </data>
+    <data name="INVALID_UNIT_PRICE" xml:space="preserve">
+        <value>Cena musi być większa niż zero.</value>
+    </data>
+    <data name="INVALID_DISCOUNT" xml:space="preserve">
+        <value>Zniżka musi być większa niż zero.</value>
+    </data>
+    <data name="DISCOUNT_EXCEEDS_TOTAL" xml:space="preserve">
+        <value>Zniżka przekracza łączną kwotę.</value>
+    </data>
+    <data name="EMPTY_STORE_NAME" xml:space="preserve">
+        <value>Nazwa sklepu nie może być pusta.</value>
     </data>
     <data name="PURCHASE_DATE_IN_FUTURE" xml:space="preserve">
         <value>Data zakupu nie może być w przyszłości.</value>

@@ -7,3 +7,10 @@ window.downloadFile = (fileName, contentType, content) => {
     link.click();
     URL.revokeObjectURL(link.href);
 };
+
+window.triggerClick = (elementId) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.click();
+    }
+};
