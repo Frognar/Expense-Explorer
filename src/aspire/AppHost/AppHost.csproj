@@ -1,21 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-    <Sdk Name="Aspire.AppHost.Sdk" Version="13.0.1" />
+<Project Sdk="Aspire.AppHost.Sdk/13.6.0">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <IsAspireHost>true</IsAspireHost>
+        <NoWarn>$(NoWarn);ASPIRE010</NoWarn>
         <UserSecretsId>0f7c1b14-31e9-454f-a5f4-8ce7f1a6ce1b</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Aspire.Hosting.AppHost" />
         <PackageReference Include="Aspire.Hosting.PostgreSQL" />
-        <PackageReference Include="Dapper" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\ExpenseExplorer.WebApp\ExpenseExplorer.WebApp.csproj" />
+      <ProjectReference Include="..\..\ExpenseExplorer.Api\ExpenseExplorer.Api.csproj" />
     </ItemGroup>
 
 </Project>

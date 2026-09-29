@@ -12,8 +12,16 @@ Expense Explorer is a simple expense tracking application designed to run on a h
 
 ## Note
 
-This project is undergoing a fresh start with a significantly simplified technical approach. Initially, the app was developed with the goal of exploring and learning new technologies, which made the codebase more complex than desired. To focus on core functionality and maintainability, the original code has been archived on a separate branch [`archive\100commitow`](https://github.com/Frognar/Expense-Explorer/tree/archive/100commitow), and the main branch now reflects a streamlined version of Expense Explorer.
-Thank you for your understanding and stay tuned for the new, simplified version!
+The application is being rewritten as a Web API (ASP.NET Core, .NET 10) with a Blazor WebAssembly frontend.
+The previous version is kept on the [`main-2609-archive`](https://github.com/Frognar/Expense-Explorer/tree/main-2609-archive) branch.
+
+## Project layout
+
+- `src/ExpenseExplorer.Domain` – receipt model; invalid states cannot be constructed
+- `src/ExpenseExplorer.Api` – HTTP API, also serves the frontend
+- `src/ExpenseExplorer.Web` – Blazor WebAssembly frontend (MudBlazor, mobile first)
+- `src/aspire/AppHost` – local run with PostgreSQL (`dotnet run --project src/aspire/AppHost`)
+- `tests/` – unit and API tests (`dotnet test --solution ExpenseExplorer.slnx`)
 
 ## Features
 

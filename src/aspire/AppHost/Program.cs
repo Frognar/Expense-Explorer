@@ -1,17 +1,14 @@
-using AppHost;
-
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
-IResourceBuilder<PostgresServerResource> postgres = builder
+IResourceBuilder<PostgresDatabaseResource> db = builder
     .AddPostgres("postgres")
     .WithLifetime(ContainerLifetime.Persistent)
-    .WithDataVolume();
+    .WithDataVolume()
+    .AddDatabase("expense-explorer");
 
-IResourceBuilder<PostgresDatabaseResource> db = postgres
-    .CreateDatabase("expense-explorer");
-
-builder.AddProject<Projects.ExpenseExplorer_WebApp>("expense-explorer-web-app")
+builder.AddProject<Projects.ExpenseExplorer_Api>("expense-explorer-api")
     .WithReference(db)
-    .WaitFor(db);
+    .WaitFor(db)
+    .WithExternalHttpEndpoints();
 
 await builder.Build().RunAsync();

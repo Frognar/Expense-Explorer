@@ -30,7 +30,7 @@ jobs:
       run: dotnet build ExpenseExplorer.slnx --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test ExpenseExplorer.slnx --configuration Release --no-restore --no-build
+      run: dotnet test --solution ExpenseExplorer.slnx --configuration Release --no-build
 
   deploy-to-pi:
     needs: build-and-test

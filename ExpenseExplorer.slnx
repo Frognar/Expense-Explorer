@@ -1,20 +1,26 @@
-﻿<Solution>
+<Solution>
   <Folder Name="/solution-items/">
-    <File Path=".gitignore" />
-    <File Path="Directory.Packages.props" />
-    <File Path="Directory.Build.props" />
-    <File Path="LICENSE" />
-    <File Path="README.md" />
     <File Path=".editorconfig" />
+    <File Path=".github/workflows/dotnet.yml" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
     <File Path="Dockerfile" />
     <File Path="docker-compose.yaml" />
+    <File Path="global.json" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src\ExpenseExplorer.Application\ExpenseExplorer.Application.csproj" Type="Classic C#" />
-    <Project Path="src\ExpenseExplorer.Infrastructure\ExpenseExplorer.Infrastructure.csproj" Type="Classic C#" />
-    <Project Path="src\ExpenseExplorer.WebApp\ExpenseExplorer.WebApp.csproj" Type="Classic C#" />
+    <Project Path="src/ExpenseExplorer.Api/ExpenseExplorer.Api.csproj" />
+    <Project Path="src/ExpenseExplorer.Domain/ExpenseExplorer.Domain.csproj" />
+    <Project Path="src/ExpenseExplorer.Web/ExpenseExplorer.Web.csproj" />
   </Folder>
   <Folder Name="/src/aspire/">
-    <Project Path="src\aspire\AppHost\AppHost.csproj" Type="Classic C#" />
+    <Project Path="src/aspire/AppHost/AppHost.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ExpenseExplorer.Api.Tests/ExpenseExplorer.Api.Tests.csproj" />
+    <Project Path="tests/ExpenseExplorer.Domain.Tests/ExpenseExplorer.Domain.Tests.csproj" />
   </Folder>
 </Solution>

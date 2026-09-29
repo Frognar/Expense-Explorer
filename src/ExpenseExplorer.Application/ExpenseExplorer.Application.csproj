@@ -1,7 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <PackageReference Include="dotMaybe" />
-    <PackageReference Include="dotResult" />
-    <PackageReference Include="dotValid" />
-  </ItemGroup>
-</Project>
