@@ -33,6 +33,8 @@ jobs:
       run: dotnet test --solution ExpenseExplorer.slnx --configuration Release --no-build
 
   deploy-to-pi:
+    # Only code merged to main may reach the Pi, never pull request branches.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: build-and-test
     runs-on: self-hosted
 
