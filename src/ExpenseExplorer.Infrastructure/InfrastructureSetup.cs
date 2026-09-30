@@ -1,8 +1,12 @@
 using ExpenseExplorer.Application.Dictionaries;
+using ExpenseExplorer.Application.ReceiptItems;
 using ExpenseExplorer.Application.Receipts;
+using ExpenseExplorer.Application.Reports;
 using ExpenseExplorer.Infrastructure.Dictionaries;
 using ExpenseExplorer.Infrastructure.Persistence;
+using ExpenseExplorer.Infrastructure.ReceiptItems;
 using ExpenseExplorer.Infrastructure.Receipts;
+using ExpenseExplorer.Infrastructure.Reports;
 using ExpenseExplorer.Application.Users;
 using ExpenseExplorer.Domain.Users;
 using ExpenseExplorer.Infrastructure.Users;
@@ -24,6 +28,8 @@ public static class InfrastructureSetup
         services.AddScoped<IReceiptRepository, ReceiptRepository>();
         services.AddScoped<IReceiptQueries, ReceiptQueries>();
         services.AddScoped<IDictionaryQueries, DictionaryQueries>();
+        services.AddScoped<IReceiptItemQueries, ReceiptItemQueries>();
+        services.AddScoped<IReportQueries, ReportQueries>();
         services.AddUsers();
         return services;
     }

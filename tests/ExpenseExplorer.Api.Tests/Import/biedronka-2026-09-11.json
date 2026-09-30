@@ -1,0 +1,160 @@
+{
+  "header": [
+    {
+      "headerData": {
+        "date": "2026-09-11T19:19:27.000Z",
+        "CPS": 56
+      }
+    }
+  ],
+  "body": [
+    {
+      "sellLine": {
+        "name": "ChipsyZCebLay s130g      C",
+        "vatId": "C",
+        "price": 869,
+        "total": 1738,
+        "quantity": "2",
+        "isStorno": false
+      }
+    },
+    {
+      "discountLine": {
+        "base": 1738,
+        "value": 610,
+        "isDiscount": true,
+        "isPercent": false,
+        "isStorno": false,
+        "vatId": "C"
+      }
+    },
+    {
+      "sellLine": {
+        "name": "TruskMrożMroźKra750g     C",
+        "vatId": "C",
+        "price": 1139,
+        "total": 2278,
+        "quantity": "2",
+        "isStorno": false
+      }
+    },
+    {
+      "sellLine": {
+        "name": "KetBezCukKotlin420g      B",
+        "vatId": "B",
+        "price": 699,
+        "total": 699,
+        "quantity": "1",
+        "isStorno": false
+      }
+    },
+    {
+      "sellLine": {
+        "name": "COCA COLA MIX 1l PET     A",
+        "vatId": "A",
+        "price": 749,
+        "total": 749,
+        "quantity": "1",
+        "isStorno": false
+      }
+    },
+    {
+      "sellLine": {
+        "name": "KnoppersKokos40g         A",
+        "vatId": "A",
+        "price": 295,
+        "total": 590,
+        "quantity": "2",
+        "isStorno": false
+      }
+    },
+    {
+      "sellLine": {
+        "name": "HummusSpicyGV160gN       C",
+        "vatId": "C",
+        "price": 429,
+        "total": 858,
+        "quantity": "2",
+        "isStorno": false
+      }
+    },
+    {
+      "sellLine": {
+        "name": "Limonka szt              C",
+        "vatId": "C",
+        "price": 199,
+        "total": 398,
+        "quantity": "2",
+        "isStorno": false
+      }
+    },
+    {
+      "sellLine": {
+        "name": "MLEK WYPAS 3,2  1L       C",
+        "vatId": "C",
+        "price": 449,
+        "total": 5388,
+        "quantity": "12",
+        "isStorno": false
+      }
+    },
+    {
+      "discountLine": {
+        "base": 5388,
+        "value": 2694,
+        "isDiscount": true,
+        "isPercent": false,
+        "isStorno": false,
+        "vatId": "C"
+      }
+    },
+    {
+      "discountSummary": {
+        "discounts": 3304
+      }
+    },
+    {
+      "vatSummary": {
+        "currency": "PLN",
+        "vatRatesSummary": [
+          {
+            "vatId": "A",
+            "vatRate": 2300,
+            "vatSale": 1339,
+            "vatAmount": 250
+          },
+          {
+            "vatId": "B",
+            "vatRate": 800,
+            "vatSale": 699,
+            "vatAmount": 52
+          },
+          {
+            "vatId": "C",
+            "vatRate": 500,
+            "vatSale": 7356,
+            "vatAmount": 350
+          }
+        ]
+      }
+    },
+    {
+      "sumInCurrency": {
+        "fiscalTotal": 9394,
+        "totalWithPacks": 9444,
+        "currency": "PLN",
+        "printBig": true,
+        "printable": true
+      }
+    },
+    {
+      "pack": {
+        "name": "But Plastik kaucja",
+        "price": 50,
+        "quantity": "1",
+        "total": 50,
+        "isNegative": false
+      }
+    }
+  ]
+}

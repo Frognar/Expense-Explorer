@@ -9,4 +9,8 @@
         <ProjectReference Include="..\..\src\ExpenseExplorer.Api\ExpenseExplorer.Api.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="Import\*.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
 </Project>

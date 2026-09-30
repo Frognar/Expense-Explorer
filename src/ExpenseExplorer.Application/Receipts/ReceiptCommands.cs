@@ -18,3 +18,6 @@ public sealed record AddReceiptItem(ReceiptId ReceiptId, Purchase Purchase);
 public sealed record ChangeReceiptItem(ReceiptId ReceiptId, ReceiptItemId ItemId, Purchase Purchase);
 
 public sealed record RemoveReceiptItem(ReceiptId ReceiptId, ReceiptItemId ItemId);
+
+/// <summary>A whole receipt at once, e.g. read from a file a store provides.</summary>
+public sealed record ImportReceipt(StoreName Store, PurchaseDate PurchaseDate, IReadOnlyList<Purchase> Purchases);

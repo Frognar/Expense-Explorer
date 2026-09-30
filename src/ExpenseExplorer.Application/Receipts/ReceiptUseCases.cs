@@ -19,6 +19,23 @@ public static class ReceiptUseCases
         return Result.Success(receipt);
     }
 
+    /// <summary>The receipt and all its lines are saved together, or nothing is.</summary>
+    public static async Task<Result<Receipt>> ImportAsync(
+        IReceiptRepository receipts,
+        ImportReceipt command,
+        CancellationToken cancellationToken)
+    {
+        Receipt receipt = Receipt.Create(ReceiptId.New(), command.Store, command.PurchaseDate);
+        foreach (Purchase purchase in command.Purchases)
+        {
+            receipt.AddItem(ReceiptItemId.New(), purchase);
+        }
+
+        receipts.Add(receipt);
+        await receipts.SaveChangesAsync(cancellationToken);
+        return Result.Success(receipt);
+    }
+
     public static Task<Result<Receipt>> ChangeAsync(
         IReceiptRepository receipts,
         ChangeReceipt command,

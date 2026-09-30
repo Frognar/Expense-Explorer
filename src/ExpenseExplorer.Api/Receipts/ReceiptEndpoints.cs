@@ -1,5 +1,7 @@
+using System.Text;
 using ExpenseExplorer.Api.Auth;
 using ExpenseExplorer.Api.Http;
+using ExpenseExplorer.Api.Receipts.Import;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Contracts.Receipts;
 using ExpenseExplorer.Domain.Common;
@@ -9,15 +11,21 @@ namespace ExpenseExplorer.Api.Receipts;
 
 internal static class ReceiptEndpoints
 {
+    private const long MaxImportFileBytes = 1024 * 1024;
+
     public static RouteGroupBuilder MapReceipts(this RouteGroupBuilder api)
     {
         RouteGroupBuilder receipts = api.MapGroup("/receipts").WithTags("Receipts");
 
         receipts.MapGet("/", ListAsync);
         receipts.MapGet("/{receiptId:guid}", GetAsync).WithName(nameof(GetAsync));
+        receipts.MapGet("/{receiptId:guid}/export.csv", ExportAsync);
         receipts.MapPost("/", CreateAsync).RequireAuthorization(Policies.CanEdit);
         receipts.MapPatch("/{receiptId:guid}", ChangeAsync).RequireAuthorization(Policies.CanEdit);
         receipts.MapDelete("/{receiptId:guid}", DeleteAsync).RequireAuthorization(Policies.CanEdit);
+        receipts.MapPost("/import/biedronka", ImportBiedronkaAsync)
+            .RequireAuthorization(Policies.CanEdit)
+            .DisableAntiforgery(); // Requests carry a bearer token, which a forged cross-site form cannot add.
         receipts.MapPost("/{receiptId:guid}/duplicate", DuplicateAsync).RequireAuthorization(Policies.CanEdit);
         receipts.MapPost("/{receiptId:guid}/items", AddItemAsync).RequireAuthorization(Policies.CanEdit);
         receipts.MapPut("/{receiptId:guid}/items/{itemId:guid}", ChangeItemAsync).RequireAuthorization(Policies.CanEdit);
@@ -38,6 +46,15 @@ internal static class ReceiptEndpoints
     private static async Task<IResult> GetAsync(Guid receiptId, IReceiptQueries queries, CancellationToken cancellationToken) =>
         await queries.GetAsync(receiptId, cancellationToken) is { } receipt
             ? Results.Ok(receipt)
+            : ErrorResults.From([ApplicationErrors.ReceiptNotFound]);
+
+    /// <summary>UTF-8 with a byte order mark, so spreadsheets show Polish letters correctly.</summary>
+    private static async Task<IResult> ExportAsync(Guid receiptId, IReceiptQueries queries, CancellationToken cancellationToken) =>
+        await queries.GetAsync(receiptId, cancellationToken) is { } receipt
+            ? Results.File(
+                [.. Encoding.UTF8.GetPreamble(), .. Encoding.UTF8.GetBytes(ReceiptCsv.Write(receipt))],
+                "text/csv; charset=utf-8",
+                ReceiptCsv.FileName(receipt))
             : ErrorResults.From([ApplicationErrors.ReceiptNotFound]);
 
     private static Task<IResult> CreateAsync(
@@ -73,6 +90,25 @@ internal static class ReceiptEndpoints
         CancellationToken cancellationToken) =>
         ReceiptRequestParser.ParseDuplicate(receiptId, request, clock.Today())
             .ToHttpAsync(command => ReceiptUseCases.DuplicateAsync(receipts, command, cancellationToken), Created);
+
+    /// <summary>Takes the JSON e-receipt as a multipart form file named "file".</summary>
+    private static async Task<IResult> ImportBiedronkaAsync(
+        IFormFile file,
+        IReceiptRepository receipts,
+        TimeProvider clock,
+        CancellationToken cancellationToken)
+    {
+        if (file.Length > MaxImportFileBytes)
+        {
+            return ErrorResults.From([new Error("Import.FileTooLarge", "The file is larger than 1 MB.", Target: "file")]);
+        }
+
+        using StreamReader reader = new(file.OpenReadStream(), Encoding.UTF8, detectEncodingFromByteOrderMarks: true);
+        string json = await reader.ReadToEndAsync(cancellationToken);
+
+        return await BiedronkaReceiptParser.Parse(json, clock.Today(), clock.LocalTimeZone)
+            .ToHttpAsync(command => ReceiptUseCases.ImportAsync(receipts, command, cancellationToken), Created);
+    }
 
     private static Task<IResult> AddItemAsync(
         Guid receiptId,
