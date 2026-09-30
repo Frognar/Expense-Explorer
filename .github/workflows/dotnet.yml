@@ -30,9 +30,11 @@ jobs:
       run: dotnet build ExpenseExplorer.slnx --configuration Release --no-restore
 
     - name: Test
-      run: dotnet test ExpenseExplorer.slnx --configuration Release --no-restore --no-build
+      run: dotnet test --solution ExpenseExplorer.slnx --configuration Release --no-build
 
   deploy-to-pi:
+    # The Pi is updated only on demand: Actions > .NET > Run workflow on main.
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     needs: build-and-test
     runs-on: self-hosted
 

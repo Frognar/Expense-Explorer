@@ -1,22 +1,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-COPY ["ExpenseExplorer.slnx", "./"]
-COPY ["src/ExpenseExplorer.WebApp/ExpenseExplorer.WebApp.csproj", "src/ExpenseExplorer.WebApp/"]
-COPY ["src/ExpenseExplorer.Application/ExpenseExplorer.Application.csproj", "src/ExpenseExplorer.Application/"]
-COPY ["src/ExpenseExplorer.Infrastructure/ExpenseExplorer.Infrastructure.csproj", "src/ExpenseExplorer.Infrastructure/"]
-COPY ["src/aspire/AppHost/AppHost.csproj", "src/aspire/AppHost/"]
-COPY ["Directory.Packages.props", "./"]
-COPY ["Directory.Build.props", "./"]
-COPY [".editorconfig", "./"]
+COPY ["global.json", "Directory.Packages.props", "Directory.Build.props", ".editorconfig", "./"]
+COPY ["src/ExpenseExplorer.Api/ExpenseExplorer.Api.csproj", "src/ExpenseExplorer.Api/"]
+COPY ["src/ExpenseExplorer.Domain/ExpenseExplorer.Domain.csproj", "src/ExpenseExplorer.Domain/"]
+COPY ["src/ExpenseExplorer.Web/ExpenseExplorer.Web.csproj", "src/ExpenseExplorer.Web/"]
+RUN dotnet restore "src/ExpenseExplorer.Api/ExpenseExplorer.Api.csproj"
 
-RUN dotnet restore "ExpenseExplorer.slnx"
-
-COPY . .
-
-WORKDIR "/src/src/ExpenseExplorer.WebApp"
-RUN dotnet restore "ExpenseExplorer.WebApp.csproj"
-RUN dotnet publish "ExpenseExplorer.WebApp.csproj" -c Release -o /app/publish --no-restore
+COPY src/ src/
+RUN dotnet publish "src/ExpenseExplorer.Api/ExpenseExplorer.Api.csproj" -c Release -o /app/publish --no-restore
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
@@ -25,4 +17,4 @@ COPY --from=build /app/publish .
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
 
-ENTRYPOINT ["dotnet", "ExpenseExplorer.WebApp.dll"]
+ENTRYPOINT ["dotnet", "ExpenseExplorer.Api.dll"]

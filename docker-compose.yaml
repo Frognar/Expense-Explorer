@@ -12,8 +12,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
-  webapp:
-    container_name: expense-explorer-webapp
+  api:
+    container_name: expense-explorer-api
     build:
       context: .
       dockerfile: Dockerfile
@@ -23,7 +23,10 @@ services:
       - db
     environment:
       - ConnectionStrings__expense-explorer=Host=db;Port=5432;Database=expense_explorer;Username=user;Password=password
+    volumes:
+      - app_logs:/app/logs
     restart: unless-stopped
 
 volumes:
   postgres_data:
+  app_logs:

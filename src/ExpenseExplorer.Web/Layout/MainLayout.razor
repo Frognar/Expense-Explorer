@@ -1,0 +1,26 @@
+@inherits LayoutComponentBase
+
+<MudThemeProvider/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+    <MudAppBar Elevation="1" Dense="true">
+        <MudText Typo="Typo.h6">Expense Explorer</MudText>
+        <MudSpacer/>
+        <MudHidden Breakpoint="Breakpoint.SmAndDown">
+            <NavLinks Horizontal="true"/>
+        </MudHidden>
+    </MudAppBar>
+    <MudMainContent Class="main-content">
+        <MudContainer MaxWidth="MaxWidth.Large" Class="pa-2 pa-md-4">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+    <MudHidden Breakpoint="Breakpoint.MdAndUp">
+        <nav class="bottom-nav mud-elevation-4">
+            <NavLinks Horizontal="false"/>
+        </nav>
+    </MudHidden>
+</MudLayout>
