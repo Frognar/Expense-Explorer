@@ -38,10 +38,6 @@ public sealed record Money : IComparable<Money>
 
     public int CompareTo(Money? other) => other is null ? 1 : Value.CompareTo(other.Value);
 
-    /// <summary>Price of <paramref name="quantity"/> units, rounded half away from zero to whole grosze.</summary>
-    public Money Times(Quantity quantity) =>
-        new(decimal.Round(Value * quantity.Value, MaxDecimalPlaces, MidpointRounding.AwayFromZero));
-
     /// <summary>Difference clamped at zero, so the result is always a valid amount.</summary>
     public Money MinusClamped(Money other) => other > this ? Zero : new Money(Value - other.Value);
 

@@ -58,7 +58,7 @@ public class ValueObjectTests
     [Theory]
     [InlineData("0", "Quantity.NotPositive")]
     [InlineData("-1", "Quantity.NotPositive")]
-    [InlineData("0.0001", "Quantity.TooPrecise")]
+    [InlineData("0.00001", "Quantity.TooPrecise")]
     public void Quantity_rejects_invalid_values(string value, string code)
     {
         var result = Quantity.Create(decimal.Parse(value, System.Globalization.CultureInfo.InvariantCulture));

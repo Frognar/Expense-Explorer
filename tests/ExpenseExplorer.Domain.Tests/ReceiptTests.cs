@@ -17,8 +17,8 @@ public class ReceiptTests
     public void Total_is_the_sum_of_item_totals()
     {
         var receipt = Given.Receipt();
-        receipt.AddItem(ReceiptItemId.New(), Given.Purchase(quantity: 2m, unitPrice: 3.00m, discount: 0.50m));
-        receipt.AddItem(ReceiptItemId.New(), Given.Purchase(unitPrice: 4.99m));
+        receipt.AddItem(ReceiptItemId.New(), Given.Purchase(quantity: 2m, amount: 6.00m, discount: 0.50m));
+        receipt.AddItem(ReceiptItemId.New(), Given.Purchase(amount: 4.99m));
 
         Assert.Equal(10.49m, receipt.Total.Value);
     }
@@ -42,7 +42,7 @@ public class ReceiptTests
         var receipt = Given.Receipt();
         var id = ReceiptItemId.New();
         receipt.AddItem(id, Given.Purchase());
-        var bread = Given.Purchase(item: "Bread", unitPrice: 5.00m);
+        var bread = Given.Purchase(item: "Bread", amount: 5.00m);
 
         var result = receipt.ChangeItem(id, bread);
 
@@ -119,5 +119,34 @@ public class ReceiptTests
         copy.RemoveItem(copy.Items[0].Id);
 
         Assert.Single(receipt.Items);
+    }
+
+    [Fact]
+    public void Restore_rebuilds_items_in_order()
+    {
+        var first = ReceiptItemId.New();
+        var second = ReceiptItemId.New();
+
+        var receipt = Given.Valid(Receipt.Restore(
+            ReceiptId.New(),
+            Given.Valid(StoreName.Create("Lidl")),
+            Given.Date(Given.Today),
+            [(first, Given.Purchase()), (second, Given.Purchase(item: "Bread"))]));
+
+        Assert.Equal([first, second], receipt.Items.Select(item => item.Id));
+    }
+
+    [Fact]
+    public void Restore_rejects_duplicate_item_identifiers()
+    {
+        var id = ReceiptItemId.New();
+
+        var result = Receipt.Restore(
+            ReceiptId.New(),
+            Given.Valid(StoreName.Create("Lidl")),
+            Given.Date(Given.Today),
+            [(id, Given.Purchase()), (id, Given.Purchase())]);
+
+        Assert.Equal(ReceiptErrors.ItemAlreadyExists, Assert.Single(result.Errors));
     }
 }

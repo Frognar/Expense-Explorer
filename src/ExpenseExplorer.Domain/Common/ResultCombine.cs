@@ -46,6 +46,16 @@ public static class ResultCombine
             ? Result.Failure<TOut>(errors)
             : Result.Success(combine(ValueOf(r1), ValueOf(r2), ValueOf(r3), ValueOf(r4), ValueOf(r5)));
 
+    /// <summary>Turns many results into one: all values in order, or every error.</summary>
+    public static Result<IReadOnlyList<T>> Sequence<T>(IEnumerable<Result<T>> results)
+    {
+        List<Result<T>> all = [.. results];
+        ImmutableArray<Error> errors = [.. all.SelectMany(result => result.Errors)];
+        return errors.IsEmpty
+            ? Result.Success<IReadOnlyList<T>>([.. all.Select(ValueOf)])
+            : Result.Failure<IReadOnlyList<T>>(errors);
+    }
+
     private static ImmutableArray<Error> Collect(params ReadOnlySpan<ImmutableArray<Error>> errors)
     {
         ImmutableArray<Error>.Builder all = ImmutableArray.CreateBuilder<Error>();

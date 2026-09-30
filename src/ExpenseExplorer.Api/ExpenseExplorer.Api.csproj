@@ -9,7 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ExpenseExplorer.Domain\ExpenseExplorer.Domain.csproj" />
+        <ProjectReference Include="..\ExpenseExplorer.Infrastructure\ExpenseExplorer.Infrastructure.csproj" />
         <ProjectReference Include="..\ExpenseExplorer.Web\ExpenseExplorer.Web.csproj" />
     </ItemGroup>
 

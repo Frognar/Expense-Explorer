@@ -3,7 +3,10 @@ WORKDIR /src
 
 COPY ["global.json", "Directory.Packages.props", "Directory.Build.props", ".editorconfig", "./"]
 COPY ["src/ExpenseExplorer.Api/ExpenseExplorer.Api.csproj", "src/ExpenseExplorer.Api/"]
+COPY ["src/ExpenseExplorer.Application/ExpenseExplorer.Application.csproj", "src/ExpenseExplorer.Application/"]
+COPY ["src/ExpenseExplorer.Contracts/ExpenseExplorer.Contracts.csproj", "src/ExpenseExplorer.Contracts/"]
 COPY ["src/ExpenseExplorer.Domain/ExpenseExplorer.Domain.csproj", "src/ExpenseExplorer.Domain/"]
+COPY ["src/ExpenseExplorer.Infrastructure/ExpenseExplorer.Infrastructure.csproj", "src/ExpenseExplorer.Infrastructure/"]
 COPY ["src/ExpenseExplorer.Web/ExpenseExplorer.Web.csproj", "src/ExpenseExplorer.Web/"]
 RUN dotnet restore "src/ExpenseExplorer.Api/ExpenseExplorer.Api.csproj"
 

@@ -22,12 +22,12 @@ internal static class Given
         string item = "Milk",
         string category = "Food",
         decimal quantity = 1m,
-        decimal unitPrice = 3.49m,
+        decimal amount = 3.49m,
         decimal discount = 0m) =>
         new(
             Valid(ItemName.Create(item)),
             Valid(CategoryName.Create(category)),
-            Valid(LinePrice.Create(Quantity(quantity), Money(unitPrice), Money(discount))),
+            Valid(LinePrice.Create(Quantity(quantity), Money(amount), Money(discount))),
             description: null);
 
     public static Receipt Receipt() =>

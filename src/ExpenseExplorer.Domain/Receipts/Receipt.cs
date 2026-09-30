@@ -37,6 +37,27 @@ public sealed class Receipt
         return new Receipt(id, store, purchaseDate, []);
     }
 
+    /// <summary>Rebuilds a stored receipt. Fails when two lines share an identifier.</summary>
+    public static Result<Receipt> Restore(
+        ReceiptId id,
+        StoreName store,
+        PurchaseDate purchaseDate,
+        IEnumerable<(ReceiptItemId Id, Purchase Purchase)> items)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+
+        Receipt receipt = Create(id, store, purchaseDate);
+        foreach ((ReceiptItemId itemId, Purchase purchase) in items)
+        {
+            if (!receipt.AddItem(itemId, purchase).IsSuccess)
+            {
+                return Result.Failure<Receipt>(ReceiptErrors.ItemAlreadyExists);
+            }
+        }
+
+        return Result.Success(receipt);
+    }
+
     public void ChangeStore(StoreName store)
     {
         ArgumentNullException.ThrowIfNull(store);

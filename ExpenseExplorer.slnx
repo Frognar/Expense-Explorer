@@ -7,13 +7,17 @@
     <File Path="Directory.Packages.props" />
     <File Path="Dockerfile" />
     <File Path="docker-compose.yaml" />
+    <File Path="dotnet-tools.json" />
     <File Path="global.json" />
     <File Path="LICENSE" />
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/ExpenseExplorer.Api/ExpenseExplorer.Api.csproj" />
+    <Project Path="src/ExpenseExplorer.Application/ExpenseExplorer.Application.csproj" />
+    <Project Path="src/ExpenseExplorer.Contracts/ExpenseExplorer.Contracts.csproj" />
     <Project Path="src/ExpenseExplorer.Domain/ExpenseExplorer.Domain.csproj" />
+    <Project Path="src/ExpenseExplorer.Infrastructure/ExpenseExplorer.Infrastructure.csproj" />
     <Project Path="src/ExpenseExplorer.Web/ExpenseExplorer.Web.csproj" />
   </Folder>
   <Folder Name="/src/aspire/">

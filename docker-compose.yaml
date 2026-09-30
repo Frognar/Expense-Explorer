@@ -23,6 +23,8 @@ services:
       - db
     environment:
       - ConnectionStrings__expense-explorer=Host=db;Port=5432;Database=expense_explorer;Username=user;Password=password
+      # "Today" for purchase date validation is taken from this time zone.
+      - TZ=Europe/Warsaw
     volumes:
       - app_logs:/app/logs
     restart: unless-stopped

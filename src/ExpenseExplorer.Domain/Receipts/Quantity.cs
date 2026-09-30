@@ -3,10 +3,10 @@ using ExpenseExplorer.Domain.Common;
 
 namespace ExpenseExplorer.Domain.Receipts;
 
-/// <summary>Positive amount of units (pieces, kilograms, litres) with at most three decimal places.</summary>
+/// <summary>Positive amount of units (pieces, kilograms, litres) with at most four decimal places.</summary>
 public sealed record Quantity
 {
-    public const int MaxDecimalPlaces = 3;
+    public const int MaxDecimalPlaces = 4;
 
     public static readonly Quantity One = new(1m);
 
