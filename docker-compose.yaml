@@ -27,8 +27,11 @@ services:
       - TZ=Europe/Warsaw
     volumes:
       - app_logs:/app/logs
+      # Key that signs access tokens; created on first start and kept across updates.
+      - app_keys:/app/keys
     restart: unless-stopped
 
 volumes:
   postgres_data:
   app_logs:
+  app_keys:

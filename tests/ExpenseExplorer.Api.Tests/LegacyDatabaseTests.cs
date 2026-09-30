@@ -1,5 +1,6 @@
 using System.Net;
 using ExpenseExplorer.Contracts.Receipts;
+using ExpenseExplorer.Domain.Users;
 using Npgsql;
 
 namespace ExpenseExplorer.Api.Tests;
@@ -34,7 +35,8 @@ public class LegacyDatabaseTests(ApiFixture api)
             """);
 
         await using ApiFactory app = new(connectionString);
-        HttpResponseMessage response = await app.CreateClient().Get($"/api/v1/receipts/{receiptId}");
+        HttpClient client = app.CreateClient().WithAccessToken(await app.SignInAsync(UserRole.Editor));
+        HttpResponseMessage response = await client.Get($"/api/v1/receipts/{receiptId}");
         ReceiptResponse receipt = await response.Read<ReceiptResponse>();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

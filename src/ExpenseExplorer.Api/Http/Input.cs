@@ -11,6 +11,11 @@ internal static class Input
             ? Result.Success(present)
             : Result.Failure<T>(new Error("Input.Required", "Value is required."));
 
+    public static Result<string> Required(string? value) =>
+        string.IsNullOrWhiteSpace(value)
+            ? Result.Failure<string>(new Error("Input.Required", "Value is required."))
+            : Result.Success(value);
+
     /// <summary>A missing value stays missing; a present one must parse.</summary>
     public static Result<TOut?> Optional<TIn, TOut>(TIn? value, Func<TIn, Result<TOut>> parse)
         where TIn : struct

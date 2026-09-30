@@ -6,7 +6,7 @@ namespace ExpenseExplorer.Api.Tests;
 
 public class PipelineTests(ApiFixture api)
 {
-    private readonly HttpClient _client = api.Client;
+    private readonly HttpClient _client = api.Editor;
 
     [Fact]
     public async Task Health_endpoint_reports_healthy()

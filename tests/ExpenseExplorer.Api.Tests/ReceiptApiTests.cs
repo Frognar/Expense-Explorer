@@ -10,7 +10,7 @@ public class ReceiptApiTests(ApiFixture api)
 
     private static readonly DateOnly Today = ApiFixture.Today;
 
-    private readonly HttpClient _client = api.Client;
+    private readonly HttpClient _client = api.Editor;
 
     [Fact]
     public async Task Create_returns_the_new_receipt_and_its_location()
