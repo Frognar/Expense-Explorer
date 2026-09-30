@@ -51,6 +51,51 @@ public class ImportApiTests(ApiFixture api)
         Assert.Equal(22.78m, receipt.Total);
     }
 
+    [Fact]
+    public async Task Real_receipt_matches_what_was_paid_including_the_bottle_deposit()
+    {
+        string json = await File.ReadAllTextAsync(
+            Path.Combine(AppContext.BaseDirectory, "Import", "biedronka-2026-09-11.json"),
+            TestContext.Current.CancellationToken);
+
+        ReceiptResponse receipt = await (await Upload(api.Editor, json)).Read<ReceiptResponse>();
+
+        Assert.Equal(new DateOnly(2026, 9, 11), receipt.PurchaseDate);
+        Assert.Equal(
+            [
+                ("ChipsyZCebLay s130g", 2m, 17.38m, 6.10m),
+                ("TruskMrożMroźKra750g", 2m, 22.78m, 0m),
+                ("KetBezCukKotlin420g", 1m, 6.99m, 0m),
+                ("COCA COLA MIX 1l PET", 1m, 7.49m, 0m),
+                ("KnoppersKokos40g", 2m, 5.90m, 0m),
+                ("HummusSpicyGV160gN", 2m, 8.58m, 0m),
+                ("Limonka szt", 2m, 3.98m, 0m),
+                ("MLEK WYPAS 3,2 1L", 12m, 53.88m, 26.94m),
+                ("But Plastik kaucja", 1m, 0.50m, 0m),
+            ],
+            receipt.Items.Select(item => (item.Item, item.Quantity, item.Amount, item.Discount)));
+        Assert.Equal(94.44m, receipt.Total);
+    }
+
+    [Fact]
+    public async Task Returned_deposit_lowers_the_whole_receipt()
+    {
+        HttpResponseMessage response = await Upload(api.Editor, """
+            {
+              "header": [ { "headerData": { "date": "2026-09-28T10:00:00Z" } } ],
+              "body": [
+                { "sellLine": { "name": "Woda A", "vatId": "A", "quantity": "1", "price": 300, "total": 300 } },
+                { "sellLine": { "name": "Sok A", "vatId": "A", "quantity": "1", "price": 100, "total": 100 } },
+                { "pack": { "name": "But Plastik kaucja", "price": 50, "quantity": "2", "total": 100, "isNegative": true } }
+              ]
+            }
+            """);
+        ReceiptResponse receipt = await response.Read<ReceiptResponse>();
+
+        Assert.Equal([0.75m, 0.25m], receipt.Items.Select(item => item.Discount));
+        Assert.Equal(3.00m, receipt.Total);
+    }
+
     [Theory]
     [InlineData("", "Import.EmptyFile")]
     [InlineData("{ not json", "Import.InvalidJson")]

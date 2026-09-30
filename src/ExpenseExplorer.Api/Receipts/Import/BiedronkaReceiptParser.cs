@@ -9,6 +9,8 @@ namespace ExpenseExplorer.Api.Receipts.Import;
 /// <summary>
 /// Reads the JSON e-receipt from the Biedronka app. Prices in the file are in grosze. Discounts
 /// belong to the line above them; a voucher is spread over all lines in proportion to their value.
+/// A bottle deposit becomes a line of its own, since the receipt does not say which product it is for;
+/// a returned deposit lowers the whole receipt like a voucher.
 /// </summary>
 internal static class BiedronkaReceiptParser
 {
@@ -81,7 +83,7 @@ internal static class BiedronkaReceiptParser
         {
             Result<bool> read = entry switch
             {
-                _ when Property(entry, "sellLine") is { } sell => SellLine(sell).Map(line =>
+                _ when Property(entry, "sellLine") is { } sell => ItemLine(sell).Map(line =>
                 {
                     lines.Add(line);
                     return true;
@@ -101,6 +103,16 @@ internal static class BiedronkaReceiptParser
                     voucher += value;
                     return true;
                 }),
+                _ when Property(entry, "pack") is { } pack && IsTrue(pack, "isNegative") => Grosze(pack, "total").Map(value =>
+                {
+                    voucher += value;
+                    return true;
+                }),
+                _ when Property(entry, "pack") is { } pack => ItemLine(pack).Map(line =>
+                {
+                    lines.Add(line);
+                    return true;
+                }),
                 _ => Result.Success(false),
             };
 
@@ -115,7 +127,8 @@ internal static class BiedronkaReceiptParser
             : WithVoucher(lines, voucher);
     }
 
-    private static Result<Line> SellLine(JsonElement line)
+    /// <summary>A product or a deposit. The line total printed on the receipt wins over price times quantity.</summary>
+    private static Result<Line> ItemLine(JsonElement line)
     {
         if (IsTrue(line, "isStorno"))
         {
@@ -129,12 +142,13 @@ internal static class BiedronkaReceiptParser
                 (quantity, price) => (quantity, price))
             .Bind(parts => parts.price <= 0m
                 ? Fail<Line>("Import.InvalidPrice", $"Item '{name}' has no price.")
-                : Result.Success(new Line(
-                    name,
-                    parts.quantity,
-                    decimal.Round(parts.price * parts.quantity, Money.MaxDecimalPlaces, MidpointRounding.AwayFromZero),
-                    0m)));
+                : LineAmount(line, parts.price, parts.quantity).Map(amount => new Line(name, parts.quantity, amount, 0m)));
     }
+
+    private static Result<decimal> LineAmount(JsonElement line, decimal price, decimal quantity) =>
+        Property(line, "total") is null
+            ? Result.Success(decimal.Round(price * quantity, Money.MaxDecimalPlaces, MidpointRounding.AwayFromZero))
+            : Grosze(line, "total");
 
     private static Result<decimal> DiscountLine(JsonElement line)
     {
