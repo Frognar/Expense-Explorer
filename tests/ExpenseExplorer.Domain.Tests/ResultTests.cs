@@ -35,4 +35,20 @@ public class ResultTests
     {
         Assert.Throws<ArgumentException>(() => Result.Failure<int>([]));
     }
+
+    [Fact]
+    public void Sequence_keeps_values_in_order()
+    {
+        var result = ResultCombine.Sequence([Money.Create(1m), Money.Create(2m)]);
+
+        Assert.Equal([1m, 2m], Given.Valid(result).Select(money => money.Value));
+    }
+
+    [Fact]
+    public void Sequence_collects_every_error()
+    {
+        var result = ResultCombine.Sequence([Money.Create(-1m), Money.Create(1m), Money.Create(-2m)]);
+
+        Assert.Equal(2, result.Errors.Length);
+    }
 }

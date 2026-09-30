@@ -120,4 +120,33 @@ public class ReceiptTests
 
         Assert.Single(receipt.Items);
     }
+
+    [Fact]
+    public void Restore_rebuilds_items_in_order()
+    {
+        var first = ReceiptItemId.New();
+        var second = ReceiptItemId.New();
+
+        var receipt = Given.Valid(Receipt.Restore(
+            ReceiptId.New(),
+            Given.Valid(StoreName.Create("Lidl")),
+            Given.Date(Given.Today),
+            [(first, Given.Purchase()), (second, Given.Purchase(item: "Bread"))]));
+
+        Assert.Equal([first, second], receipt.Items.Select(item => item.Id));
+    }
+
+    [Fact]
+    public void Restore_rejects_duplicate_item_identifiers()
+    {
+        var id = ReceiptItemId.New();
+
+        var result = Receipt.Restore(
+            ReceiptId.New(),
+            Given.Valid(StoreName.Create("Lidl")),
+            Given.Date(Given.Today),
+            [(id, Given.Purchase()), (id, Given.Purchase())]);
+
+        Assert.Equal(ReceiptErrors.ItemAlreadyExists, Assert.Single(result.Errors));
+    }
 }

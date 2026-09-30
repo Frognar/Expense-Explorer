@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\ExpenseExplorer.Contracts\ExpenseExplorer.Contracts.csproj" />
+        <ProjectReference Include="..\ExpenseExplorer.Domain\ExpenseExplorer.Domain.csproj" />
+    </ItemGroup>
+
+</Project>

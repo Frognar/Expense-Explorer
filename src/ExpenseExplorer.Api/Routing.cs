@@ -1,3 +1,6 @@
+using ExpenseExplorer.Api.Dictionaries;
+using ExpenseExplorer.Api.Receipts;
+
 namespace ExpenseExplorer.Api;
 
 internal static class Routing
@@ -7,6 +10,8 @@ internal static class Routing
     public static WebApplication MapApi(this WebApplication app)
     {
         RouteGroupBuilder api = app.MapGroup(ApiPrefix);
+        api.MapReceipts();
+        api.MapDictionaries();
 
         // Unknown API routes answer with ProblemDetails instead of falling through to the frontend.
         api.MapFallback(() => Results.Problem(statusCode: StatusCodes.Status404NotFound));
