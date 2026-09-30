@@ -25,6 +25,10 @@ public sealed record Money : IComparable<Money>
             _ => Result.Success(new Money(value)),
         };
 
+    /// <summary>Rounds a non-negative amount half away from zero to whole grosze.</summary>
+    internal static Money RoundedFrom(decimal nonNegative) =>
+        new(decimal.Round(nonNegative, MaxDecimalPlaces, MidpointRounding.AwayFromZero));
+
     public static Money Sum(IEnumerable<Money> amounts) =>
         new(amounts.Sum(amount => amount.Value));
 
@@ -37,10 +41,6 @@ public sealed record Money : IComparable<Money>
     public static bool operator >=(Money left, Money right) => left.Value >= right.Value;
 
     public int CompareTo(Money? other) => other is null ? 1 : Value.CompareTo(other.Value);
-
-    /// <summary>Price of <paramref name="quantity"/> units, rounded half away from zero to whole grosze.</summary>
-    public Money Times(Quantity quantity) =>
-        new(decimal.Round(Value * quantity.Value, MaxDecimalPlaces, MidpointRounding.AwayFromZero));
 
     /// <summary>Difference clamped at zero, so the result is always a valid amount.</summary>
     public Money MinusClamped(Money other) => other > this ? Zero : new Money(Value - other.Value);

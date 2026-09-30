@@ -5,7 +5,7 @@ namespace ExpenseExplorer.Domain.Receipts;
 /// <summary>Price of one receipt line. The discount never exceeds the gross value.</summary>
 public sealed record LinePrice
 {
-    private LinePrice(Quantity quantity, Money unitPrice, Money discount)
+    private LinePrice(Quantity quantity, UnitPrice unitPrice, Money discount)
     {
         Quantity = quantity;
         UnitPrice = unitPrice;
@@ -14,7 +14,7 @@ public sealed record LinePrice
 
     public Quantity Quantity { get; }
 
-    public Money UnitPrice { get; }
+    public UnitPrice UnitPrice { get; }
 
     public Money Discount { get; }
 
@@ -22,7 +22,7 @@ public sealed record LinePrice
 
     public Money Total => Gross.MinusClamped(Discount);
 
-    public static Result<LinePrice> Create(Quantity quantity, Money unitPrice, Money discount)
+    public static Result<LinePrice> Create(Quantity quantity, UnitPrice unitPrice, Money discount)
     {
         ArgumentNullException.ThrowIfNull(quantity);
         ArgumentNullException.ThrowIfNull(unitPrice);

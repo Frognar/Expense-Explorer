@@ -78,7 +78,7 @@ internal static class ReceiptMapping
     private static Result<LinePrice> ToDomainPrice(ReceiptItemRow row) =>
         ResultCombine.Combine(
                 Quantity.Create(row.Quantity),
-                Money.Create(row.UnitPrice),
+                UnitPrice.Create(row.UnitPrice),
                 Money.Create(row.Discount),
                 (quantity, unitPrice, discount) => (quantity, unitPrice, discount))
             .Bind(parts => LinePrice.Create(parts.quantity, parts.unitPrice, parts.discount));

@@ -106,6 +106,22 @@ public class ReceiptApiTests(ApiFixture api)
     }
 
     [Fact]
+    public async Task Unit_price_accepts_four_decimal_places_but_not_more()
+    {
+        ReceiptResponse receipt = await CreateReceiptAsync("Wodociągi");
+
+        HttpResponseMessage accepted = await _client.Post(
+            $"{Receipts}/{receipt.Id}/items",
+            new ReceiptItemRequest("Woda", "Media", 17.3m, 7.1358m, null, null));
+        HttpResponseMessage rejected = await _client.Post(
+            $"{Receipts}/{receipt.Id}/items",
+            new ReceiptItemRequest("Woda", "Media", 17.3m, 7.13584m, null, null));
+
+        Assert.Equal(123.45m, (await accepted.Read<ReceiptItemResponse>()).Total);
+        Assert.Equal(["UnitPrice.TooPrecise"], (await rejected.ErrorCodes())["unitPrice"]);
+    }
+
+    [Fact]
     public async Task Discount_above_the_gross_value_is_rejected()
     {
         ReceiptResponse receipt = await CreateReceiptAsync("Lidl");
