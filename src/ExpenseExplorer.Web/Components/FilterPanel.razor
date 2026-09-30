@@ -1,0 +1,54 @@
+@inject Language Language
+
+@* Filters fold away on phones to keep the list in view; applying them updates the address. *@
+<MudExpansionPanels Elevation="1" Class="mb-3">
+    <MudExpansionPanel @bind-Expanded="_expanded">
+        <TitleContent>
+            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                <MudIcon Icon="@Icons.Material.Filled.FilterList"/>
+                <MudText>@Language.Text.Filters</MudText>
+                @if (ActiveCount > 0)
+                {
+                    <MudChip T="string" Size="Size.Small" Color="Color.Primary">@ActiveCount</MudChip>
+                }
+            </MudStack>
+        </TitleContent>
+        <ChildContent>
+            <MudStack Spacing="2">
+                @ChildContent
+                <MudStack Row="true" Justify="Justify.FlexEnd" Spacing="2">
+                    <MudButton Variant="Variant.Text" OnClick="ClearAsync">@Language.Text.ClearFilters</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ApplyAsync">@Language.Text.Apply</MudButton>
+                </MudStack>
+            </MudStack>
+        </ChildContent>
+    </MudExpansionPanel>
+</MudExpansionPanels>
+
+@code {
+    private bool _expanded;
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public int ActiveCount { get; set; }
+
+    [Parameter]
+    public EventCallback OnApply { get; set; }
+
+    [Parameter]
+    public EventCallback OnClear { get; set; }
+
+    private async Task ApplyAsync()
+    {
+        _expanded = false;
+        await OnApply.InvokeAsync();
+    }
+
+    private async Task ClearAsync()
+    {
+        _expanded = false;
+        await OnClear.InvokeAsync();
+    }
+}

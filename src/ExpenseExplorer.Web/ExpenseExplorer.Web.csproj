@@ -10,4 +10,8 @@
         <PackageReference Include="MudBlazor" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\ExpenseExplorer.Contracts\ExpenseExplorer.Contracts.csproj" />
+    </ItemGroup>
+
 </Project>

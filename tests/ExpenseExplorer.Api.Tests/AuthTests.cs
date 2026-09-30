@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Json;
 using ExpenseExplorer.Contracts.Auth;
 using ExpenseExplorer.Contracts.Receipts;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -31,6 +32,21 @@ public class AuthTests(ApiFixture api)
         Assert.Contains("path=/api/v1/auth", cookie, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("samesite=strict", cookie, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("httponly", cookie, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task Refresh_cookie_is_secure_behind_an_https_proxy()
+    {
+        string user = await CreateUserAsync("reader");
+        using HttpRequestMessage request = new(HttpMethod.Post, new Uri(Login, UriKind.Relative))
+        {
+            Content = JsonContent.Create(new LoginRequest(user, Password)),
+        };
+        request.Headers.Add("X-Forwarded-Proto", "https");
+
+        HttpResponseMessage response = await NewClient().SendAsync(request, TestContext.Current.CancellationToken);
+
+        Assert.Contains("secure", Assert.Single(response.Headers.GetValues("Set-Cookie")), StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

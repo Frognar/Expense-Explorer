@@ -1,21 +1,45 @@
 @inherits LayoutComponentBase
-
-<MudThemeProvider/>
-<MudPopoverProvider/>
-<MudDialogProvider/>
-<MudSnackbarProvider/>
+@implements IDisposable
+@inject AuthSession Auth
+@inject Language Language
+@inject NavigationManager Navigation
+@inject IJSRuntime Js
 
 <MudLayout>
     <MudAppBar Elevation="1" Dense="true">
-        <MudText Typo="Typo.h6">Expense Explorer</MudText>
-        <MudSpacer/>
+        <MudText Typo="Typo.h6" Class="text-nowrap">Expense Explorer</MudText>
         <MudHidden Breakpoint="Breakpoint.SmAndDown">
             <NavLinks Horizontal="true"/>
         </MudHidden>
+        <MudSpacer/>
+        @if (Auth.User is { } user)
+        {
+            <MudMenu Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" AnchorOrigin="Origin.BottomRight"
+                     TransformOrigin="Origin.TopRight" aria-label="@user.UserName">
+                <MudMenuItem Disabled="true">
+                    @user.UserName@(user.CanEdit ? "" : $" · {Language.Text.ReadOnlyAccess}")
+                </MudMenuItem>
+                <MudDivider/>
+                @foreach ((string code, string name) in Language.Available)
+                {
+                    <MudMenuItem Icon="@(code == Language.Code ? Icons.Material.Filled.Check : Icons.Material.Filled.Language)"
+                                 OnClick="@(() => SwitchLanguageAsync(code))">@name</MudMenuItem>
+                }
+                <MudDivider/>
+                <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="SignOutAsync">@Language.Text.SignOut</MudMenuItem>
+            </MudMenu>
+        }
     </MudAppBar>
     <MudMainContent Class="main-content">
         <MudContainer MaxWidth="MaxWidth.Large" Class="pa-2 pa-md-4">
-            @Body
+            @if (Auth.IsSignedIn)
+            {
+                @Body
+            }
+            else
+            {
+                <MudProgressLinear Indeterminate="true" Color="Color.Primary"/>
+            }
         </MudContainer>
     </MudMainContent>
     <MudHidden Breakpoint="Breakpoint.MdAndUp">
@@ -24,3 +48,33 @@
         </nav>
     </MudHidden>
 </MudLayout>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        Auth.Changed += OnSessionChanged;
+        await Auth.RestoreAsync();
+        OnSessionChanged(this, EventArgs.Empty);
+    }
+
+    public void Dispose() => Auth.Changed -= OnSessionChanged;
+
+    // Every page behind this layout needs a signed-in user; without one the sign-in page takes over.
+    private void OnSessionChanged(object? sender, EventArgs args)
+    {
+        if (Auth.IsRestored && !Auth.IsSignedIn && !Navigation.IsOn(Routes.Login()))
+        {
+            Navigation.NavigateTo(Routes.Login(Navigation.ToBaseRelativePath(Navigation.Uri)));
+        }
+
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SwitchLanguageAsync(string code)
+    {
+        await Language.SaveAsync(Js, code);
+        Navigation.Refresh(forceReload: true);
+    }
+
+    private Task SignOutAsync() => Auth.SignOutAsync();
+}

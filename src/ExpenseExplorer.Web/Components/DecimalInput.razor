@@ -1,0 +1,65 @@
+@using System.Globalization
+@inject Language Language
+
+@*
+    A number typed the way people type it: both "3,60" and "3.60" mean three and sixty hundredths,
+    whichever language is chosen and whatever the phone keyboard offers.
+*@
+<MudTextField T="string" Value="@_text" ValueChanged="OnChanged" Label="@Label" InputMode="DecimalKeyboard"
+              Variant="Variant.Outlined" Margin="Margin.Dense" Clearable="@Clearable" HelperText="@HelperText" Immediate="true"
+              Error="@(Problem is not null)" ErrorText="@Problem"/>
+
+@code {
+    private const InputMode DecimalKeyboard = InputMode.@decimal;
+
+    private string? _text;
+    private decimal? _shown;
+    private bool _unreadable;
+
+    [Parameter]
+    public decimal? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<decimal?> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? HelperText { get; set; }
+
+    [Parameter]
+    public string? ErrorText { get; set; }
+
+    [Parameter]
+    public bool Clearable { get; set; }
+
+    private string? Problem => _unreadable ? Language.Text.InvalidNumber : ErrorText;
+
+    // Only a value changed from outside replaces the text, so what the user typed stays as typed.
+    protected override void OnParametersSet()
+    {
+        if (Value != _shown)
+        {
+            _text = Value?.ToString("0.####", CultureInfo.CurrentCulture);
+            _shown = Value;
+        }
+    }
+
+    private Task OnChanged(string? text)
+    {
+        _text = text;
+        _shown = Parse(text);
+        _unreadable = !string.IsNullOrWhiteSpace(text) && _shown is null;
+        return ValueChanged.InvokeAsync(_shown);
+    }
+
+    private static decimal? Parse(string? text) =>
+        decimal.TryParse(
+            text?.Replace(',', '.').Replace(" ", "", StringComparison.Ordinal),
+            NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign,
+            CultureInfo.InvariantCulture,
+            out decimal value)
+            ? value
+            : null;
+}

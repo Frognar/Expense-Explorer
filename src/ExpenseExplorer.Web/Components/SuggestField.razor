@@ -1,0 +1,39 @@
+@inject ExpenseApi Api
+
+@* Free text with suggestions from what was entered before, e.g. a store or a category. *@
+<MudAutocomplete T="string" Value="@Value" ValueChanged="ValueChanged" Label="@Label" SearchFunc="SearchAsync"
+                 CoerceValue="true" CoerceText="false" DebounceInterval="250" MaxLength="MaxLength" Clearable="@Clearable"
+                 Variant="Variant.Outlined" Margin="Margin.Dense" ResetValueOnEmptyText="true" MaxItems="50"
+                 Error="@(ErrorText is not null)" ErrorText="@ErrorText" AutoFocus="@AutoFocus"/>
+
+@code {
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter, EditorRequired]
+    public Suggestions Kind { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? ErrorText { get; set; }
+
+    [Parameter]
+    public int MaxLength { get; set; } = 100;
+
+    [Parameter]
+    public bool Clearable { get; set; }
+
+    [Parameter]
+    public bool AutoFocus { get; set; }
+
+    private async Task<IEnumerable<string>> SearchAsync(string? search, CancellationToken cancellationToken)
+    {
+        ApiResult<IReadOnlyList<string>> result = await Api.SuggestionsAsync(Kind, search);
+        return result.IsSuccess ? result.Value : [];
+    }
+}

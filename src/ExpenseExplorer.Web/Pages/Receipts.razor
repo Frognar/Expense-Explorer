@@ -1,5 +1,161 @@
 @page "/"
+@implements IDisposable
+@inject ExpenseApi Api
+@inject AuthSession Auth
+@inject Language Language
+@inject NavigationManager Navigation
+@inject IDialogService Dialogs
+@inject ISnackbar Snackbar
 
-<PageTitle>Paragony</PageTitle>
-<MudText Typo="Typo.h5" GutterBottom="true">Paragony</MudText>
-<MudText>Lista paragonów pojawi się w kolejnym etapie.</MudText>
+<PageTitle>@Language.Text.Receipts · Expense Explorer</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2" Wrap="Wrap.Wrap">
+    <MudText Typo="Typo.h5" HtmlTag="h1">@Language.Text.Receipts</MudText>
+    <MudSpacer/>
+    @if (Auth.CanEdit)
+    {
+        <MudFileUpload T="IBrowserFile" Accept=".json,application/json" FilesChanged="ImportAsync" Disabled="_importing">
+            <CustomContent>
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.UploadFile" Size="Size.Small"
+                           OnClick="@context.OpenFilePickerAsync">
+                    @Language.Text.ImportBiedronka
+                </MudButton>
+            </CustomContent>
+        </MudFileUpload>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small"
+                   OnClick="CreateAsync">@Language.Text.NewReceipt</MudButton>
+    }
+</MudStack>
+
+<FilterPanel ActiveCount="ActiveFilters" OnApply="() => Show(_draft with { Page = null })" OnClear="() => Show(new ReceiptListRequest())">
+    <ChipsFilter Kind="Suggestions.Stores" Label="@Language.Text.Stores" Values="_draft.Stores"
+                 ValuesChanged="stores => _draft = _draft with { Stores = stores }"/>
+    <MudStack Row="true" Spacing="2">
+        <DateInput Label="@Language.Text.From" Value="_draft.From" ValueChanged="from => _draft = _draft with { From = from }" Clearable="true"/>
+        <DateInput Label="@Language.Text.To" Value="_draft.To" ValueChanged="to => _draft = _draft with { To = to }" Clearable="true"/>
+    </MudStack>
+    <RangeInput Label="@Language.Text.Total" Min="_draft.TotalMin" MinChanged="min => _draft = _draft with { TotalMin = min }"
+                Max="_draft.TotalMax" MaxChanged="max => _draft = _draft with { TotalMax = max }"/>
+</FilterPanel>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-2">
+    <SortPicker TField="ReceiptSortField" Labels="Language.Text.ReceiptSort"
+                Field="@(_filter.SortBy ?? ReceiptSortField.PurchaseDate)" FieldChanged="field => Show(_filter with { SortBy = field, Page = null })"
+                Direction="@(_filter.Direction ?? SortDirection.Descending)" DirectionChanged="direction => Show(_filter with { Direction = direction, Page = null })"/>
+    @if (_list is not null)
+    {
+        <div class="num">
+            <MudText Typo="Typo.caption" Class="d-block">@Language.Text.TotalOfFiltered</MudText>
+            <MudText Typo="Typo.subtitle1"><b>@Display.Money(_list.TotalCost)</b></MudText>
+        </div>
+    }
+</MudStack>
+
+@if (_problem is not null)
+{
+    <ProblemAlert Problem="_problem"/>
+}
+else if (_list is null)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary"/>
+}
+else if (_list.Receipts.Items.Count == 0)
+{
+    <MudText Class="pa-4" Align="Align.Center">@Language.Text.NothingFound</MudText>
+}
+else
+{
+    <MudPaper Elevation="1">
+        <MudList T="ReceiptSummaryResponse" Dense="true" Padding="false">
+            @foreach (ReceiptSummaryResponse receipt in _list.Receipts.Items)
+            {
+                <MudListItem T="ReceiptSummaryResponse" Href="@Routes.Receipt(receipt.Id)" Class="list-row">
+                    <div class="d-flex align-center gap-3">
+                        <div class="flex-grow-1 min-w-0">
+                            <MudText Typo="Typo.body1" Class="text-truncate"><b>@receipt.Store</b></MudText>
+                            <MudText Typo="Typo.body2" Class="mud-text-secondary">@Display.Date(receipt.PurchaseDate)</MudText>
+                        </div>
+                        <MudText Typo="Typo.body1" Class="text-nowrap">@Display.Money(receipt.Total)</MudText>
+                    </div>
+                </MudListItem>
+                <MudDivider/>
+            }
+        </MudList>
+    </MudPaper>
+    <Pager Page="_list.Receipts.Page" PageSize="_list.Receipts.PageSize" TotalCount="_list.Receipts.TotalCount"
+           PageChanged="page => Show(_filter with { Page = page })"/>
+}
+
+@code {
+    private ReceiptListRequest _filter = new();
+    private ReceiptListRequest _draft = new();
+    private ReceiptListResponse? _list;
+    private ApiProblem? _problem;
+    private bool _importing;
+
+    private int ActiveFilters =>
+        (_filter.Stores is { Length: > 0 } ? 1 : 0)
+        + (_filter.From is null && _filter.To is null ? 0 : 1)
+        + (_filter.TotalMin is null && _filter.TotalMax is null ? 0 : 1);
+
+    protected override async Task OnInitializedAsync()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        await LoadAsync();
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if (Navigation.IsOn(Routes.Receipts()))
+        {
+            _ = InvokeAsync(LoadAsync);
+        }
+    }
+
+    // The address is the single source of the filter: reading it after every change keeps the back button working.
+    private async Task LoadAsync()
+    {
+        _filter = ListQueries.ReceiptList(QueryReader.Of(new Uri(Navigation.Uri)));
+        _draft = _filter;
+        ApiResult<ReceiptListResponse> result = await Api.ReceiptsAsync(_filter);
+        _list = result.ValueOrDefault;
+        _problem = result.Problem;
+        StateHasChanged();
+    }
+
+    private void Show(ReceiptListRequest filter) => Navigation.NavigateTo(Routes.Receipts(filter));
+
+    private async Task CreateAsync()
+    {
+        IDialogReference dialog = await Dialogs.ShowAsync<ReceiptDialog>(Language.Text.NewReceipt);
+        if (await dialog.Result is { Canceled: false, Data: ReceiptResponse receipt })
+        {
+            Navigation.NavigateTo(Routes.Receipt(receipt.Id));
+        }
+    }
+
+    private async Task ImportAsync(IBrowserFile? file)
+    {
+        if (file is null)
+        {
+            return;
+        }
+
+        _importing = true;
+        // The API refuses files over 1 MB; reading a bit more lets it say so instead of the browser failing.
+        await using Stream content = file.OpenReadStream(maxAllowedSize: 2 * 1024 * 1024);
+        ApiResult<ReceiptResponse> result = await Api.ImportBiedronkaAsync(content, file.Name);
+        _importing = false;
+        if (result.IsSuccess)
+        {
+            Snackbar.Add(Language.Text.Imported, Severity.Success);
+            Navigation.NavigateTo(Routes.Receipt(result.Value.Id));
+        }
+        else
+        {
+            Snackbar.Add(Language.Errors(result.Problem!.ErrorCodes.Values.SelectMany(codes => codes)), Severity.Error);
+        }
+    }
+}

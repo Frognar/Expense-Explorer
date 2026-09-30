@@ -1,0 +1,163 @@
+@page "/receipts/{Id:guid}"
+@inject ExpenseApi Api
+@inject AuthSession Auth
+@inject Language Language
+@inject NavigationManager Navigation
+@inject IDialogService Dialogs
+@inject ISnackbar Snackbar
+@inject IJSRuntime Js
+
+<PageTitle>@(_receipt?.Store ?? Language.Text.Receipts) · Expense Explorer</PageTitle>
+
+@if (_problem is not null)
+{
+    <ProblemAlert Problem="_problem"/>
+}
+else if (_receipt is null)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary"/>
+}
+else
+{
+    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="mb-2">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Href="@Routes.Receipts()" aria-label="@Language.Text.Receipts"/>
+        <div class="flex-grow-1 min-w-0">
+            <MudText Typo="Typo.h5" HtmlTag="h1" Class="text-truncate">@_receipt.Store</MudText>
+            <MudText Typo="Typo.body2" Class="mud-text-secondary">@Display.Date(_receipt.PurchaseDate)</MudText>
+        </div>
+        <MudText Typo="Typo.h6" Class="text-nowrap">@Display.Money(_receipt.Total)</MudText>
+        <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
+            @if (Auth.CanEdit)
+            {
+                <MudMenuItem Icon="@Icons.Material.Filled.Edit" OnClick="EditAsync">@Language.Text.EditReceipt</MudMenuItem>
+                <MudMenuItem Icon="@Icons.Material.Filled.ContentCopy" OnClick="DuplicateAsync">@Language.Text.DuplicateAsOf</MudMenuItem>
+            }
+            <MudMenuItem Icon="@Icons.Material.Filled.Download" OnClick="ExportAsync">@Language.Text.ExportCsv</MudMenuItem>
+            @if (Auth.CanEdit)
+            {
+                <MudDivider/>
+                <MudMenuItem Icon="@Icons.Material.Filled.Delete" IconColor="Color.Error" OnClick="DeleteAsync">@Language.Text.DeleteReceipt</MudMenuItem>
+            }
+        </MudMenu>
+    </MudStack>
+
+    @if (_receipt.Items.Count == 0)
+    {
+        <MudText Class="pa-4" Align="Align.Center">@Language.Text.NoItemsYet</MudText>
+    }
+    else
+    {
+        <MudPaper Elevation="1">
+            <MudList T="ReceiptItemResponse" Dense="true" Padding="false" ReadOnly="@(!Auth.CanEdit)">
+                @foreach (ReceiptItemResponse item in _receipt.Items)
+                {
+                    <MudListItem T="ReceiptItemResponse" OnClick="() => EditItemAsync(item)" Class="list-row">
+                        <ReceiptLine Item="@item.Item" Category="@item.Category" Quantity="item.Quantity" UnitPrice="item.UnitPrice"
+                                     Discount="item.Discount" Total="item.Total" Description="@item.Description"/>
+                    </MudListItem>
+                    <MudDivider/>
+                }
+            </MudList>
+        </MudPaper>
+    }
+
+    @if (Auth.CanEdit)
+    {
+        <MudFab Class="fab" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Label="@Language.Text.AddItem"
+                OnClick="AddItemAsync"/>
+        <div class="fab-space"></div>
+    }
+}
+
+@code {
+    private ReceiptResponse? _receipt;
+    private ApiProblem? _problem;
+
+    [Parameter]
+    public Guid Id { get; set; }
+
+    protected override Task OnParametersSetAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        ApiResult<ReceiptResponse> result = await Api.ReceiptAsync(Id);
+        _receipt = result.ValueOrDefault;
+        _problem = result.Problem;
+    }
+
+    private async Task EditAsync()
+    {
+        IDialogReference dialog = await Dialogs.ShowAsync<ReceiptDialog>(
+            Language.Text.EditReceipt,
+            new DialogParameters<ReceiptDialog> { { d => d.Receipt, _receipt } });
+        if (await dialog.Result is { Canceled: false, Data: ReceiptResponse receipt })
+        {
+            _receipt = receipt;
+        }
+    }
+
+    private async Task DuplicateAsync()
+    {
+        IDialogReference dialog = await Dialogs.ShowAsync<DuplicateDialog>(
+            Language.Text.DuplicateAsOf,
+            new DialogParameters<DuplicateDialog> { { d => d.ReceiptId, Id } });
+        if (await dialog.Result is { Canceled: false, Data: ReceiptResponse copy })
+        {
+            Navigation.NavigateTo(Routes.Receipt(copy.Id));
+        }
+    }
+
+    private async Task ExportAsync()
+    {
+        ApiResult<DownloadedFile> result = await Api.ExportCsvAsync(Id);
+        if (result.IsSuccess)
+        {
+            await Js.InvokeVoidAsync("downloadFile", result.Value.Name, result.Value.ContentType, Convert.ToBase64String(result.Value.Content.Span));
+        }
+        else
+        {
+            Snackbar.Add(Language.Errors(result.Problem!.ErrorCodes.Values.SelectMany(codes => codes)), Severity.Error);
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!await Confirm.AskAsync(Dialogs, Language.Text, Language.Text.DeleteReceiptQuestion))
+        {
+            return;
+        }
+
+        ApiResult<bool> result = await Api.DeleteReceiptAsync(Id);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add(Language.Text.Deleted, Severity.Success);
+            Navigation.NavigateTo(Routes.Receipts());
+        }
+        else
+        {
+            Snackbar.Add(Language.Errors(result.Problem!.ErrorCodes.Values.SelectMany(codes => codes)), Severity.Error);
+        }
+    }
+
+    // A new line starts with the category of the last one: receipts are usually typed in store order.
+    private Task AddItemAsync() =>
+        ShowItemDialogAsync(Language.Text.AddItem, new DialogParameters<ItemDialog>
+        {
+            { d => d.ReceiptId, Id },
+            { d => d.Category, _receipt?.Items.LastOrDefault()?.Category },
+        });
+
+    private Task EditItemAsync(ReceiptItemResponse item) =>
+        Auth.CanEdit
+            ? ShowItemDialogAsync(Language.Text.EditItem, new DialogParameters<ItemDialog> { { d => d.ReceiptId, Id }, { d => d.Item, item } })
+            : Task.CompletedTask;
+
+    private async Task ShowItemDialogAsync(string title, DialogParameters<ItemDialog> parameters)
+    {
+        IDialogReference dialog = await Dialogs.ShowAsync<ItemDialog>(title, parameters);
+        if (await dialog.Result is { Canceled: false })
+        {
+            await LoadAsync();
+        }
+    }
+}

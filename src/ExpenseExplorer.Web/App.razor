@@ -1,12 +1,27 @@
+@inject Language Language
+
+<MudThemeProvider Theme="Theme"/>
+<MudPopoverProvider/>
+<MudDialogProvider FullWidth="true" MaxWidth="MaxWidth.Small" CloseButton="true"/>
+<MudSnackbarProvider/>
+
 <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
         <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
     </Found>
     <NotFound>
-        <PageTitle>Nie znaleziono</PageTitle>
+        <PageTitle>@Language.Text.NotFound</PageTitle>
         <LayoutView Layout="@typeof(MainLayout)">
-            <MudText Typo="Typo.h6">Nie ma takiej strony.</MudText>
+            <MudText Typo="Typo.h6">@Language.Text.NotFound</MudText>
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    private static readonly MudTheme Theme = new()
+    {
+        PaletteLight = new PaletteLight { Primary = "#4a5fc1", AppbarBackground = "#4a5fc1" },
+        PaletteDark = new PaletteDark { Primary = "#8c9eff" },
+    };
+}

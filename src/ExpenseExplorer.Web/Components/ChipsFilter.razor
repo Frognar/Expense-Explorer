@@ -1,0 +1,55 @@
+@inject ExpenseApi Api
+
+@* Picks any number of stores, items or categories; the list matches any of them. *@
+<div>
+    <MudAutocomplete T="string" Value="@_picked" ValueChanged="Add" Label="@Label" SearchFunc="SearchAsync" DebounceInterval="250"
+                     Variant="Variant.Outlined" Margin="Margin.Dense" ResetValueOnEmptyText="true" CoerceValue="false"
+                     MaxItems="50"/>
+    @if (Values is { Length: > 0 })
+    {
+        <MudChipSet T="string" AllClosable="true" OnClose="Remove" Class="mt-1">
+            @foreach (string value in Values)
+            {
+                <MudChip T="string" Value="@value" Text="@value" Size="Size.Small" Color="Color.Primary" Variant="Variant.Outlined"/>
+            }
+        </MudChipSet>
+    }
+</div>
+
+@code {
+    private string? _picked;
+
+    [Parameter]
+    public string[]? Values { get; set; }
+
+    [Parameter]
+    public EventCallback<string[]?> ValuesChanged { get; set; }
+
+    [Parameter, EditorRequired]
+    public Suggestions Kind { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    private async Task<IEnumerable<string>> SearchAsync(string? search, CancellationToken cancellationToken)
+    {
+        ApiResult<IReadOnlyList<string>> result = await Api.SuggestionsAsync(Kind, search);
+        return result.IsSuccess ? result.Value.Except(Values ?? []) : [];
+    }
+
+    // The picked value moves into the chips and the field empties for the next one.
+    private async Task Add(string? picked)
+    {
+        _picked = null;
+        if (!string.IsNullOrWhiteSpace(picked))
+        {
+            await ValuesChanged.InvokeAsync([.. (Values ?? []).Append(picked).Distinct()]);
+        }
+    }
+
+    private Task Remove(MudChip<string> chip)
+    {
+        string[] left = [.. (Values ?? []).Where(value => value != chip.Value)];
+        return ValuesChanged.InvokeAsync(left.Length == 0 ? null : left);
+    }
+}

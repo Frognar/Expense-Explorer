@@ -1,0 +1,36 @@
+@typeparam TField where TField : struct, Enum
+@inject Language Language
+
+<MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+    <MudSelect T="TField" Value="@Field" ValueChanged="FieldChanged" Label="@Language.Text.SortBy" Dense="true"
+               Variant="Variant.Outlined" Margin="Margin.Dense">
+        @foreach ((TField field, string label) in Labels)
+        {
+            <MudSelectItem T="TField" Value="@field">@label</MudSelectItem>
+        }
+    </MudSelect>
+    <MudIconButton Icon="@(Direction == SortDirection.Ascending ? Icons.Material.Filled.ArrowUpward : Icons.Material.Filled.ArrowDownward)"
+                   aria-label="@(Direction == SortDirection.Ascending ? Language.Text.Ascending : Language.Text.Descending)"
+                   title="@(Direction == SortDirection.Ascending ? Language.Text.Ascending : Language.Text.Descending)"
+                   OnClick="Flip"/>
+</MudStack>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyDictionary<TField, string> Labels { get; set; } = new Dictionary<TField, string>();
+
+    [Parameter]
+    public TField Field { get; set; }
+
+    [Parameter]
+    public EventCallback<TField> FieldChanged { get; set; }
+
+    [Parameter]
+    public SortDirection Direction { get; set; }
+
+    [Parameter]
+    public EventCallback<SortDirection> DirectionChanged { get; set; }
+
+    private Task Flip() =>
+        DirectionChanged.InvokeAsync(Direction == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending);
+}

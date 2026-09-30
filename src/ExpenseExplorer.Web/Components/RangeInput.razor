@@ -1,0 +1,24 @@
+@inject Language Language
+
+@* Two optional bounds, both included. *@
+<MudStack Row="true" Spacing="2">
+    <DecimalInput Value="@Min" ValueChanged="MinChanged" Label="@($"{Label} {Language.Text.Min}")" Clearable="true"/>
+    <DecimalInput Value="@Max" ValueChanged="MaxChanged" Label="@($"{Label} {Language.Text.Max}")" Clearable="true"/>
+</MudStack>
+
+@code {
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public decimal? Min { get; set; }
+
+    [Parameter]
+    public EventCallback<decimal?> MinChanged { get; set; }
+
+    [Parameter]
+    public decimal? Max { get; set; }
+
+    [Parameter]
+    public EventCallback<decimal?> MaxChanged { get; set; }
+}
