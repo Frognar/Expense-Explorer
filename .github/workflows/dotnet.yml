@@ -42,6 +42,19 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
 
+    - name: Back up the database
+      shell: bash
+      run: |
+        backups="$HOME/expense-explorer-backups"
+        mkdir -p "$backups"
+        if docker ps --format '{{.Names}}' | grep -qx expense-explorer-db; then
+          docker exec expense-explorer-db pg_dump -U user -d expense_explorer | gzip > "$backups/$(date +%Y%m%d-%H%M%S).sql.gz"
+          # Keep the 20 newest backups.
+          ls -1t "$backups"/*.sql.gz | tail -n +21 | xargs -r rm --
+        fi
+
+    # --remove-orphans stops containers of services no longer in the compose file
+    # (the old "webapp" would otherwise keep port 8080).
     - name: Deploy with Docker Compose
-      run: docker compose up -d --build
+      run: docker compose up -d --build --remove-orphans
 

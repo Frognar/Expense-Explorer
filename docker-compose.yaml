@@ -10,6 +10,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d expense_explorer"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
     restart: unless-stopped
 
   api:
@@ -19,8 +24,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+    # The API migrates the database on start, so it waits until Postgres accepts connections.
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - ConnectionStrings__expense-explorer=Host=db;Port=5432;Database=expense_explorer;Username=user;Password=password
       # "Today" for purchase date validation is taken from this time zone.

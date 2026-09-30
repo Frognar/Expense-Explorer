@@ -23,6 +23,21 @@ The previous version is kept on the [`main-2609-archive`](https://github.com/Fro
 - `src/aspire/AppHost` – local run with PostgreSQL (`dotnet run --project src/aspire/AppHost`)
 - `tests/` – unit and API tests (`dotnet test --solution ExpenseExplorer.slnx`)
 
+## Deployment
+
+The app runs on the home server with Docker Compose (`docker-compose.yaml`): PostgreSQL and the API, which also serves the frontend on port 8080.
+It is meant to sit behind a reverse proxy that terminates HTTPS (Caddy on the Pi); the API trusts its `X-Forwarded-Proto` and `X-Forwarded-For` headers.
+
+Deploying is manual: **Actions > .NET > Run workflow** on `main`. The job on the self-hosted runner:
+
+1. dumps the database to `~/expense-explorer-backups/<timestamp>.sql.gz` (the 20 newest are kept),
+2. runs `docker compose up -d --build --remove-orphans`.
+
+On the first start the API creates its tables in the `expense` schema and copies receipts from the previous version's `public.receipts` and `public.receipt_items` (once; the old tables are left untouched).
+Then create the accounts (see below).
+
+To restore a backup: `gunzip -c <file>.sql.gz | docker exec -i expense-explorer-db psql -U user -d expense_explorer` (into an empty database).
+
 ## Accounts
 
 There is no sign-up. Accounts are managed from the command line, which asks for the password:
