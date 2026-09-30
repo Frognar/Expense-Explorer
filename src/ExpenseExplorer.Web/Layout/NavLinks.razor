@@ -1,5 +1,7 @@
+@inject Language Language
+
 @* Same destinations on every screen size: app bar on desktop, bottom bar on phones. *@
-@foreach (NavTarget target in Targets)
+@foreach (NavTarget target in Targets(Language.Text))
 {
     <NavLink class="@(Horizontal ? "top-link" : "bottom-link")" href="@target.Href" Match="@target.Match">
         <MudIcon Icon="@target.Icon" Size="Size.Small"/>
@@ -13,10 +15,10 @@
 
     private sealed record NavTarget(string Href, string Label, string Icon, NavLinkMatch Match);
 
-    private static readonly NavTarget[] Targets =
+    private static NavTarget[] Targets(UiText text) =>
     [
-        new("", "Paragony", Icons.Material.Filled.ReceiptLong, NavLinkMatch.All),
-        new("receipt-items", "Pozycje", Icons.Material.Filled.ShoppingBasket, NavLinkMatch.Prefix),
-        new("reports", "Raporty", Icons.Material.Filled.PieChart, NavLinkMatch.Prefix),
+        new(Routes.Receipts(), text.Receipts, Icons.Material.Filled.ReceiptLong, NavLinkMatch.All),
+        new(Routes.ReceiptItems(), text.Items, Icons.Material.Filled.ShoppingBasket, NavLinkMatch.Prefix),
+        new(Routes.Reports, text.Reports, Icons.Material.Filled.PieChart, NavLinkMatch.Prefix),
     ];
 }

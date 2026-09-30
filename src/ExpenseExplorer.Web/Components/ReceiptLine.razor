@@ -1,0 +1,50 @@
+@* One receipt line: what was bought on the left, what it cost on the right. *@
+<div class="d-flex align-center gap-3">
+    <div class="flex-grow-1 min-w-0">
+        <MudText Typo="Typo.body1" Class="text-truncate"><b>@Item</b></MudText>
+        <MudText Typo="Typo.body2" Class="mud-text-secondary text-truncate">
+            @Category@(Context is null ? "" : $" · {Context}")
+        </MudText>
+        @if (!string.IsNullOrWhiteSpace(Description))
+        {
+            <MudText Typo="Typo.caption" Class="d-block text-truncate">@Description</MudText>
+        }
+    </div>
+    <div class="num text-nowrap">
+        <MudText Typo="Typo.body1">@Display.Money(Total)</MudText>
+        <MudText Typo="Typo.caption" Class="mud-text-secondary d-block">
+            @Display.Quantity(Quantity) × @Display.Money(UnitPrice)
+        </MudText>
+        @if (Discount > 0)
+        {
+            <MudText Typo="Typo.caption" Color="Color.Success" Class="d-block">−@Display.Money(Discount)</MudText>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Item { get; set; } = "";
+
+    [Parameter]
+    public string Category { get; set; } = "";
+
+    /// <summary>Extra detail after the category, e.g. the store and date in the list of all lines.</summary>
+    [Parameter]
+    public string? Context { get; set; }
+
+    [Parameter]
+    public decimal Quantity { get; set; }
+
+    [Parameter]
+    public decimal UnitPrice { get; set; }
+
+    [Parameter]
+    public decimal Discount { get; set; }
+
+    [Parameter]
+    public decimal Total { get; set; }
+
+    [Parameter]
+    public string? Description { get; set; }
+}

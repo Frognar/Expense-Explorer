@@ -1,0 +1,18 @@
+@inject Language Language
+
+@* Errors that do not belong to any field of the form. *@
+@if (Message is { } message)
+{
+    <MudAlert Severity="Severity.Error" Dense="true">@message</MudAlert>
+}
+
+@code {
+    [Parameter]
+    public ApiProblem? Problem { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<string> Fields { get; set; } = [];
+
+    private string? Message =>
+        Problem?.CodesOutside([.. Fields]) is { Count: > 0 } codes ? Language.Errors(codes) : null;
+}

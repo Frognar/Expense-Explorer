@@ -71,3 +71,49 @@
     float: right;
     cursor: pointer;
 }
+
+.list-row .mud-list-item-text {
+    min-width: 0;
+}
+
+.min-w-0 {
+    min-width: 0;
+}
+
+.text-nowrap {
+    white-space: nowrap;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.items-table .description-cell {
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* The add button floats above the bottom navigation on phones. */
+.fab {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 1000;
+}
+
+@media (max-width: 959.98px) {
+    .fab {
+        bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 16px);
+    }
+}
+
+/* Room below the last line so the floating button never covers it. */
+.fab-space {
+    height: 72px;
+}
+
+.num {
+    text-align: right;
+}

@@ -1,0 +1,48 @@
+@inject ExpenseApi Api
+@inject Language Language
+
+@* Copies a receipt with all its items to another date, e.g. a weekly purchase. *@
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="this" OnSubmit="DuplicateAsync" id="duplicate-form">
+            <MudStack Spacing="3">
+                <DateInput @bind-Value="_purchaseDate" Label="@Language.Text.PurchaseDate" ErrorText="@ErrorFor("purchaseDate")"/>
+                <ProblemAlert Problem="_problem" Fields="Fields"/>
+            </MudStack>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => Dialog.Cancel()">@Language.Text.Cancel</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" form="duplicate-form" Color="Color.Primary" Variant="Variant.Filled"
+                   Disabled="_busy">@Language.Text.Duplicate</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private static readonly string[] Fields = ["purchaseDate"];
+
+    private DateOnly? _purchaseDate = DateOnly.FromDateTime(DateTime.Today);
+    private ApiProblem? _problem;
+    private bool _busy;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public Guid ReceiptId { get; set; }
+
+    private string? ErrorFor(string field) =>
+        _problem?.CodesFor(field) is { Count: > 0 } codes ? Language.Errors(codes) : null;
+
+    private async Task DuplicateAsync()
+    {
+        _busy = true;
+        ApiResult<ReceiptResponse> result = await Api.DuplicateReceiptAsync(ReceiptId, new DuplicateReceiptRequest(_purchaseDate));
+        _busy = false;
+        _problem = result.Problem;
+        if (result.IsSuccess)
+        {
+            Dialog.Close(DialogResult.Ok(result.Value));
+        }
+    }
+}

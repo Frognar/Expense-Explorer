@@ -1,0 +1,60 @@
+@inject ExpenseApi Api
+@inject Language Language
+
+@* Creates a receipt, or changes the store and date of an existing one. *@
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="this" OnSubmit="SaveAsync" id="receipt-form">
+            <MudStack Spacing="3">
+                <SuggestField Kind="Suggestions.Stores" @bind-Value="_store" Label="@Language.Text.Store" AutoFocus="@(Receipt is null)"
+                              ErrorText="@ErrorFor("store")"/>
+                <DateInput @bind-Value="_purchaseDate" Label="@Language.Text.PurchaseDate" ErrorText="@ErrorFor("purchaseDate")"/>
+                <ProblemAlert Problem="_problem" Fields="Fields"/>
+            </MudStack>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => Dialog.Cancel()">@Language.Text.Cancel</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" form="receipt-form" Color="Color.Primary" Variant="Variant.Filled"
+                   Disabled="_busy">@Language.Text.Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private static readonly string[] Fields = ["store", "purchaseDate"];
+
+    private string? _store;
+    private DateOnly? _purchaseDate;
+    private ApiProblem? _problem;
+    private bool _busy;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = null!;
+
+    /// <summary>The receipt to change; a new one is created when this is null.</summary>
+    [Parameter]
+    public ReceiptResponse? Receipt { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _store = Receipt?.Store;
+        _purchaseDate = Receipt?.PurchaseDate ?? DateOnly.FromDateTime(DateTime.Today);
+    }
+
+    private string? ErrorFor(string field) =>
+        _problem?.CodesFor(field) is { Count: > 0 } codes ? Language.Errors(codes) : null;
+
+    private async Task SaveAsync()
+    {
+        _busy = true;
+        ApiResult<ReceiptResponse> result = Receipt is null
+            ? await Api.CreateReceiptAsync(new CreateReceiptRequest(_store, _purchaseDate))
+            : await Api.ChangeReceiptAsync(Receipt.Id, new UpdateReceiptRequest(_store ?? "", _purchaseDate));
+        _busy = false;
+        _problem = result.Problem;
+        if (result.IsSuccess)
+        {
+            Dialog.Close(DialogResult.Ok(result.Value));
+        }
+    }
+}

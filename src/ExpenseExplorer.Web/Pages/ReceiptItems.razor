@@ -1,5 +1,200 @@
 @page "/receipt-items"
+@implements IDisposable
+@inject ExpenseApi Api
+@inject Language Language
+@inject NavigationManager Navigation
 
-<PageTitle>Pozycje</PageTitle>
-<MudText Typo="Typo.h5" GutterBottom="true">Pozycje paragonów</MudText>
-<MudText>Przeglądarka pozycji pojawi się w kolejnym etapie.</MudText>
+<PageTitle>@Language.Text.Items · Expense Explorer</PageTitle>
+
+<MudText Typo="Typo.h5" HtmlTag="h1" Class="mb-2">@Language.Text.Items</MudText>
+
+<FilterPanel ActiveCount="ActiveFilters" OnApply="() => Show(_draft with { Page = null })" OnClear="() => Show(new ReceiptItemListRequest())">
+    <MudGrid Spacing="2">
+        <MudItem xs="12" md="4">
+            <ChipsFilter Kind="Suggestions.Stores" Label="@Language.Text.Stores" Values="_draft.Stores"
+                         ValuesChanged="values => _draft = _draft with { Stores = values }"/>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <ChipsFilter Kind="Suggestions.Items" Label="@Language.Text.ItemNames" Values="_draft.Items"
+                         ValuesChanged="values => _draft = _draft with { Items = values }"/>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <ChipsFilter Kind="Suggestions.Categories" Label="@Language.Text.Categories" Values="_draft.Categories"
+                         ValuesChanged="values => _draft = _draft with { Categories = values }"/>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudStack Row="true" Spacing="2">
+                <DateInput Label="@Language.Text.From" Value="_draft.From" ValueChanged="from => _draft = _draft with { From = from }" Clearable="true"/>
+                <DateInput Label="@Language.Text.To" Value="_draft.To" ValueChanged="to => _draft = _draft with { To = to }" Clearable="true"/>
+            </MudStack>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <RangeInput Label="@Language.Text.Total" Min="_draft.TotalMin" MinChanged="v => _draft = _draft with { TotalMin = v }"
+                        Max="_draft.TotalMax" MaxChanged="v => _draft = _draft with { TotalMax = v }"/>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField T="string" Label="@Language.Text.DescriptionContains" Value="@_draft.Description"
+                          ValueChanged="v => _draft = _draft with { Description = v }" Variant="Variant.Outlined"
+                          Margin="Margin.Dense" Clearable="true"/>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <RangeInput Label="@Language.Text.Quantity" Min="_draft.QuantityMin" MinChanged="v => _draft = _draft with { QuantityMin = v }"
+                        Max="_draft.QuantityMax" MaxChanged="v => _draft = _draft with { QuantityMax = v }"/>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <RangeInput Label="@Language.Text.UnitPrice" Min="_draft.UnitPriceMin" MinChanged="v => _draft = _draft with { UnitPriceMin = v }"
+                        Max="_draft.UnitPriceMax" MaxChanged="v => _draft = _draft with { UnitPriceMax = v }"/>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <RangeInput Label="@Language.Text.Amount" Min="_draft.AmountMin" MinChanged="v => _draft = _draft with { AmountMin = v }"
+                        Max="_draft.AmountMax" MaxChanged="v => _draft = _draft with { AmountMax = v }"/>
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <RangeInput Label="@Language.Text.Discount" Min="_draft.DiscountMin" MinChanged="v => _draft = _draft with { DiscountMin = v }"
+                        Max="_draft.DiscountMax" MaxChanged="v => _draft = _draft with { DiscountMax = v }"/>
+        </MudItem>
+    </MudGrid>
+</FilterPanel>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-2">
+    <SortPicker TField="ReceiptItemSortField" Labels="Language.Text.ItemSort"
+                Field="@(_filter.SortBy ?? ReceiptItemSortField.PurchaseDate)" FieldChanged="field => Show(_filter with { SortBy = field, Page = null })"
+                Direction="@(_filter.Direction ?? SortDirection.Descending)" DirectionChanged="direction => Show(_filter with { Direction = direction, Page = null })"/>
+    @if (_list is not null)
+    {
+        <div class="num">
+            <MudText Typo="Typo.caption" Class="d-block">@Language.Text.TotalOfFiltered</MudText>
+            <MudText Typo="Typo.subtitle1"><b>@Display.Money(_list.TotalCost)</b></MudText>
+        </div>
+    }
+</MudStack>
+
+@if (_problem is not null)
+{
+    <ProblemAlert Problem="_problem"/>
+}
+else if (_list is null)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary"/>
+}
+else if (_list.Items.Items.Count == 0)
+{
+    <MudText Class="pa-4" Align="Align.Center">@Language.Text.NothingFound</MudText>
+}
+else
+{
+    <MudHidden Breakpoint="Breakpoint.MdAndUp">
+        <MudPaper Elevation="1">
+            <MudList T="ReceiptItemSummaryResponse" Dense="true" Padding="false">
+                @foreach (ReceiptItemSummaryResponse line in _list.Items.Items)
+                {
+                    <MudListItem T="ReceiptItemSummaryResponse" Href="@Routes.Receipt(line.ReceiptId)" Class="list-row">
+                        <ReceiptLine Item="@line.Item" Category="@line.Category" Context="@($"{line.Store} · {Display.Date(line.PurchaseDate)}")"
+                                     Quantity="line.Quantity" UnitPrice="line.UnitPrice" Discount="line.Discount" Total="line.Total"
+                                     Description="@line.Description"/>
+                    </MudListItem>
+                    <MudDivider/>
+                }
+            </MudList>
+        </MudPaper>
+    </MudHidden>
+    <MudHidden Breakpoint="Breakpoint.SmAndDown">
+        <MudPaper Elevation="1" Class="overflow-x-auto">
+            <MudSimpleTable Dense="true" Hover="true" Class="items-table">
+                <thead>
+                    <tr>
+                        @foreach ((ReceiptItemSortField field, string label) in Language.Text.ItemSort)
+                        {
+                            <th class="@(IsNumeric(field) ? "num" : "")">
+                                <MudTableSortLabel T="ReceiptItemSortField" SortDirection="SortStateOf(field)"
+                                                   SortDirectionChanged="direction => SortBy(field, direction)">@label</MudTableSortLabel>
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (ReceiptItemSummaryResponse line in _list.Items.Items)
+                    {
+                        <tr class="cursor-pointer" @onclick="() => Navigation.NavigateTo(Routes.Receipt(line.ReceiptId))">
+                            <td class="text-nowrap">@Display.Date(line.PurchaseDate)</td>
+                            <td>@line.Store</td>
+                            <td>@line.Item</td>
+                            <td>@line.Category</td>
+                            <td class="num">@Display.Quantity(line.Quantity)</td>
+                            <td class="num text-nowrap">@Display.Money(line.UnitPrice)</td>
+                            <td class="num text-nowrap">@Display.Money(line.Amount)</td>
+                            <td class="num text-nowrap">@(line.Discount > 0 ? Display.Money(line.Discount) : "")</td>
+                            <td class="num text-nowrap"><b>@Display.Money(line.Total)</b></td>
+                            <td class="description-cell">@line.Description</td>
+                        </tr>
+                    }
+                </tbody>
+            </MudSimpleTable>
+        </MudPaper>
+    </MudHidden>
+    <Pager Page="_list.Items.Page" PageSize="_list.Items.PageSize" TotalCount="_list.Items.TotalCount"
+           PageChanged="page => Show(_filter with { Page = page })"/>
+}
+
+@code {
+    private ReceiptItemListRequest _filter = new();
+    private ReceiptItemListRequest _draft = new();
+    private ReceiptItemListResponse? _list;
+    private ApiProblem? _problem;
+
+    private int ActiveFilters =>
+        new object?[]
+        {
+            _filter.Stores, _filter.Items, _filter.Categories, _filter.From ?? _filter.To, _filter.Description,
+            _filter.QuantityMin ?? _filter.QuantityMax, _filter.UnitPriceMin ?? _filter.UnitPriceMax,
+            _filter.AmountMin ?? _filter.AmountMax, _filter.DiscountMin ?? _filter.DiscountMax, _filter.TotalMin ?? _filter.TotalMax,
+        }.Count(value => value is not null);
+
+    protected override async Task OnInitializedAsync()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        await LoadAsync();
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if (Navigation.IsOn(Routes.ReceiptItems()))
+        {
+            _ = InvokeAsync(LoadAsync);
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        _filter = ListQueries.ReceiptItemList(QueryReader.Of(new Uri(Navigation.Uri)));
+        _draft = _filter;
+        ApiResult<ReceiptItemListResponse> result = await Api.ReceiptItemsAsync(_filter);
+        _list = result.ValueOrDefault;
+        _problem = result.Problem;
+        StateHasChanged();
+    }
+
+    private void Show(ReceiptItemListRequest filter) => Navigation.NavigateTo(Routes.ReceiptItems(filter));
+
+    private static bool IsNumeric(ReceiptItemSortField field) =>
+        field is ReceiptItemSortField.Quantity or ReceiptItemSortField.UnitPrice or ReceiptItemSortField.Amount
+            or ReceiptItemSortField.Discount or ReceiptItemSortField.Total;
+
+    private MudBlazor.SortDirection SortStateOf(ReceiptItemSortField field) =>
+        ((_filter.SortBy ?? ReceiptItemSortField.PurchaseDate) == field, _filter.Direction ?? SortDirection.Descending) switch
+        {
+            (false, _) => MudBlazor.SortDirection.None,
+            (true, SortDirection.Ascending) => MudBlazor.SortDirection.Ascending,
+            _ => MudBlazor.SortDirection.Descending,
+        };
+
+    private void SortBy(ReceiptItemSortField field, MudBlazor.SortDirection direction) =>
+        Show(_filter with
+        {
+            SortBy = field,
+            Direction = direction == MudBlazor.SortDirection.Ascending ? SortDirection.Ascending : SortDirection.Descending,
+            Page = null,
+        });
+}

@@ -58,3 +58,7 @@ dotnet_diagnostic.CA2100.severity = none
 
 [src/ExpenseExplorer.Infrastructure/Persistence/Migrations/**.cs]
 generated_code = true
+
+[src/ExpenseExplorer.Web/**.cs]
+# CA1515: Consider making public types internal (Razor components are public and take these types as parameters)
+dotnet_diagnostic.CA1515.severity = none

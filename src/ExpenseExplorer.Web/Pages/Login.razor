@@ -1,0 +1,73 @@
+@page "/login"
+@layout LoginLayout
+@inject AuthSession Auth
+@inject Language Language
+@inject NavigationManager Navigation
+
+<PageTitle>@Language.Text.SignIn · Expense Explorer</PageTitle>
+
+<MudPaper Class="pa-6" Elevation="2">
+    <MudStack Spacing="4">
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <MudIcon Icon="@Icons.Material.Filled.ReceiptLong" Color="Color.Primary" Size="Size.Large"/>
+            <MudText Typo="Typo.h5" HtmlTag="h1">Expense Explorer</MudText>
+        </MudStack>
+        <EditForm Model="this" OnSubmit="SignInAsync">
+            <MudStack Spacing="3">
+                <MudTextField @bind-Value="_userName" Label="@Language.Text.UserName" Variant="Variant.Outlined"
+                              autocomplete="username" Immediate="true"/>
+                <MudTextField @bind-Value="_password" Label="@Language.Text.Password" Variant="Variant.Outlined"
+                              InputType="InputType.Password" autocomplete="current-password" Immediate="true"/>
+                @if (_error is not null)
+                {
+                    <MudAlert Severity="Severity.Error" Dense="true">@_error</MudAlert>
+                }
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large"
+                           Disabled="_busy" FullWidth="true">@Language.Text.SignIn</MudButton>
+            </MudStack>
+        </EditForm>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? ReturnPath { get; set; }
+
+    private string? _userName;
+    private string? _password;
+    private string? _error;
+    private bool _busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Auth.RestoreAsync();
+        if (Auth.IsSignedIn)
+        {
+            GoBack();
+        }
+    }
+
+    private async Task SignInAsync()
+    {
+        _busy = true;
+        _error = null;
+        ApiProblem? problem = await Auth.SignInAsync(_userName, _password);
+        _busy = false;
+        if (problem is null)
+        {
+            GoBack();
+            return;
+        }
+
+        _error = Language.Errors(problem.ErrorCodes.Values.SelectMany(codes => codes));
+        _password = null;
+    }
+
+    // Only addresses inside the app are followed, so a crafted link cannot send the user elsewhere.
+    private void GoBack()
+    {
+        Uri target = new(new Uri(Navigation.BaseUri), ReturnPath ?? "");
+        bool isLocal = target.GetLeftPart(UriPartial.Authority) == new Uri(Navigation.BaseUri).GetLeftPart(UriPartial.Authority);
+        Navigation.NavigateTo(isLocal ? Navigation.ToBaseRelativePath(target.ToString()) : Routes.Receipts(), replace: true);
+    }
+}

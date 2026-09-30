@@ -1,0 +1,30 @@
+@using System.Globalization
+@* The browser's own date picker: the most convenient one on phones. *@
+<MudTextField T="string" Value="@Text" ValueChanged="OnChanged" Label="@Label" InputType="InputType.Date"
+              Variant="Variant.Outlined" Margin="Margin.Dense" Clearable="@Clearable"
+              Error="@(ErrorText is not null)" ErrorText="@ErrorText" ShrinkLabel="true"/>
+
+@code {
+    private const string Format = "yyyy-MM-dd";
+
+    [Parameter]
+    public DateOnly? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<DateOnly?> ValueChanged { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? ErrorText { get; set; }
+
+    [Parameter]
+    public bool Clearable { get; set; }
+
+    private string? Text => Value?.ToString(Format, CultureInfo.InvariantCulture);
+
+    private Task OnChanged(string? text) =>
+        ValueChanged.InvokeAsync(
+            DateOnly.TryParseExact(text, Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly date) ? date : null);
+}

@@ -1,0 +1,152 @@
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
+using ExpenseExplorer.Contracts.ReceiptItems;
+using ExpenseExplorer.Contracts.Receipts;
+using ExpenseExplorer.Contracts.Reports;
+
+namespace ExpenseExplorer.Web.Api;
+
+/// <summary>Typed access to the API. Every call returns an <see cref="ApiResult{T}"/>; nothing throws for HTTP errors.</summary>
+public sealed class ExpenseApi(HttpClient http)
+{
+    private const string Receipts = "api/v1/receipts";
+
+    public Task<ApiResult<ReceiptListResponse>> ReceiptsAsync(ReceiptListRequest request) =>
+        GetAsync<ReceiptListResponse>(Receipts + ListQueries.ToQuery(request));
+
+    public Task<ApiResult<ReceiptResponse>> ReceiptAsync(Guid id) =>
+        GetAsync<ReceiptResponse>($"{Receipts}/{id}");
+
+    public Task<ApiResult<ReceiptResponse>> CreateReceiptAsync(CreateReceiptRequest request) =>
+        SendAsync<ReceiptResponse>(HttpMethod.Post, Receipts, request);
+
+    public Task<ApiResult<ReceiptResponse>> ChangeReceiptAsync(Guid id, UpdateReceiptRequest request) =>
+        SendAsync<ReceiptResponse>(HttpMethod.Patch, $"{Receipts}/{id}", request);
+
+    public Task<ApiResult<bool>> DeleteReceiptAsync(Guid id) =>
+        SendAsync<bool>(HttpMethod.Delete, $"{Receipts}/{id}", null);
+
+    public Task<ApiResult<ReceiptResponse>> DuplicateReceiptAsync(Guid id, DuplicateReceiptRequest request) =>
+        SendAsync<ReceiptResponse>(HttpMethod.Post, $"{Receipts}/{id}/duplicate", request);
+
+    public Task<ApiResult<ReceiptItemResponse>> AddItemAsync(Guid receiptId, ReceiptItemRequest request) =>
+        SendAsync<ReceiptItemResponse>(HttpMethod.Post, $"{Receipts}/{receiptId}/items", request);
+
+    public Task<ApiResult<ReceiptItemResponse>> ChangeItemAsync(Guid receiptId, Guid itemId, ReceiptItemRequest request) =>
+        SendAsync<ReceiptItemResponse>(HttpMethod.Put, $"{Receipts}/{receiptId}/items/{itemId}", request);
+
+    public Task<ApiResult<bool>> RemoveItemAsync(Guid receiptId, Guid itemId) =>
+        SendAsync<bool>(HttpMethod.Delete, $"{Receipts}/{receiptId}/items/{itemId}", null);
+
+    public async Task<ApiResult<DownloadedFile>> ExportCsvAsync(Guid receiptId)
+    {
+        using HttpResponseMessage response = await http.GetAsync(new Uri($"{Receipts}/{receiptId}/export.csv", UriKind.Relative));
+        if (!response.IsSuccessStatusCode)
+        {
+            return ApiResult.Failure<DownloadedFile>(await ProblemAsync(response));
+        }
+
+        return ApiResult.Success(new DownloadedFile(
+            response.Content.Headers.ContentDisposition?.FileNameStar ?? response.Content.Headers.ContentDisposition?.FileName ?? "receipt.csv",
+            response.Content.Headers.ContentType?.ToString() ?? "text/csv",
+            new ReadOnlyMemory<byte>(await response.Content.ReadAsByteArrayAsync())));
+    }
+
+    public async Task<ApiResult<ReceiptResponse>> ImportBiedronkaAsync(Stream file, string fileName)
+    {
+        using MultipartFormDataContent form = new();
+        using StreamContent content = new(file);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        form.Add(content, "file", fileName);
+        using HttpResponseMessage response = await http.PostAsync(new Uri($"{Receipts}/import/biedronka", UriKind.Relative), form);
+        return await ReadAsync<ReceiptResponse>(response);
+    }
+
+    public Task<ApiResult<ReceiptItemListResponse>> ReceiptItemsAsync(ReceiptItemListRequest request) =>
+        GetAsync<ReceiptItemListResponse>("api/v1/receipt-items" + ListQueries.ToQuery(request));
+
+    public Task<ApiResult<CategoryReportResponse>> CategoryReportAsync(DateOnly? from, DateOnly? to) =>
+        GetAsync<CategoryReportResponse>("api/v1/reports/categories" + new QueryString().Add("from", from).Add("to", to));
+
+    /// <summary>Known stores, item names or categories containing <paramref name="search"/>, for suggestions.</summary>
+    public Task<ApiResult<IReadOnlyList<string>>> SuggestionsAsync(Suggestions kind, string? search) =>
+        GetAsync<IReadOnlyList<string>>(
+            kind switch
+            {
+                Suggestions.Stores => "api/v1/stores",
+                Suggestions.Items => "api/v1/items",
+                _ => "api/v1/categories",
+            }
+            + new QueryString().Add("search", search).Add("limit", 50));
+
+    private async Task<ApiResult<T>> GetAsync<T>(string url)
+    {
+        using HttpResponseMessage response = await http.GetAsync(new Uri(url, UriKind.Relative));
+        return await ReadAsync<T>(response);
+    }
+
+    private async Task<ApiResult<T>> SendAsync<T>(HttpMethod method, string url, object? body)
+    {
+        using HttpRequestMessage request = new(method, new Uri(url, UriKind.Relative));
+        if (body is not null)
+        {
+            request.Content = JsonContent.Create(body);
+        }
+
+        using HttpResponseMessage response = await http.SendAsync(request);
+        return await ReadAsync<T>(response);
+    }
+
+    private static async Task<ApiResult<T>> ReadAsync<T>(HttpResponseMessage response)
+    {
+        if (!response.IsSuccessStatusCode)
+        {
+            return ApiResult.Failure<T>(await ProblemAsync(response));
+        }
+
+        // Endpoints answering 204 No Content are read as bool "done".
+        if (response.StatusCode == HttpStatusCode.NoContent || typeof(T) == typeof(bool))
+        {
+            return ApiResult.Success((T)(object)true);
+        }
+
+        T? value = await response.Content.ReadFromJsonAsync<T>();
+        return value is null
+            ? ApiResult.Failure<T>(new ApiProblem(response.StatusCode, new Dictionary<string, string[]> { [""] = ["Http.EmptyResponse"] }))
+            : ApiResult.Success(value);
+    }
+
+    /// <summary>Error codes from a ProblemDetails body, or one code naming the HTTP status when there is none.</summary>
+    private static async Task<ApiProblem> ProblemAsync(HttpResponseMessage response)
+    {
+        Dictionary<string, string[]>? codes = null;
+        try
+        {
+            using JsonDocument problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            if (problem.RootElement.ValueKind == JsonValueKind.Object
+                && problem.RootElement.TryGetProperty("errorCodes", out JsonElement errorCodes))
+            {
+                codes = errorCodes.Deserialize<Dictionary<string, string[]>>();
+            }
+        }
+        catch (JsonException)
+        {
+            // Not a ProblemDetails body; fall back to the status code below.
+        }
+
+        return new ApiProblem(
+            response.StatusCode,
+            codes is { Count: > 0 } ? codes : new Dictionary<string, string[]> { [""] = [$"Http.{(int)response.StatusCode}"] });
+    }
+}
+
+public enum Suggestions
+{
+    Stores,
+    Items,
+    Categories,
+}
+
+public sealed record DownloadedFile(string Name, string ContentType, ReadOnlyMemory<byte> Content);

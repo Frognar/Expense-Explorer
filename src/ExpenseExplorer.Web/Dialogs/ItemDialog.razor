@@ -1,0 +1,118 @@
+@inject ExpenseApi Api
+@inject Language Language
+@inject IDialogService Dialogs
+
+@* Adds a line to a receipt or changes one. Amount and discount are for the whole line, as printed on the receipt. *@
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="this" OnSubmit="SaveAsync" id="item-form">
+            <MudStack Spacing="2">
+                <SuggestField Kind="Suggestions.Items" @bind-Value="_item" Label="@Language.Text.Item" AutoFocus="@(Item is null)"
+                              ErrorText="@ErrorFor("item")"/>
+                <SuggestField Kind="Suggestions.Categories" @bind-Value="_category" Label="@Language.Text.Category"
+                              ErrorText="@ErrorFor("category")"/>
+                <MudStack Row="true" Spacing="2">
+                    <DecimalInput @bind-Value="_quantity" Label="@Language.Text.Quantity" ErrorText="@ErrorFor("quantity")"/>
+                    <DecimalInput @bind-Value="_amount" Label="@Language.Text.Amount" HelperText="@Language.Text.AmountHelp"
+                                  ErrorText="@ErrorFor("amount")"/>
+                </MudStack>
+                <DecimalInput @bind-Value="_discount" Label="@Language.Text.Discount" ErrorText="@ErrorFor("discount")"/>
+                <MudTextField T="string" @bind-Value="_description" Label="@Language.Text.Description" Variant="Variant.Outlined"
+                              Margin="Margin.Dense" Lines="2" Sizing="InputSizing.Auto" MaxLength="500"
+                              Error="@(ErrorFor("description") is not null)" ErrorText="@ErrorFor("description")"/>
+                @if (Preview is { } preview)
+                {
+                    <MudText Typo="Typo.body2" Align="Align.End">@preview</MudText>
+                }
+                <ProblemAlert Problem="_problem" Fields="Fields"/>
+            </MudStack>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        @if (Item is not null)
+        {
+            <MudButton Color="Color.Error" OnClick="DeleteAsync" Disabled="_busy" Class="mr-auto">@Language.Text.Delete</MudButton>
+        }
+        <MudButton OnClick="() => Dialog.Cancel()">@Language.Text.Cancel</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" form="item-form" Color="Color.Primary" Variant="Variant.Filled"
+                   Disabled="_busy">@Language.Text.Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private static readonly string[] Fields = ["item", "category", "quantity", "amount", "discount", "description"];
+
+    private string? _item;
+    private string? _category;
+    private decimal? _quantity;
+    private decimal? _amount;
+    private decimal? _discount;
+    private string? _description;
+    private ApiProblem? _problem;
+    private bool _busy;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public Guid ReceiptId { get; set; }
+
+    /// <summary>The line to change; a new one is added when this is null.</summary>
+    [Parameter]
+    public ReceiptItemResponse? Item { get; set; }
+
+    /// <summary>Starting category for a new line, usually the one used last on this receipt.</summary>
+    [Parameter]
+    public string? Category { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _item = Item?.Item;
+        _category = Item?.Category ?? Category;
+        _quantity = Item?.Quantity ?? 1;
+        _amount = Item?.Amount;
+        _discount = Item?.Discount ?? 0;
+        _description = Item?.Description;
+    }
+
+    // What the line will cost, so a typo in the amount is visible before saving.
+    private string? Preview =>
+        (_quantity, _amount) is ({ } quantity and > 0, { } amount)
+            ? $"{Display.Quantity(quantity)} × {Display.Money(amount / quantity)} · {Language.Text.Total}: {Display.Money(amount - (_discount ?? 0))}"
+            : null;
+
+    private string? ErrorFor(string field) =>
+        _problem?.CodesFor(field) is { Count: > 0 } codes ? Language.Errors(codes) : null;
+
+    private async Task SaveAsync()
+    {
+        _busy = true;
+        ReceiptItemRequest request = new(_item, _category, _quantity, _amount, _discount ?? 0, _description);
+        ApiResult<ReceiptItemResponse> result = Item is null
+            ? await Api.AddItemAsync(ReceiptId, request)
+            : await Api.ChangeItemAsync(ReceiptId, Item.Id, request);
+        _busy = false;
+        _problem = result.Problem;
+        if (result.IsSuccess)
+        {
+            Dialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (Item is null || !await Confirm.AskAsync(Dialogs, Language.Text, Language.Text.DeleteItemQuestion))
+        {
+            return;
+        }
+
+        _busy = true;
+        ApiResult<bool> result = await Api.RemoveItemAsync(ReceiptId, Item.Id);
+        _busy = false;
+        _problem = result.Problem;
+        if (result.IsSuccess)
+        {
+            Dialog.Close(DialogResult.Ok(true));
+        }
+    }
+}
