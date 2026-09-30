@@ -61,7 +61,7 @@ internal static class ReceiptRequestParser
             Input.InRange(request.Page, 1, 1, int.MaxValue).ForTarget("page"),
             Input.InRange(request.PageSize, ReceiptListRequest.DefaultPageSize, 1, ReceiptListRequest.MaxPageSize).ForTarget("pageSize"),
             (dates, totals, page, pageSize) => new ReceiptListQuery(
-                NonBlankDistinct(request.Stores),
+                Input.NonBlankDistinct(request.Stores),
                 dates.From,
                 dates.To,
                 totals.From,
@@ -95,7 +95,4 @@ internal static class ReceiptRequestParser
 
     private static Result<ReceiptItemId> ItemId(Guid value) =>
         ReceiptItemId.Create(value).ForTarget("itemId");
-
-    private static string[] NonBlankDistinct(IEnumerable<string>? values) =>
-        [.. (values ?? []).Select(value => value.Trim()).Where(value => value.Length > 0).Distinct(StringComparer.Ordinal)];
 }

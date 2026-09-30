@@ -41,7 +41,9 @@ A reader can browse everything; an editor can also change data. Locally, run the
 - [ ] **Purchase Management:** Add, edit, and delete purchases associated with receipts.
 - [ ] **Browse Receipts:** View and search through receipts based on store, date, and total amount.
 - [ ] **Browse Stores, Items, and Categories:** View and search through stores, items, and categories used in receipts and purchases.
-- [ ] **Reporting:** Generate category-wise expense reports for a given date range.
+- [x] **Reporting:** Generate category-wise expense reports for a given date range.
+- [x] **Browse Purchases:** Every receipt line with filters on store, item, category, date, price, quantity, discount, total and description.
+- [x] **Export and Import:** Export a receipt to CSV; import a Biedronka e-receipt (JSON).
 - [x] **Accounts:** Sign-in with read-only and full access roles.
 
 ## Contributing

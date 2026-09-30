@@ -41,5 +41,13 @@ internal static class Input
             ? Result.Failure<(T?, T?)>(new Error("Input.RangeReversed", "The start of the range is after its end."))
             : Result.Success((from, to));
 
+    /// <summary>Trimmed values of a list filter; blanks and repeats are dropped.</summary>
+    public static string[] NonBlankDistinct(IEnumerable<string>? values) =>
+        [.. (values ?? []).Select(value => value.Trim()).Where(value => value.Length > 0).Distinct(StringComparer.Ordinal)];
+
+    /// <summary>Trimmed text, or null when nothing but whitespace was given.</summary>
+    public static string? NonBlank(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
     public static DateOnly Today(this TimeProvider clock) => DateOnly.FromDateTime(clock.GetLocalNow().DateTime);
 }
