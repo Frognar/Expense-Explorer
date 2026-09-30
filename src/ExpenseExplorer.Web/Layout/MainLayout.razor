@@ -4,6 +4,7 @@
 @inject Language Language
 @inject NavigationManager Navigation
 @inject IJSRuntime Js
+@inject Appearance Appearance
 
 <MudLayout>
     <MudAppBar Elevation="1" Dense="true">
@@ -25,6 +26,11 @@
                     <MudMenuItem Icon="@(code == Language.Code ? Icons.Material.Filled.Check : Icons.Material.Filled.Language)"
                                  OnClick="@(() => SwitchLanguageAsync(code))">@name</MudMenuItem>
                 }
+                <MudDivider/>
+                <MudMenuItem Icon="@(Appearance.IsDark ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                             OnClick="@(() => Appearance.SwitchAsync(Js))">
+                    @(Appearance.IsDark ? Language.Text.LightTheme : Language.Text.DarkTheme)
+                </MudMenuItem>
                 <MudDivider/>
                 <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="SignOutAsync">@Language.Text.SignOut</MudMenuItem>
             </MudMenu>

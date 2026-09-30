@@ -30,7 +30,7 @@ else
 {
     <MudPaper Elevation="1">
         <MudList T="CategoryExpenseResponse" Dense="true" Padding="false">
-            @foreach (CategoryExpenseResponse category in _report.Categories)
+            @foreach ((CategoryExpenseResponse category, int rank) in _report.Categories.Select((category, rank) => (category, rank)))
             {
                 <MudListItem T="CategoryExpenseResponse" Href="@ItemsOf(category.Category)" Class="list-row">
                     <div class="d-flex align-center gap-3">
@@ -38,7 +38,7 @@ else
                         <MudText Typo="Typo.caption" Class="mud-text-secondary">@Share(category.Total)</MudText>
                         <MudText Class="text-nowrap"><b>@Display.Money(category.Total)</b></MudText>
                     </div>
-                    <MudProgressLinear Value="@((double)(category.Total / _report.Categories[0].Total * 100))" Color="Color.Primary"
+                    <MudProgressLinear Value="@((double)(category.Total / _report.Categories[0].Total * 100))" Color="@BarColors[rank % BarColors.Length]"
                                        Rounded="true" Size="Size.Medium" Class="mt-1"/>
                 </MudListItem>
                 <MudDivider/>
@@ -52,6 +52,9 @@ else
 }
 
 @code {
+    // Neighbouring bars get different colours so the categories are easy to tell apart.
+    private static readonly Color[] BarColors = [Color.Primary, Color.Info, Color.Warning, Color.Secondary];
+
     private DateOnly? _from;
     private DateOnly? _to;
     private CategoryReportResponse? _report;

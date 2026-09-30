@@ -12,6 +12,8 @@ public sealed class UiText
     public required string Reports { get; init; }
     public required string SignIn { get; init; }
     public required string SignOut { get; init; }
+    public required string DarkTheme { get; init; }
+    public required string LightTheme { get; init; }
     public required string UserName { get; init; }
     public required string Password { get; init; }
     public required string ReadOnlyAccess { get; init; }
@@ -77,6 +79,8 @@ public sealed class UiText
         Reports = "Raporty",
         SignIn = "Zaloguj",
         SignOut = "Wyloguj",
+        DarkTheme = "Ciemny motyw",
+        LightTheme = "Jasny motyw",
         UserName = "Użytkownik",
         Password = "Hasło",
         ReadOnlyAccess = "Tylko odczyt",
@@ -203,6 +207,8 @@ public sealed class UiText
         Reports = "Reports",
         SignIn = "Sign in",
         SignOut = "Sign out",
+        DarkTheme = "Dark theme",
+        LightTheme = "Light theme",
         UserName = "User name",
         Password = "Password",
         ReadOnlyAccess = "Read only",

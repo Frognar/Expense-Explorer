@@ -3,8 +3,8 @@
   "short_name": "Wydatki",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#594ae2",
+  "background_color": "#101814",
+  "theme_color": "#17221c",
   "icons": [
     { "src": "icon-512.png", "type": "image/png", "sizes": "512x512" }
   ]
