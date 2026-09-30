@@ -13,6 +13,7 @@ using ExpenseExplorer.Infrastructure.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace ExpenseExplorer.Infrastructure;
 
@@ -22,8 +23,11 @@ public static class InfrastructureSetup
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
     {
+        // The database is reached with a password on a private network; without this Npgsql
+        // probes for Kerberos and the container, which has no Kerberos library, prints a warning.
+        NpgsqlConnectionStringBuilder connection = new(connectionString) { GssEncryptionMode = GssEncryptionMode.Disable };
         services.AddDbContext<ExpenseExplorerDbContext>(options => options.UseNpgsql(
-            connectionString,
+            connection.ConnectionString,
             npgsql => npgsql.MigrationsHistoryTable("__ef_migrations_history", ExpenseExplorerDbContext.Schema)));
         services.AddScoped<IReceiptRepository, ReceiptRepository>();
         services.AddScoped<IReceiptQueries, ReceiptQueries>();

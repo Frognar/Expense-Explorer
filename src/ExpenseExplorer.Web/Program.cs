@@ -32,6 +32,7 @@ builder.Services.AddScoped(services => new ExpenseApi(new HttpClient(new BearerT
 }));
 builder.Services.AddScoped<Language>();
 builder.Services.AddScoped<Appearance>();
+builder.Services.AddScoped<BackNavigation>();
 builder.Services.AddMudServices();
 
 WebAssemblyHost host = builder.Build();
@@ -42,5 +43,8 @@ await language.LoadAsync(host.Services.GetRequiredService<IJSRuntime>());
 CultureInfo.DefaultThreadCurrentCulture = language.Culture;
 CultureInfo.DefaultThreadCurrentUICulture = language.Culture;
 await host.Services.GetRequiredService<Appearance>().LoadAsync(host.Services.GetRequiredService<IJSRuntime>());
+
+// Created now so it sees every navigation, not only those after the first page with a back arrow.
+host.Services.GetRequiredService<BackNavigation>();
 
 await host.RunAsync();
