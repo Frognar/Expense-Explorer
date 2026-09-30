@@ -2,6 +2,17 @@
     --bottom-nav-height: 64px;
 }
 
+/* Shown until Blazor starts; afterwards MudBlazor paints the page. */
+html[data-theme="dark"] {
+    /* Native parts (date picker, scrollbars) match the dark theme too. */
+    color-scheme: dark;
+}
+
+html[data-theme="dark"] body {
+    background: #101814;
+    color: #e8f5e9;
+}
+
 .loading {
     display: flex;
     align-items: center;

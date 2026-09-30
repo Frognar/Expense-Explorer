@@ -3,6 +3,7 @@ using ExpenseExplorer.Web;
 using ExpenseExplorer.Web.Api;
 using ExpenseExplorer.Web.Auth;
 using ExpenseExplorer.Web.Localization;
+using ExpenseExplorer.Web.Theming;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -30,6 +31,7 @@ builder.Services.AddScoped(services => new ExpenseApi(new HttpClient(new BearerT
     BaseAddress = baseAddress,
 }));
 builder.Services.AddScoped<Language>();
+builder.Services.AddScoped<Appearance>();
 builder.Services.AddMudServices();
 
 WebAssemblyHost host = builder.Build();
@@ -39,5 +41,6 @@ Language language = host.Services.GetRequiredService<Language>();
 await language.LoadAsync(host.Services.GetRequiredService<IJSRuntime>());
 CultureInfo.DefaultThreadCurrentCulture = language.Culture;
 CultureInfo.DefaultThreadCurrentUICulture = language.Culture;
+await host.Services.GetRequiredService<Appearance>().LoadAsync(host.Services.GetRequiredService<IJSRuntime>());
 
 await host.RunAsync();

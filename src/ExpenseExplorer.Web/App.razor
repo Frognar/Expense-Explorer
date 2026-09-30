@@ -1,6 +1,8 @@
+@implements IDisposable
 @inject Language Language
+@inject Appearance Appearance
 
-<MudThemeProvider Theme="Theme"/>
+<MudThemeProvider Theme="Themes.App" IsDarkMode="Appearance.IsDark"/>
 <MudPopoverProvider/>
 <MudDialogProvider FullWidth="true" MaxWidth="MaxWidth.Small" CloseButton="true"/>
 <MudSnackbarProvider/>
@@ -19,9 +21,9 @@
 </Router>
 
 @code {
-    private static readonly MudTheme Theme = new()
-    {
-        PaletteLight = new PaletteLight { Primary = "#4a5fc1", AppbarBackground = "#4a5fc1" },
-        PaletteDark = new PaletteDark { Primary = "#8c9eff" },
-    };
+    protected override void OnInitialized() => Appearance.Changed += OnAppearanceChanged;
+
+    public void Dispose() => Appearance.Changed -= OnAppearanceChanged;
+
+    private void OnAppearanceChanged(object? sender, EventArgs args) => StateHasChanged();
 }

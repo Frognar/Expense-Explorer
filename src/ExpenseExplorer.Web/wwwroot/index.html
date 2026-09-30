@@ -4,7 +4,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#594ae2" />
+    <meta name="theme-color" content="#17221c" />
+    <script>
+        // Dark from the first paint unless light was chosen, so the page never flashes white.
+        try { document.documentElement.dataset.theme = localStorage.getItem("theme") === "light" ? "light" : "dark"; } catch { }
+    </script>
     <title>Expense Explorer</title>
     <base href="/" />
     <link rel="icon" type="image/png" href="favicon.png" />
