@@ -23,6 +23,18 @@ The previous version is kept on the [`main-2609-archive`](https://github.com/Fro
 - `src/aspire/AppHost` – local run with PostgreSQL (`dotnet run --project src/aspire/AppHost`)
 - `tests/` – unit and API tests (`dotnet test --solution ExpenseExplorer.slnx`)
 
+## Accounts
+
+There is no sign-up. Accounts are managed from the command line, which asks for the password:
+
+```sh
+docker exec -it expense-explorer-api dotnet ExpenseExplorer.Api.dll users add jan editor
+docker exec -it expense-explorer-api dotnet ExpenseExplorer.Api.dll users list
+```
+
+Commands: `users list`, `users add <name> <reader|editor>`, `users password <name>`, `users role <name> <reader|editor>`, `users remove <name>`.
+A reader can browse everything; an editor can also change data. Locally, run the same commands with `dotnet run --project src/ExpenseExplorer.Api -- users ...`.
+
 ## Features
 
 - [ ] **Receipt Management:** Add, edit, and delete receipts.
@@ -30,6 +42,7 @@ The previous version is kept on the [`main-2609-archive`](https://github.com/Fro
 - [ ] **Browse Receipts:** View and search through receipts based on store, date, and total amount.
 - [ ] **Browse Stores, Items, and Categories:** View and search through stores, items, and categories used in receipts and purchases.
 - [ ] **Reporting:** Generate category-wise expense reports for a given date range.
+- [x] **Accounts:** Sign-in with read-only and full access roles.
 
 ## Contributing
 

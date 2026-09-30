@@ -18,6 +18,10 @@ internal static class ErrorResults
 
         return errors switch
         {
+            _ when errors.Any(error => error.Type == ErrorType.Unauthorized) => Results.Problem(
+                statusCode: StatusCodes.Status401Unauthorized,
+                detail: Describe(errors, ErrorType.Unauthorized),
+                extensions: extensions),
             _ when errors.Any(error => error.Type == ErrorType.NotFound) => Results.Problem(
                 statusCode: StatusCodes.Status404NotFound,
                 detail: Describe(errors, ErrorType.NotFound),

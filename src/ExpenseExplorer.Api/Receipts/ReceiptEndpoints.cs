@@ -1,3 +1,4 @@
+using ExpenseExplorer.Api.Auth;
 using ExpenseExplorer.Api.Http;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Contracts.Receipts;
@@ -14,13 +15,13 @@ internal static class ReceiptEndpoints
 
         receipts.MapGet("/", ListAsync);
         receipts.MapGet("/{receiptId:guid}", GetAsync).WithName(nameof(GetAsync));
-        receipts.MapPost("/", CreateAsync);
-        receipts.MapPatch("/{receiptId:guid}", ChangeAsync);
-        receipts.MapDelete("/{receiptId:guid}", DeleteAsync);
-        receipts.MapPost("/{receiptId:guid}/duplicate", DuplicateAsync);
-        receipts.MapPost("/{receiptId:guid}/items", AddItemAsync);
-        receipts.MapPut("/{receiptId:guid}/items/{itemId:guid}", ChangeItemAsync);
-        receipts.MapDelete("/{receiptId:guid}/items/{itemId:guid}", RemoveItemAsync);
+        receipts.MapPost("/", CreateAsync).RequireAuthorization(Policies.CanEdit);
+        receipts.MapPatch("/{receiptId:guid}", ChangeAsync).RequireAuthorization(Policies.CanEdit);
+        receipts.MapDelete("/{receiptId:guid}", DeleteAsync).RequireAuthorization(Policies.CanEdit);
+        receipts.MapPost("/{receiptId:guid}/duplicate", DuplicateAsync).RequireAuthorization(Policies.CanEdit);
+        receipts.MapPost("/{receiptId:guid}/items", AddItemAsync).RequireAuthorization(Policies.CanEdit);
+        receipts.MapPut("/{receiptId:guid}/items/{itemId:guid}", ChangeItemAsync).RequireAuthorization(Policies.CanEdit);
+        receipts.MapDelete("/{receiptId:guid}/items/{itemId:guid}", RemoveItemAsync).RequireAuthorization(Policies.CanEdit);
 
         return api;
     }

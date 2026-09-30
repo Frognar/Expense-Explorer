@@ -1,3 +1,4 @@
+using ExpenseExplorer.Api.Auth;
 using ExpenseExplorer.Api.Dictionaries;
 using ExpenseExplorer.Api.Receipts;
 
@@ -10,8 +11,12 @@ internal static class Routing
     public static WebApplication MapApi(this WebApplication app)
     {
         RouteGroupBuilder api = app.MapGroup(ApiPrefix);
-        api.MapReceipts();
-        api.MapDictionaries();
+        api.MapAuth();
+
+        // Everything else needs a signed-in user; endpoints that change data also need the editor role.
+        RouteGroupBuilder data = api.MapGroup("").RequireAuthorization(Policies.CanRead);
+        data.MapReceipts();
+        data.MapDictionaries();
 
         // Unknown API routes answer with ProblemDetails instead of falling through to the frontend.
         api.MapFallback(() => Results.Problem(statusCode: StatusCodes.Status404NotFound));

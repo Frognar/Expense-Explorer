@@ -24,6 +24,10 @@ dotnet_diagnostic.CA1040.severity = none
 # CA1062: Validate arguments of public methods
 dotnet_diagnostic.CA1062.severity = none
 
+# CA1303: Do not pass literals as localized parameters (API messages, logs and the CLI are English only;
+# the frontend localizes by error codes)
+dotnet_diagnostic.CA1303.severity = none
+
 # CA1716: Identifiers should not match keywords
 dotnet_diagnostic.CA1716.severity = none
 
