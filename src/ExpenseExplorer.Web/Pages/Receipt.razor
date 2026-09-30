@@ -6,6 +6,7 @@
 @inject IDialogService Dialogs
 @inject ISnackbar Snackbar
 @inject IJSRuntime Js
+@inject BackNavigation Back
 
 <PageTitle>@(_receipt?.Store ?? Language.Text.Receipts) · Expense Explorer</PageTitle>
 
@@ -20,7 +21,8 @@ else if (_receipt is null)
 else
 {
     <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1" Class="mb-2">
-        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Href="@Routes.Receipts()" aria-label="@Language.Text.Receipts"/>
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" OnClick="@(() => Back.GoBackAsync(Js, Routes.Receipts()))"
+                       aria-label="@Language.Text.Receipts"/>
         <div class="flex-grow-1 min-w-0">
             <MudText Typo="Typo.h5" HtmlTag="h1" Class="text-truncate">@_receipt.Store</MudText>
             <MudText Typo="Typo.body2" Class="mud-text-secondary">@Display.Date(_receipt.PurchaseDate)</MudText>
