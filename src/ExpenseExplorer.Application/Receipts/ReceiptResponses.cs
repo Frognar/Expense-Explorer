@@ -19,9 +19,9 @@ public static class ReceiptResponses
             item.Purchase.Item.Value,
             item.Purchase.Category.Value,
             item.Purchase.Price.Quantity.Value,
-            item.Purchase.Price.UnitPrice.Value,
+            item.Purchase.Price.Amount.Value,
             item.Purchase.Price.Discount.Value,
-            item.Purchase.Price.Gross.Value,
             item.Total.Value,
+            item.Purchase.Price.UnitPrice,
             item.Purchase.Description?.Value);
 }

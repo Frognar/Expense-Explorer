@@ -12,14 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ExpenseExplorer.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ExpenseExplorerDbContext))]
-    [Migration("20260930044121_Baseline")]
-    partial class Baseline
+    [Migration("20260930062825_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("expense")
                 .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -31,31 +32,35 @@ namespace ExpenseExplorer.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
+                        .HasColumnName("amount");
+
                     b.Property<string>("Category")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("category");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
                         .HasColumnName("description");
 
                     b.Property<decimal>("Discount")
-                        .ValueGeneratedOnAdd()
-                        .HasPrecision(15, 2)
-                        .HasColumnType("numeric(15,2)")
-                        .HasDefaultValue(0m)
+                        .HasPrecision(12, 2)
+                        .HasColumnType("numeric(12,2)")
                         .HasColumnName("discount");
 
                     b.Property<string>("Item")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("item");
 
                     b.Property<int>("Position")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(0)
                         .HasColumnName("position");
 
                     b.Property<decimal>("Quantity")
@@ -67,18 +72,26 @@ namespace ExpenseExplorer.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("receipt_id");
 
-                    b.Property<decimal>("UnitPrice")
-                        .HasPrecision(15, 4)
-                        .HasColumnType("numeric(15,4)")
-                        .HasColumnName("unit_price");
+                    b.HasKey("Id");
 
-                    b.HasKey("Id")
-                        .HasName("receipt_items_pkey");
+                    b.HasIndex("Category");
 
-                    b.HasIndex("ReceiptId")
-                        .HasDatabaseName("ix_receipt_items_receipt_id");
+                    b.HasIndex("Item");
 
-                    b.ToTable("receipt_items", (string)null);
+                    b.HasIndex("ReceiptId");
+
+                    b.ToTable("receipt_items", "expense", t =>
+                        {
+                            t.HasCheckConstraint("ck_receipt_items_amount_not_negative", "amount >= 0");
+
+                            t.HasCheckConstraint("ck_receipt_items_category_not_blank", "btrim(category) <> ''");
+
+                            t.HasCheckConstraint("ck_receipt_items_discount_within_amount", "discount >= 0 and discount <= amount");
+
+                            t.HasCheckConstraint("ck_receipt_items_item_not_blank", "btrim(item) <> ''");
+
+                            t.HasCheckConstraint("ck_receipt_items_quantity_positive", "quantity > 0");
+                        });
                 });
 
             modelBuilder.Entity("ExpenseExplorer.Infrastructure.Persistence.ReceiptRow", b =>
@@ -93,16 +106,20 @@ namespace ExpenseExplorer.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("Store")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("store");
 
-                    b.HasKey("Id")
-                        .HasName("receipts_pkey");
+                    b.HasKey("Id");
 
-                    b.HasIndex("PurchaseDate")
-                        .HasDatabaseName("ix_receipts_purchase_date");
+                    b.HasIndex("PurchaseDate");
 
-                    b.ToTable("receipts", (string)null);
+                    b.HasIndex("Store");
+
+                    b.ToTable("receipts", "expense", t =>
+                        {
+                            t.HasCheckConstraint("ck_receipts_store_not_blank", "btrim(store) <> ''");
+                        });
                 });
 
             modelBuilder.Entity("ExpenseExplorer.Infrastructure.Persistence.ReceiptItemRow", b =>
@@ -110,9 +127,8 @@ namespace ExpenseExplorer.Infrastructure.Persistence.Migrations
                     b.HasOne("ExpenseExplorer.Infrastructure.Persistence.ReceiptRow", null)
                         .WithMany("Items")
                         .HasForeignKey("ReceiptId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired()
-                        .HasConstraintName("receipt_items_receipt_id_fkey");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ExpenseExplorer.Infrastructure.Persistence.ReceiptRow", b =>

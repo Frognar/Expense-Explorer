@@ -8,6 +8,8 @@ internal sealed class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<E
 {
     public ExpenseExplorerDbContext CreateDbContext(string[] args) =>
         new(new DbContextOptionsBuilder<ExpenseExplorerDbContext>()
-            .UseNpgsql("Host=localhost;Database=expense_explorer")
+            .UseNpgsql(
+                "Host=localhost;Database=expense_explorer",
+                npgsql => npgsql.MigrationsHistoryTable("__ef_migrations_history", ExpenseExplorerDbContext.Schema))
             .Options);
 }

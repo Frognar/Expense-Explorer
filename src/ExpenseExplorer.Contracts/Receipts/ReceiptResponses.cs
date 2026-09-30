@@ -14,10 +14,10 @@ public sealed record ReceiptItemResponse(
     string Item,
     string Category,
     decimal Quantity,
-    decimal UnitPrice,
+    decimal Amount,
     decimal Discount,
-    decimal Gross,
     decimal Total,
+    decimal UnitPrice,
     string? Description);
 
 public sealed record ReceiptSummaryResponse(

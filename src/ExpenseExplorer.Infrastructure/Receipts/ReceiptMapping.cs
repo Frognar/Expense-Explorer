@@ -61,7 +61,7 @@ internal static class ReceiptMapping
         row.Item = purchase.Item.Value;
         row.Category = purchase.Category.Value;
         row.Quantity = purchase.Price.Quantity.Value;
-        row.UnitPrice = purchase.Price.UnitPrice.Value;
+        row.Amount = purchase.Price.Amount.Value;
         row.Discount = purchase.Price.Discount.Value;
         row.Description = purchase.Description?.Value;
     }
@@ -78,8 +78,8 @@ internal static class ReceiptMapping
     private static Result<LinePrice> ToDomainPrice(ReceiptItemRow row) =>
         ResultCombine.Combine(
                 Quantity.Create(row.Quantity),
-                UnitPrice.Create(row.UnitPrice),
+                Money.Create(row.Amount),
                 Money.Create(row.Discount),
-                (quantity, unitPrice, discount) => (quantity, unitPrice, discount))
-            .Bind(parts => LinePrice.Create(parts.quantity, parts.unitPrice, parts.discount));
+                (quantity, amount, discount) => (quantity, amount, discount))
+            .Bind(parts => LinePrice.Create(parts.quantity, parts.amount, parts.discount));
 }

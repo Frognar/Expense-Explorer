@@ -2,36 +2,45 @@ using ExpenseExplorer.Domain.Common;
 
 namespace ExpenseExplorer.Domain.Receipts;
 
-/// <summary>Price of one receipt line. The discount never exceeds the gross value.</summary>
+/// <summary>
+/// Price of one receipt line as printed on the receipt or invoice: the amount for the whole
+/// quantity and a discount on that amount. The discount never exceeds the amount.
+/// </summary>
 public sealed record LinePrice
 {
-    private LinePrice(Quantity quantity, UnitPrice unitPrice, Money discount)
+    public const int UnitPriceDecimalPlaces = 4;
+
+    private LinePrice(Quantity quantity, Money amount, Money discount)
     {
         Quantity = quantity;
-        UnitPrice = unitPrice;
+        Amount = amount;
         Discount = discount;
     }
 
     public Quantity Quantity { get; }
 
-    public UnitPrice UnitPrice { get; }
+    /// <summary>Amount for the whole quantity, before the discount.</summary>
+    public Money Amount { get; }
 
     public Money Discount { get; }
 
-    public Money Gross => UnitPrice.Times(Quantity);
+    /// <summary>What was actually paid for the line.</summary>
+    public Money Total => Amount.MinusClamped(Discount);
 
-    public Money Total => Gross.MinusClamped(Discount);
+    /// <summary>Derived for display only; rounded, so it may not multiply back to <see cref="Amount"/> exactly.</summary>
+    public decimal UnitPrice =>
+        decimal.Round(Amount.Value / Quantity.Value, UnitPriceDecimalPlaces, MidpointRounding.AwayFromZero);
 
-    public static Result<LinePrice> Create(Quantity quantity, UnitPrice unitPrice, Money discount)
+    public static Result<LinePrice> Create(Quantity quantity, Money amount, Money discount)
     {
         ArgumentNullException.ThrowIfNull(quantity);
-        ArgumentNullException.ThrowIfNull(unitPrice);
+        ArgumentNullException.ThrowIfNull(amount);
         ArgumentNullException.ThrowIfNull(discount);
 
-        return discount > unitPrice.Times(quantity)
+        return discount > amount
             ? Result.Failure<LinePrice>(new Error(
-                "LinePrice.DiscountExceedsGross",
-                "Discount cannot be greater than unit price multiplied by quantity."))
-            : Result.Success(new LinePrice(quantity, unitPrice, discount));
+                "LinePrice.DiscountExceedsAmount",
+                "Discount cannot be greater than the amount for the whole quantity."))
+            : Result.Success(new LinePrice(quantity, amount, discount));
     }
 }

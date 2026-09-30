@@ -82,10 +82,10 @@ internal static class ReceiptRequestParser
     private static Result<LinePrice> LinePrice(ReceiptItemRequest request) =>
         ResultCombine.Combine(
                 Input.Required(request.Quantity).Bind(Quantity.Create).ForTarget("quantity"),
-                Input.Required(request.UnitPrice).Bind(UnitPrice.Create).ForTarget("unitPrice"),
+                Input.Required(request.Amount).Bind(Money.Create).ForTarget("amount"),
                 Money.Create(request.Discount ?? 0m).ForTarget("discount"),
-                (quantity, unitPrice, discount) => (quantity, unitPrice, discount))
-            .Bind(parts => Domain.Receipts.LinePrice.Create(parts.quantity, parts.unitPrice, parts.discount).ForTarget("discount"));
+                (quantity, amount, discount) => (quantity, amount, discount))
+            .Bind(parts => Domain.Receipts.LinePrice.Create(parts.quantity, parts.amount, parts.discount).ForTarget("discount"));
 
     private static Result<PurchaseDate> RequiredDate(DateOnly? value, DateOnly today) =>
         Input.Required(value).Bind(date => PurchaseDate.Create(date, today));

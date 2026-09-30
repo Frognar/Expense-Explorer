@@ -36,18 +36,14 @@ internal sealed class ReceiptQueries(ExpenseExplorerDbContext db) : IReceiptQuer
             totalCost);
     }
 
-    /// <summary>
-    /// Totals computed in SQL the same way as <see cref="Domain.Receipts.LinePrice"/>:
-    /// unit price × quantity rounded to grosze, minus the discount.
-    /// </summary>
+    /// <summary>Totals computed in SQL the same way as <see cref="Domain.Receipts.LinePrice"/>: amount minus discount.</summary>
     private static IQueryable<SummaryRow> Summaries(IQueryable<ReceiptRow> receipts) =>
         receipts.Select(r => new SummaryRow
         {
             Id = r.Id,
             Store = r.Store,
             PurchaseDate = r.PurchaseDate,
-            // PostgreSQL round() on numeric rounds half away from zero, like the domain.
-            Total = r.Items.Sum(i => Math.Round(i.UnitPrice * i.Quantity, 2) - i.Discount),
+            Total = r.Items.Sum(i => i.Amount - i.Discount),
         });
 
     private static IQueryable<SummaryRow> Filter(IQueryable<SummaryRow> receipts, ReceiptListQuery query)

@@ -10,10 +10,14 @@ public sealed record UpdateReceiptRequest(string? Store, DateOnly? PurchaseDate)
 
 public sealed record DuplicateReceiptRequest(DateOnly? PurchaseDate);
 
+/// <summary>
+/// <paramref name="Amount"/> is the price of the whole quantity as printed on the receipt,
+/// <paramref name="Discount"/> is taken off that amount.
+/// </summary>
 public sealed record ReceiptItemRequest(
     string? Item,
     string? Category,
     decimal? Quantity,
-    decimal? UnitPrice,
+    decimal? Amount,
     decimal? Discount,
     string? Description);

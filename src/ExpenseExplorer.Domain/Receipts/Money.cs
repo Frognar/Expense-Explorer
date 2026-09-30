@@ -25,10 +25,6 @@ public sealed record Money : IComparable<Money>
             _ => Result.Success(new Money(value)),
         };
 
-    /// <summary>Rounds a non-negative amount half away from zero to whole grosze.</summary>
-    internal static Money RoundedFrom(decimal nonNegative) =>
-        new(decimal.Round(nonNegative, MaxDecimalPlaces, MidpointRounding.AwayFromZero));
-
     public static Money Sum(IEnumerable<Money> amounts) =>
         new(amounts.Sum(amount => amount.Value));
 

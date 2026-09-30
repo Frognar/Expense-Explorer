@@ -14,14 +14,16 @@ public static class InfrastructureSetup
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
     {
-        services.AddDbContext<ExpenseExplorerDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddDbContext<ExpenseExplorerDbContext>(options => options.UseNpgsql(
+            connectionString,
+            npgsql => npgsql.MigrationsHistoryTable("__ef_migrations_history", ExpenseExplorerDbContext.Schema)));
         services.AddScoped<IReceiptRepository, ReceiptRepository>();
         services.AddScoped<IReceiptQueries, ReceiptQueries>();
         services.AddScoped<IDictionaryQueries, DictionaryQueries>();
         return services;
     }
 
-    /// <summary>Brings the database schema up to date. Safe on a database created by the previous app version.</summary>
+    /// <summary>Brings the database schema up to date. On the first run it also copies the data of the previous app version.</summary>
     public static async Task MigrateDatabaseAsync(this IServiceProvider services)
     {
         await using AsyncServiceScope scope = services.CreateAsyncScope();

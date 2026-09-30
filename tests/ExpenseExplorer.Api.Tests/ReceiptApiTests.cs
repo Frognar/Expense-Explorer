@@ -62,8 +62,8 @@ public class ReceiptApiTests(ApiFixture api)
     {
         ReceiptResponse receipt = await CreateReceiptAsync("Biedronka");
 
-        await AddItemAsync(receipt.Id, new ReceiptItemRequest("Mleko", "Nabiał", 2m, 3.49m, 0.50m, null));
-        await AddItemAsync(receipt.Id, new ReceiptItemRequest("Chleb", "Pieczywo", 0.5m, 9.99m, null, "  pół bochenka "));
+        await AddItemAsync(receipt.Id, new ReceiptItemRequest("Mleko", "Nabiał", 2m, 6.98m, 0.50m, null));
+        await AddItemAsync(receipt.Id, new ReceiptItemRequest("Chleb", "Pieczywo", 0.5m, 5.00m, null, "  pół bochenka "));
         ReceiptResponse stored = await (await _client.Get($"{Receipts}/{receipt.Id}")).Read<ReceiptResponse>();
 
         Assert.Equal(11.48m, stored.Total);
@@ -72,12 +72,14 @@ public class ReceiptApiTests(ApiFixture api)
             milk =>
             {
                 Assert.Equal("Mleko", milk.Item);
-                Assert.Equal(6.98m, milk.Gross);
+                Assert.Equal(6.98m, milk.Amount);
+                Assert.Equal(3.49m, milk.UnitPrice);
                 Assert.Equal(6.48m, milk.Total);
             },
             bread =>
             {
-                Assert.Equal(5.00m, bread.Total); // 4.995 rounds half away from zero
+                Assert.Equal(5.00m, bread.Total);
+                Assert.Equal(10.00m, bread.UnitPrice);
                 Assert.Equal(0m, bread.Discount);
                 Assert.Equal("pół bochenka", bread.Description);
             });
@@ -99,39 +101,49 @@ public class ReceiptApiTests(ApiFixture api)
                 ["item"] = ["ItemName.Empty"],
                 ["category"] = ["CategoryName.Empty"],
                 ["quantity"] = ["Quantity.NotPositive"],
-                ["unitPrice"] = ["Input.Required"],
+                ["amount"] = ["Input.Required"],
                 ["discount"] = ["Money.Negative"],
             },
             await response.ErrorCodes());
     }
 
     [Fact]
-    public async Task Unit_price_accepts_four_decimal_places_but_not_more()
+    public async Task Utility_bill_line_keeps_the_invoice_amount_and_derives_the_unit_price()
     {
         ReceiptResponse receipt = await CreateReceiptAsync("Wodociągi");
 
-        HttpResponseMessage accepted = await _client.Post(
+        HttpResponseMessage response = await _client.Post(
             $"{Receipts}/{receipt.Id}/items",
-            new ReceiptItemRequest("Woda", "Media", 17.3m, 7.1358m, null, null));
-        HttpResponseMessage rejected = await _client.Post(
-            $"{Receipts}/{receipt.Id}/items",
-            new ReceiptItemRequest("Woda", "Media", 17.3m, 7.13584m, null, null));
+            new ReceiptItemRequest("Woda", "Media", 17.3m, 123.45m, null, null));
+        ReceiptItemResponse water = await response.Read<ReceiptItemResponse>();
 
-        Assert.Equal(123.45m, (await accepted.Read<ReceiptItemResponse>()).Total);
-        Assert.Equal(["UnitPrice.TooPrecise"], (await rejected.ErrorCodes())["unitPrice"]);
+        Assert.Equal(123.45m, water.Total);
+        Assert.Equal(7.1358m, water.UnitPrice);
     }
 
     [Fact]
-    public async Task Discount_above_the_gross_value_is_rejected()
+    public async Task Amount_with_more_than_two_decimal_places_is_rejected()
     {
         ReceiptResponse receipt = await CreateReceiptAsync("Lidl");
 
         HttpResponseMessage response = await _client.Post(
             $"{Receipts}/{receipt.Id}/items",
-            new ReceiptItemRequest("Masło", "Nabiał", 1m, 5m, 6m, null));
+            new ReceiptItemRequest("Ser", "Nabiał", 1m, 5.001m, null, null));
+
+        Assert.Equal(["Money.TooPrecise"], (await response.ErrorCodes())["amount"]);
+    }
+
+    [Fact]
+    public async Task Discount_above_the_amount_is_rejected()
+    {
+        ReceiptResponse receipt = await CreateReceiptAsync("Lidl");
+
+        HttpResponseMessage response = await _client.Post(
+            $"{Receipts}/{receipt.Id}/items",
+            new ReceiptItemRequest("Masło", "Nabiał", 1m, 5.00m, 6m, null));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Equal(["LinePrice.DiscountExceedsGross"], (await response.ErrorCodes())["discount"]);
+        Assert.Equal(["LinePrice.DiscountExceedsAmount"], (await response.ErrorCodes())["discount"]);
     }
 
     [Fact]
@@ -139,7 +151,7 @@ public class ReceiptApiTests(ApiFixture api)
     {
         HttpResponseMessage response = await _client.Post(
             $"{Receipts}/{Guid.NewGuid()}/items",
-            new ReceiptItemRequest("Masło", "Nabiał", 1m, 5m, null, null));
+            new ReceiptItemRequest("Masło", "Nabiał", 1m, 5.00m, null, null));
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
@@ -148,12 +160,12 @@ public class ReceiptApiTests(ApiFixture api)
     public async Task Items_can_be_changed_and_removed()
     {
         ReceiptResponse receipt = await CreateReceiptAsync("Lidl");
-        ReceiptItemResponse first = await AddItemAsync(receipt.Id, new ReceiptItemRequest("Masło", "Nabiał", 1m, 5m, null, null));
-        ReceiptItemResponse second = await AddItemAsync(receipt.Id, new ReceiptItemRequest("Ser", "Nabiał", 1m, 8m, null, null));
+        ReceiptItemResponse first = await AddItemAsync(receipt.Id, new ReceiptItemRequest("Masło", "Nabiał", 1m, 5.00m, null, null));
+        ReceiptItemResponse second = await AddItemAsync(receipt.Id, new ReceiptItemRequest("Ser", "Nabiał", 1m, 8.00m, null, null));
 
         HttpResponseMessage changed = await _client.Put(
             $"{Receipts}/{receipt.Id}/items/{first.Id}",
-            new ReceiptItemRequest("Masło extra", "Nabiał", 2m, 6m, 1m, null));
+            new ReceiptItemRequest("Masło extra", "Nabiał", 2m, 12.00m, 1m, null));
         HttpResponseMessage removed = await _client.Delete($"{Receipts}/{receipt.Id}/items/{second.Id}");
         ReceiptResponse stored = await (await _client.Get($"{Receipts}/{receipt.Id}")).Read<ReceiptResponse>();
 
@@ -202,7 +214,7 @@ public class ReceiptApiTests(ApiFixture api)
     public async Task Deleted_receipt_is_gone_with_its_items()
     {
         ReceiptResponse receipt = await CreateReceiptAsync("Lidl");
-        await AddItemAsync(receipt.Id, new ReceiptItemRequest("Masło", "Nabiał", 1m, 5m, null, null));
+        await AddItemAsync(receipt.Id, new ReceiptItemRequest("Masło", "Nabiał", 1m, 5.00m, null, null));
 
         HttpResponseMessage deleted = await _client.Delete($"{Receipts}/{receipt.Id}");
         HttpResponseMessage fetched = await _client.Get($"{Receipts}/{receipt.Id}");
@@ -215,7 +227,7 @@ public class ReceiptApiTests(ApiFixture api)
     public async Task Duplicate_copies_store_and_items_to_a_new_date()
     {
         ReceiptResponse receipt = await CreateReceiptAsync("Lidl");
-        await AddItemAsync(receipt.Id, new ReceiptItemRequest("Masło", "Nabiał", 1m, 5m, null, null));
+        await AddItemAsync(receipt.Id, new ReceiptItemRequest("Masło", "Nabiał", 1m, 5.00m, null, null));
 
         HttpResponseMessage response = await _client.Post(
             $"{Receipts}/{receipt.Id}/duplicate",
@@ -233,11 +245,11 @@ public class ReceiptApiTests(ApiFixture api)
     {
         string store = $"Sklep-{Guid.NewGuid():N}";
         ReceiptResponse cheap = await CreateReceiptAsync(store, Today.AddDays(-2));
-        await AddItemAsync(cheap.Id, new ReceiptItemRequest("Woda", "Napoje", 1m, 2m, null, null));
+        await AddItemAsync(cheap.Id, new ReceiptItemRequest("Woda", "Napoje", 1m, 2.00m, null, null));
         ReceiptResponse expensive = await CreateReceiptAsync(store, Today.AddDays(-1));
-        await AddItemAsync(expensive.Id, new ReceiptItemRequest("Kawa", "Napoje", 1m, 30m, null, null));
+        await AddItemAsync(expensive.Id, new ReceiptItemRequest("Kawa", "Napoje", 1m, 30.00m, null, null));
         ReceiptResponse old = await CreateReceiptAsync(store, Today.AddDays(-30));
-        await AddItemAsync(old.Id, new ReceiptItemRequest("Herbata", "Napoje", 1m, 10m, null, null));
+        await AddItemAsync(old.Id, new ReceiptItemRequest("Herbata", "Napoje", 1m, 10.00m, null, null));
 
         HttpResponseMessage response = await _client.Get(
             $"{Receipts}?stores={store}&from={Today.AddDays(-7):yyyy-MM-dd}&sortBy=Total&direction=Descending&pageSize=1");
@@ -254,7 +266,7 @@ public class ReceiptApiTests(ApiFixture api)
     {
         string store = $"Sklep-{Guid.NewGuid():N}";
         ReceiptResponse receipt = await CreateReceiptAsync(store);
-        await AddItemAsync(receipt.Id, new ReceiptItemRequest("Ser", "Nabiał", 0.5m, 9.99m, null, null));
+        await AddItemAsync(receipt.Id, new ReceiptItemRequest("Ser", "Nabiał", 0.5m, 5.00m, null, null));
 
         ReceiptListResponse list = await (await _client.Get($"{Receipts}?stores={store}")).Read<ReceiptListResponse>();
         ReceiptResponse details = await (await _client.Get($"{Receipts}/{receipt.Id}")).Read<ReceiptResponse>();
@@ -277,8 +289,8 @@ public class ReceiptApiTests(ApiFixture api)
     {
         string marker = Guid.NewGuid().ToString("N")[..8];
         ReceiptResponse receipt = await CreateReceiptAsync($"Żabka {marker}");
-        await AddItemAsync(receipt.Id, new ReceiptItemRequest($"Bułka {marker}", $"Pieczywo {marker}", 1m, 1m, null, null));
-        await AddItemAsync(receipt.Id, new ReceiptItemRequest($"Bułka {marker}", $"Pieczywo {marker}", 2m, 1m, null, null));
+        await AddItemAsync(receipt.Id, new ReceiptItemRequest($"Bułka {marker}", $"Pieczywo {marker}", 1m, 1.00m, null, null));
+        await AddItemAsync(receipt.Id, new ReceiptItemRequest($"Bułka {marker}", $"Pieczywo {marker}", 2m, 2.00m, null, null));
 
         string[] stores = await (await _client.Get($"/api/v1/stores?search={marker.ToUpperInvariant()}")).Read<string[]>();
         string[] items = await (await _client.Get($"/api/v1/items?search={marker}")).Read<string[]>();

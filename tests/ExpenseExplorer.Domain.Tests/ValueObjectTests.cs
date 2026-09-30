@@ -56,22 +56,6 @@ public class ValueObjectTests
     }
 
     [Theory]
-    [InlineData("-0.0001", "UnitPrice.Negative")]
-    [InlineData("7.13589", "UnitPrice.TooPrecise")]
-    public void UnitPrice_rejects_invalid_values(string value, string code)
-    {
-        var result = UnitPrice.Create(decimal.Parse(value, System.Globalization.CultureInfo.InvariantCulture));
-
-        Assert.Equal(code, Assert.Single(result.Errors).Code);
-    }
-
-    [Fact]
-    public void UnitPrice_accepts_four_decimal_places()
-    {
-        Assert.True(UnitPrice.Create(7.1359m).IsSuccess);
-    }
-
-    [Theory]
     [InlineData("0", "Quantity.NotPositive")]
     [InlineData("-1", "Quantity.NotPositive")]
     [InlineData("0.00001", "Quantity.TooPrecise")]

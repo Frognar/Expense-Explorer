@@ -28,7 +28,7 @@ internal sealed class ReceiptItemRow
 
     public decimal Quantity { get; set; }
 
-    public decimal UnitPrice { get; set; }
+    public decimal Amount { get; set; }
 
     public decimal Discount { get; set; }
 
