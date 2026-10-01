@@ -64,6 +64,18 @@ public sealed class ExpenseApi(HttpClient http)
         return await ReadAsync<ReceiptResponse>(response);
     }
 
+    public async Task<ApiResult<PhotoImportResponse>> ImportPhotoAsync(Stream photo, string fileName, string contentType)
+    {
+        using MultipartFormDataContent form = new();
+        using StreamContent content = new(photo);
+        content.Headers.ContentType = MediaTypeHeaderValue.TryParse(contentType, out MediaTypeHeaderValue? type)
+            ? type
+            : new MediaTypeHeaderValue("image/jpeg");
+        form.Add(content, "file", fileName);
+        using HttpResponseMessage response = await http.PostAsync(new Uri($"{Receipts}/import/photo", UriKind.Relative), form);
+        return await ReadAsync<PhotoImportResponse>(response);
+    }
+
     public Task<ApiResult<ReceiptItemListResponse>> ReceiptItemsAsync(ReceiptItemListRequest request) =>
         GetAsync<ReceiptItemListResponse>("api/v1/receipt-items" + ListQueries.ToQuery(request));
 

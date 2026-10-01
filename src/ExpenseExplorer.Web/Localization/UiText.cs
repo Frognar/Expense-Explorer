@@ -52,6 +52,13 @@ public sealed class UiText
     public required string EditReceipt { get; init; }
     public required string ImportBiedronka { get; init; }
     public required string Imported { get; init; }
+    public required string ImportPhoto { get; init; }
+    public required string ReadingPhoto { get; init; }
+    public required string PhotoTotalMatches { get; init; }
+    public required Func<string, string, string> PhotoTotalDiffers { get; init; }
+    public required string PhotoTotalMissing { get; init; }
+    public required string PhotoDateMissing { get; init; }
+    public required string PhotoSkippedLines { get; init; }
     public required string AddItem { get; init; }
     public required string EditItem { get; init; }
     public required string NoItemsYet { get; init; }
@@ -119,6 +126,13 @@ public sealed class UiText
         EditReceipt = "Edytuj paragon",
         ImportBiedronka = "Import z Biedronki",
         Imported = "Paragon zaimportowany.",
+        ImportPhoto = "Ze zdjęcia",
+        ReadingPhoto = "Odczytuję paragon ze zdjęcia…",
+        PhotoTotalMatches = "Paragon zaimportowany, suma zgadza się z paragonem.",
+        PhotoTotalDiffers = (lines, printed) => $"Suma pozycji {lines} różni się od sumy na paragonie {printed}. Sprawdź pozycje.",
+        PhotoTotalMissing = "Nie odczytałem sumy z paragonu. Sprawdź pozycje.",
+        PhotoDateMissing = "Nie odczytałem daty zakupu, ustawiłem dzisiejszą.",
+        PhotoSkippedLines = "Nie odczytałem tych linii:",
         AddItem = "Dodaj pozycję",
         EditItem = "Edytuj pozycję",
         NoItemsYet = "Paragon nie ma jeszcze pozycji.",
@@ -193,6 +207,10 @@ public sealed class UiText
             ["Import.InvalidAmount"] = "Plik zawiera niepoprawną kwotę.",
             ["Import.InvalidDiscount"] = "Plik zawiera niepoprawny rabat.",
             ["Import.VoucherTooLarge"] = "Bon jest większy niż wartość paragonu.",
+            ["Import.NothingRead"] = "Nie udało się odczytać żadnej pozycji ze zdjęcia.",
+            ["Import.NotAnImage"] = "To nie jest zdjęcie.",
+            ["Import.PhotoTooLarge"] = "Zdjęcie jest większe niż 20 MB.",
+            ["Import.OcrUnavailable"] = "Odczytywanie zdjęć jest teraz niedostępne.",
             ["Http.401"] = "Zaloguj się ponownie.",
             ["Http.403"] = "Nie masz uprawnień do tej operacji.",
             ["Http.404"] = "Nie znaleziono.",
@@ -247,6 +265,13 @@ public sealed class UiText
         EditReceipt = "Edit receipt",
         ImportBiedronka = "Import from Biedronka",
         Imported = "Receipt imported.",
+        ImportPhoto = "From photo",
+        ReadingPhoto = "Reading the receipt photo…",
+        PhotoTotalMatches = "Receipt imported; the total matches the paper.",
+        PhotoTotalDiffers = (lines, printed) => $"The items add up to {lines}, but the receipt says {printed}. Check the items.",
+        PhotoTotalMissing = "Could not read the total on the receipt. Check the items.",
+        PhotoDateMissing = "Could not read the purchase date; today is set.",
+        PhotoSkippedLines = "Could not read these lines:",
         AddItem = "Add item",
         EditItem = "Edit item",
         NoItemsYet = "This receipt has no items yet.",
@@ -321,6 +346,10 @@ public sealed class UiText
             ["Import.InvalidAmount"] = "The file contains an invalid amount.",
             ["Import.InvalidDiscount"] = "The file contains an invalid discount.",
             ["Import.VoucherTooLarge"] = "The voucher is larger than the receipt.",
+            ["Import.NothingRead"] = "No receipt lines could be read from the photo.",
+            ["Import.NotAnImage"] = "This is not a photo.",
+            ["Import.PhotoTooLarge"] = "The photo is larger than 20 MB.",
+            ["Import.OcrUnavailable"] = "Reading photos is not available right now.",
             ["Http.401"] = "Please sign in again.",
             ["Http.403"] = "You are not allowed to do this.",
             ["Http.404"] = "Not found.",

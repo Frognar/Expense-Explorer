@@ -14,6 +14,14 @@
     <MudSpacer/>
     @if (Auth.CanEdit)
     {
+        <MudFileUpload T="IBrowserFile" Accept="image/*" FilesChanged="ImportPhotoAsync" Disabled="_importing">
+            <CustomContent>
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.PhotoCamera" Size="Size.Small"
+                           OnClick="@context.OpenFilePickerAsync">
+                    @Language.Text.ImportPhoto
+                </MudButton>
+            </CustomContent>
+        </MudFileUpload>
         <MudFileUpload T="IBrowserFile" Accept=".json,application/json" FilesChanged="ImportAsync" Disabled="_importing">
             <CustomContent>
                 <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.UploadFile" Size="Size.Small"
@@ -26,6 +34,12 @@
                    OnClick="CreateAsync">@Language.Text.NewReceipt</MudButton>
     }
 </MudStack>
+
+@if (_readingPhoto)
+{
+    <MudAlert Severity="Severity.Info" Dense="true" Class="mb-2">@Language.Text.ReadingPhoto</MudAlert>
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="mb-2"/>
+}
 
 <FilterPanel ActiveCount="ActiveFilters" OnApply="() => Show(_draft with { Page = null })" OnClear="() => Show(new ReceiptListRequest())">
     <ChipsFilter Kind="Suggestions.Stores" Label="@Language.Text.Stores" Values="_draft.Stores"
@@ -87,11 +101,16 @@ else
 }
 
 @code {
+    private const int MaxPhotoWidth = 3000;
+    private const int MaxPhotoHeight = 4000;
+    private const long MaxPhotoBytes = 8 * 1024 * 1024;
+
     private ReceiptListRequest _filter = new();
     private ReceiptListRequest _draft = new();
     private ReceiptListResponse? _list;
     private ApiProblem? _problem;
     private bool _importing;
+    private bool _readingPhoto;
 
     private int ActiveFilters =>
         (_filter.Stores is { Length: > 0 } ? 1 : 0)
@@ -156,6 +175,65 @@ else
         else
         {
             Snackbar.Add(Language.Errors(result.Problem!.ErrorCodes.Values.SelectMany(codes => codes)), Severity.Error);
+        }
+    }
+
+    private async Task ImportPhotoAsync(IBrowserFile? photo)
+    {
+        if (photo is null)
+        {
+            return;
+        }
+
+        _importing = _readingPhoto = true;
+        // The browser re-encodes the photo at a size the OCR still reads well, which keeps the upload
+        // small and leaves the photo upright even when the phone stored it sideways.
+        IBrowserFile upload = await photo.RequestImageFileAsync("image/jpeg", MaxPhotoWidth, MaxPhotoHeight);
+        await using Stream content = upload.OpenReadStream(MaxPhotoBytes);
+        ApiResult<PhotoImportResponse> result = await Api.ImportPhotoAsync(content, photo.Name, upload.ContentType);
+        _importing = _readingPhoto = false;
+        if (!result.IsSuccess)
+        {
+            Snackbar.Add(Language.Errors(result.Problem!.ErrorCodes.Values.SelectMany(codes => codes)), Severity.Error);
+            return;
+        }
+
+        ShowWhatToCheck(result.Value);
+        Navigation.NavigateTo(Routes.Receipt(result.Value.Receipt.Id));
+    }
+
+    /// <summary>OCR makes mistakes, so anything that does not add up stays on screen until dismissed.</summary>
+    private void ShowWhatToCheck(PhotoImportResponse imported)
+    {
+        List<string> warnings = [];
+        if (imported.PrintedTotal is not { } printed)
+        {
+            warnings.Add(Language.Text.PhotoTotalMissing);
+        }
+        else if (printed != imported.Receipt.Total)
+        {
+            warnings.Add(Language.Text.PhotoTotalDiffers(Display.Money(imported.Receipt.Total), Display.Money(printed)));
+        }
+
+        if (!imported.PurchaseDateFound)
+        {
+            warnings.Add(Language.Text.PhotoDateMissing);
+        }
+
+        if (imported.SkippedLines.Count > 0)
+        {
+            warnings.Add($"{Language.Text.PhotoSkippedLines} {string.Join("; ", imported.SkippedLines)}");
+        }
+
+        if (warnings.Count == 0)
+        {
+            Snackbar.Add(Language.Text.PhotoTotalMatches, Severity.Success);
+            return;
+        }
+
+        foreach (string warning in warnings)
+        {
+            Snackbar.Add(warning, Severity.Warning, options => options.RequireInteraction = true);
         }
     }
 }

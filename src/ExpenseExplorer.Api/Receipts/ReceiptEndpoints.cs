@@ -2,6 +2,7 @@ using System.Text;
 using ExpenseExplorer.Api.Auth;
 using ExpenseExplorer.Api.Http;
 using ExpenseExplorer.Api.Receipts.Import;
+using ExpenseExplorer.Api.Receipts.Import.Photo;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Contracts.Receipts;
 using ExpenseExplorer.Domain.Common;
@@ -12,6 +13,7 @@ namespace ExpenseExplorer.Api.Receipts;
 internal static class ReceiptEndpoints
 {
     private const long MaxImportFileBytes = 1024 * 1024;
+    private const long MaxPhotoBytes = 20 * 1024 * 1024;
 
     public static RouteGroupBuilder MapReceipts(this RouteGroupBuilder api)
     {
@@ -26,6 +28,9 @@ internal static class ReceiptEndpoints
         receipts.MapPost("/import/biedronka", ImportBiedronkaAsync)
             .RequireAuthorization(Policies.CanEdit)
             .DisableAntiforgery(); // Requests carry a bearer token, which a forged cross-site form cannot add.
+        receipts.MapPost("/import/photo", ImportPhotoAsync)
+            .RequireAuthorization(Policies.CanEdit)
+            .DisableAntiforgery();
         receipts.MapPost("/{receiptId:guid}/duplicate", DuplicateAsync).RequireAuthorization(Policies.CanEdit);
         receipts.MapPost("/{receiptId:guid}/items", AddItemAsync).RequireAuthorization(Policies.CanEdit);
         receipts.MapPut("/{receiptId:guid}/items/{itemId:guid}", ChangeItemAsync).RequireAuthorization(Policies.CanEdit);
@@ -108,6 +113,42 @@ internal static class ReceiptEndpoints
 
         return await BiedronkaReceiptParser.Parse(json, clock.Today(), clock.LocalTimeZone)
             .ToHttpAsync(command => ReceiptUseCases.ImportAsync(receipts, command, cancellationToken), Created);
+    }
+
+    /// <summary>Takes a photo of a paper receipt as a multipart form file named "file".</summary>
+    private static async Task<IResult> ImportPhotoAsync(
+        IFormFile file,
+        IReceiptOcr ocr,
+        IReceiptRepository receipts,
+        TimeProvider clock,
+        ILogger<IReceiptOcr> logger,
+        CancellationToken cancellationToken)
+    {
+        if (file.Length > MaxPhotoBytes)
+        {
+            return ErrorResults.From([new Error("Import.PhotoTooLarge", "The photo is larger than 20 MB.", Target: "file")]);
+        }
+
+        await using Stream photo = file.OpenReadStream();
+        Result<IReadOnlyList<OcrText>> read = await ocr.ReadAsync(photo, file.ContentType, cancellationToken);
+
+        return await read
+            .Map(PrintedLines.Of)
+            .Bind(lines =>
+            {
+                logger.LinesRead(lines.Count, lines);
+                return PaperReceiptParser.Parse(lines, clock.Today());
+            })
+            .ToHttpAsync(
+                async paper => (await ReceiptUseCases.ImportAsync(receipts, paper.Receipt, cancellationToken))
+                    .Map(receipt => (Receipt: receipt, Paper: paper)),
+                imported => Results.Created(
+                    $"{Routing.ApiPrefix}/receipts/{imported.Receipt.Id.Value}",
+                    new PhotoImportResponse(
+                        ReceiptResponses.From(imported.Receipt),
+                        imported.Paper.PrintedTotal,
+                        imported.Paper.PurchaseDateFound,
+                        imported.Paper.SkippedLines)));
     }
 
     private static Task<IResult> AddItemAsync(

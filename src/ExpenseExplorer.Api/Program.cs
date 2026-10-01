@@ -1,5 +1,6 @@
 using ExpenseExplorer.Api;
 using ExpenseExplorer.Api.Auth;
+using ExpenseExplorer.Api.Receipts.Import.Photo;
 using ExpenseExplorer.Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
 using Scalar.AspNetCore;
@@ -28,6 +29,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
     options.KnownProxies.Clear();
 });
 builder.AddAuth();
+builder.AddReceiptOcr();
 builder.Services.AddInfrastructure(
     builder.Configuration.GetConnectionString(InfrastructureSetup.ConnectionStringName)
     ?? throw new InvalidOperationException($"Connection string '{InfrastructureSetup.ConnectionStringName}' is missing."));

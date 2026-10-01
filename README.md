@@ -20,12 +20,14 @@ The previous version is kept on the [`main-2609-archive`](https://github.com/Fro
 - `src/ExpenseExplorer.Domain` – receipt model; invalid states cannot be constructed
 - `src/ExpenseExplorer.Api` – HTTP API, also serves the frontend
 - `src/ExpenseExplorer.Web` – Blazor WebAssembly frontend (MudBlazor, mobile first)
+- `ocr` – text recognition for receipt photos (Python, RapidOCR with PaddleOCR models); the API sends it photos
 - `src/aspire/AppHost` – local run with PostgreSQL (`dotnet run --project src/aspire/AppHost`)
 - `tests/` – unit and API tests (`dotnet test --solution ExpenseExplorer.slnx`)
 
 ## Deployment
 
-The app runs on the home server with Docker Compose (`docker-compose.yaml`): PostgreSQL and the API, which also serves the frontend on port 8080.
+The app runs on the home server with Docker Compose (`docker-compose.yaml`): PostgreSQL, the API, which also serves the frontend on port 8080, and the OCR service for receipt photos (about 300 MB of memory, reachable only by the API).
+Photos are read on the server; nothing leaves the home network. Without `Ocr__Url` the app works, only importing photos is unavailable.
 It is meant to sit behind a reverse proxy that terminates HTTPS (Caddy on the Pi); the API trusts its `X-Forwarded-Proto` and `X-Forwarded-For` headers.
 
 Deploying is manual: **Actions > .NET > Run workflow** on `main`. The job on the self-hosted runner:
@@ -58,7 +60,7 @@ A reader can browse everything; an editor can also change data. Locally, run the
 - [ ] **Browse Stores, Items, and Categories:** View and search through stores, items, and categories used in receipts and purchases.
 - [x] **Reporting:** Generate category-wise expense reports for a given date range.
 - [x] **Browse Purchases:** Every receipt line with filters on store, item, category, date, price, quantity, discount, total and description.
-- [x] **Export and Import:** Export a receipt to CSV; import a Biedronka e-receipt (JSON).
+- [x] **Export and Import:** Export a receipt to CSV; import a Biedronka e-receipt (JSON) or a photo of any paper receipt. After a photo the app shows whether the lines add up to the total printed on the receipt and which lines it could not read.
 - [x] **Accounts:** Sign-in with read-only and full access roles.
 
 ## Contributing
