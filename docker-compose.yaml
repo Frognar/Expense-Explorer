@@ -32,10 +32,19 @@ services:
       - ConnectionStrings__expense-explorer=Host=db;Port=5432;Database=expense_explorer;Username=user;Password=password
       # "Today" for purchase date validation is taken from this time zone.
       - TZ=Europe/Warsaw
+      # Reads the text of receipt photos; see the ocr folder.
+      - Ocr__Url=http://ocr:8000/
     volumes:
       - app_logs:/app/logs
       # Key that signs access tokens; created on first start and kept across updates.
       - app_keys:/app/keys
+    restart: unless-stopped
+
+  # Text recognition for receipt photos. Only the API talks to it, so it has no published port.
+  ocr:
+    container_name: expense-explorer-ocr
+    build:
+      context: ocr
     restart: unless-stopped
 
 volumes:

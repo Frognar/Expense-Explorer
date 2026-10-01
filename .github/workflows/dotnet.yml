@@ -32,10 +32,30 @@ jobs:
     - name: Test
       run: dotnet test --solution ExpenseExplorer.slnx --configuration Release --no-build
 
+  ocr-image:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+
+    - name: Build the OCR image
+      run: docker build -t expense-explorer-ocr ocr
+
+    - name: Check that it starts and answers
+      run: |
+        docker run -d --name ocr -p 8000:8000 expense-explorer-ocr
+        for attempt in $(seq 1 30); do
+          curl -sf http://localhost:8000/health && exit 0
+          sleep 2
+        done
+        docker logs ocr
+        exit 1
+
   deploy-to-pi:
     # The Pi is updated only on demand: Actions > .NET > Run workflow on main.
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
-    needs: build-and-test
+    needs: [build-and-test, ocr-image]
     runs-on: self-hosted
 
     steps:

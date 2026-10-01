@@ -1,0 +1,15 @@
+# RapidOCR runs the PaddleOCR models on ONNX Runtime; the models come inside its package.
+# It is installed without its dependencies (see the Dockerfile) so that OpenCV comes in the
+# headless build, which needs no graphics libraries; the rest of its dependencies are listed here.
+colorlog==6.12.0
+numpy==2.4.6
+omegaconf==2.3.1
+onnxruntime==1.30.0
+opencv-python-headless==5.0.0.93
+pillow==12.3.0
+pyclipper==1.4.0
+PyYAML==6.0.3
+requests==2.34.2
+shapely==2.1.2
+six==1.17.0
+tqdm==4.70.1

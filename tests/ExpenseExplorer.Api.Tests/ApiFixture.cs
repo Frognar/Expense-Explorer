@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using ExpenseExplorer.Api.Auth;
+using ExpenseExplorer.Api.Receipts.Import.Photo;
 using ExpenseExplorer.Contracts.Auth;
 using ExpenseExplorer.Domain.Users;
 using Microsoft.AspNetCore.Hosting;
@@ -99,7 +100,11 @@ public sealed class ApiFactory(string connectionString, int signInAttemptsPerMin
         builder.UseSetting("ConnectionStrings:expense-explorer", connectionString);
         builder.UseSetting("Auth:SigningKeyPath", _signingKeyPath);
         builder.UseSetting("Auth:SignInAttemptsPerMinute", signInAttemptsPerMinute.ToString(System.Globalization.CultureInfo.InvariantCulture));
-        builder.ConfigureTestServices(services => services.AddSingleton<TimeProvider>(new FixedClock(ApiFixture.Today)));
+        builder.ConfigureTestServices(services =>
+        {
+            services.AddSingleton<TimeProvider>(new FixedClock(ApiFixture.Today));
+            services.AddSingleton<IReceiptOcr, UploadedOcrResponse>();
+        });
     }
 
     public override async ValueTask DisposeAsync()
