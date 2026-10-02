@@ -10,6 +10,7 @@ internal static class IdentityRoles
     [
         Role(UserRole.Reader, "0199a1e2-0000-7000-8000-000000000001"),
         Role(UserRole.Editor, "0199a1e2-0000-7000-8000-000000000002"),
+        Role(UserRole.Admin, "0199a1e2-0000-7000-8000-000000000003"),
     ];
 
     public static string NameOf(UserRole role) => role.ToString();

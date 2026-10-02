@@ -1,0 +1,152 @@
+@page "/logs"
+@implements IDisposable
+@inject ExpenseApi Api
+@inject Language Language
+@inject NavigationManager Navigation
+
+<PageTitle>@Language.Text.Logs · Expense Explorer</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-2">
+    <MudText Typo="Typo.h5" HtmlTag="h1">@Language.Text.Logs</MudText>
+    <MudIconButton Icon="@Icons.Material.Filled.Refresh" aria-label="@Language.Text.Refresh" OnClick="LoadAsync"/>
+</MudStack>
+
+<MudPaper Elevation="1" Class="pa-3 mb-3">
+    <MudGrid Spacing="2">
+        <MudItem xs="6" sm="4">
+            <MudSelect T="DateOnly" Label="@Language.Text.Day" Value="Day" ValueChanged="day => Show(_filter with { Day = day, Page = null })"
+                       ToStringFunc="Display.Date" Variant="Variant.Outlined" Margin="Margin.Dense">
+                @foreach (DateOnly day in Days)
+                {
+                    <MudSelectItem T="DateOnly" Value="day">@Display.Date(day)</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="6" sm="4">
+            <MudSelect T="LogSeverity" Label="@Language.Text.LevelFrom" Value="@(_filter.Level ?? LogSeverity.Verbose)"
+                       ValueChanged="level => Show(_filter with { Level = level == LogSeverity.Verbose ? null : level, Page = null })"
+                       ToStringFunc="level => Language.Text.LogLevels[level]" Variant="Variant.Outlined" Margin="Margin.Dense">
+                @foreach ((LogSeverity level, string label) in Language.Text.LogLevels)
+                {
+                    <MudSelectItem T="LogSeverity" Value="level">@label</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudTextField T="string" Label="@Language.Text.Search" Value="@_filter.Search"
+                          ValueChanged="search => Show(_filter with { Search = search, Page = null })"
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                          Variant="Variant.Outlined" Margin="Margin.Dense" Clearable="true"/>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@if (_problem is not null)
+{
+    <ProblemAlert Problem="_problem"/>
+}
+else if (_list is null)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary"/>
+}
+else if (_list.Entries.Items.Count == 0)
+{
+    <MudText Class="pa-4" Align="Align.Center">@Language.Text.NothingFound</MudText>
+}
+else
+{
+    <MudPaper Elevation="1">
+        @foreach ((LogEntryResponse entry, int index) in _list.Entries.Items.Select((entry, index) => (entry, index)))
+        {
+            <div class="log-entry cursor-pointer px-3 py-2" @onclick="() => Toggle(index)">
+                <div class="d-flex align-center gap-2">
+                    <MudChip T="string" Size="Size.Small" Color="ColorOf(entry.Level)" Class="ma-0">@Language.Text.LogLevels[entry.Level]</MudChip>
+                    <MudText Typo="Typo.caption" Class="text-nowrap">@entry.Timestamp.ToLocalTime().ToString("HH:mm:ss", Language.Culture)</MudText>
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary text-truncate">@ShortName(entry.Source)</MudText>
+                </div>
+                <div class="log-text mt-1">@entry.Message</div>
+                @if (_expanded.Contains(index))
+                {
+                    <div class="mt-2">
+                        @if (entry.Source is { } source)
+                        {
+                            <MudText Typo="Typo.caption" Class="d-block"><b>@Language.Text.Source:</b> @source</MudText>
+                        }
+                        @foreach ((string name, string value) in entry.Properties)
+                        {
+                            <MudText Typo="Typo.caption" Class="d-block log-text"><b>@name:</b> @value</MudText>
+                        }
+                        @if (entry.Exception is { } exception)
+                        {
+                            <MudText Typo="Typo.caption" Class="d-block mt-1"><b>@Language.Text.Exception:</b></MudText>
+                            <pre class="log-text log-exception">@exception</pre>
+                        }
+                    </div>
+                }
+            </div>
+            <MudDivider/>
+        }
+    </MudPaper>
+    <Pager Page="_list.Entries.Page" PageSize="_list.Entries.PageSize" TotalCount="_list.Entries.TotalCount"
+           PageChanged="page => Show(_filter with { Page = page })"/>
+}
+
+@code {
+    private readonly HashSet<int> _expanded = [];
+    private LogListRequest _filter = new();
+    private LogListResponse? _list;
+    private ApiProblem? _problem;
+
+    private DateOnly Day => _list?.Day ?? _filter.Day ?? DateOnly.FromDateTime(DateTime.Today);
+
+    // The shown day stays selectable even when it has no file, e.g. today before anything was logged.
+    private IEnumerable<DateOnly> Days => (_list?.Days ?? []).Append(Day).Distinct().OrderDescending();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        await LoadAsync();
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if (Navigation.IsOn(Routes.Logs()))
+        {
+            _ = InvokeAsync(LoadAsync);
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        _filter = ListQueries.LogList(QueryReader.Of(new Uri(Navigation.Uri)));
+        ApiResult<LogListResponse> result = await Api.LogsAsync(_filter);
+        _list = result.ValueOrDefault;
+        _problem = result.Problem;
+        _expanded.Clear();
+        StateHasChanged();
+    }
+
+    private void Show(LogListRequest filter) => Navigation.NavigateTo(Routes.Logs(filter));
+
+    private void Toggle(int index)
+    {
+        if (!_expanded.Remove(index))
+        {
+            _expanded.Add(index);
+        }
+    }
+
+    private static Color ColorOf(LogSeverity level) =>
+        level switch
+        {
+            LogSeverity.Information => Color.Info,
+            LogSeverity.Warning => Color.Warning,
+            LogSeverity.Error or LogSeverity.Fatal => Color.Error,
+            _ => Color.Default,
+        };
+
+    // "ExpenseExplorer.Api.Receipts.ReceiptEndpoints" reads well enough as "ReceiptEndpoints" in the list.
+    private static string ShortName(string? source) => source?.Split('.')[^1] ?? "";
+}

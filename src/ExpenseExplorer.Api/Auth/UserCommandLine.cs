@@ -15,9 +15,9 @@ internal static class UserCommandLine
     private const string Usage = """
         Usage:
           users list
-          users add <name> <reader|editor>   asks for the password
-          users password <name>              asks for the new password; signs the user out everywhere
-          users role <name> <reader|editor>
+          users add <name> <reader|editor|admin>   asks for the password
+          users password <name>                    asks for the new password; signs the user out everywhere
+          users role <name> <reader|editor|admin>
           users remove <name>
         """;
 
@@ -114,7 +114,7 @@ internal static class UserCommandLine
     private static Result<UserRole> ParseRole(string value) =>
         Enum.TryParse(value, ignoreCase: true, out UserRole role) && Enum.IsDefined(role)
             ? Result.Success(role)
-            : Result.Failure<UserRole>(new Error("UserRole.Unknown", "Role must be 'reader' or 'editor'."));
+            : Result.Failure<UserRole>(new Error("UserRole.Unknown", "Role must be 'reader', 'editor' or 'admin'."));
 
     private static Task<Result<AuthenticatedUser>> RunAsync<TCommand>(
         Result<TCommand> command,

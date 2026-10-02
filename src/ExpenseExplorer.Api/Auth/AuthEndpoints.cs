@@ -78,7 +78,7 @@ internal static class AuthEndpoints
             (userName, password) => new Credentials(userName.Trim(), password));
 
     internal static CurrentUserResponse ToResponse(string userName, UserRole role) =>
-        new(userName, role.ToString(), role == UserRole.Editor);
+        new(userName, role.ToString(), CanEdit: role >= UserRole.Editor, CanViewLogs: role == UserRole.Admin);
 }
 
 /// <summary>Turns a started session into the response: the access token in the body, the refresh token in the cookie.</summary>

@@ -8,5 +8,8 @@ public sealed record LoginRequest(string? UserName, string? Password);
 /// </summary>
 public sealed record SessionResponse(string AccessToken, DateTimeOffset ExpiresAt, CurrentUserResponse User);
 
-/// <summary><see cref="Role"/> is <c>Reader</c> or <c>Editor</c>; only editors can change data.</summary>
-public sealed record CurrentUserResponse(string UserName, string Role, bool CanEdit);
+/// <summary>
+/// <see cref="Role"/> is <c>Reader</c>, <c>Editor</c> or <c>Admin</c>. Editors and admins can change data;
+/// only admins can read the application logs.
+/// </summary>
+public sealed record CurrentUserResponse(string UserName, string Role, bool CanEdit, bool CanViewLogs);

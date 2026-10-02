@@ -1,5 +1,6 @@
 using ExpenseExplorer.Api.Auth;
 using ExpenseExplorer.Api.Dictionaries;
+using ExpenseExplorer.Api.Logs;
 using ExpenseExplorer.Api.ReceiptItems;
 using ExpenseExplorer.Api.Receipts;
 using ExpenseExplorer.Api.Reports;
@@ -21,6 +22,9 @@ internal static class Routing
         data.MapReceiptItems();
         data.MapReports();
         data.MapDictionaries();
+
+        // The application logs are for admins only.
+        api.MapGroup("").RequireAuthorization(Policies.CanViewLogs).MapLogs();
 
         // Unknown API routes answer with ProblemDetails instead of falling through to the frontend.
         api.MapFallback(() => Results.Problem(statusCode: StatusCodes.Status404NotFound));

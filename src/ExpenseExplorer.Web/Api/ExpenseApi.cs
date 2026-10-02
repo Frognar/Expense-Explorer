@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using ExpenseExplorer.Contracts.Logs;
 using ExpenseExplorer.Contracts.ReceiptItems;
 using ExpenseExplorer.Contracts.Receipts;
 using ExpenseExplorer.Contracts.Reports;
@@ -81,6 +82,9 @@ public sealed class ExpenseApi(HttpClient http)
 
     public Task<ApiResult<CategoryReportResponse>> CategoryReportAsync(DateOnly? from, DateOnly? to) =>
         GetAsync<CategoryReportResponse>("api/v1/reports/categories" + new QueryString().Add("from", from).Add("to", to));
+
+    public Task<ApiResult<LogListResponse>> LogsAsync(LogListRequest request) =>
+        GetAsync<LogListResponse>("api/v1/logs" + ListQueries.ToQuery(request));
 
     /// <summary>Known stores, item names or categories containing <paramref name="search"/>, for suggestions.</summary>
     public Task<ApiResult<IReadOnlyList<string>>> SuggestionsAsync(Suggestions kind, string? search) =>

@@ -26,6 +26,8 @@ public sealed class AuthSession(HttpClient http, TimeProvider clock) : IDisposab
 
     public bool CanEdit => _session?.User.CanEdit == true;
 
+    public bool CanViewLogs => _session?.User.CanViewLogs == true;
+
     public async Task<ApiProblem?> SignInAsync(string? userName, string? password)
     {
         using HttpResponseMessage response = await http.PostAsJsonAsync(

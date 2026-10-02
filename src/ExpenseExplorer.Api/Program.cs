@@ -1,5 +1,6 @@
 using ExpenseExplorer.Api;
 using ExpenseExplorer.Api.Auth;
+using ExpenseExplorer.Api.Logs;
 using ExpenseExplorer.Api.Receipts.Import.Photo;
 using ExpenseExplorer.Infrastructure;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -30,6 +31,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 builder.AddAuth();
 builder.AddReceiptOcr();
+builder.AddLogFiles();
 builder.Services.AddInfrastructure(
     builder.Configuration.GetConnectionString(InfrastructureSetup.ConnectionStringName)
     ?? throw new InvalidOperationException($"Connection string '{InfrastructureSetup.ConnectionStringName}' is missing."));
@@ -44,8 +46,11 @@ if (UserCommandLine.IsInvoked(args))
 }
 
 app.UseForwardedHeaders();
-app.UseSerilogRequestLogging(options => options.EnrichDiagnosticContext = (log, http) =>
-    log.Set("UserName", http.User.Identity?.Name ?? "anonymous"));
+app.UseSerilogRequestLogging(options =>
+{
+    options.EnrichDiagnosticContext = (log, http) => log.Set("UserName", http.User.Identity?.Name ?? "anonymous");
+    options.GetLevel = LoggingSetup.RequestLevel;
+});
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
