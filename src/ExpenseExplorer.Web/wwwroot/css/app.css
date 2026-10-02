@@ -128,3 +128,22 @@ html[data-theme="dark"] body {
 .num {
     text-align: right;
 }
+
+/* Log messages keep their line breaks and wrap long words instead of widening the page. */
+.log-text {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8125rem;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.log-exception {
+    margin: 4px 0 0;
+    padding: 8px;
+    border-radius: 4px;
+    background: var(--mud-palette-background-gray);
+}
+
+.log-entry:hover {
+    background: var(--mud-palette-action-default-hover);
+}

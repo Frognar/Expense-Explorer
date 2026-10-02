@@ -1,3 +1,4 @@
+using ExpenseExplorer.Contracts.Logs;
 using ExpenseExplorer.Contracts.ReceiptItems;
 using ExpenseExplorer.Contracts.Receipts;
 
@@ -46,6 +47,15 @@ public static class ListQueries
             .Add("pageSize", request.PageSize)
             .ToString();
 
+    public static string ToQuery(LogListRequest request) =>
+        new QueryString()
+            .Add("day", request.Day)
+            .Add("level", request.Level)
+            .Add("search", request.Search)
+            .Add("page", request.Page)
+            .Add("pageSize", request.PageSize)
+            .ToString();
+
     public static ReceiptItemListRequest ReceiptItemList(QueryReader query) =>
         new()
         {
@@ -81,6 +91,16 @@ public static class ListQueries
             TotalMax = query.Number("totalMax"),
             SortBy = query.Enum<ReceiptSortField>("sortBy"),
             Direction = query.Enum<Contracts.Common.SortDirection>("direction"),
+            Page = query.WholeNumber("page"),
+            PageSize = query.WholeNumber("pageSize"),
+        };
+
+    public static LogListRequest LogList(QueryReader query) =>
+        new()
+        {
+            Day = query.Date("day"),
+            Level = query.Enum<LogSeverity>("level"),
+            Search = query.Text("search"),
             Page = query.WholeNumber("page"),
             PageSize = query.WholeNumber("pageSize"),
         };

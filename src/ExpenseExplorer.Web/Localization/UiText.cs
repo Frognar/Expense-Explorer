@@ -1,3 +1,4 @@
+using ExpenseExplorer.Contracts.Logs;
 using ExpenseExplorer.Contracts.ReceiptItems;
 using ExpenseExplorer.Contracts.Receipts;
 
@@ -75,6 +76,14 @@ public sealed class UiText
     public required string NotFound { get; init; }
     public required string UnexpectedError { get; init; }
     public required string InvalidNumber { get; init; }
+    public required string Logs { get; init; }
+    public required string Day { get; init; }
+    public required string LevelFrom { get; init; }
+    public required string Search { get; init; }
+    public required string Refresh { get; init; }
+    public required string Source { get; init; }
+    public required string Exception { get; init; }
+    public required IReadOnlyDictionary<LogSeverity, string> LogLevels { get; init; }
     public required IReadOnlyDictionary<ReceiptSortField, string> ReceiptSort { get; init; }
     public required IReadOnlyDictionary<ReceiptItemSortField, string> ItemSort { get; init; }
     public required IReadOnlyDictionary<string, string> Errors { get; init; }
@@ -149,6 +158,22 @@ public sealed class UiText
         NotFound = "Nie ma takiej strony.",
         UnexpectedError = "Coś poszło nie tak. Spróbuj ponownie.",
         InvalidNumber = "To nie jest liczba.",
+        Logs = "Logi",
+        Day = "Dzień",
+        LevelFrom = "Poziom od",
+        Search = "Szukaj",
+        Refresh = "Odśwież",
+        Source = "Źródło",
+        Exception = "Wyjątek",
+        LogLevels = new Dictionary<LogSeverity, string>
+        {
+            [LogSeverity.Verbose] = "Wszystko",
+            [LogSeverity.Debug] = "Debug",
+            [LogSeverity.Information] = "Informacje",
+            [LogSeverity.Warning] = "Ostrzeżenia",
+            [LogSeverity.Error] = "Błędy",
+            [LogSeverity.Fatal] = "Krytyczne",
+        },
         ReceiptSort = new Dictionary<ReceiptSortField, string>
         {
             [ReceiptSortField.PurchaseDate] = "Data",
@@ -288,6 +313,22 @@ public sealed class UiText
         NotFound = "There is no such page.",
         UnexpectedError = "Something went wrong. Please try again.",
         InvalidNumber = "This is not a number.",
+        Logs = "Logs",
+        Day = "Day",
+        LevelFrom = "Level from",
+        Search = "Search",
+        Refresh = "Refresh",
+        Source = "Source",
+        Exception = "Exception",
+        LogLevels = new Dictionary<LogSeverity, string>
+        {
+            [LogSeverity.Verbose] = "Everything",
+            [LogSeverity.Debug] = "Debug",
+            [LogSeverity.Information] = "Information",
+            [LogSeverity.Warning] = "Warnings",
+            [LogSeverity.Error] = "Errors",
+            [LogSeverity.Fatal] = "Fatal",
+        },
         ReceiptSort = new Dictionary<ReceiptSortField, string>
         {
             [ReceiptSortField.PurchaseDate] = "Date",

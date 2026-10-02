@@ -25,7 +25,8 @@ internal static class AuthSetup
 
         builder.Services.AddAuthorizationBuilder()
             .AddPolicy(Policies.CanRead, policy => policy.RequireRole(Policies.Readers))
-            .AddPolicy(Policies.CanEdit, policy => policy.RequireRole(Policies.Editors));
+            .AddPolicy(Policies.CanEdit, policy => policy.RequireRole(Policies.Editors))
+            .AddPolicy(Policies.CanViewLogs, policy => policy.RequireRole(Policies.Admins));
 
         int attemptsPerMinute = section.Get<AuthOptions>()?.SignInAttemptsPerMinute ?? new AuthOptions().SignInAttemptsPerMinute;
         builder.Services.AddRateLimiter(limiter =>

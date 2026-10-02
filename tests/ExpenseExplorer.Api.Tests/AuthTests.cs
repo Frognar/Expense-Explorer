@@ -26,7 +26,7 @@ public class AuthTests(ApiFixture api)
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.NotEmpty(session.AccessToken);
         Assert.Equal(new DateTimeOffset(ApiFixture.Today.ToDateTime(new TimeOnly(12, 15)), TimeSpan.Zero), session.ExpiresAt);
-        Assert.Equal(new CurrentUserResponse(user, "Editor", CanEdit: true), session.User);
+        Assert.Equal(new CurrentUserResponse(user, "Editor", CanEdit: true, CanViewLogs: false), session.User);
         string cookie = Assert.Single(response.Headers.GetValues("Set-Cookie"));
         Assert.StartsWith("ee_refresh=", cookie, StringComparison.Ordinal);
         Assert.Contains("path=/api/v1/auth", cookie, StringComparison.OrdinalIgnoreCase);
@@ -155,7 +155,7 @@ public class AuthTests(ApiFixture api)
         await api.App.RunUsersAsync("", "role", user, "reader");
         SessionResponse session = await (await PostWithCookie(Refresh, cookie)).Read<SessionResponse>();
 
-        Assert.Equal(new CurrentUserResponse(user, "Reader", CanEdit: false), session.User);
+        Assert.Equal(new CurrentUserResponse(user, "Reader", CanEdit: false, CanViewLogs: false), session.User);
     }
 
     [Fact]
@@ -163,7 +163,7 @@ public class AuthTests(ApiFixture api)
     {
         HttpResponseMessage response = await api.Reader.Get(Me);
 
-        Assert.Equal(new CurrentUserResponse("reader", "Reader", CanEdit: false), await response.Read<CurrentUserResponse>());
+        Assert.Equal(new CurrentUserResponse("reader", "Reader", CanEdit: false, CanViewLogs: false), await response.Read<CurrentUserResponse>());
     }
 
     [Fact]
@@ -208,7 +208,7 @@ public class AuthTests(ApiFixture api)
 
     [Theory]
     [InlineData("add", "x", "editor", "User name must have 3 to 50 characters.")]
-    [InlineData("add", "valid.name", "admin", "Role must be 'reader' or 'editor'.")]
+    [InlineData("add", "valid.name", "owner", "Role must be 'reader', 'editor' or 'admin'.")]
     [InlineData("password", "nobody", null, "User was not found.")]
     public async Task Command_line_reports_invalid_input(string command, string name, string? role, string message)
     {

@@ -25,6 +25,7 @@ public sealed class ApiFixture : IAsyncLifetime
     private ApiFactory? _default;
     private string _editorToken = "";
     private string _readerToken = "";
+    private string _adminToken = "";
 
     public ApiFactory App => _default ?? throw new InvalidOperationException("Fixture is not initialized.");
 
@@ -34,6 +35,9 @@ public sealed class ApiFixture : IAsyncLifetime
     /// <summary>A client signed in as a user who can only read.</summary>
     public HttpClient Reader => App.CreateClient().WithAccessToken(_readerToken);
 
+    /// <summary>A client signed in as a user who can also read the application logs.</summary>
+    public HttpClient Admin => App.CreateClient().WithAccessToken(_adminToken);
+
     public HttpClient Anonymous => App.CreateClient();
 
     public async ValueTask InitializeAsync()
@@ -42,6 +46,7 @@ public sealed class ApiFixture : IAsyncLifetime
         _default = new ApiFactory(await CreateDatabaseAsync("api_tests"));
         _editorToken = await _default.SignInAsync(UserRole.Editor);
         _readerToken = await _default.SignInAsync(UserRole.Reader);
+        _adminToken = await _default.SignInAsync(UserRole.Admin);
     }
 
     public async ValueTask DisposeAsync()
@@ -72,6 +77,9 @@ public sealed class ApiFactory(string connectionString, int signInAttemptsPerMin
 
     private readonly string _signingKeyPath = Path.Combine(Path.GetTempPath(), $"expense-explorer-{Guid.NewGuid()}.key");
 
+    /// <summary>Where the log panel reads from; tests put their own log files here.</summary>
+    public string LogsDirectory { get; } = Directory.CreateTempSubdirectory("expense-explorer-logs-").FullName;
+
     /// <summary>Runs <c>users ...</c> of the command line; returns the exit code and what it printed.</summary>
     public async Task<(int ExitCode, string Output)> RunUsersAsync(string password, params string[] args)
     {
@@ -83,7 +91,12 @@ public sealed class ApiFactory(string connectionString, int signInAttemptsPerMin
     /// <summary>Creates the user of this role if needed and returns an access token for it.</summary>
     public async Task<string> SignInAsync(UserRole role)
     {
-        string userName = role == UserRole.Editor ? "editor" : "reader";
+        string userName = role switch
+        {
+            UserRole.Reader => "reader",
+            UserRole.Editor => "editor",
+            _ => "admin",
+        };
         await RunUsersAsync(TestPassword, "add", userName, userName);
 
         HttpResponseMessage response = await CreateClient().PostAsJsonAsync(
@@ -99,6 +112,7 @@ public sealed class ApiFactory(string connectionString, int signInAttemptsPerMin
     {
         builder.UseSetting("ConnectionStrings:expense-explorer", connectionString);
         builder.UseSetting("Auth:SigningKeyPath", _signingKeyPath);
+        builder.UseSetting("Logs:Directory", LogsDirectory);
         builder.UseSetting("Auth:SignInAttemptsPerMinute", signInAttemptsPerMinute.ToString(System.Globalization.CultureInfo.InvariantCulture));
         builder.ConfigureTestServices(services =>
         {
@@ -111,6 +125,7 @@ public sealed class ApiFactory(string connectionString, int signInAttemptsPerMin
     {
         await base.DisposeAsync();
         File.Delete(_signingKeyPath);
+        Directory.Delete(LogsDirectory, recursive: true);
     }
 
     private sealed class FixedClock(DateOnly today) : TimeProvider

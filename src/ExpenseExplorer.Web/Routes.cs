@@ -1,3 +1,4 @@
+using ExpenseExplorer.Contracts.Logs;
 using ExpenseExplorer.Contracts.ReceiptItems;
 using ExpenseExplorer.Contracts.Receipts;
 using ExpenseExplorer.Web.Api;
@@ -17,6 +18,9 @@ public static class Routes
         "receipt-items" + (filter is null ? "" : ListQueries.ToQuery(filter));
 
     public static string Receipt(Guid id) => $"receipts/{id}";
+
+    public static string Logs(LogListRequest? filter = null) =>
+        "logs" + (filter is null ? "" : ListQueries.ToQuery(filter));
 
     public static string Login(string? returnPath = null) =>
         string.IsNullOrEmpty(returnPath) || returnPath.StartsWith("login", StringComparison.Ordinal)
