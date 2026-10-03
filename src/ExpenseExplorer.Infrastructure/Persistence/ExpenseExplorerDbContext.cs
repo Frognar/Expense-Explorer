@@ -22,6 +22,16 @@ internal sealed class ExpenseExplorerDbContext(DbContextOptions<ExpenseExplorerD
 
     public DbSet<NameAliasRow> NameAliases => Set<NameAliasRow>();
 
+    public DbSet<BudgetGroupRow> BudgetGroups => Set<BudgetGroupRow>();
+
+    public DbSet<BudgetCategoryRow> BudgetCategories => Set<BudgetCategoryRow>();
+
+    public DbSet<BudgetPeriodRow> BudgetPeriods => Set<BudgetPeriodRow>();
+
+    public DbSet<BudgetFundRow> BudgetFunds => Set<BudgetFundRow>();
+
+    public DbSet<BudgetItemRow> BudgetItems => Set<BudgetItemRow>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -82,6 +92,84 @@ internal sealed class ExpenseExplorerDbContext(DbContextOptions<ExpenseExplorerD
             alias.Property(a => a.Kind).HasColumnName("kind").HasMaxLength(10);
             alias.Property(a => a.Alias).HasColumnName("alias").HasMaxLength(100);
             alias.Property(a => a.Name).HasColumnName("name").HasMaxLength(100);
+        });
+
+        ConfigureBudget(builder);
+    }
+
+    private static void ConfigureBudget(ModelBuilder builder)
+    {
+        builder.Entity<BudgetGroupRow>(group =>
+        {
+            group.ToTable("budget_groups", table =>
+                table.HasCheckConstraint("ck_budget_groups_name_not_blank", "btrim(name) <> ''"));
+            group.HasKey(g => g.Id);
+            group.Property(g => g.Id).HasColumnName("id").ValueGeneratedNever();
+            group.Property(g => g.Name).HasColumnName("name").HasMaxLength(100);
+            group.Property(g => g.Position).HasColumnName("position");
+            group.HasIndex(g => g.Name).IsUnique();
+        });
+
+        builder.Entity<BudgetCategoryRow>(category =>
+        {
+            category.ToTable("budget_categories");
+            category.HasKey(c => c.Category);
+            category.Property(c => c.Category).HasColumnName("category").HasMaxLength(100);
+            category.Property(c => c.GroupId).HasColumnName("group_id");
+            category.HasIndex(c => c.GroupId);
+            category.HasOne<BudgetGroupRow>().WithMany().HasForeignKey(c => c.GroupId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<BudgetPeriodRow>(period =>
+        {
+            period.ToTable("budget_periods", table =>
+                table.HasCheckConstraint("ck_budget_periods_end_after_start", "end_date >= start_date"));
+            period.HasKey(p => p.Id);
+            period.Property(p => p.Id).HasColumnName("id").ValueGeneratedNever();
+            period.Property(p => p.Start).HasColumnName("start_date");
+            period.Property(p => p.End).HasColumnName("end_date");
+            period.HasIndex(p => p.Start).IsUnique();
+        });
+
+        builder.Entity<BudgetFundRow>(fund =>
+        {
+            fund.ToTable("budget_funds", table =>
+            {
+                table.HasCheckConstraint("ck_budget_funds_name_not_blank", "btrim(name) <> ''");
+                table.HasCheckConstraint("ck_budget_funds_day", "day between 1 and 31");
+            });
+            fund.HasKey(f => f.Id);
+            fund.Property(f => f.Id).HasColumnName("id").ValueGeneratedNever();
+            fund.Property(f => f.PeriodId).HasColumnName("period_id");
+            fund.Property(f => f.Position).HasColumnName("position");
+            fund.Property(f => f.Name).HasColumnName("name").HasMaxLength(100);
+            fund.Property(f => f.Amount).HasColumnName("amount").HasPrecision(12, 2);
+            fund.Property(f => f.Day).HasColumnName("day");
+            fund.HasIndex(f => f.PeriodId);
+            fund.HasOne<BudgetPeriodRow>().WithMany().HasForeignKey(f => f.PeriodId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<BudgetItemRow>(item =>
+        {
+            item.ToTable("budget_items", table =>
+            {
+                table.HasCheckConstraint("ck_budget_items_name_not_blank", "btrim(name) <> ''");
+                table.HasCheckConstraint("ck_budget_items_amount_not_negative", "amount >= 0 and (estimate is null or estimate >= 0)");
+                table.HasCheckConstraint("ck_budget_items_day", "day between 1 and 31");
+            });
+            item.HasKey(i => i.Id);
+            item.Property(i => i.Id).HasColumnName("id").ValueGeneratedNever();
+            item.Property(i => i.PeriodId).HasColumnName("period_id");
+            item.Property(i => i.GroupId).HasColumnName("group_id");
+            item.Property(i => i.Position).HasColumnName("position");
+            item.Property(i => i.Name).HasColumnName("name").HasMaxLength(100);
+            item.Property(i => i.Amount).HasColumnName("amount").HasPrecision(12, 2);
+            item.Property(i => i.Estimate).HasColumnName("estimate").HasPrecision(12, 2);
+            item.Property(i => i.Day).HasColumnName("day");
+            item.HasIndex(i => i.PeriodId);
+            item.HasIndex(i => i.GroupId);
+            item.HasOne<BudgetPeriodRow>().WithMany().HasForeignKey(i => i.PeriodId).OnDelete(DeleteBehavior.Cascade);
+            item.HasOne<BudgetGroupRow>().WithMany().HasForeignKey(i => i.GroupId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 
