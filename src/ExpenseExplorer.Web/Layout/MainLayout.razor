@@ -21,11 +21,12 @@
                     @user.UserName@(user.CanEdit ? "" : $" · {Language.Text.ReadOnlyAccess}")
                 </MudMenuItem>
                 <MudDivider/>
+                <MudMenuItem Icon="@Icons.Material.Filled.MenuBook" Href="@Routes.Dictionaries()">@Language.Text.Dictionaries</MudMenuItem>
                 @if (user.CanViewLogs)
                 {
                     <MudMenuItem Icon="@Icons.Material.Filled.Article" Href="@Routes.Logs()">@Language.Text.Logs</MudMenuItem>
-                    <MudDivider/>
                 }
+                <MudDivider/>
                 @foreach ((string code, string name) in Language.Available)
                 {
                     <MudMenuItem Icon="@(code == Language.Code ? Icons.Material.Filled.Check : Icons.Material.Filled.Language)"

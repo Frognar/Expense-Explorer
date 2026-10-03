@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using ExpenseExplorer.Contracts.Dictionaries;
 using ExpenseExplorer.Contracts.Logs;
 using ExpenseExplorer.Contracts.ReceiptItems;
 using ExpenseExplorer.Contracts.Receipts;
@@ -89,13 +90,23 @@ public sealed class ExpenseApi(HttpClient http)
     /// <summary>Known stores, item names or categories containing <paramref name="search"/>, for suggestions.</summary>
     public Task<ApiResult<IReadOnlyList<string>>> SuggestionsAsync(Suggestions kind, string? search) =>
         GetAsync<IReadOnlyList<string>>(
-            kind switch
-            {
-                Suggestions.Stores => "api/v1/stores",
-                Suggestions.Items => "api/v1/items",
-                _ => "api/v1/categories",
-            }
+            $"api/v1/{PathOf(kind)}"
             + new QueryString().Add("search", search).Add("limit", 50));
+
+    /// <summary>Names of one kind in use, with how often and how recently, for tidying them up.</summary>
+    public Task<ApiResult<IReadOnlyList<NameUsageResponse>>> NameUsageAsync(Suggestions kind, string? search, int limit) =>
+        GetAsync<IReadOnlyList<NameUsageResponse>>(
+            $"api/v1/dictionaries/{PathOf(kind)}" + new QueryString().Add("search", search).Add("limit", limit));
+
+    public Task<ApiResult<RenameNameResponse>> RenameAsync(Suggestions kind, RenameNameRequest request) =>
+        SendAsync<RenameNameResponse>(HttpMethod.Post, $"api/v1/dictionaries/{PathOf(kind)}/rename", request);
+
+    public static string PathOf(Suggestions kind) => kind switch
+    {
+        Suggestions.Stores => "stores",
+        Suggestions.Items => "items",
+        _ => "categories",
+    };
 
     private async Task<ApiResult<T>> GetAsync<T>(string url)
     {

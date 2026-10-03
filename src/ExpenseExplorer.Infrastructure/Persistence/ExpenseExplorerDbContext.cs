@@ -20,6 +20,8 @@ internal sealed class ExpenseExplorerDbContext(DbContextOptions<ExpenseExplorerD
 
     public DbSet<RefreshTokenRow> RefreshTokens => Set<RefreshTokenRow>();
 
+    public DbSet<NameAliasRow> NameAliases => Set<NameAliasRow>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -67,6 +69,19 @@ internal sealed class ExpenseExplorerDbContext(DbContextOptions<ExpenseExplorerD
             item.HasIndex(i => i.ReceiptId);
             item.HasIndex(i => i.Item);
             item.HasIndex(i => i.Category);
+        });
+
+        builder.Entity<NameAliasRow>(alias =>
+        {
+            alias.ToTable("name_aliases", table =>
+            {
+                table.HasCheckConstraint("ck_name_aliases_kind", "kind in ('store', 'item', 'category')");
+                table.HasCheckConstraint("ck_name_aliases_name_not_blank", "btrim(name) <> ''");
+            });
+            alias.HasKey(a => new { a.Kind, a.Alias });
+            alias.Property(a => a.Kind).HasColumnName("kind").HasMaxLength(10);
+            alias.Property(a => a.Alias).HasColumnName("alias").HasMaxLength(100);
+            alias.Property(a => a.Name).HasColumnName("name").HasMaxLength(100);
         });
     }
 

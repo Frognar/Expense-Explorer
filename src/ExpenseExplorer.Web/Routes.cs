@@ -22,6 +22,9 @@ public static class Routes
     public static string Logs(LogListRequest? filter = null) =>
         "logs" + (filter is null ? "" : ListQueries.ToQuery(filter));
 
+    public static string Dictionaries(Suggestions kind = Suggestions.Items, string? search = null) =>
+        "dictionaries" + new QueryString().Add("kind", ExpenseApi.PathOf(kind)).Add("search", search);
+
     public static string Login(string? returnPath = null) =>
         string.IsNullOrEmpty(returnPath) || returnPath.StartsWith("login", StringComparison.Ordinal)
             ? "login"

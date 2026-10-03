@@ -34,3 +34,15 @@ internal sealed class ReceiptItemRow
 
     public string? Description { get; set; }
 }
+
+/// <summary>An old name kept after a rename, so imports that still read it get the new one.</summary>
+internal sealed class NameAliasRow
+{
+    /// <summary>"store", "item" or "category".</summary>
+    public string Kind { get; set; } = "";
+
+    /// <summary>The old name in upper case, so letter case does not matter.</summary>
+    public string Alias { get; set; } = "";
+
+    public string Name { get; set; } = "";
+}
