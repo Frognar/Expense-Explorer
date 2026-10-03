@@ -3,6 +3,7 @@ using ExpenseExplorer.Api.Auth;
 using ExpenseExplorer.Api.Http;
 using ExpenseExplorer.Api.Receipts.Import;
 using ExpenseExplorer.Api.Receipts.Import.Photo;
+using ExpenseExplorer.Application.Dictionaries;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Contracts.Receipts;
 using ExpenseExplorer.Domain.Common;
@@ -100,6 +101,7 @@ internal static class ReceiptEndpoints
     private static async Task<IResult> ImportBiedronkaAsync(
         IFormFile file,
         IReceiptRepository receipts,
+        INameHistory history,
         TimeProvider clock,
         CancellationToken cancellationToken)
     {
@@ -112,7 +114,7 @@ internal static class ReceiptEndpoints
         string json = await reader.ReadToEndAsync(cancellationToken);
 
         return await BiedronkaReceiptParser.Parse(json, clock.Today(), clock.LocalTimeZone)
-            .ToHttpAsync(command => ReceiptUseCases.ImportAsync(receipts, command, cancellationToken), Created);
+            .ToHttpAsync(command => ReceiptUseCases.ImportAsync(receipts, history, command, cancellationToken), Created);
     }
 
     /// <summary>Takes a photo of a paper receipt as a multipart form file named "file".</summary>
@@ -120,6 +122,7 @@ internal static class ReceiptEndpoints
         IFormFile file,
         IReceiptOcr ocr,
         IReceiptRepository receipts,
+        INameHistory history,
         TimeProvider clock,
         ILogger<IReceiptOcr> logger,
         CancellationToken cancellationToken)
@@ -140,7 +143,7 @@ internal static class ReceiptEndpoints
                 return PaperReceiptParser.Parse(lines, clock.Today());
             })
             .ToHttpAsync(
-                async paper => (await ReceiptUseCases.ImportAsync(receipts, paper.Receipt, cancellationToken))
+                async paper => (await ReceiptUseCases.ImportAsync(receipts, history, paper.Receipt, cancellationToken))
                     .Map(receipt => (Receipt: receipt, Paper: paper)),
                 imported => Results.Created(
                     $"{Routing.ApiPrefix}/receipts/{imported.Receipt.Id.Value}",

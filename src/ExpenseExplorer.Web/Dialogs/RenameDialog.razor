@@ -1,0 +1,55 @@
+@inject ExpenseApi Api
+@inject Language Language
+
+@* Renames a store, item or category on every receipt; a name already in use merges the two. *@
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="this" OnSubmit="RenameAsync" id="rename-form">
+            <MudStack Spacing="3">
+                <MudText Typo="Typo.body2"><b>@From</b></MudText>
+                <SuggestField Kind="Kind" @bind-Value="_to" Label="@Language.Text.NewName" ErrorText="@ErrorFor("to")" AutoFocus="true"/>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">@Language.Text.RenameHelp</MudText>
+                <ProblemAlert Problem="_problem" Fields="Fields"/>
+            </MudStack>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => Dialog.Cancel()">@Language.Text.Cancel</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" form="rename-form" Color="Color.Primary" Variant="Variant.Filled"
+                   Disabled="_busy">@Language.Text.Rename</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private static readonly string[] Fields = ["to"];
+
+    private string? _to;
+    private ApiProblem? _problem;
+    private bool _busy;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public Suggestions Kind { get; set; }
+
+    [Parameter, EditorRequired]
+    public string From { get; set; } = "";
+
+    protected override void OnParametersSet() => _to ??= From;
+
+    private string? ErrorFor(string field) =>
+        _problem?.CodesFor(field) is { Count: > 0 } codes ? Language.Errors(codes) : null;
+
+    private async Task RenameAsync()
+    {
+        _busy = true;
+        ApiResult<RenameNameResponse> result = await Api.RenameAsync(Kind, new RenameNameRequest(From, _to));
+        _busy = false;
+        _problem = result.Problem;
+        if (result.IsSuccess)
+        {
+            Dialog.Close(DialogResult.Ok(result.Value));
+        }
+    }
+}

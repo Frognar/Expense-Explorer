@@ -33,7 +33,7 @@ internal sealed class DictionaryQueries(ExpenseExplorerDbContext db) : IDictiona
             .ToListAsync(cancellationToken);
     }
 
-    private static string EscapeLike(string value) =>
+    public static string EscapeLike(string value) =>
         value.Replace(@"\", @"\\", StringComparison.Ordinal)
             .Replace("%", @"\%", StringComparison.Ordinal)
             .Replace("_", @"\_", StringComparison.Ordinal);

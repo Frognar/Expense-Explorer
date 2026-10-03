@@ -1,3 +1,4 @@
+using ExpenseExplorer.Application.Dictionaries;
 using ExpenseExplorer.Domain.Common;
 using ExpenseExplorer.Domain.Receipts;
 
@@ -19,12 +20,17 @@ public static class ReceiptUseCases
         return Result.Success(receipt);
     }
 
-    /// <summary>The receipt and all its lines are saved together, or nothing is.</summary>
+    /// <summary>
+    /// The receipt and all its lines are saved together, or nothing is. Names and categories
+    /// follow earlier receipts first (see <see cref="ImportHints"/>).
+    /// </summary>
     public static async Task<Result<Receipt>> ImportAsync(
         IReceiptRepository receipts,
-        ImportReceipt command,
+        INameHistory history,
+        ImportReceipt imported,
         CancellationToken cancellationToken)
     {
+        ImportReceipt command = await ImportHints.ApplyAsync(history, imported, cancellationToken);
         Receipt receipt = Receipt.Create(ReceiptId.New(), command.Store, command.PurchaseDate);
         foreach (Purchase purchase in command.Purchases)
         {

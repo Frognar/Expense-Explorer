@@ -32,6 +32,8 @@ public static class InfrastructureSetup
         services.AddScoped<IReceiptRepository, ReceiptRepository>();
         services.AddScoped<IReceiptQueries, ReceiptQueries>();
         services.AddScoped<IDictionaryQueries, DictionaryQueries>();
+        services.AddScoped<IDictionaryEditor, DictionaryEditor>();
+        services.AddScoped<INameHistory, NameHistory>();
         services.AddScoped<IReceiptItemQueries, ReceiptItemQueries>();
         services.AddScoped<IReportQueries, ReportQueries>();
         services.AddUsers();

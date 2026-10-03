@@ -83,6 +83,14 @@ public sealed class UiText
     public required string Refresh { get; init; }
     public required string Source { get; init; }
     public required string Exception { get; init; }
+    public required string Dictionaries { get; init; }
+    public required string Rename { get; init; }
+    public required string NewName { get; init; }
+    public required string RenameHelp { get; init; }
+    public required Func<int, string, string> UsedTimes { get; init; }
+    public required Func<int, string> ChangedCount { get; init; }
+    public required Func<string, string> MergedInto { get; init; }
+    public required Func<int, string> ShowingFirst { get; init; }
     public required IReadOnlyDictionary<LogSeverity, string> LogLevels { get; init; }
     public required IReadOnlyDictionary<ReceiptSortField, string> ReceiptSort { get; init; }
     public required IReadOnlyDictionary<ReceiptItemSortField, string> ItemSort { get; init; }
@@ -165,6 +173,14 @@ public sealed class UiText
         Refresh = "Odśwież",
         Source = "Źródło",
         Exception = "Wyjątek",
+        Dictionaries = "Słowniki",
+        Rename = "Zmień nazwę",
+        NewName = "Nowa nazwa",
+        RenameHelp = "Zmiana obejmie wszystkie paragony. Jeśli nowa nazwa już istnieje, obie zostaną połączone. Import, który odczyta starą nazwę, wpisze nową.",
+        UsedTimes = (count, last) => $"{count}× · ostatnio {last}",
+        ChangedCount = count => $"Zmieniono: {count}.",
+        MergedInto = name => $"Połączono z „{name}”.",
+        ShowingFirst = count => $"Pokazuję pierwsze {count}. Zawęź wyszukiwanie.",
         LogLevels = new Dictionary<LogSeverity, string>
         {
             [LogSeverity.Verbose] = "Wszystko",
@@ -236,6 +252,9 @@ public sealed class UiText
             ["Import.NotAnImage"] = "To nie jest zdjęcie.",
             ["Import.PhotoTooLarge"] = "Zdjęcie jest większe niż 20 MB.",
             ["Import.OcrUnavailable"] = "Odczytywanie zdjęć jest teraz niedostępne.",
+            ["Dictionary.NameNotFound"] = "Ta nazwa nie jest już nigdzie używana.",
+            ["Dictionary.SameName"] = "Nowa nazwa jest taka sama jak stara.",
+            ["Dictionary.UnknownKind"] = "Nie ma takiego słownika.",
             ["Http.401"] = "Zaloguj się ponownie.",
             ["Http.403"] = "Nie masz uprawnień do tej operacji.",
             ["Http.404"] = "Nie znaleziono.",
@@ -320,6 +339,14 @@ public sealed class UiText
         Refresh = "Refresh",
         Source = "Source",
         Exception = "Exception",
+        Dictionaries = "Dictionaries",
+        Rename = "Rename",
+        NewName = "New name",
+        RenameHelp = "This changes every receipt. If the new name is already in use, the two are merged. Imports that read the old name will enter the new one.",
+        UsedTimes = (count, last) => $"{count}× · last {last}",
+        ChangedCount = count => $"Changed: {count}.",
+        MergedInto = name => $"Merged into \"{name}\".",
+        ShowingFirst = count => $"Showing the first {count}. Narrow the search.",
         LogLevels = new Dictionary<LogSeverity, string>
         {
             [LogSeverity.Verbose] = "Everything",
@@ -391,6 +418,9 @@ public sealed class UiText
             ["Import.NotAnImage"] = "This is not a photo.",
             ["Import.PhotoTooLarge"] = "The photo is larger than 20 MB.",
             ["Import.OcrUnavailable"] = "Reading photos is not available right now.",
+            ["Dictionary.NameNotFound"] = "This name is no longer used anywhere.",
+            ["Dictionary.SameName"] = "The new name is the same as the old one.",
+            ["Dictionary.UnknownKind"] = "There is no such dictionary.",
             ["Http.401"] = "Please sign in again.",
             ["Http.403"] = "You are not allowed to do this.",
             ["Http.404"] = "Not found.",
