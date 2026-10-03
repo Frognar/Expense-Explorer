@@ -192,10 +192,10 @@ else
         _current is null
             ? Task.CompletedTask
             : SaveTemplateAsync(new TemplateRequest(
-                [.. _current.Funds.Select(fund => new FundRequest(fund.Name, fund.Amount, fund.Day))],
+                [.. _current.Funds.Select(fund => new FundRequest(fund.Name, fund.Amount))],
                 [
                     .. _current.Groups.SelectMany(group => group.Items.Select(item =>
-                        new TemplateItemRequest(group.Name, item.Name, item.Amount, item.Estimate, item.Day))),
+                        new TemplateItemRequest(group.Name, item.Name, item.Amount))),
                 ]));
 
     private async Task SaveTemplateAsync(TemplateRequest template)

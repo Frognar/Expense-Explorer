@@ -90,17 +90,7 @@ else
                     @foreach (PlanItemResponse item in group.Items)
                     {
                         <div class="d-flex align-center gap-2 py-1 cursor-pointer list-row" @onclick="() => EditItemAsync(item)">
-                            <div class="flex-grow-1 text-truncate">
-                                @item.Name
-                                @if (item.Day is { } day)
-                                {
-                                    <MudText Typo="Typo.caption" Class="mud-text-secondary"> · @(day).</MudText>
-                                }
-                            </div>
-                            @if (item.Estimate is { } estimate && estimate != item.Amount)
-                            {
-                                <MudText Typo="Typo.caption" Class="mud-text-secondary text-nowrap"><s>@Display.Money(estimate)</s></MudText>
-                            }
+                            <div class="flex-grow-1 text-truncate">@item.Name</div>
                             <MudText Typo="Typo.body2" Class="text-nowrap">@Display.Money(item.Amount)</MudText>
                         </div>
                     }
@@ -141,13 +131,7 @@ else
         @foreach (FundResponse fund in _budget.Funds)
         {
             <div class="d-flex align-center gap-2 px-3 py-2 cursor-pointer list-row" @onclick="() => EditFundAsync(fund)">
-                <div class="flex-grow-1 text-truncate">
-                    @fund.Name
-                    @if (fund.Day is { } day)
-                    {
-                        <MudText Typo="Typo.caption" Class="mud-text-secondary"> · @(day).</MudText>
-                    }
-                </div>
+                <div class="flex-grow-1 text-truncate">@fund.Name</div>
                 <MudText Typo="Typo.body2" Color="@(fund.Amount < 0 ? Color.Warning : Color.Default)" Class="text-nowrap">
                     @(fund.Amount > 0 ? "+" : "")@Display.Money(fund.Amount)
                 </MudText>

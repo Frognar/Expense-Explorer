@@ -27,7 +27,6 @@ internal sealed class BudgetStore(ExpenseExplorerDbContext db) : IBudgetStore
             Position = fund.Position,
             Name = fund.Name,
             Amount = fund.Amount,
-            Day = fund.Day,
         }));
 
         List<BudgetItemRow> items = await db.BudgetItems.AsNoTracking().Where(i => i.PeriodId == null).ToListAsync(cancellationToken);
@@ -39,8 +38,6 @@ internal sealed class BudgetStore(ExpenseExplorerDbContext db) : IBudgetStore
             Position = item.Position,
             Name = item.Name,
             Amount = item.Amount,
-            Estimate = item.Estimate,
-            Day = item.Day,
         }));
 
         await db.SaveChangesAsync(cancellationToken);
@@ -180,7 +177,7 @@ internal sealed class BudgetStore(ExpenseExplorerDbContext db) : IBudgetStore
         db.BudgetItems.AddRange(template.Items.Select((item, position) =>
         {
             BudgetItemRow row = new() { Id = Guid.CreateVersion7(), Position = position };
-            CopyTo(new PlanItem(groups[item.Group.Value], item.Name, item.Amount, item.Estimate, item.Day), row);
+            CopyTo(new PlanItem(groups[item.Group.Value], item.Name, item.Amount), row);
             return row;
         }));
 
@@ -216,7 +213,6 @@ internal sealed class BudgetStore(ExpenseExplorerDbContext db) : IBudgetStore
     {
         row.Name = fund.Name.Value;
         row.Amount = fund.Amount.Value;
-        row.Day = fund.Day?.Value;
     }
 
     private static void CopyTo(PlanItem item, BudgetItemRow row)
@@ -224,7 +220,5 @@ internal sealed class BudgetStore(ExpenseExplorerDbContext db) : IBudgetStore
         row.GroupId = item.GroupId;
         row.Name = item.Name.Value;
         row.Amount = item.Amount.Value;
-        row.Estimate = item.Estimate?.Value;
-        row.Day = item.Day?.Value;
     }
 }

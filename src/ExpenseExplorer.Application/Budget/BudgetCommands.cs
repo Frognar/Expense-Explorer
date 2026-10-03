@@ -8,11 +8,11 @@ namespace ExpenseExplorer.Application.Budget;
 /// <summary>A missing start means "right after the last period".</summary>
 public sealed record CreatePeriod(DateOnly? Start, DateOnly? End);
 
-public sealed record Fund(BudgetName Name, FundAmount Amount, DayOfMonth? Day);
+public sealed record Fund(BudgetName Name, FundAmount Amount);
 
-public sealed record PlanItem(Guid GroupId, BudgetName Name, Money Amount, Money? Estimate, DayOfMonth? Day);
+public sealed record PlanItem(Guid GroupId, BudgetName Name, Money Amount);
 
-public sealed record TemplateItem(BudgetName Group, BudgetName Name, Money Amount, Money? Estimate, DayOfMonth? Day);
+public sealed record TemplateItem(BudgetName Group, BudgetName Name, Money Amount);
 
 public sealed record Template(IReadOnlyList<Fund> Funds, IReadOnlyList<TemplateItem> Items);
 

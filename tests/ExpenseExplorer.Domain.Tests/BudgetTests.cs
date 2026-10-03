@@ -89,10 +89,4 @@ public class BudgetTests
     [Fact]
     public void Fund_amount_may_be_negative() =>
         Assert.Equal(-3000m, Given.Valid(FundAmount.Create(-3000m)).Value);
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(32)]
-    public void Day_of_month_is_between_1_and_31(int day) =>
-        Assert.Equal("DayOfMonth.OutOfRange", Assert.Single(DayOfMonth.Create(day).Errors).Code);
 }

@@ -31,12 +31,12 @@ internal sealed class BudgetQueries(ExpenseExplorerDbContext db) : IBudgetQuerie
         List<FundResponse> funds = await db.BudgetFunds.AsNoTracking()
             .Where(f => f.PeriodId == periodId)
             .OrderBy(f => f.Position)
-            .Select(f => new FundResponse(f.Id, f.Name, f.Amount, f.Day))
+            .Select(f => new FundResponse(f.Id, f.Name, f.Amount))
             .ToListAsync(cancellationToken);
         List<PlanItemResponse> items = await db.BudgetItems.AsNoTracking()
             .Where(i => i.PeriodId == periodId)
             .OrderBy(i => i.Position)
-            .Select(i => new PlanItemResponse(i.Id, i.GroupId, i.Name, i.Amount, i.Estimate, i.Day))
+            .Select(i => new PlanItemResponse(i.Id, i.GroupId, i.Name, i.Amount))
             .ToListAsync(cancellationToken);
         IReadOnlyList<GroupResponse> groups = await GroupsAsync(cancellationToken);
         Dictionary<string, decimal> spent = await SpentByCategoryAsync(period, cancellationToken);
@@ -99,14 +99,14 @@ internal sealed class BudgetQueries(ExpenseExplorerDbContext db) : IBudgetQuerie
         List<FundResponse> funds = await db.BudgetFunds.AsNoTracking()
             .Where(f => f.PeriodId == null)
             .OrderBy(f => f.Position)
-            .Select(f => new FundResponse(f.Id, f.Name, f.Amount, f.Day))
+            .Select(f => new FundResponse(f.Id, f.Name, f.Amount))
             .ToListAsync(cancellationToken);
         List<TemplateItemResponse> items = await (
                 from item in db.BudgetItems.AsNoTracking()
                 join grp in db.BudgetGroups.AsNoTracking() on item.GroupId equals grp.Id
                 where item.PeriodId == null
                 orderby item.Position
-                select new TemplateItemResponse(item.Id, grp.Name, item.Name, item.Amount, item.Estimate, item.Day))
+                select new TemplateItemResponse(item.Id, grp.Name, item.Name, item.Amount))
             .ToListAsync(cancellationToken);
         return new TemplateResponse(funds, items);
     }

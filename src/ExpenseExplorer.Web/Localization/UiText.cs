@@ -108,8 +108,6 @@ public sealed class UiText
     public required string EditPlanItem { get; init; }
     public required string Name { get; init; }
     public required string FundAmountHelp { get; init; }
-    public required string Estimate { get; init; }
-    public required string DayOfMonth { get; init; }
     public required string Group { get; init; }
     public required string NoCurrentPeriod { get; init; }
     public required string NewPeriod { get; init; }
@@ -237,8 +235,6 @@ public sealed class UiText
         EditPlanItem = "Edytuj wydatek",
         Name = "Nazwa",
         FundAmountHelp = "Odejmij od środków, np. oszczędności albo mniejszy przychód",
-        Estimate = "Zakładana",
-        DayOfMonth = "Dzień miesiąca",
         Group = "Grupa",
         NoCurrentPeriod = "Żaden okres budżetu nie obejmuje dzisiejszego dnia.",
         NewPeriod = "Nowy okres",
@@ -336,7 +332,6 @@ public sealed class UiText
             ["BudgetName.Empty"] = "Podaj nazwę.",
             ["BudgetName.TooLong"] = "Nazwa może mieć najwyżej 100 znaków.",
             ["FundAmount.Zero"] = "Kwota nie może być zerem.",
-            ["DayOfMonth.OutOfRange"] = "Dzień musi być od 1 do 31.",
             ["BudgetPeriod.EndBeforeStart"] = "Okres kończy się przed początkiem.",
             ["BudgetPeriod.TooLong"] = "Okres może trwać najwyżej 62 dni.",
             ["Budget.PeriodNotFound"] = "Nie ma takiego okresu budżetu.",
@@ -456,8 +451,6 @@ public sealed class UiText
         EditPlanItem = "Edit expense",
         Name = "Name",
         FundAmountHelp = "Subtract from the funds, e.g. savings or a smaller income",
-        Estimate = "Estimate",
-        DayOfMonth = "Day of month",
         Group = "Group",
         NoCurrentPeriod = "No budget period covers today.",
         NewPeriod = "New period",
@@ -555,7 +548,6 @@ public sealed class UiText
             ["BudgetName.Empty"] = "Enter a name.",
             ["BudgetName.TooLong"] = "The name can have at most 100 characters.",
             ["FundAmount.Zero"] = "The amount cannot be zero.",
-            ["DayOfMonth.OutOfRange"] = "The day must be between 1 and 31.",
             ["BudgetPeriod.EndBeforeStart"] = "The period ends before it starts.",
             ["BudgetPeriod.TooLong"] = "A period can last at most 62 days.",
             ["Budget.PeriodNotFound"] = "There is no such budget period.",
