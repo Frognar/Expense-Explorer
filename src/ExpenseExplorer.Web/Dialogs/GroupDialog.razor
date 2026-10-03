@@ -1,0 +1,55 @@
+@inject ExpenseApi Api
+@inject Language Language
+
+@* Adds a budget group or renames one. *@
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="this" OnSubmit="SaveAsync" id="group-form">
+            <MudStack Spacing="2">
+                <MudTextField T="string" @bind-Value="_name" Label="@Language.Text.Name" Variant="Variant.Outlined" Margin="Margin.Dense"
+                              MaxLength="100" AutoFocus="true" Error="@(ErrorFor("name") is not null)" ErrorText="@ErrorFor("name")"/>
+                <ProblemAlert Problem="_problem" Fields="Fields"/>
+            </MudStack>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => Dialog.Cancel()">@Language.Text.Cancel</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" form="group-form" Color="Color.Primary" Variant="Variant.Filled"
+                   Disabled="_busy">@Language.Text.Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private static readonly string[] Fields = ["name"];
+
+    private string? _name;
+    private ApiProblem? _problem;
+    private bool _busy;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = null!;
+
+    /// <summary>The group to rename; a new one is added at <see cref="Position"/> when this is null.</summary>
+    [Parameter]
+    public GroupResponse? Group { get; set; }
+
+    [Parameter]
+    public int Position { get; set; }
+
+    protected override void OnInitialized() => _name = Group?.Name;
+
+    private string? ErrorFor(string field) =>
+        _problem?.CodesFor(field) is { Count: > 0 } codes ? Language.Errors(codes) : null;
+
+    private async Task SaveAsync()
+    {
+        _busy = true;
+        ApiResult<bool> result = await Api.SaveBudgetGroupAsync(Group?.Id, new GroupRequest(_name, Group?.Position ?? Position));
+        _busy = false;
+        _problem = result.Problem;
+        if (result.IsSuccess)
+        {
+            Dialog.Close(DialogResult.Ok(true));
+        }
+    }
+}

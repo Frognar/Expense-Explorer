@@ -10,9 +10,12 @@
 
 <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-2">
     <MudText Typo="Typo.h5" HtmlTag="h1">@Language.Text.Budget</MudText>
-    <MudButton Variant="Variant.Outlined" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" OnClick="NewPeriodAsync">
-        @Language.Text.NewPeriod
-    </MudButton>
+    <div class="d-flex align-center gap-1">
+        <MudButton Variant="Variant.Outlined" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" OnClick="NewPeriodAsync">
+            @Language.Text.NewPeriod
+        </MudButton>
+        <MudIconButton Icon="@Icons.Material.Filled.Settings" Href="@Routes.BudgetSettings" aria-label="@Language.Text.BudgetSettings"/>
+    </div>
 </MudStack>
 
 @if (_problem is { Status: System.Net.HttpStatusCode.NotFound } && _budget is null)

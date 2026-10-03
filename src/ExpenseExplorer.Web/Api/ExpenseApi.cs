@@ -129,6 +129,26 @@ public sealed class ExpenseApi(HttpClient http)
     public Task<ApiResult<bool>> RemovePlanItemAsync(Guid periodId, Guid itemId) =>
         SendAsync<bool>(HttpMethod.Delete, $"{Budget}/periods/{periodId}/items/{itemId}", null);
 
+    public Task<ApiResult<IReadOnlyList<GroupResponse>>> BudgetGroupsAsync() =>
+        GetAsync<IReadOnlyList<GroupResponse>>($"{Budget}/groups");
+
+    public Task<ApiResult<bool>> SaveBudgetGroupAsync(Guid? groupId, GroupRequest request) =>
+        groupId is { } id
+            ? SendAsync<bool>(HttpMethod.Put, $"{Budget}/groups/{id}", request)
+            : SendAsync<bool>(HttpMethod.Post, $"{Budget}/groups", request);
+
+    public Task<ApiResult<bool>> DeleteBudgetGroupAsync(Guid groupId) =>
+        SendAsync<bool>(HttpMethod.Delete, $"{Budget}/groups/{groupId}", null);
+
+    public Task<ApiResult<bool>> SetCategoryGroupAsync(CategoryGroupRequest request) =>
+        SendAsync<bool>(HttpMethod.Put, $"{Budget}/categories", request);
+
+    public Task<ApiResult<TemplateResponse>> BudgetTemplateAsync() =>
+        GetAsync<TemplateResponse>($"{Budget}/template");
+
+    public Task<ApiResult<bool>> SaveBudgetTemplateAsync(TemplateRequest request) =>
+        SendAsync<bool>(HttpMethod.Put, $"{Budget}/template", request);
+
     public static string PathOf(Suggestions kind) => kind switch
     {
         Suggestions.Stores => "stores",
