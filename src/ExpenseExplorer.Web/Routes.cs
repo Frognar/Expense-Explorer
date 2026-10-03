@@ -25,6 +25,8 @@ public static class Routes
     public static string Budget(Guid? periodId = null) =>
         "budget" + new QueryString().Add("period", periodId?.ToString());
 
+    public const string BudgetSettings = "budget/settings";
+
     public static string Dictionaries(Suggestions kind = Suggestions.Items, string? search = null) =>
         "dictionaries" + new QueryString().Add("kind", ExpenseApi.PathOf(kind)).Add("search", search);
 

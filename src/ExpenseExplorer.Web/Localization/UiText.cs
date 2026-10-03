@@ -117,6 +117,19 @@ public sealed class UiText
     public required string NewPeriodHelp { get; init; }
     public required string DeleteQuestion { get; init; }
     public required string NoGroupsYet { get; init; }
+    public required string BudgetSettings { get; init; }
+    public required string Groups { get; init; }
+    public required string AddGroup { get; init; }
+    public required string RenameGroup { get; init; }
+    public required string DeleteGroupQuestion { get; init; }
+    public required string CategoriesHelp { get; init; }
+    public required string NoGroup { get; init; }
+    public required string Template { get; init; }
+    public required string TemplateHelp { get; init; }
+    public required string LoadTemplate { get; init; }
+    public required string SaveAsTemplate { get; init; }
+    public required string TemplateSaved { get; init; }
+    public required string InvalidTemplateFile { get; init; }
     public required IReadOnlyDictionary<LogSeverity, string> LogLevels { get; init; }
     public required IReadOnlyDictionary<ReceiptSortField, string> ReceiptSort { get; init; }
     public required IReadOnlyDictionary<ReceiptItemSortField, string> ItemSort { get; init; }
@@ -232,7 +245,20 @@ public sealed class UiText
         PeriodStart = "Początek okresu",
         NewPeriodHelp = "Okres potrwa miesiąc i dostanie przychody i wydatki z szablonu.",
         DeleteQuestion = "Usunąć tę pozycję?",
-        NoGroupsYet = "Nie ma jeszcze grup budżetu.",
+        NoGroupsYet = "Nie ma jeszcze grup budżetu. Dodasz je w ustawieniach budżetu.",
+        BudgetSettings = "Ustawienia budżetu",
+        Groups = "Grupy",
+        AddGroup = "Dodaj grupę",
+        RenameGroup = "Zmień nazwę grupy",
+        DeleteGroupQuestion = "Usunąć tę grupę? Jej kategorie trafią poza grupy.",
+        CategoriesHelp = "Wydatki z paragonów liczą się do grupy, do której należy ich kategoria.",
+        NoGroup = "Poza grupami",
+        Template = "Szablon",
+        TemplateHelp = "Każdy nowy okres dostaje te przychody i wydatki.",
+        LoadTemplate = "Wczytaj z pliku JSON",
+        SaveAsTemplate = "Zapisz ten okres jako szablon",
+        TemplateSaved = "Szablon zapisany.",
+        InvalidTemplateFile = "To nie jest plik szablonu budżetu.",
         LogLevels = new Dictionary<LogSeverity, string>
         {
             [LogSeverity.Verbose] = "Wszystko",
@@ -438,7 +464,20 @@ public sealed class UiText
         PeriodStart = "Period start",
         NewPeriodHelp = "The period lasts a month and gets the incomes and expenses of the template.",
         DeleteQuestion = "Delete this entry?",
-        NoGroupsYet = "There are no budget groups yet.",
+        NoGroupsYet = "There are no budget groups yet. Add them in the budget settings.",
+        BudgetSettings = "Budget settings",
+        Groups = "Groups",
+        AddGroup = "Add group",
+        RenameGroup = "Rename group",
+        DeleteGroupQuestion = "Delete this group? Its categories will be outside groups.",
+        CategoriesHelp = "Spending from receipts counts in the group its category belongs to.",
+        NoGroup = "Outside groups",
+        Template = "Template",
+        TemplateHelp = "Every new period gets these incomes and expenses.",
+        LoadTemplate = "Load from a JSON file",
+        SaveAsTemplate = "Save this period as the template",
+        TemplateSaved = "Template saved.",
+        InvalidTemplateFile = "This is not a budget template file.",
         LogLevels = new Dictionary<LogSeverity, string>
         {
             [LogSeverity.Verbose] = "Everything",

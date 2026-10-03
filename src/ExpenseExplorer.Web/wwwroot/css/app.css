@@ -147,3 +147,11 @@ html[data-theme="dark"] body {
 .log-entry:hover {
     background: var(--mud-palette-action-default-hover);
 }
+
+/* Budget settings: every category's group select lines up in one column. */
+.category-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 55%);
+    align-items: center;
+    gap: 8px;
+}

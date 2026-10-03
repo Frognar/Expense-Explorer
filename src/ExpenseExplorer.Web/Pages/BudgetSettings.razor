@@ -1,0 +1,220 @@
+@page "/budget/settings"
+@using System.Text.Json
+@inject ExpenseApi Api
+@inject Language Language
+@inject IDialogService Dialogs
+@inject ISnackbar Snackbar
+
+<PageTitle>@Language.Text.BudgetSettings · Expense Explorer</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Class="mb-2">
+    <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Href="@Routes.Budget()" aria-label="@Language.Text.Budget"/>
+    <MudText Typo="Typo.h5" HtmlTag="h1">@Language.Text.BudgetSettings</MudText>
+</MudStack>
+
+@if (_problem is not null)
+{
+    <ProblemAlert Problem="_problem"/>
+}
+else if (_groups is null || _template is null)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary"/>
+}
+else
+{
+    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-1">
+        <MudText Typo="Typo.h6" HtmlTag="h2">@Language.Text.Groups</MudText>
+        <MudButton Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" OnClick="() => EditGroupAsync(null)">@Language.Text.AddGroup</MudButton>
+    </MudStack>
+    <MudPaper Elevation="1" Class="mb-4">
+        @foreach (GroupResponse group in _groups)
+        {
+            <div class="d-flex align-center gap-1 px-3 py-1 list-row">
+                <MudText Class="flex-grow-1 text-truncate">@group.Name</MudText>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" aria-label="@Language.Text.RenameGroup"
+                               OnClick="() => EditGroupAsync(group)"/>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" aria-label="@Language.Text.Delete"
+                               OnClick="() => DeleteGroupAsync(group)"/>
+            </div>
+            <MudDivider/>
+        }
+    </MudPaper>
+
+    <MudText Typo="Typo.h6" HtmlTag="h2">@Language.Text.Categories</MudText>
+    <MudText Typo="Typo.caption" Class="d-block mb-1 mud-text-secondary">@Language.Text.CategoriesHelp</MudText>
+    <MudPaper Elevation="1" Class="mb-4">
+        @foreach (string category in _categories)
+        {
+            <div class="category-row px-3 py-1">
+                <MudText Class="text-truncate">@category</MudText>
+                <MudSelect T="Guid?" Value="GroupOf(category)" ValueChanged="group => AssignAsync(category, group)" Dense="true"
+                           Variant="Variant.Text" Margin="Margin.Dense" Class="category-group" aria-label="@category"
+                           ToStringFunc="@(id => _groups.FirstOrDefault(group => group.Id == id)?.Name ?? Language.Text.NoGroup)">
+                    <MudSelectItem T="Guid?" Value="null">@Language.Text.NoGroup</MudSelectItem>
+                    @foreach (GroupResponse group in _groups)
+                    {
+                        <MudSelectItem T="Guid?" Value="group.Id">@group.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </div>
+            <MudDivider/>
+        }
+    </MudPaper>
+
+    <MudText Typo="Typo.h6" HtmlTag="h2">@Language.Text.Template</MudText>
+    <MudText Typo="Typo.caption" Class="d-block mb-1 mud-text-secondary">@Language.Text.TemplateHelp</MudText>
+    <MudStack Row="true" Spacing="2" Class="mb-2" Wrap="Wrap.Wrap">
+        <MudFileUpload T="IBrowserFile" Accept=".json,application/json" FilesChanged="LoadTemplateAsync">
+            <CustomContent>
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" StartIcon="@Icons.Material.Filled.UploadFile"
+                           OnClick="@context.OpenFilePickerAsync">@Language.Text.LoadTemplate</MudButton>
+            </CustomContent>
+        </MudFileUpload>
+        @if (_current is not null)
+        {
+            <MudButton Variant="Variant.Outlined" Size="Size.Small" StartIcon="@Icons.Material.Filled.Save"
+                       OnClick="SaveCurrentAsTemplateAsync">@Language.Text.SaveAsTemplate</MudButton>
+        }
+    </MudStack>
+    <MudPaper Elevation="1" Class="mb-4">
+        @foreach (FundResponse fund in _template.Funds)
+        {
+            <div class="d-flex gap-2 px-3 py-1">
+                <MudText Typo="Typo.body2" Class="flex-grow-1">@fund.Name</MudText>
+                <MudText Typo="Typo.body2" Color="@(fund.Amount < 0 ? Color.Warning : Color.Default)">@(fund.Amount > 0 ? "+" : "")@Display.Money(fund.Amount)</MudText>
+            </div>
+        }
+        <MudDivider/>
+        @foreach (IGrouping<string, TemplateItemResponse> group in _template.Items.GroupBy(item => item.Group))
+        {
+            <MudText Typo="Typo.caption" Class="d-block px-3 pt-2 mud-text-secondary">@group.Key</MudText>
+            @foreach (TemplateItemResponse item in group)
+            {
+                <div class="d-flex gap-2 px-3 py-1">
+                    <MudText Typo="Typo.body2" Class="flex-grow-1">@item.Name</MudText>
+                    <MudText Typo="Typo.body2">@Display.Money(item.Amount)</MudText>
+                </div>
+            }
+        }
+    </MudPaper>
+}
+
+@code {
+    private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
+
+    private IReadOnlyList<GroupResponse>? _groups;
+    private IReadOnlyList<string> _categories = [];
+    private TemplateResponse? _template;
+    private BudgetResponse? _current;
+    private ApiProblem? _problem;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        ApiResult<IReadOnlyList<GroupResponse>> groups = await Api.BudgetGroupsAsync();
+        ApiResult<IReadOnlyList<NameUsageResponse>> categories = await Api.NameUsageAsync(Suggestions.Categories, null, 1000);
+        ApiResult<TemplateResponse> template = await Api.BudgetTemplateAsync();
+        _current = (await Api.BudgetAsync(null)).ValueOrDefault;
+        _groups = groups.ValueOrDefault;
+        _template = template.ValueOrDefault;
+        _problem = groups.Problem ?? template.Problem;
+
+        // Categories already assigned stay listed even when no receipt uses them any more.
+        _categories =
+        [
+            .. (categories.ValueOrDefault ?? []).Select(category => category.Name)
+                .Concat((_groups ?? []).SelectMany(group => group.Categories))
+                .Distinct(StringComparer.Ordinal)
+                .Order(StringComparer.Create(Language.Culture, ignoreCase: true)),
+        ];
+        StateHasChanged();
+    }
+
+    private Guid? GroupOf(string category) => _groups?.FirstOrDefault(group => group.Categories.Contains(category))?.Id;
+
+    private async Task AssignAsync(string category, Guid? groupId)
+    {
+        ApiResult<bool> result = await Api.SetCategoryGroupAsync(new CategoryGroupRequest(category, groupId));
+        Report(result);
+        await LoadAsync();
+    }
+
+    private async Task EditGroupAsync(GroupResponse? group)
+    {
+        IDialogReference dialog = await Dialogs.ShowAsync<GroupDialog>(
+            group is null ? Language.Text.AddGroup : Language.Text.RenameGroup,
+            new DialogParameters<GroupDialog> { { d => d.Group, group }, { d => d.Position, _groups?.Count ?? 0 } });
+        if (await dialog.Result is { Canceled: false })
+        {
+            await LoadAsync();
+        }
+    }
+
+    private async Task DeleteGroupAsync(GroupResponse group)
+    {
+        if (await Confirm.AskAsync(Dialogs, Language.Text, Language.Text.DeleteGroupQuestion))
+        {
+            Report(await Api.DeleteBudgetGroupAsync(group.Id));
+            await LoadAsync();
+        }
+    }
+
+    private async Task LoadTemplateAsync(IBrowserFile? file)
+    {
+        if (file is null)
+        {
+            return;
+        }
+
+        TemplateRequest? template;
+        try
+        {
+            await using Stream content = file.OpenReadStream(maxAllowedSize: 1024 * 1024);
+            template = await JsonSerializer.DeserializeAsync<TemplateRequest>(content, Json);
+        }
+        catch (Exception exception) when (exception is JsonException or IOException)
+        {
+            template = null;
+        }
+
+        if (template is null)
+        {
+            Snackbar.Add(Language.Text.InvalidTemplateFile, Severity.Error);
+            return;
+        }
+
+        await SaveTemplateAsync(template);
+    }
+
+    // The current period, as changed during the month, becomes the starting point of the next ones.
+    private Task SaveCurrentAsTemplateAsync() =>
+        _current is null
+            ? Task.CompletedTask
+            : SaveTemplateAsync(new TemplateRequest(
+                [.. _current.Funds.Select(fund => new FundRequest(fund.Name, fund.Amount, fund.Day))],
+                [
+                    .. _current.Groups.SelectMany(group => group.Items.Select(item =>
+                        new TemplateItemRequest(group.Name, item.Name, item.Amount, item.Estimate, item.Day))),
+                ]));
+
+    private async Task SaveTemplateAsync(TemplateRequest template)
+    {
+        ApiResult<bool> result = await Api.SaveBudgetTemplateAsync(template);
+        if (result.IsSuccess)
+        {
+            Snackbar.Add(Language.Text.TemplateSaved, Severity.Success);
+        }
+
+        Report(result);
+        await LoadAsync();
+    }
+
+    private void Report(ApiResult<bool> result)
+    {
+        if (result.Problem is { } problem)
+        {
+            Snackbar.Add(Language.Errors(problem.ErrorCodes.Values.SelectMany(codes => codes)), Severity.Error);
+        }
+    }
+}
