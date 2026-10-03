@@ -1,0 +1,280 @@
+@page "/budget"
+@implements IDisposable
+@inject ExpenseApi Api
+@inject AuthSession Auth
+@inject Language Language
+@inject NavigationManager Navigation
+@inject IDialogService Dialogs
+
+<PageTitle>@Language.Text.Budget · Expense Explorer</PageTitle>
+
+<MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-2">
+    <MudText Typo="Typo.h5" HtmlTag="h1">@Language.Text.Budget</MudText>
+    <MudButton Variant="Variant.Outlined" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" OnClick="NewPeriodAsync">
+        @Language.Text.NewPeriod
+    </MudButton>
+</MudStack>
+
+@if (_problem is { Status: System.Net.HttpStatusCode.NotFound } && _budget is null)
+{
+    <MudAlert Severity="Severity.Info" Class="mb-3">@Language.Text.NoCurrentPeriod</MudAlert>
+    <PeriodList Periods="_periods"/>
+}
+else if (_problem is not null)
+{
+    <ProblemAlert Problem="_problem"/>
+}
+else if (_budget is null)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary"/>
+}
+else
+{
+    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-2">
+        <MudIconButton Icon="@Icons.Material.Filled.ChevronLeft" Disabled="@(Older is null)" aria-label="@Language.Text.From"
+                       Href="@(Older is { } older ? Routes.Budget(older.Id) : null)"/>
+        <div class="text-center">
+            <MudText Typo="Typo.subtitle1"><b>@Display.Date(_budget.Period.Start) – @Display.Date(_budget.Period.End)</b></MudText>
+            <MudText Typo="Typo.caption" Class="mud-text-secondary">@Language.Text.DaysLeft(_budget.DaysLeft)</MudText>
+        </div>
+        <MudIconButton Icon="@Icons.Material.Filled.ChevronRight" Disabled="@(Newer is null)" aria-label="@Language.Text.To"
+                       Href="@(Newer is { } newer ? Routes.Budget(newer.Id) : null)"/>
+    </MudStack>
+
+    <MudPaper Elevation="1" Class="pa-3 mb-3">
+        <div class="d-flex align-end justify-space-between">
+            <div>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">@Language.Text.FreePool</MudText>
+                <MudText Typo="Typo.h4" Color="@(_budget.FreePool < 0 ? Color.Error : Color.Primary)">@Display.Money(_budget.FreePool)</MudText>
+            </div>
+            @if (_budget.PerDay is { } perDay)
+            {
+                <div class="text-right">
+                    <MudText Typo="Typo.caption" Class="mud-text-secondary">@Language.Text.PerDay</MudText>
+                    <MudText Typo="Typo.h6" Color="@(perDay < 0 ? Color.Error : Color.Default)">@Display.Money(perDay)</MudText>
+                </div>
+            }
+        </div>
+        <MudDivider Class="my-2"/>
+        <div class="d-flex justify-space-between gap-2 budget-totals">
+            <div><MudText Typo="Typo.caption" Class="mud-text-secondary">@Language.Text.Funds</MudText><div>@Display.Money(_budget.TotalFunds)</div></div>
+            <div><MudText Typo="Typo.caption" Class="mud-text-secondary">@Language.Text.Planned</MudText><div>@Display.Money(_budget.Planned)</div></div>
+            <div class="text-right"><MudText Typo="Typo.caption" Class="mud-text-secondary">@Language.Text.Spent</MudText><div>@Display.Money(_budget.Spent)</div></div>
+        </div>
+    </MudPaper>
+
+    @if (_budget.Groups.Count == 0)
+    {
+        <MudText Class="pa-2 mud-text-secondary">@Language.Text.NoGroupsYet</MudText>
+    }
+
+    <MudPaper Elevation="1" Class="mb-3">
+        @foreach (GroupBudgetResponse group in _budget.Groups)
+        {
+            <div class="px-3 py-2 cursor-pointer" @onclick="() => Toggle(group.Id)">
+                <div class="d-flex align-center gap-2">
+                    <MudText Class="flex-grow-1 text-truncate"><b>@group.Name</b></MudText>
+                    <MudText Typo="Typo.body2" Class="text-nowrap">@Language.Text.SpentOf(Display.Money(group.Spent), Display.Money(group.Planned))</MudText>
+                </div>
+                <MudProgressLinear Value="@Percent(group)" Color="@ColorOf(group)" Rounded="true" Size="Size.Medium" Class="my-1"/>
+                <MudText Typo="Typo.caption" Color="@(group.Remaining < 0 ? Color.Error : Color.Default)" Class="mud-text-secondary">
+                    @(group.Remaining < 0 ? Language.Text.OverPlanBy(Display.Money(-group.Remaining)) : Language.Text.LeftInGroup(Display.Money(group.Remaining)))
+                </MudText>
+            </div>
+            @if (_expanded.Contains(group.Id))
+            {
+                <div class="px-3 pb-2">
+                    @foreach (PlanItemResponse item in group.Items)
+                    {
+                        <div class="d-flex align-center gap-2 py-1 cursor-pointer list-row" @onclick="() => EditItemAsync(item)">
+                            <div class="flex-grow-1 text-truncate">
+                                @item.Name
+                                @if (item.Day is { } day)
+                                {
+                                    <MudText Typo="Typo.caption" Class="mud-text-secondary"> · @(day).</MudText>
+                                }
+                            </div>
+                            @if (item.Estimate is { } estimate && estimate != item.Amount)
+                            {
+                                <MudText Typo="Typo.caption" Class="mud-text-secondary text-nowrap"><s>@Display.Money(estimate)</s></MudText>
+                            }
+                            <MudText Typo="Typo.body2" Class="text-nowrap">@Display.Money(item.Amount)</MudText>
+                        </div>
+                    }
+                    <div class="d-flex gap-2 mt-1">
+                        <MudButton Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" OnClick="() => AddItemAsync(group.Id)">@Language.Text.AddPlanItem</MudButton>
+                        @if (group.Categories.Count > 0)
+                        {
+                            <MudButton Size="Size.Small" StartIcon="@Icons.Material.Filled.ShoppingBasket" Href="@ItemsOf(group.Categories)">@Language.Text.ShowItems</MudButton>
+                        }
+                    </div>
+                </div>
+            }
+            <MudDivider/>
+        }
+        @if (_budget.Unassigned.Count > 0)
+        {
+            <div class="px-3 py-2">
+                <div class="d-flex align-center gap-2">
+                    <MudText Class="flex-grow-1"><b>@Language.Text.OutsideGroups</b></MudText>
+                    <MudText Typo="Typo.body2">@Display.Money(_budget.Unassigned.Sum(category => category.Spent))</MudText>
+                </div>
+                @foreach (CategorySpentResponse category in _budget.Unassigned)
+                {
+                    <MudLink Href="@ItemsOf([category.Category])" Color="Color.Inherit" Underline="Underline.None" Class="d-flex gap-2 py-1">
+                        <MudText Typo="Typo.body2" Class="flex-grow-1 mud-text-secondary">@category.Category</MudText>
+                        <MudText Typo="Typo.body2" Class="mud-text-secondary">@Display.Money(category.Spent)</MudText>
+                    </MudLink>
+                }
+            </div>
+        }
+    </MudPaper>
+
+    <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-1">
+        <MudText Typo="Typo.h6" HtmlTag="h2">@Language.Text.Funds</MudText>
+        <MudButton Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" OnClick="() => EditFundAsync(null)">@Language.Text.AddFund</MudButton>
+    </MudStack>
+    <MudPaper Elevation="1" Class="mb-3">
+        @foreach (FundResponse fund in _budget.Funds)
+        {
+            <div class="d-flex align-center gap-2 px-3 py-2 cursor-pointer list-row" @onclick="() => EditFundAsync(fund)">
+                <div class="flex-grow-1 text-truncate">
+                    @fund.Name
+                    @if (fund.Day is { } day)
+                    {
+                        <MudText Typo="Typo.caption" Class="mud-text-secondary"> · @(day).</MudText>
+                    }
+                </div>
+                <MudText Typo="Typo.body2" Color="@(fund.Amount < 0 ? Color.Warning : Color.Default)" Class="text-nowrap">
+                    @(fund.Amount > 0 ? "+" : "")@Display.Money(fund.Amount)
+                </MudText>
+            </div>
+            <MudDivider/>
+        }
+    </MudPaper>
+}
+
+@code {
+    private readonly HashSet<Guid> _expanded = [];
+    private IReadOnlyList<PeriodResponse> _periods = [];
+    private BudgetResponse? _budget;
+    private ApiProblem? _problem;
+
+    // Periods come newest first.
+    private PeriodResponse? Older => _budget is null ? null : _periods.FirstOrDefault(period => period.Start < _budget.Period.Start);
+
+    private PeriodResponse? Newer => _budget is null ? null : _periods.LastOrDefault(period => period.Start > _budget.Period.Start);
+
+    protected override async Task OnInitializedAsync()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        await LoadAsync();
+    }
+
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs args)
+    {
+        if (Navigation.IsOn(Routes.Budget()))
+        {
+            _ = InvokeAsync(LoadAsync);
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        Guid? periodId = Guid.TryParse(QueryReader.Of(new Uri(Navigation.Uri)).Text("period"), out Guid id) ? id : null;
+        ApiResult<IReadOnlyList<PeriodResponse>> periods = await Api.BudgetPeriodsAsync();
+        ApiResult<BudgetResponse> budget = await Api.BudgetAsync(periodId);
+        _periods = periods.ValueOrDefault ?? [];
+        _budget = budget.ValueOrDefault;
+        _problem = budget.Problem;
+        StateHasChanged();
+    }
+
+    private void Toggle(Guid groupId)
+    {
+        if (!_expanded.Remove(groupId))
+        {
+            _expanded.Add(groupId);
+        }
+    }
+
+    // A group without a plan is full as soon as anything is spent in it.
+    private static double Percent(GroupBudgetResponse group) =>
+        group switch
+        {
+            { Planned: > 0 } => (double)Math.Min(100m, group.Spent / group.Planned * 100m),
+            { Spent: > 0 } => 100,
+            _ => 0,
+        };
+
+    // Green while there is room or the plan is met exactly (a paid bill), amber from 80% of it, red over it.
+    private static Color ColorOf(GroupBudgetResponse group) =>
+        group switch
+        {
+            _ when group.Spent > group.Planned => Color.Error,
+            { Planned: > 0 } when group.Spent >= group.Planned * 0.8m && group.Spent < group.Planned => Color.Warning,
+            _ => Color.Success,
+        };
+
+    private string ItemsOf(IReadOnlyList<string> categories) =>
+        Routes.ReceiptItems(new ReceiptItemListRequest
+        {
+            Categories = [.. categories],
+            From = _budget?.Period.Start,
+            To = _budget?.Period.End,
+        });
+
+    private async Task NewPeriodAsync()
+    {
+        IDialogReference dialog = await Dialogs.ShowAsync<NewPeriodDialog>(
+            Language.Text.NewPeriod,
+            new DialogParameters<NewPeriodDialog> { { d => d.Start, _periods.Count == 0 ? FirstStart() : null } });
+        if (await dialog.Result is { Canceled: false, Data: BudgetResponse created })
+        {
+            Navigation.NavigateTo(Routes.Budget(created.Period.Id));
+        }
+    }
+
+    // The first period usually starts on the 5th, when the salary comes.
+    private static DateOnly FirstStart()
+    {
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        DateOnly fifth = new(today.Year, today.Month, 5);
+        return today >= fifth ? fifth : fifth.AddMonths(-1);
+    }
+
+    private Task AddItemAsync(Guid groupId) =>
+        ShowAsync<PlanItemDialog>(Language.Text.AddPlanItem, new DialogParameters<PlanItemDialog>
+        {
+            { d => d.PeriodId, _budget!.Period.Id },
+            { d => d.Groups, _budget.Groups },
+            { d => d.GroupId, groupId },
+        });
+
+    private Task EditItemAsync(PlanItemResponse item) =>
+        ShowAsync<PlanItemDialog>(Language.Text.EditPlanItem, new DialogParameters<PlanItemDialog>
+        {
+            { d => d.PeriodId, _budget!.Period.Id },
+            { d => d.Groups, _budget.Groups },
+            { d => d.Item, item },
+        });
+
+    private Task EditFundAsync(FundResponse? fund) =>
+        ShowAsync<FundDialog>(fund is null ? Language.Text.AddFund : Language.Text.EditFund, new DialogParameters<FundDialog>
+        {
+            { d => d.PeriodId, _budget!.Period.Id },
+            { d => d.Fund, fund },
+        });
+
+    private async Task ShowAsync<TDialog>(string title, DialogParameters parameters)
+        where TDialog : IComponent
+    {
+        IDialogReference dialog = await Dialogs.ShowAsync<TDialog>(title, parameters);
+        if (await dialog.Result is { Canceled: false })
+        {
+            await LoadAsync();
+        }
+    }
+}

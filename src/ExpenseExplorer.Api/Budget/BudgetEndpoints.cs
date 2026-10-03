@@ -43,7 +43,7 @@ internal static class BudgetEndpoints
         budget.MapGet("/groups", async (IBudgetQueries queries, CancellationToken ct) => Results.Ok(await queries.GroupsAsync(ct)));
         budget.MapPost("/groups", (GroupRequest request, IBudgetStore store, CancellationToken ct) =>
             BudgetRequestParser.ParseGroup(request)
-                .ToHttpAsync(group => BudgetUseCases.AddGroupAsync(store, group, ct), id => Results.Created($"{Routing.ApiPrefix}/budget/groups", new { id })));
+                .ToHttpAsync(group => BudgetUseCases.AddGroupAsync(store, group, ct), id => Results.Created($"{Routing.ApiPrefix}/budget/groups", new CreatedResponse(id))));
         budget.MapPut("/groups/{groupId:guid}", (Guid groupId, GroupRequest request, IBudgetStore store, CancellationToken ct) =>
             BudgetRequestParser.ParseGroup(request)
                 .ToHttpAsync(group => BudgetUseCases.ChangeGroupAsync(store, groupId, group, ct), _ => Results.NoContent()));
@@ -91,7 +91,7 @@ internal static class BudgetEndpoints
     }
 
     private static Func<Guid, IResult> Created(Guid periodId) =>
-        id => Results.Created($"{Routing.ApiPrefix}/budget/periods/{periodId}", new { id });
+        id => Results.Created($"{Routing.ApiPrefix}/budget/periods/{periodId}", new CreatedResponse(id));
 
     private static async Task<IResult> Done(Task<Result<bool>> change) =>
         (await change).ToHttp(_ => Results.NoContent());

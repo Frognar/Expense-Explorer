@@ -23,6 +23,9 @@ public sealed record TemplateItemRequest(string? Group, string? Name, decimal? A
 
 // Responses.
 
+/// <summary>The id of something just added.</summary>
+public sealed record CreatedResponse(Guid Id);
+
 public sealed record PeriodResponse(Guid Id, DateOnly Start, DateOnly End);
 
 public sealed record FundResponse(Guid Id, string Name, decimal Amount, int? Day);

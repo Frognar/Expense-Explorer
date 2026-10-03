@@ -91,6 +91,32 @@ public sealed class UiText
     public required Func<int, string> ChangedCount { get; init; }
     public required Func<string, string> MergedInto { get; init; }
     public required Func<int, string> ShowingFirst { get; init; }
+    public required string Budget { get; init; }
+    public required string FreePool { get; init; }
+    public required string PerDay { get; init; }
+    public required Func<int, string> DaysLeft { get; init; }
+    public required string Funds { get; init; }
+    public required string Planned { get; init; }
+    public required string Spent { get; init; }
+    public required Func<string, string, string> SpentOf { get; init; }
+    public required Func<string, string> OverPlanBy { get; init; }
+    public required Func<string, string> LeftInGroup { get; init; }
+    public required string OutsideGroups { get; init; }
+    public required string AddFund { get; init; }
+    public required string EditFund { get; init; }
+    public required string AddPlanItem { get; init; }
+    public required string EditPlanItem { get; init; }
+    public required string Name { get; init; }
+    public required string FundAmountHelp { get; init; }
+    public required string Estimate { get; init; }
+    public required string DayOfMonth { get; init; }
+    public required string Group { get; init; }
+    public required string NoCurrentPeriod { get; init; }
+    public required string NewPeriod { get; init; }
+    public required string PeriodStart { get; init; }
+    public required string NewPeriodHelp { get; init; }
+    public required string DeleteQuestion { get; init; }
+    public required string NoGroupsYet { get; init; }
     public required IReadOnlyDictionary<LogSeverity, string> LogLevels { get; init; }
     public required IReadOnlyDictionary<ReceiptSortField, string> ReceiptSort { get; init; }
     public required IReadOnlyDictionary<ReceiptItemSortField, string> ItemSort { get; init; }
@@ -181,6 +207,32 @@ public sealed class UiText
         ChangedCount = count => $"Zmieniono: {count}.",
         MergedInto = name => $"Połączono z „{name}”.",
         ShowingFirst = count => $"Pokazuję pierwsze {count}. Zawęź wyszukiwanie.",
+        Budget = "Budżet",
+        FreePool = "Wolna pula",
+        PerDay = "Na dzień",
+        DaysLeft = days => days switch { 0 => "Okres się zakończył", 1 => "Ostatni dzień okresu", _ => $"{days} dni do końca okresu" },
+        Funds = "Środki",
+        Planned = "Zaplanowane",
+        Spent = "Wydane",
+        SpentOf = (spent, planned) => $"{spent} z {planned}",
+        OverPlanBy = amount => $"ponad plan o {amount}",
+        LeftInGroup = amount => $"zostało {amount}",
+        OutsideGroups = "Poza grupami",
+        AddFund = "Dodaj korektę",
+        EditFund = "Edytuj środki",
+        AddPlanItem = "Dodaj wydatek",
+        EditPlanItem = "Edytuj wydatek",
+        Name = "Nazwa",
+        FundAmountHelp = "Odejmij od środków, np. oszczędności albo mniejszy przychód",
+        Estimate = "Zakładana",
+        DayOfMonth = "Dzień miesiąca",
+        Group = "Grupa",
+        NoCurrentPeriod = "Żaden okres budżetu nie obejmuje dzisiejszego dnia.",
+        NewPeriod = "Nowy okres",
+        PeriodStart = "Początek okresu",
+        NewPeriodHelp = "Okres potrwa miesiąc i dostanie przychody i wydatki z szablonu.",
+        DeleteQuestion = "Usunąć tę pozycję?",
+        NoGroupsYet = "Nie ma jeszcze grup budżetu.",
         LogLevels = new Dictionary<LogSeverity, string>
         {
             [LogSeverity.Verbose] = "Wszystko",
@@ -255,6 +307,20 @@ public sealed class UiText
             ["Dictionary.NameNotFound"] = "Ta nazwa nie jest już nigdzie używana.",
             ["Dictionary.SameName"] = "Nowa nazwa jest taka sama jak stara.",
             ["Dictionary.UnknownKind"] = "Nie ma takiego słownika.",
+            ["BudgetName.Empty"] = "Podaj nazwę.",
+            ["BudgetName.TooLong"] = "Nazwa może mieć najwyżej 100 znaków.",
+            ["FundAmount.Zero"] = "Kwota nie może być zerem.",
+            ["DayOfMonth.OutOfRange"] = "Dzień musi być od 1 do 31.",
+            ["BudgetPeriod.EndBeforeStart"] = "Okres kończy się przed początkiem.",
+            ["BudgetPeriod.TooLong"] = "Okres może trwać najwyżej 62 dni.",
+            ["Budget.PeriodNotFound"] = "Nie ma takiego okresu budżetu.",
+            ["Budget.NoCurrentPeriod"] = "Żaden okres budżetu nie obejmuje dzisiejszego dnia.",
+            ["Budget.FundNotFound"] = "Nie ma takiej pozycji środków.",
+            ["Budget.ItemNotFound"] = "Nie ma takiego wydatku.",
+            ["Budget.GroupNotFound"] = "Nie ma takiej grupy.",
+            ["Budget.GroupNameTaken"] = "Grupa o tej nazwie już istnieje.",
+            ["Budget.GroupInUse"] = "Grupa ma jeszcze zaplanowane wydatki.",
+            ["Budget.PeriodOverlaps"] = "Ten okres nachodzi na inny.",
             ["Http.401"] = "Zaloguj się ponownie.",
             ["Http.403"] = "Nie masz uprawnień do tej operacji.",
             ["Http.404"] = "Nie znaleziono.",
@@ -347,6 +413,32 @@ public sealed class UiText
         ChangedCount = count => $"Changed: {count}.",
         MergedInto = name => $"Merged into \"{name}\".",
         ShowingFirst = count => $"Showing the first {count}. Narrow the search.",
+        Budget = "Budget",
+        FreePool = "Free pool",
+        PerDay = "Per day",
+        DaysLeft = days => days switch { 0 => "The period is over", 1 => "Last day of the period", _ => $"{days} days left in the period" },
+        Funds = "Funds",
+        Planned = "Planned",
+        Spent = "Spent",
+        SpentOf = (spent, planned) => $"{spent} of {planned}",
+        OverPlanBy = amount => $"{amount} over plan",
+        LeftInGroup = amount => $"{amount} left",
+        OutsideGroups = "Outside groups",
+        AddFund = "Add change",
+        EditFund = "Edit funds",
+        AddPlanItem = "Add expense",
+        EditPlanItem = "Edit expense",
+        Name = "Name",
+        FundAmountHelp = "Subtract from the funds, e.g. savings or a smaller income",
+        Estimate = "Estimate",
+        DayOfMonth = "Day of month",
+        Group = "Group",
+        NoCurrentPeriod = "No budget period covers today.",
+        NewPeriod = "New period",
+        PeriodStart = "Period start",
+        NewPeriodHelp = "The period lasts a month and gets the incomes and expenses of the template.",
+        DeleteQuestion = "Delete this entry?",
+        NoGroupsYet = "There are no budget groups yet.",
         LogLevels = new Dictionary<LogSeverity, string>
         {
             [LogSeverity.Verbose] = "Everything",
@@ -421,6 +513,20 @@ public sealed class UiText
             ["Dictionary.NameNotFound"] = "This name is no longer used anywhere.",
             ["Dictionary.SameName"] = "The new name is the same as the old one.",
             ["Dictionary.UnknownKind"] = "There is no such dictionary.",
+            ["BudgetName.Empty"] = "Enter a name.",
+            ["BudgetName.TooLong"] = "The name can have at most 100 characters.",
+            ["FundAmount.Zero"] = "The amount cannot be zero.",
+            ["DayOfMonth.OutOfRange"] = "The day must be between 1 and 31.",
+            ["BudgetPeriod.EndBeforeStart"] = "The period ends before it starts.",
+            ["BudgetPeriod.TooLong"] = "A period can last at most 62 days.",
+            ["Budget.PeriodNotFound"] = "There is no such budget period.",
+            ["Budget.NoCurrentPeriod"] = "No budget period covers today.",
+            ["Budget.FundNotFound"] = "There is no such entry.",
+            ["Budget.ItemNotFound"] = "There is no such planned expense.",
+            ["Budget.GroupNotFound"] = "There is no such group.",
+            ["Budget.GroupNameTaken"] = "A group with this name already exists.",
+            ["Budget.GroupInUse"] = "The group still has planned expenses.",
+            ["Budget.PeriodOverlaps"] = "This period overlaps another one.",
             ["Http.401"] = "Please sign in again.",
             ["Http.403"] = "You are not allowed to do this.",
             ["Http.404"] = "Not found.",

@@ -22,6 +22,9 @@ public static class Routes
     public static string Logs(LogListRequest? filter = null) =>
         "logs" + (filter is null ? "" : ListQueries.ToQuery(filter));
 
+    public static string Budget(Guid? periodId = null) =>
+        "budget" + new QueryString().Add("period", periodId?.ToString());
+
     public static string Dictionaries(Suggestions kind = Suggestions.Items, string? search = null) =>
         "dictionaries" + new QueryString().Add("kind", ExpenseApi.PathOf(kind)).Add("search", search);
 

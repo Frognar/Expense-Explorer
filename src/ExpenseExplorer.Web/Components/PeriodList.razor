@@ -1,0 +1,20 @@
+@inject Language Language
+
+@* Earlier budget periods, newest first, for when none covers today. *@
+@if (Periods.Count > 0)
+{
+    <MudPaper Elevation="1">
+        @foreach (PeriodResponse period in Periods)
+        {
+            <MudLink Href="@Routes.Budget(period.Id)" Color="Color.Inherit" Underline="Underline.None" Class="d-block px-3 py-2 list-row">
+                @Display.Date(period.Start) – @Display.Date(period.End)
+            </MudLink>
+            <MudDivider/>
+        }
+    </MudPaper>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PeriodResponse> Periods { get; set; } = [];
+}
