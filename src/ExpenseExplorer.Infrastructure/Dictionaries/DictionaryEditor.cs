@@ -19,6 +19,11 @@ internal sealed class DictionaryEditor(ExpenseExplorerDbContext db) : IDictionar
         }
 
         await RememberAliasAsync(command, cancellationToken);
+        if (command.Kind == NameKind.Category)
+        {
+            await MoveBudgetGroupAsync(command, cancellationToken);
+        }
+
         await transaction.CommitAsync(cancellationToken);
         return new RenamedName(command.To, changed, merged);
     }
@@ -74,6 +79,20 @@ internal sealed class DictionaryEditor(ExpenseExplorerDbContext db) : IDictionar
             .Where(item => item.Category == command.From)
             .ExecuteUpdateAsync(set => set.SetProperty(item => item.Category, command.To), cancellationToken),
     };
+
+    /// <summary>A renamed category stays in its budget group; when merged, the group of the name kept wins.</summary>
+    private async Task MoveBudgetGroupAsync(RenameName command, CancellationToken cancellationToken)
+    {
+        if (await db.BudgetCategories.AnyAsync(category => category.Category == command.To, cancellationToken))
+        {
+            await db.BudgetCategories.Where(category => category.Category == command.From).ExecuteDeleteAsync(cancellationToken);
+            return;
+        }
+
+        await db.BudgetCategories
+            .Where(category => category.Category == command.From)
+            .ExecuteUpdateAsync(set => set.SetProperty(category => category.Category, command.To), cancellationToken);
+    }
 
     /// <summary>
     /// The old name now leads to the new one, and so does every older name that led to the old one.

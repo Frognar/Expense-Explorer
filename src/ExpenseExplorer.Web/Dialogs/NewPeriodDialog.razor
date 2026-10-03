@@ -1,0 +1,51 @@
+@inject ExpenseApi Api
+@inject Language Language
+
+@* Starts a budget period. After the first one the start can stay empty: the period follows the last one. *@
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="this" OnSubmit="CreateAsync" id="period-form">
+            <MudStack Spacing="3">
+                <DateInput @bind-Value="_start" Label="@Language.Text.PeriodStart" ErrorText="@ErrorFor("start")" Clearable="true"/>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">@Language.Text.NewPeriodHelp</MudText>
+                <ProblemAlert Problem="_problem" Fields="Fields"/>
+            </MudStack>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="() => Dialog.Cancel()">@Language.Text.Cancel</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" form="period-form" Color="Color.Primary" Variant="Variant.Filled"
+                   Disabled="_busy">@Language.Text.NewPeriod</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private static readonly string[] Fields = ["start", "end"];
+
+    private DateOnly? _start;
+    private ApiProblem? _problem;
+    private bool _busy;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter]
+    public DateOnly? Start { get; set; }
+
+    protected override void OnInitialized() => _start = Start;
+
+    private string? ErrorFor(string field) =>
+        _problem?.CodesFor(field) is { Count: > 0 } codes ? Language.Errors(codes) : null;
+
+    private async Task CreateAsync()
+    {
+        _busy = true;
+        ApiResult<BudgetResponse> result = await Api.CreatePeriodAsync(new CreatePeriodRequest(_start, null));
+        _busy = false;
+        _problem = result.Problem;
+        if (result.IsSuccess)
+        {
+            Dialog.Close(DialogResult.Ok(result.Value));
+        }
+    }
+}

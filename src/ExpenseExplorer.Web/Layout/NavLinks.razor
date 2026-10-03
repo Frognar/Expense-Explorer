@@ -1,7 +1,7 @@
 @inject Language Language
 
 @* Same destinations on every screen size: app bar on desktop, bottom bar on phones. *@
-@foreach (NavTarget target in Targets(Language.Text))
+@foreach (NavTarget target in Targets(Language.Text, CanEdit))
 {
     <NavLink class="@(Horizontal ? "top-link" : "bottom-link")" href="@target.Href" Match="@target.Match">
         <MudIcon Icon="@target.Icon" Size="Size.Small"/>
@@ -13,12 +13,22 @@
     [Parameter]
     public bool Horizontal { get; set; }
 
+    // A parameter rather than read from the session, so the links render again once the session is restored.
+    [Parameter]
+    public bool CanEdit { get; set; }
+
     private sealed record NavTarget(string Href, string Label, string Icon, NavLinkMatch Match);
 
-    private static NavTarget[] Targets(UiText text) =>
-    [
-        new(Routes.Receipts(), text.Receipts, Icons.Material.Filled.ReceiptLong, NavLinkMatch.All),
-        new(Routes.ReceiptItems(), text.Items, Icons.Material.Filled.ShoppingBasket, NavLinkMatch.Prefix),
-        new(Routes.Reports, text.Reports, Icons.Material.Filled.PieChart, NavLinkMatch.Prefix),
-    ];
+    // The budget is for editors only, like everything that changes data.
+    private static IEnumerable<NavTarget> Targets(UiText text, bool canEdit)
+    {
+        yield return new(Routes.Receipts(), text.Receipts, Icons.Material.Filled.ReceiptLong, NavLinkMatch.All);
+        yield return new(Routes.ReceiptItems(), text.Items, Icons.Material.Filled.ShoppingBasket, NavLinkMatch.Prefix);
+        if (canEdit)
+        {
+            yield return new(Routes.Budget(), text.Budget, Icons.Material.Filled.AccountBalanceWallet, NavLinkMatch.Prefix);
+        }
+
+        yield return new(Routes.Reports, text.Reports, Icons.Material.Filled.PieChart, NavLinkMatch.Prefix);
+    }
 }

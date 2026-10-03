@@ -46,3 +46,67 @@ internal sealed class NameAliasRow
 
     public string Name { get; set; } = "";
 }
+
+// Budget. Incomes and planned expenses without a period make up the template for new periods.
+
+internal sealed class BudgetGroupRow
+{
+    public Guid Id { get; set; }
+
+    public string Name { get; set; } = "";
+
+    public int Position { get; set; }
+}
+
+/// <summary>A receipt category counted in a budget group; a category belongs to at most one group.</summary>
+internal sealed class BudgetCategoryRow
+{
+    public string Category { get; set; } = "";
+
+    public Guid GroupId { get; set; }
+}
+
+internal sealed class BudgetPeriodRow
+{
+    public Guid Id { get; set; }
+
+    public DateOnly Start { get; set; }
+
+    public DateOnly End { get; set; }
+}
+
+internal sealed class BudgetFundRow
+{
+    public Guid Id { get; set; }
+
+    /// <summary><c>null</c> for the template.</summary>
+    public Guid? PeriodId { get; set; }
+
+    public int Position { get; set; }
+
+    public string Name { get; set; } = "";
+
+    public decimal Amount { get; set; }
+
+    public int? Day { get; set; }
+}
+
+internal sealed class BudgetItemRow
+{
+    public Guid Id { get; set; }
+
+    /// <summary><c>null</c> for the template.</summary>
+    public Guid? PeriodId { get; set; }
+
+    public Guid GroupId { get; set; }
+
+    public int Position { get; set; }
+
+    public string Name { get; set; } = "";
+
+    public decimal Amount { get; set; }
+
+    public decimal? Estimate { get; set; }
+
+    public int? Day { get; set; }
+}

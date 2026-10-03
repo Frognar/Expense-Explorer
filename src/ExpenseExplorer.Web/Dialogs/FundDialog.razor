@@ -1,0 +1,97 @@
+@inject ExpenseApi Api
+@inject Language Language
+@inject IDialogService Dialogs
+
+@*
+    An income or a change to the money of a period. The amount is typed without a sign, since phone
+    keyboards for numbers often have no minus; a switch says whether it adds or takes away.
+*@
+<MudDialog>
+    <DialogContent>
+        <EditForm Model="this" OnSubmit="SaveAsync" id="fund-form">
+            <MudStack Spacing="2">
+                <MudTextField T="string" @bind-Value="_name" Label="@Language.Text.Name" Variant="Variant.Outlined" Margin="Margin.Dense"
+                              MaxLength="100" AutoFocus="@(Fund is null)" Error="@(ErrorFor("name") is not null)" ErrorText="@ErrorFor("name")"/>
+                <MudStack Row="true" Spacing="2">
+                    <DecimalInput @bind-Value="_amount" Label="@Language.Text.Amount" ErrorText="@ErrorFor("amount")"/>
+                    <MudNumericField T="int?" @bind-Value="_day" Label="@Language.Text.DayOfMonth" Min="1" Max="31" Variant="Variant.Outlined"
+                                     Margin="Margin.Dense" HideSpinButtons="true" Clearable="true"
+                                     Error="@(ErrorFor("day") is not null)" ErrorText="@ErrorFor("day")"/>
+                </MudStack>
+                <MudSwitch T="bool" @bind-Value="_subtract" Color="Color.Warning" Label="@Language.Text.FundAmountHelp"/>
+                <ProblemAlert Problem="_problem" Fields="Fields"/>
+            </MudStack>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        @if (Fund is not null)
+        {
+            <MudButton Color="Color.Error" OnClick="DeleteAsync" Disabled="_busy" Class="mr-auto">@Language.Text.Delete</MudButton>
+        }
+        <MudButton OnClick="() => Dialog.Cancel()">@Language.Text.Cancel</MudButton>
+        <MudButton ButtonType="ButtonType.Submit" form="fund-form" Color="Color.Primary" Variant="Variant.Filled"
+                   Disabled="_busy">@Language.Text.Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private static readonly string[] Fields = ["name", "amount", "day"];
+
+    private string? _name;
+    private decimal? _amount;
+    private int? _day;
+    private bool _subtract;
+    private ApiProblem? _problem;
+    private bool _busy;
+
+    [CascadingParameter]
+    private IMudDialogInstance Dialog { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public Guid PeriodId { get; set; }
+
+    /// <summary>The entry to change; a new one is added when this is null.</summary>
+    [Parameter]
+    public FundResponse? Fund { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _name = Fund?.Name;
+        _amount = Fund is null ? null : Math.Abs(Fund.Amount);
+        _day = Fund?.Day;
+        _subtract = Fund?.Amount < 0;
+    }
+
+    private string? ErrorFor(string field) =>
+        _problem?.CodesFor(field) is { Count: > 0 } codes ? Language.Errors(codes) : null;
+
+    private async Task SaveAsync()
+    {
+        _busy = true;
+        decimal? amount = _subtract ? -Math.Abs(_amount ?? 0) : _amount;
+        ApiResult<bool> result = await Api.SaveFundAsync(PeriodId, Fund?.Id, new FundRequest(_name, amount, _day));
+        _busy = false;
+        _problem = result.Problem;
+        if (result.IsSuccess)
+        {
+            Dialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (Fund is null || !await Confirm.AskAsync(Dialogs, Language.Text, Language.Text.DeleteQuestion))
+        {
+            return;
+        }
+
+        _busy = true;
+        ApiResult<bool> result = await Api.RemoveFundAsync(PeriodId, Fund.Id);
+        _busy = false;
+        _problem = result.Problem;
+        if (result.IsSuccess)
+        {
+            Dialog.Close(DialogResult.Ok(true));
+        }
+    }
+}

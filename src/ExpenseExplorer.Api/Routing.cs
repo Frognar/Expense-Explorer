@@ -1,4 +1,5 @@
 using ExpenseExplorer.Api.Auth;
+using ExpenseExplorer.Api.Budget;
 using ExpenseExplorer.Api.Dictionaries;
 using ExpenseExplorer.Api.Logs;
 using ExpenseExplorer.Api.ReceiptItems;
@@ -22,6 +23,9 @@ internal static class Routing
         data.MapReceiptItems();
         data.MapReports();
         data.MapDictionaries();
+
+        // The household budget is for editors only, reading included.
+        api.MapGroup("").RequireAuthorization(Policies.CanEdit).MapBudget();
 
         // The application logs are for admins only.
         api.MapGroup("").RequireAuthorization(Policies.CanViewLogs).MapLogs();

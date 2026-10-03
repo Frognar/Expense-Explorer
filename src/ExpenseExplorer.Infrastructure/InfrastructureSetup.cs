@@ -1,7 +1,9 @@
+using ExpenseExplorer.Application.Budget;
 using ExpenseExplorer.Application.Dictionaries;
 using ExpenseExplorer.Application.ReceiptItems;
 using ExpenseExplorer.Application.Receipts;
 using ExpenseExplorer.Application.Reports;
+using ExpenseExplorer.Infrastructure.Budget;
 using ExpenseExplorer.Infrastructure.Dictionaries;
 using ExpenseExplorer.Infrastructure.Persistence;
 using ExpenseExplorer.Infrastructure.ReceiptItems;
@@ -34,6 +36,8 @@ public static class InfrastructureSetup
         services.AddScoped<IDictionaryQueries, DictionaryQueries>();
         services.AddScoped<IDictionaryEditor, DictionaryEditor>();
         services.AddScoped<INameHistory, NameHistory>();
+        services.AddScoped<IBudgetStore, BudgetStore>();
+        services.AddScoped<IBudgetQueries, BudgetQueries>();
         services.AddScoped<IReceiptItemQueries, ReceiptItemQueries>();
         services.AddScoped<IReportQueries, ReportQueries>();
         services.AddUsers();

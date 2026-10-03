@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using ExpenseExplorer.Contracts.Budget;
 using ExpenseExplorer.Contracts.Dictionaries;
 using ExpenseExplorer.Contracts.Logs;
 using ExpenseExplorer.Contracts.ReceiptItems;
@@ -14,6 +15,7 @@ namespace ExpenseExplorer.Web.Api;
 public sealed class ExpenseApi(HttpClient http)
 {
     private const string Receipts = "api/v1/receipts";
+    private const string Budget = "api/v1/budget";
 
     public Task<ApiResult<ReceiptListResponse>> ReceiptsAsync(ReceiptListRequest request) =>
         GetAsync<ReceiptListResponse>(Receipts + ListQueries.ToQuery(request));
@@ -100,6 +102,32 @@ public sealed class ExpenseApi(HttpClient http)
 
     public Task<ApiResult<RenameNameResponse>> RenameAsync(Suggestions kind, RenameNameRequest request) =>
         SendAsync<RenameNameResponse>(HttpMethod.Post, $"api/v1/dictionaries/{PathOf(kind)}/rename", request);
+
+    public Task<ApiResult<IReadOnlyList<PeriodResponse>>> BudgetPeriodsAsync() =>
+        GetAsync<IReadOnlyList<PeriodResponse>>($"{Budget}/periods");
+
+    /// <summary>The period covering today, or the given one.</summary>
+    public Task<ApiResult<BudgetResponse>> BudgetAsync(Guid? periodId) =>
+        GetAsync<BudgetResponse>($"{Budget}/periods/{(periodId is { } id ? id.ToString() : "current")}");
+
+    public Task<ApiResult<BudgetResponse>> CreatePeriodAsync(CreatePeriodRequest request) =>
+        SendAsync<BudgetResponse>(HttpMethod.Post, $"{Budget}/periods", request);
+
+    public Task<ApiResult<bool>> SaveFundAsync(Guid periodId, Guid? fundId, FundRequest request) =>
+        fundId is { } id
+            ? SendAsync<bool>(HttpMethod.Put, $"{Budget}/periods/{periodId}/funds/{id}", request)
+            : SendAsync<bool>(HttpMethod.Post, $"{Budget}/periods/{periodId}/funds", request);
+
+    public Task<ApiResult<bool>> RemoveFundAsync(Guid periodId, Guid fundId) =>
+        SendAsync<bool>(HttpMethod.Delete, $"{Budget}/periods/{periodId}/funds/{fundId}", null);
+
+    public Task<ApiResult<bool>> SavePlanItemAsync(Guid periodId, Guid? itemId, PlanItemRequest request) =>
+        itemId is { } id
+            ? SendAsync<bool>(HttpMethod.Put, $"{Budget}/periods/{periodId}/items/{id}", request)
+            : SendAsync<bool>(HttpMethod.Post, $"{Budget}/periods/{periodId}/items", request);
+
+    public Task<ApiResult<bool>> RemovePlanItemAsync(Guid periodId, Guid itemId) =>
+        SendAsync<bool>(HttpMethod.Delete, $"{Budget}/periods/{periodId}/items/{itemId}", null);
 
     public static string PathOf(Suggestions kind) => kind switch
     {
