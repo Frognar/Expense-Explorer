@@ -144,7 +144,6 @@ internal sealed class ExpenseExplorerDbContext(DbContextOptions<ExpenseExplorerD
             fund.Property(f => f.Position).HasColumnName("position");
             fund.Property(f => f.Name).HasColumnName("name").HasMaxLength(100);
             fund.Property(f => f.Amount).HasColumnName("amount").HasPrecision(12, 2);
-            fund.Property(f => f.Day).HasColumnName("day");
             fund.HasIndex(f => f.PeriodId);
             fund.HasOne<BudgetPeriodRow>().WithMany().HasForeignKey(f => f.PeriodId).OnDelete(DeleteBehavior.Cascade);
         });
@@ -164,8 +163,6 @@ internal sealed class ExpenseExplorerDbContext(DbContextOptions<ExpenseExplorerD
             item.Property(i => i.Position).HasColumnName("position");
             item.Property(i => i.Name).HasColumnName("name").HasMaxLength(100);
             item.Property(i => i.Amount).HasColumnName("amount").HasPrecision(12, 2);
-            item.Property(i => i.Estimate).HasColumnName("estimate").HasPrecision(12, 2);
-            item.Property(i => i.Day).HasColumnName("day");
             item.HasIndex(i => i.PeriodId);
             item.HasIndex(i => i.GroupId);
             item.HasOne<BudgetPeriodRow>().WithMany().HasForeignKey(i => i.PeriodId).OnDelete(DeleteBehavior.Cascade);

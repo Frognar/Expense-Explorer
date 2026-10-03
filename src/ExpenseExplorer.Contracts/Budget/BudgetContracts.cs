@@ -6,10 +6,9 @@ namespace ExpenseExplorer.Contracts.Budget;
 public sealed record CreatePeriodRequest(DateOnly? Start, DateOnly? End);
 
 /// <summary>An income or a change to the money of a period; negative for savings or a smaller income.</summary>
-public sealed record FundRequest(string? Name, decimal? Amount, int? Day);
+public sealed record FundRequest(string? Name, decimal? Amount);
 
-/// <summary><see cref="Estimate"/> is the first guess, kept for comparison with <see cref="Amount"/>.</summary>
-public sealed record PlanItemRequest(Guid? GroupId, string? Name, decimal? Amount, decimal? Estimate, int? Day);
+public sealed record PlanItemRequest(Guid? GroupId, string? Name, decimal? Amount);
 
 public sealed record GroupRequest(string? Name, int? Position);
 
@@ -19,7 +18,7 @@ public sealed record CategoryGroupRequest(string? Category, Guid? GroupId);
 /// <summary>The whole template at once. Groups are named; missing ones are created.</summary>
 public sealed record TemplateRequest(IReadOnlyList<FundRequest>? Funds, IReadOnlyList<TemplateItemRequest>? Items);
 
-public sealed record TemplateItemRequest(string? Group, string? Name, decimal? Amount, decimal? Estimate, int? Day);
+public sealed record TemplateItemRequest(string? Group, string? Name, decimal? Amount);
 
 // Responses.
 
@@ -28,9 +27,9 @@ public sealed record CreatedResponse(Guid Id);
 
 public sealed record PeriodResponse(Guid Id, DateOnly Start, DateOnly End);
 
-public sealed record FundResponse(Guid Id, string Name, decimal Amount, int? Day);
+public sealed record FundResponse(Guid Id, string Name, decimal Amount);
 
-public sealed record PlanItemResponse(Guid Id, Guid GroupId, string Name, decimal Amount, decimal? Estimate, int? Day);
+public sealed record PlanItemResponse(Guid Id, Guid GroupId, string Name, decimal Amount);
 
 public sealed record GroupResponse(Guid Id, string Name, int Position, IReadOnlyList<string> Categories);
 
@@ -64,4 +63,4 @@ public sealed record BudgetResponse(
 
 public sealed record TemplateResponse(IReadOnlyList<FundResponse> Funds, IReadOnlyList<TemplateItemResponse> Items);
 
-public sealed record TemplateItemResponse(Guid Id, string Group, string Name, decimal Amount, decimal? Estimate, int? Day);
+public sealed record TemplateItemResponse(Guid Id, string Group, string Name, decimal Amount);

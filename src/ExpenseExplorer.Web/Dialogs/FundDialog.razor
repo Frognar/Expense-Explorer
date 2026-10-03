@@ -12,12 +12,7 @@
             <MudStack Spacing="2">
                 <MudTextField T="string" @bind-Value="_name" Label="@Language.Text.Name" Variant="Variant.Outlined" Margin="Margin.Dense"
                               MaxLength="100" AutoFocus="@(Fund is null)" Error="@(ErrorFor("name") is not null)" ErrorText="@ErrorFor("name")"/>
-                <MudStack Row="true" Spacing="2">
-                    <DecimalInput @bind-Value="_amount" Label="@Language.Text.Amount" ErrorText="@ErrorFor("amount")"/>
-                    <MudNumericField T="int?" @bind-Value="_day" Label="@Language.Text.DayOfMonth" Min="1" Max="31" Variant="Variant.Outlined"
-                                     Margin="Margin.Dense" HideSpinButtons="true" Clearable="true"
-                                     Error="@(ErrorFor("day") is not null)" ErrorText="@ErrorFor("day")"/>
-                </MudStack>
+                <DecimalInput @bind-Value="_amount" Label="@Language.Text.Amount" ErrorText="@ErrorFor("amount")"/>
                 <MudSwitch T="bool" @bind-Value="_subtract" Color="Color.Warning" Label="@Language.Text.FundAmountHelp"/>
                 <ProblemAlert Problem="_problem" Fields="Fields"/>
             </MudStack>
@@ -35,11 +30,10 @@
 </MudDialog>
 
 @code {
-    private static readonly string[] Fields = ["name", "amount", "day"];
+    private static readonly string[] Fields = ["name", "amount"];
 
     private string? _name;
     private decimal? _amount;
-    private int? _day;
     private bool _subtract;
     private ApiProblem? _problem;
     private bool _busy;
@@ -58,7 +52,6 @@
     {
         _name = Fund?.Name;
         _amount = Fund is null ? null : Math.Abs(Fund.Amount);
-        _day = Fund?.Day;
         _subtract = Fund?.Amount < 0;
     }
 
@@ -69,7 +62,7 @@
     {
         _busy = true;
         decimal? amount = _subtract ? -Math.Abs(_amount ?? 0) : _amount;
-        ApiResult<bool> result = await Api.SaveFundAsync(PeriodId, Fund?.Id, new FundRequest(_name, amount, _day));
+        ApiResult<bool> result = await Api.SaveFundAsync(PeriodId, Fund?.Id, new FundRequest(_name, amount));
         _busy = false;
         _problem = result.Problem;
         if (result.IsSuccess)

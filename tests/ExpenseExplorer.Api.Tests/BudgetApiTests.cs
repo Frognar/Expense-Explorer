@@ -12,11 +12,11 @@ public sealed class BudgetApiTests(ApiFixture api) : IAsyncLifetime
     private const string Budget = "/api/v1/budget";
 
     private static readonly TemplateRequest Template = new(
-        [new FundRequest("Wypłata", 10_000m, 5), new FundRequest("Oszczędności", -2_000m, 5)],
+        [new FundRequest("Wypłata", 10_000m), new FundRequest("Oszczędności", -2_000m)],
         [
-            new TemplateItemRequest("Dom", "Prąd", 300m, 350m, 10),
-            new TemplateItemRequest("Dom", "Kredyt", 3_000m, null, 15),
-            new TemplateItemRequest("Jedzenie", "Spożywcze", 2_000m, null, null),
+            new TemplateItemRequest("Dom", "Prąd", 300m),
+            new TemplateItemRequest("Dom", "Kredyt", 3_000m),
+            new TemplateItemRequest("Jedzenie", "Spożywcze", 2_000m),
         ]);
 
     private ApiFactory _app = null!;
@@ -98,16 +98,16 @@ public sealed class BudgetApiTests(ApiFixture api) : IAsyncLifetime
         BudgetResponse budget = await _editor.Post($"{Budget}/periods", new CreatePeriodRequest(new DateOnly(2026, 9, 5), null)).Then<BudgetResponse>();
         string funds = $"{Budget}/periods/{budget.Period.Id}/funds";
 
-        (await _editor.Post(funds, new FundRequest("Wypłata", 10_000m, 5))).EnsureSuccessStatusCode();
-        (await _editor.Post(funds, new FundRequest("Urodziny", 300m, null))).EnsureSuccessStatusCode();
+        (await _editor.Post(funds, new FundRequest("Wypłata", 10_000m))).EnsureSuccessStatusCode();
+        (await _editor.Post(funds, new FundRequest("Urodziny", 300m))).EnsureSuccessStatusCode();
         FundResponse leave = (await Reload(budget)).Funds[1];
-        (await _editor.Put($"{funds}/{leave.Id}", new FundRequest("Wolne w pracy", -1_200m, null))).EnsureSuccessStatusCode();
-        HttpResponseMessage invalid = await _editor.Post(funds, new FundRequest(" ", 0m, 32));
+        (await _editor.Put($"{funds}/{leave.Id}", new FundRequest("Wolne w pracy", -1_200m))).EnsureSuccessStatusCode();
+        HttpResponseMessage invalid = await _editor.Post(funds, new FundRequest(" ", 0m));
 
         Assert.Equal(8_800m, (await Reload(budget)).TotalFunds);
         Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
         Dictionary<string, string[]> errors = await invalid.ErrorCodes();
-        Assert.Equal(["BudgetName.Empty", "FundAmount.Zero", "DayOfMonth.OutOfRange"], [.. errors["name"], .. errors["amount"], .. errors["day"]]);
+        Assert.Equal(["BudgetName.Empty", "FundAmount.Zero"], [.. errors["name"], .. errors["amount"]]);
 
         Assert.Equal(HttpStatusCode.NoContent, (await _editor.Delete($"{funds}/{leave.Id}")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await _editor.Delete($"{funds}/{leave.Id}")).StatusCode);
@@ -121,13 +121,13 @@ public sealed class BudgetApiTests(ApiFixture api) : IAsyncLifetime
         string items = $"{Budget}/periods/{budget.Period.Id}/items";
         Guid group = await AddGroupAsync("Dzieci");
 
-        HttpResponseMessage unknown = await _editor.Post(items, new PlanItemRequest(Guid.NewGuid(), "Przedszkole", 488m, 600m, 10));
-        (await _editor.Post(items, new PlanItemRequest(group, "Przedszkole", 488m, 600m, 10))).EnsureSuccessStatusCode();
+        HttpResponseMessage unknown = await _editor.Post(items, new PlanItemRequest(Guid.NewGuid(), "Przedszkole", 488m));
+        (await _editor.Post(items, new PlanItemRequest(group, "Przedszkole", 488m))).EnsureSuccessStatusCode();
 
         Assert.Equal(HttpStatusCode.BadRequest, unknown.StatusCode);
         Assert.Contains("Budget.GroupNotFound", (await unknown.ErrorCodes())["groupId"]);
         PlanItemResponse item = Assert.Single((await Reload(budget)).Groups.Single(g => g.Id == group).Items);
-        Assert.Equal(("Przedszkole", 488m, 600m, 10), (item.Name, item.Amount, item.Estimate, item.Day));
+        Assert.Equal(("Przedszkole", 488m), (item.Name, item.Amount));
 
         Assert.Equal(HttpStatusCode.Conflict, (await _editor.Delete($"{Budget}/groups/{group}")).StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, (await _editor.Delete($"{items}/{item.Id}")).StatusCode);
@@ -162,7 +162,7 @@ public sealed class BudgetApiTests(ApiFixture api) : IAsyncLifetime
     {
         HttpResponseMessage response = await _editor.Put(
             $"{Budget}/template",
-            new TemplateRequest([new FundRequest("Wypłata", null, 5)], [new TemplateItemRequest("Dom", "Prąd", -1m, null, null)]));
+            new TemplateRequest([new FundRequest("Wypłata", null)], [new TemplateItemRequest("Dom", "Prąd", -1m)]));
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         Dictionary<string, string[]> errors = await response.ErrorCodes();

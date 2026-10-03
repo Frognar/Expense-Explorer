@@ -2,7 +2,7 @@
 @inject Language Language
 @inject IDialogService Dialogs
 
-@* A planned expense of a period. The estimate is the first guess, kept to compare with the real amount. *@
+@* A planned expense of a period. *@
 <MudDialog>
     <DialogContent>
         <EditForm Model="this" OnSubmit="SaveAsync" id="plan-item-form">
@@ -17,13 +17,7 @@
                         <MudSelectItem T="Guid?" Value="group.Id">@group.Name</MudSelectItem>
                     }
                 </MudSelect>
-                <MudStack Row="true" Spacing="2">
-                    <DecimalInput @bind-Value="_amount" Label="@Language.Text.Amount" ErrorText="@ErrorFor("amount")"/>
-                    <DecimalInput @bind-Value="_estimate" Label="@Language.Text.Estimate" ErrorText="@ErrorFor("estimate")" Clearable="true"/>
-                </MudStack>
-                <MudNumericField T="int?" @bind-Value="_day" Label="@Language.Text.DayOfMonth" Min="1" Max="31" Variant="Variant.Outlined"
-                                 Margin="Margin.Dense" HideSpinButtons="true" Clearable="true"
-                                 Error="@(ErrorFor("day") is not null)" ErrorText="@ErrorFor("day")"/>
+                <DecimalInput @bind-Value="_amount" Label="@Language.Text.Amount" ErrorText="@ErrorFor("amount")"/>
                 <ProblemAlert Problem="_problem" Fields="Fields"/>
             </MudStack>
         </EditForm>
@@ -40,13 +34,11 @@
 </MudDialog>
 
 @code {
-    private static readonly string[] Fields = ["name", "groupId", "amount", "estimate", "day"];
+    private static readonly string[] Fields = ["name", "groupId", "amount"];
 
     private string? _name;
     private Guid? _groupId;
     private decimal? _amount;
-    private decimal? _estimate;
-    private int? _day;
     private ApiProblem? _problem;
     private bool _busy;
 
@@ -72,8 +64,6 @@
         _name = Item?.Name;
         _groupId = Item?.GroupId ?? GroupId;
         _amount = Item?.Amount;
-        _estimate = Item?.Estimate;
-        _day = Item?.Day;
     }
 
     private string? ErrorFor(string field) =>
@@ -82,7 +72,7 @@
     private async Task SaveAsync()
     {
         _busy = true;
-        ApiResult<bool> result = await Api.SavePlanItemAsync(PeriodId, Item?.Id, new PlanItemRequest(_groupId, _name, _amount, _estimate, _day));
+        ApiResult<bool> result = await Api.SavePlanItemAsync(PeriodId, Item?.Id, new PlanItemRequest(_groupId, _name, _amount));
         _busy = false;
         _problem = result.Problem;
         if (result.IsSuccess)

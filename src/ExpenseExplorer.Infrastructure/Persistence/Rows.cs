@@ -87,8 +87,6 @@ internal sealed class BudgetFundRow
     public string Name { get; set; } = "";
 
     public decimal Amount { get; set; }
-
-    public int? Day { get; set; }
 }
 
 internal sealed class BudgetItemRow
@@ -105,8 +103,4 @@ internal sealed class BudgetItemRow
     public string Name { get; set; } = "";
 
     public decimal Amount { get; set; }
-
-    public decimal? Estimate { get; set; }
-
-    public int? Day { get; set; }
 }

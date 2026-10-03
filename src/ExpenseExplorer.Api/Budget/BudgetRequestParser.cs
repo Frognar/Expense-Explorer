@@ -16,17 +16,14 @@ internal static class BudgetRequestParser
         ResultCombine.Combine(
             BudgetName.Create(request.Name).ForTarget("name"),
             Input.Required(request.Amount).Bind(FundAmount.Create).ForTarget("amount"),
-            Day(request.Day).ForTarget("day"),
-            (name, amount, day) => new Fund(name, amount, day));
+            (name, amount) => new Fund(name, amount));
 
     public static Result<PlanItem> ParsePlanItem(PlanItemRequest request) =>
         ResultCombine.Combine(
             Input.Required(request.GroupId).ForTarget("groupId"),
             BudgetName.Create(request.Name).ForTarget("name"),
             Input.Required(request.Amount).Bind(Money.Create).ForTarget("amount"),
-            Input.Optional(request.Estimate, Money.Create).ForTarget("estimate"),
-            Day(request.Day).ForTarget("day"),
-            (group, name, amount, estimate, day) => new PlanItem(group, name, amount, estimate, day));
+            (group, name, amount) => new PlanItem(group, name, amount));
 
     public static Result<Group> ParseGroup(GroupRequest request) =>
         BudgetName.Create(request.Name).ForTarget("name").Map(name => new Group(name, request.Position ?? 0));
@@ -46,11 +43,7 @@ internal static class BudgetRequestParser
             BudgetName.Create(request.Group).ForTarget("group"),
             BudgetName.Create(request.Name).ForTarget("name"),
             Input.Required(request.Amount).Bind(Money.Create).ForTarget("amount"),
-            Input.Optional(request.Estimate, Money.Create).ForTarget("estimate"),
-            Day(request.Day).ForTarget("day"),
-            (group, name, amount, estimate, day) => new TemplateItem(group, name, amount, estimate, day));
-
-    private static Result<DayOfMonth?> Day(int? day) => Input.Optional(day, DayOfMonth.Create);
+            (group, name, amount) => new TemplateItem(group, name, amount));
 
     private static Result<T> ForTargetPrefix<T>(this Result<T> result, string prefix) =>
         result.Match(
