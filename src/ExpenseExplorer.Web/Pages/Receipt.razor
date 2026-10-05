@@ -154,12 +154,21 @@ else
             ? ShowItemDialogAsync(Language.Text.EditItem, new DialogParameters<ItemDialog> { { d => d.ReceiptId, Id }, { d => d.Item, item } })
             : Task.CompletedTask;
 
+    // Nothing is saved until the copy is confirmed, so cancelling it leaves the receipt as it was.
+    private Task DuplicateItemAsync(ReceiptItemResponse item) =>
+        ShowItemDialogAsync(Language.Text.DuplicateItem, new DialogParameters<ItemDialog> { { d => d.ReceiptId, Id }, { d => d.Copy, item } });
+
     private async Task ShowItemDialogAsync(string title, DialogParameters<ItemDialog> parameters)
     {
         IDialogReference dialog = await Dialogs.ShowAsync<ItemDialog>(title, parameters);
-        if (await dialog.Result is { Canceled: false })
+        switch (await dialog.Result)
         {
-            await LoadAsync();
+            case { Canceled: false, Data: ReceiptItemResponse duplicated }:
+                await DuplicateItemAsync(duplicated);
+                break;
+            case { Canceled: false }:
+                await LoadAsync();
+                break;
         }
     }
 }
