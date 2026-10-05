@@ -2,12 +2,13 @@
 @inject Language Language
 @inject IDialogService Dialogs
 
-@* Adds a line to a receipt or changes one. Amount and discount are for the whole line, as printed on the receipt. *@
+@* Adds a line to a receipt or changes one. Amount and discount are for the whole line, as printed on the receipt.
+   Duplicating closes the dialog with the line as its data, so the caller can open a new one prefilled with it. *@
 <MudDialog>
     <DialogContent>
         <EditForm Model="this" OnSubmit="SaveAsync" id="item-form">
             <MudStack Spacing="2">
-                <SuggestField Kind="Suggestions.Items" @bind-Value="_item" Label="@Language.Text.Item" AutoFocus="@(Item is null)"
+                <SuggestField Kind="Suggestions.Items" @bind-Value="_item" Label="@Language.Text.Item" AutoFocus="@(Item is null && Copy is null)"
                               ErrorText="@ErrorFor("item")"/>
                 <SuggestField Kind="Suggestions.Categories" @bind-Value="_category" Label="@Language.Text.Category"
                               ErrorText="@ErrorFor("category")"/>
@@ -31,7 +32,12 @@
     <DialogActions>
         @if (Item is not null)
         {
-            <MudButton Color="Color.Error" OnClick="DeleteAsync" Disabled="_busy" Class="mr-auto">@Language.Text.Delete</MudButton>
+            <MudButton Color="Color.Error" OnClick="DeleteAsync" Disabled="_busy">@Language.Text.Delete</MudButton>
+            @* An icon, so four actions still fit in one row on a narrow phone. *@
+            <MudTooltip Text="@Language.Text.Duplicate" RootClass="mr-auto">
+                <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" OnClick="Duplicate" Disabled="_busy"
+                               aria-label="@Language.Text.Duplicate"/>
+            </MudTooltip>
         }
         <MudButton OnClick="() => Dialog.Cancel()">@Language.Text.Cancel</MudButton>
         <MudButton ButtonType="ButtonType.Submit" form="item-form" Color="Color.Primary" Variant="Variant.Filled"
@@ -65,14 +71,19 @@
     [Parameter]
     public string? Category { get; set; }
 
+    /// <summary>A line whose values a new line starts from, e.g. when duplicating it.</summary>
+    [Parameter]
+    public ReceiptItemResponse? Copy { get; set; }
+
     protected override void OnInitialized()
     {
-        _item = Item?.Item;
-        _category = Item?.Category ?? Category;
-        _quantity = Item?.Quantity ?? 1;
-        _amount = Item?.Amount;
-        _discount = Item?.Discount ?? 0;
-        _description = Item?.Description;
+        ReceiptItemResponse? source = Item ?? Copy;
+        _item = source?.Item;
+        _category = source?.Category ?? Category;
+        _quantity = source?.Quantity ?? 1;
+        _amount = source?.Amount;
+        _discount = source?.Discount ?? 0;
+        _description = source?.Description;
     }
 
     // What the line will cost, so a typo in the amount is visible before saving.
@@ -98,6 +109,8 @@
             Dialog.Close(DialogResult.Ok(true));
         }
     }
+
+    private void Duplicate() => Dialog.Close(DialogResult.Ok(Item));
 
     private async Task DeleteAsync()
     {

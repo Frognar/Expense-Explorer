@@ -62,6 +62,7 @@ public sealed class UiText
     public required string PhotoSkippedLines { get; init; }
     public required string AddItem { get; init; }
     public required string EditItem { get; init; }
+    public required string DuplicateItem { get; init; }
     public required string NoItemsYet { get; init; }
     public required string Duplicate { get; init; }
     public required string DuplicateAsOf { get; init; }
@@ -189,6 +190,7 @@ public sealed class UiText
         PhotoSkippedLines = "Nie odczytałem tych linii:",
         AddItem = "Dodaj pozycję",
         EditItem = "Edytuj pozycję",
+        DuplicateItem = "Duplikuj pozycję",
         NoItemsYet = "Paragon nie ma jeszcze pozycji.",
         Duplicate = "Duplikuj",
         DuplicateAsOf = "Duplikuj z datą",
@@ -405,6 +407,7 @@ public sealed class UiText
         PhotoSkippedLines = "Could not read these lines:",
         AddItem = "Add item",
         EditItem = "Edit item",
+        DuplicateItem = "Duplicate item",
         NoItemsYet = "This receipt has no items yet.",
         Duplicate = "Duplicate",
         DuplicateAsOf = "Duplicate with date",
