@@ -25,6 +25,7 @@ internal sealed class ReceiptQueries(ExpenseExplorerDbContext db) : IReceiptQuer
 
         int totalCount = await filtered.CountAsync(cancellationToken);
         decimal totalCost = await filtered.SumAsync(r => r.Total, cancellationToken);
+        decimal totalDiscount = await filtered.SumAsync(r => r.Discount, cancellationToken);
         List<ReceiptSummaryResponse> page = await Sort(filtered, query)
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
@@ -33,7 +34,8 @@ internal sealed class ReceiptQueries(ExpenseExplorerDbContext db) : IReceiptQuer
 
         return new ReceiptListResponse(
             new PageResponse<ReceiptSummaryResponse>(page, query.Page, query.PageSize, totalCount),
-            totalCost);
+            totalCost,
+            totalDiscount);
     }
 
     /// <summary>Totals computed in SQL the same way as <see cref="Domain.Receipts.LinePrice"/>: amount minus discount.</summary>
@@ -44,6 +46,7 @@ internal sealed class ReceiptQueries(ExpenseExplorerDbContext db) : IReceiptQuer
             Store = r.Store,
             PurchaseDate = r.PurchaseDate,
             Total = r.Items.Sum(i => i.Amount - i.Discount),
+            Discount = r.Items.Sum(i => i.Discount),
         });
 
     private static IQueryable<SummaryRow> Filter(IQueryable<SummaryRow> receipts, ReceiptListQuery query)
@@ -104,5 +107,7 @@ internal sealed class ReceiptQueries(ExpenseExplorerDbContext db) : IReceiptQuer
         public DateOnly PurchaseDate { get; init; }
 
         public decimal Total { get; init; }
+
+        public decimal Discount { get; init; }
     }
 }

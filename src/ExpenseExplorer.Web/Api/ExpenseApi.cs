@@ -86,6 +86,9 @@ public sealed class ExpenseApi(HttpClient http)
     public Task<ApiResult<CategoryReportResponse>> CategoryReportAsync(DateOnly? from, DateOnly? to) =>
         GetAsync<CategoryReportResponse>("api/v1/reports/categories" + new QueryString().Add("from", from).Add("to", to));
 
+    public Task<ApiResult<MonthlyReportResponse>> MonthlyReportAsync(int months) =>
+        GetAsync<MonthlyReportResponse>("api/v1/reports/monthly" + new QueryString().Add("months", months));
+
     public Task<ApiResult<LogListResponse>> LogsAsync(LogListRequest request) =>
         GetAsync<LogListResponse>("api/v1/logs" + ListQueries.ToQuery(request));
 
@@ -105,6 +108,10 @@ public sealed class ExpenseApi(HttpClient http)
 
     public Task<ApiResult<IReadOnlyList<PeriodResponse>>> BudgetPeriodsAsync() =>
         GetAsync<IReadOnlyList<PeriodResponse>>($"{Budget}/periods");
+
+    /// <summary>The last periods that have started, oldest first.</summary>
+    public Task<ApiResult<IReadOnlyList<PeriodResultResponse>>> BudgetHistoryAsync(int count) =>
+        GetAsync<IReadOnlyList<PeriodResultResponse>>($"{Budget}/history" + new QueryString().Add("count", count));
 
     /// <summary>The period covering today, or the given one.</summary>
     public Task<ApiResult<BudgetResponse>> BudgetAsync(Guid? periodId) =>

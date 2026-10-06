@@ -41,6 +41,18 @@ public sealed class QueryString
         where TEnum : struct, Enum =>
         Add(name, value?.ToString());
 
+    /// <summary>Writes the name even without a date, so "no date" can be told apart from "not given".</summary>
+    public QueryString AddKeepingName(string name, DateOnly? value)
+    {
+        if (value is null)
+        {
+            _parts.Add($"{name}=");
+            return this;
+        }
+
+        return Add(name, value);
+    }
+
     public override string ToString() =>
         _parts.Count == 0 ? "" : new StringBuilder("?").AppendJoin('&', _parts).ToString();
 }

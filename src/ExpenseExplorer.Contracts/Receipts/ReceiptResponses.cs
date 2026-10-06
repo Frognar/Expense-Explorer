@@ -7,6 +7,7 @@ public sealed record ReceiptResponse(
     string Store,
     DateOnly PurchaseDate,
     decimal Total,
+    decimal Discount,
     IReadOnlyList<ReceiptItemResponse> Items);
 
 public sealed record ReceiptItemResponse(
@@ -26,10 +27,11 @@ public sealed record ReceiptSummaryResponse(
     DateOnly PurchaseDate,
     decimal Total);
 
-/// <summary>One page of receipts plus the total cost of every receipt matching the filter.</summary>
+/// <summary>One page of receipts plus the total cost and total discount of every receipt matching the filter.</summary>
 public sealed record ReceiptListResponse(
     PageResponse<ReceiptSummaryResponse> Receipts,
-    decimal TotalCost);
+    decimal TotalCost,
+    decimal TotalDiscount);
 
 /// <summary>
 /// A receipt read from a photo, with what to check against the paper: <paramref name="PrintedTotal"/>

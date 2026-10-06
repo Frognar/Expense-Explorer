@@ -11,6 +11,7 @@ public static class ReceiptResponses
             receipt.Store.Value,
             receipt.PurchaseDate.Value,
             receipt.Total.Value,
+            receipt.Discount.Value,
             [.. receipt.Items.Select(From)]);
 
     public static ReceiptItemResponse From(ReceiptItem item) =>

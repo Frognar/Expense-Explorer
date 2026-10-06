@@ -61,6 +61,10 @@
         <div class="num">
             <MudText Typo="Typo.caption" Class="d-block">@Language.Text.TotalOfFiltered</MudText>
             <MudText Typo="Typo.subtitle1"><b>@Display.Money(_list.TotalCost)</b></MudText>
+            @if (_list.TotalDiscount > 0)
+            {
+                <MudText Typo="Typo.caption" Color="Color.Success" Class="d-block">@Language.Text.Discounts: @Display.Money(_list.TotalDiscount)</MudText>
+            }
         </div>
     }
 </MudStack>
@@ -136,7 +140,7 @@ else
     // The address is the single source of the filter: reading it after every change keeps the back button working.
     private async Task LoadAsync()
     {
-        _filter = ListQueries.ReceiptList(QueryReader.Of(new Uri(Navigation.Uri)));
+        _filter = ListQueries.ReceiptList(QueryReader.Of(new Uri(Navigation.Uri)), DateOnly.FromDateTime(DateTime.Today));
         _draft = _filter;
         ApiResult<ReceiptListResponse> result = await Api.ReceiptsAsync(_filter);
         _list = result.ValueOrDefault;

@@ -1,0 +1,130 @@
+@inject ExpenseApi Api
+@inject Language Language
+@inject IJSRuntime Js
+
+<MudPaper Elevation="1" Class="pa-3 mb-3">
+    <div class="d-flex gap-2">
+        <MudSelect T="int" Class="flex-1 min-w-0" Value="_months" ValueChanged="LoadAsync" Label="@Language.Text.Range" Variant="Variant.Outlined"
+                   Margin="Margin.Dense" Dense="true">
+            @foreach (int months in MonthChoices)
+            {
+                <MudSelectItem Value="months">@Language.Text.LastMonths(months)</MudSelectItem>
+            }
+        </MudSelect>
+        <MudSelect T="string" Class="flex-1 min-w-0" @bind-Value="_category" Label="@Language.Text.Category" Variant="Variant.Outlined"
+                   Margin="Margin.Dense" Dense="true">
+            <MudSelectItem Value="@AllCategories">@Language.Text.AllCategories</MudSelectItem>
+            @foreach (string category in (_report?.Categories ?? []).Select(category => category.Category))
+            {
+                <MudSelectItem Value="@category">@category</MudSelectItem>
+            }
+        </MudSelect>
+    </div>
+</MudPaper>
+
+@if (_problem is not null)
+{
+    <ProblemAlert Problem="_problem"/>
+}
+else if (_report is null)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary"/>
+}
+else
+{
+    IReadOnlyList<decimal> totals = Selected?.Totals ?? _report.Totals;
+    decimal highest = Math.Max(totals.Max(), 1m);
+    <MudPaper Elevation="1" Class="pa-3 mb-3">
+        <div class="d-flex align-baseline gap-2 mb-2">
+            <MudText Typo="Typo.subtitle1" Class="flex-grow-1 text-truncate"><b>@(Selected?.Category ?? Language.Text.AllCategories)</b></MudText>
+            @if (AverageOf(totals) is { } average)
+            {
+                <MudText Typo="Typo.body2" Class="text-nowrap">@Language.Text.AveragePerMonth: <b>@Display.WholeMoney(average)</b></MudText>
+            }
+        </div>
+        @* One bar per month, scaled to the highest; the current month is paler because it is not over yet. *@
+        <div class="month-bars" role="img" aria-label="@(Selected?.Category ?? Language.Text.AllCategories)">
+            @for (int index = 0; index < totals.Count; index++)
+            {
+                bool current = index == totals.Count - 1;
+                string label = Display.Month(_report.Months[index]) + (current ? $" ({Language.Text.SoFar})" : "");
+                <div class="month-bar" title="@($"{label}: {Display.Money(totals[index])}")">
+                    @if (totals.Count <= 12)
+                    {
+                        <span class="month-bar-value">@Display.Compact(totals[index])</span>
+                    }
+                    <div class="month-bar-track">
+                        <div class="@(current ? "month-bar-fill current" : "month-bar-fill")"
+                             style="height: @Percent(totals[index], highest)"></div>
+                    </div>
+                    <span class="month-bar-label">@Display.Month(_report.Months[index])</span>
+                </div>
+            }
+        </div>
+        <MudText Typo="Typo.caption" Class="mud-text-secondary d-block mt-2">@Language.Text.AverageOfFullMonths</MudText>
+    </MudPaper>
+
+    @if (_report.Categories.Count == 0)
+    {
+        <MudText Class="pa-4" Align="Align.Center">@Language.Text.NothingFound</MudText>
+    }
+    else
+    {
+        <MudPaper Elevation="1">
+            <MudList T="string" Dense="true" Padding="false">
+                @foreach (CategoryMonthsResponse category in _report.Categories)
+                {
+                    <MudListItem T="string" OnClick="() => SelectAsync(category.Category)" Class="@RowClass(category)">
+                        <div class="d-flex align-center gap-3">
+                            <MudText Class="flex-grow-1 text-truncate">@category.Category</MudText>
+                            <div class="num">
+                                <MudText Class="text-nowrap"><b>@Display.WholeMoney(AverageOf(category.Totals) ?? category.Total)</b></MudText>
+                                <MudText Typo="Typo.caption" Class="mud-text-secondary text-nowrap">@Language.Text.Total @Display.WholeMoney(category.Total)</MudText>
+                            </div>
+                        </div>
+                    </MudListItem>
+                    <MudDivider/>
+                }
+            </MudList>
+        </MudPaper>
+    }
+}
+
+@code {
+    private const string AllCategories = "";
+    private static readonly int[] MonthChoices = [6, 12, 24];
+
+    private int _months = MonthChoices[0];
+    private string _category = AllCategories;
+    private MonthlyReportResponse? _report;
+    private ApiProblem? _problem;
+
+    private CategoryMonthsResponse? Selected => _report?.Categories.FirstOrDefault(category => category.Category == _category);
+
+    protected override Task OnInitializedAsync() => LoadAsync(_months);
+
+    private async Task LoadAsync(int months)
+    {
+        _months = months;
+        ApiResult<MonthlyReportResponse> result = await Api.MonthlyReportAsync(months);
+        _report = result.ValueOrDefault;
+        _problem = result.Problem;
+    }
+
+    /// <summary>The average of the full months; the current one is left out, as it has only just begun.</summary>
+    private static decimal? AverageOf(IReadOnlyList<decimal> totals) =>
+        totals.Count > 1 ? totals.Take(totals.Count - 1).Average() : null;
+
+    private static string Percent(decimal value, decimal highest) =>
+        (value / highest * 100).ToString("0.#", System.Globalization.CultureInfo.InvariantCulture) + "%";
+
+    // The chart is above the list, out of sight on a phone.
+    private async Task SelectAsync(string category)
+    {
+        _category = category;
+        await Js.InvokeVoidAsync("window.scrollTo", 0, 0);
+    }
+
+    private string RowClass(CategoryMonthsResponse category) =>
+        category.Category == _category ? "list-row mud-selected-item" : "list-row";
+}

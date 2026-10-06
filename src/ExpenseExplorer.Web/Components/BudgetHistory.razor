@@ -1,0 +1,143 @@
+@inject ExpenseApi Api
+@inject Language Language
+
+<MudPaper Elevation="1" Class="pa-3 mb-3">
+    <MudSelect T="int" Value="_count" ValueChanged="LoadAsync" Label="@Language.Text.Range" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+        @foreach (int count in CountChoices)
+        {
+            <MudSelectItem Value="count">@Language.Text.LastPeriods(count)</MudSelectItem>
+        }
+    </MudSelect>
+</MudPaper>
+
+@if (_problem is not null)
+{
+    <ProblemAlert Problem="_problem"/>
+}
+else if (_periods is null)
+{
+    <MudProgressLinear Indeterminate="true" Color="Color.Primary"/>
+}
+else if (_periods.Count == 0)
+{
+    <MudText Class="pa-4" Align="Align.Center">@Language.Text.NoPeriodsYet</MudText>
+}
+else
+{
+    IReadOnlyList<PeriodResultResponse> finished = [.. _periods.Where(period => period.Period.End < Today)];
+    <MudPaper Elevation="1">
+        <MudSimpleTable Dense="true" Class="history-table">
+            <thead>
+            <tr>
+                <th>@Language.Text.Group</th>
+                @foreach (PeriodResponse period in _periods.Select(period => period.Period))
+                {
+                    <th class="num">@ShortDate(period.Start) – @ShortDate(period.End)</th>
+                }
+                <th class="num">@Language.Text.Average</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach ((Guid id, string name) in Groups)
+            {
+                <tr>
+                    <td>@name</td>
+                    @foreach (PeriodResultResponse period in _periods)
+                    {
+                        <td class="num">@Cell(period.Groups.FirstOrDefault(group => group.Id == id))</td>
+                    }
+                    <td class="num">
+                        @Cell(finished.Count == 0 ? null : new GroupResultResponse(
+                            id,
+                            name,
+                            finished.Average(period => PlannedIn(period, id)),
+                            finished.Average(period => SpentIn(period, id))))
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td>@Language.Text.OutsideGroups</td>
+                @foreach (PeriodResultResponse period in _periods)
+                {
+                    <td class="num">@Display.WholeMoney(period.OutsideGroups)</td>
+                }
+                <td class="num">@AverageOf(finished, period => period.OutsideGroups)</td>
+            </tr>
+            <tr>
+                <td><b>@Language.Text.TotalSpent</b></td>
+                @foreach (PeriodResultResponse period in _periods)
+                {
+                    <td class="num"><b>@Display.WholeMoney(period.Spent)</b></td>
+                }
+                <td class="num"><b>@AverageOf(finished, period => period.Spent)</b></td>
+            </tr>
+            <tr>
+                <td>@Language.Text.Funds</td>
+                @foreach (PeriodResultResponse period in _periods)
+                {
+                    <td class="num">@Display.WholeMoney(period.TotalFunds)</td>
+                }
+                <td class="num">@AverageOf(finished, period => period.TotalFunds)</td>
+            </tr>
+            <tr>
+                <td>@Language.Text.FreePool</td>
+                @foreach (decimal freePool in _periods.Select(period => period.FreePool))
+                {
+                    <td class="num"><MudText Typo="Typo.body2" Color="@(freePool < 0 ? Color.Error : Color.Inherit)">@Display.WholeMoney(freePool)</MudText></td>
+                }
+                <td class="num">@AverageOf(finished, period => period.FreePool)</td>
+            </tr>
+            </tbody>
+        </MudSimpleTable>
+    </MudPaper>
+    <MudText Typo="Typo.caption" Class="mud-text-secondary d-block mt-2">@Language.Text.AverageOfFinishedPeriods</MudText>
+}
+
+@code {
+    private static readonly int[] CountChoices = [3, 6, 12];
+
+    private int _count = 6;
+    private IReadOnlyList<PeriodResultResponse>? _periods;
+    private ApiProblem? _problem;
+
+    private static DateOnly Today => DateOnly.FromDateTime(DateTime.Today);
+
+    /// <summary>Every group seen in the periods, in the order the newest period lists them.</summary>
+    private IEnumerable<(Guid Id, string Name)> Groups =>
+        (_periods ?? []).Reverse().SelectMany(period => period.Groups).DistinctBy(group => group.Id).Select(group => (group.Id, group.Name));
+
+    protected override Task OnInitializedAsync() => LoadAsync(_count);
+
+    private async Task LoadAsync(int count)
+    {
+        _count = count;
+        ApiResult<IReadOnlyList<PeriodResultResponse>> result = await Api.BudgetHistoryAsync(count);
+        _periods = result.ValueOrDefault;
+        _problem = result.Problem;
+    }
+
+    private static decimal PlannedIn(PeriodResultResponse period, Guid groupId) =>
+        period.Groups.FirstOrDefault(group => group.Id == groupId)?.Planned ?? 0m;
+
+    private static decimal SpentIn(PeriodResultResponse period, Guid groupId) =>
+        period.Groups.FirstOrDefault(group => group.Id == groupId)?.Spent ?? 0m;
+
+    private static string AverageOf(IReadOnlyList<PeriodResultResponse> finished, Func<PeriodResultResponse, decimal> value) =>
+        finished.Count == 0 ? "–" : Display.WholeMoney(finished.Average(value));
+
+    private static string ShortDate(DateOnly date) => date.ToString("dd.MM", System.Globalization.CultureInfo.InvariantCulture);
+
+    /// <summary>What was spent, with the plan under it; red once spending goes over the plan.</summary>
+    private RenderFragment Cell(GroupResultResponse? group) =>
+        @<text>
+            @if (group is null)
+            {
+                <span class="mud-text-secondary">–</span>
+            }
+            else
+            {
+                <MudText Typo="Typo.body2" Color="@(group.Spent > group.Planned ? Color.Error : Color.Inherit)">@Display.WholeMoney(group.Spent)</MudText>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary">@Language.Text.OfPlanned(Display.WholeMoney(group.Planned))</MudText>
+            }
+        </text>;
+}
