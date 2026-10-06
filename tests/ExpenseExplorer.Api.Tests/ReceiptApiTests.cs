@@ -67,6 +67,7 @@ public class ReceiptApiTests(ApiFixture api)
         ReceiptResponse stored = await (await _client.Get($"{Receipts}/{receipt.Id}")).Read<ReceiptResponse>();
 
         Assert.Equal(11.48m, stored.Total);
+        Assert.Equal(0.50m, stored.Discount);
         Assert.Collection(
             stored.Items,
             milk =>
@@ -245,7 +246,7 @@ public class ReceiptApiTests(ApiFixture api)
     {
         string store = $"Sklep-{Guid.NewGuid():N}";
         ReceiptResponse cheap = await CreateReceiptAsync(store, Today.AddDays(-2));
-        await AddItemAsync(cheap.Id, new ReceiptItemRequest("Woda", "Napoje", 1m, 2.00m, null, null));
+        await AddItemAsync(cheap.Id, new ReceiptItemRequest("Woda", "Napoje", 1m, 2.50m, 0.50m, null));
         ReceiptResponse expensive = await CreateReceiptAsync(store, Today.AddDays(-1));
         await AddItemAsync(expensive.Id, new ReceiptItemRequest("Kawa", "Napoje", 1m, 30.00m, null, null));
         ReceiptResponse old = await CreateReceiptAsync(store, Today.AddDays(-30));
@@ -258,6 +259,7 @@ public class ReceiptApiTests(ApiFixture api)
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(2, list.Receipts.TotalCount);
         Assert.Equal(32m, list.TotalCost);
+        Assert.Equal(0.50m, list.TotalDiscount);
         Assert.Equal(expensive.Id, Assert.Single(list.Receipts.Items).Id);
     }
 

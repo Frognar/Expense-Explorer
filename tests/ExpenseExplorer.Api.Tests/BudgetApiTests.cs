@@ -179,6 +179,29 @@ public sealed class BudgetApiTests(ApiFixture api) : IAsyncLifetime
         Assert.Equal(HttpStatusCode.Unauthorized, (await _app.CreateClient().Get($"{Budget}/periods")).StatusCode);
     }
 
+    [Fact]
+    public async Task History_lists_started_periods_oldest_first_with_plan_and_spending_per_group()
+    {
+        Assert.Equal(HttpStatusCode.NoContent, (await _editor.Put($"{Budget}/template", Template)).StatusCode);
+        IReadOnlyList<GroupResponse> groups = await _editor.Get($"{Budget}/groups").Then<List<GroupResponse>>();
+        await AssignAsync("Spożywcze", groups.Single(group => group.Name == "Jedzenie").Id);
+        await _editor.Post($"{Budget}/periods", new CreatePeriodRequest(new DateOnly(2026, 7, 5), null));
+        await _editor.Post($"{Budget}/periods", new CreatePeriodRequest(null, null));
+        await _editor.Post($"{Budget}/periods", new CreatePeriodRequest(null, null));
+        await _editor.Post($"{Budget}/periods", new CreatePeriodRequest(null, null));
+        await _editor.ReceiptAsync("Lidl", new DateOnly(2026, 8, 10), Line("Chleb", "Spożywcze", 2_100m), Line("Prezent", "Prezenty", 50m));
+        await _editor.ReceiptAsync("Lidl", new DateOnly(2026, 9, 10), Line("Chleb", "Spożywcze", 1_500m));
+
+        List<PeriodResultResponse> history = await _editor.Get($"{Budget}/history?count=2").Then<List<PeriodResultResponse>>();
+
+        Assert.Equal([new DateOnly(2026, 8, 5), new DateOnly(2026, 9, 5)], history.Select(period => period.Period.Start));
+        Assert.Equal(
+            [("Dom", 3_300m, 0m), ("Jedzenie", 2_000m, 2_100m)],
+            history[0].Groups.Select(group => (group.Name, group.Planned, group.Spent)));
+        Assert.Equal((50m, 2_150m, 8_000m - 3_300m - 2_100m - 50m), (history[0].OutsideGroups, history[0].Spent, history[0].FreePool));
+        Assert.Equal(1_500m, history[1].Groups.Single(group => group.Name == "Jedzenie").Spent);
+    }
+
     private static ReceiptItemRequest Line(string item, string category, decimal amount) => new(item, category, 1m, amount, null, null);
 
     private async Task AssignAsync(string category, Guid groupId) =>

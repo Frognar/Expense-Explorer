@@ -17,6 +17,7 @@ internal static class BudgetEndpoints
 
         budget.MapGet("/periods", async (IBudgetQueries queries, CancellationToken ct) => Results.Ok(await queries.PeriodsAsync(ct)));
         budget.MapGet("/periods/current", CurrentAsync);
+        budget.MapGet("/history", HistoryAsync);
         budget.MapGet("/periods/{periodId:guid}", GetAsync);
         budget.MapPost("/periods", CreatePeriodAsync);
         budget.MapDelete("/periods/{periodId:guid}", (Guid periodId, IBudgetStore store, CancellationToken ct) =>
@@ -69,6 +70,14 @@ internal static class BudgetEndpoints
             ? Results.Ok(budget)
             : ErrorResults.From([BudgetErrors.NoCurrentPeriod]);
     }
+
+    /// <summary>The last <paramref name="count"/> periods (6 by default) that have started, oldest first.</summary>
+    private static Task<IResult> HistoryAsync(int? count, IBudgetQueries queries, TimeProvider clock, CancellationToken cancellationToken) =>
+        Input.InRange(count, defaultValue: 6, min: 1, max: 24)
+            .ForTarget("count")
+            .ToHttpAsync(
+                async periods => Result.Success(await queries.HistoryAsync(periods, clock.Today(), cancellationToken)),
+                history => Results.Ok(history));
 
     private static async Task<IResult> GetAsync(Guid periodId, IBudgetQueries queries, TimeProvider clock, CancellationToken cancellationToken) =>
         await queries.GetAsync(periodId, clock.Today(), cancellationToken) is { } budget

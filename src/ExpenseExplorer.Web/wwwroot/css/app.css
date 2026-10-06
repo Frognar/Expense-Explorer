@@ -155,3 +155,70 @@ html[data-theme="dark"] body {
     align-items: center;
     gap: 8px;
 }
+
+/* Monthly report: one bar per month, the value above and the month below. */
+.month-bars {
+    display: flex;
+    align-items: stretch;
+    gap: 2px;
+    height: 180px;
+}
+
+.month-bar {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.month-bar-track {
+    flex: 1;
+    width: 100%;
+    max-width: 40px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.month-bar-fill {
+    width: 100%;
+    min-height: 1px;
+    border-radius: 4px 4px 0 0;
+    background: var(--mud-palette-primary);
+}
+
+.month-bar-fill.current {
+    opacity: 0.5;
+}
+
+.month-bar-value,
+.month-bar-label {
+    font-size: 0.7rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    color: var(--mud-palette-text-secondary);
+}
+
+/* Budget across periods: the group names stay in view while the periods scroll sideways. */
+.history-table th:first-child,
+.history-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--mud-palette-surface);
+}
+
+.history-table td,
+.history-table th {
+    white-space: nowrap;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+/* Report tabs share the width equally instead of scrolling on a phone. */
+.report-tabs .mud-tab {
+    flex: 1;
+}

@@ -14,6 +14,34 @@ internal sealed class BudgetQueries(ExpenseExplorerDbContext db) : IBudgetQuerie
             .Select(p => new PeriodResponse(p.Id, p.Start, p.End))
             .ToListAsync(cancellationToken);
 
+    public async Task<IReadOnlyList<PeriodResultResponse>> HistoryAsync(int count, DateOnly today, CancellationToken cancellationToken)
+    {
+        List<Guid> periodIds = await db.BudgetPeriods.AsNoTracking()
+            .Where(p => p.Start <= today)
+            .OrderByDescending(p => p.Start)
+            .Take(count)
+            .Select(p => p.Id)
+            .ToListAsync(cancellationToken);
+
+        List<PeriodResultResponse> history = [];
+        foreach (Guid periodId in Enumerable.Reverse(periodIds))
+        {
+            if (await GetAsync(periodId, today, cancellationToken) is { } budget)
+            {
+                history.Add(new PeriodResultResponse(
+                    budget.Period,
+                    budget.TotalFunds,
+                    budget.Planned,
+                    budget.Spent,
+                    budget.FreePool,
+                    [.. budget.Groups.Select(group => new GroupResultResponse(group.Id, group.Name, group.Planned, group.Spent))],
+                    budget.Unassigned.Sum(category => category.Spent)));
+            }
+        }
+
+        return history;
+    }
+
     public async Task<Guid?> PeriodOnAsync(DateOnly day, CancellationToken cancellationToken) =>
         await db.BudgetPeriods.AsNoTracking()
             .Where(p => p.Start <= day && p.End >= day)

@@ -1,84 +1,40 @@
 @page "/reports"
-@inject ExpenseApi Api
+@inject AuthSession Auth
 @inject Language Language
 @inject NavigationManager Navigation
 
 <PageTitle>@Language.Text.Reports · Expense Explorer</PageTitle>
 
-<MudText Typo="Typo.h5" HtmlTag="h1" Class="mb-2">@Language.Text.CategoryReport</MudText>
+<MudText Typo="Typo.h5" HtmlTag="h1" Class="mb-2">@Language.Text.Reports</MudText>
 
-<MudPaper Elevation="1" Class="pa-3 mb-3">
-    <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
-        <DateInput Label="@Language.Text.From" Value="_from" ValueChanged="from => ChangeAsync(from, _to)"/>
-        <DateInput Label="@Language.Text.To" Value="_to" ValueChanged="to => ChangeAsync(_from, to)"/>
-    </MudStack>
-</MudPaper>
-
-@if (_problem is not null)
-{
-    <ProblemAlert Problem="_problem"/>
-}
-else if (_report is null)
-{
-    <MudProgressLinear Indeterminate="true" Color="Color.Primary"/>
-}
-else if (_report.Categories.Count == 0)
-{
-    <MudText Class="pa-4" Align="Align.Center">@Language.Text.NothingFound</MudText>
-}
-else
-{
-    <MudPaper Elevation="1">
-        <MudList T="CategoryExpenseResponse" Dense="true" Padding="false">
-            @foreach ((CategoryExpenseResponse category, int rank) in _report.Categories.Select((category, rank) => (category, rank)))
-            {
-                <MudListItem T="CategoryExpenseResponse" Href="@ItemsOf(category.Category)" Class="list-row">
-                    <div class="d-flex align-center gap-3">
-                        <MudText Class="flex-grow-1 text-truncate">@category.Category</MudText>
-                        <MudText Typo="Typo.caption" Class="mud-text-secondary">@Share(category.Total)</MudText>
-                        <MudText Class="text-nowrap"><b>@Display.Money(category.Total)</b></MudText>
-                    </div>
-                    <MudProgressLinear Value="@((double)(category.Total / _report.Categories[0].Total * 100))" Color="@BarColors[rank % BarColors.Length]"
-                                       Rounded="true" Size="Size.Medium" Class="mt-1"/>
-                </MudListItem>
-                <MudDivider/>
-            }
-            <div class="d-flex align-center px-4 py-3">
-                <MudText Class="flex-grow-1"><b>@Language.Text.Total</b></MudText>
-                <MudText><b>@Display.Money(_report.Total)</b></MudText>
-            </div>
-        </MudList>
-    </MudPaper>
-}
+@* The chosen tab is kept in the address, so the back button returns to it. *@
+<MudTabs ActivePanelIndex="@Views.IndexOf(View)" ActivePanelIndexChanged="Show" Rounded="true" TabPanelsClass="pt-3" MinimumTabWidth="0px"
+         ApplyEffectsToContainer="true" Class="report-tabs">
+    @* Each tab takes an equal share of the width, so all of them fit on a phone. *@
+    <MudTabPanel Text="@Language.Text.Categories">
+        <CategoryReport/>
+    </MudTabPanel>
+    <MudTabPanel Text="@Language.Text.ByMonth">
+        <MonthlyReport/>
+    </MudTabPanel>
+    @if (Auth.CanEdit)
+    {
+        <MudTabPanel Text="@Language.Text.Budget">
+            <BudgetHistory/>
+        </MudTabPanel>
+    }
+</MudTabs>
 
 @code {
-    // Neighbouring bars get different colours so the categories are easy to tell apart.
-    private static readonly Color[] BarColors = [Color.Primary, Color.Info, Color.Warning, Color.Secondary];
+    [SupplyParameterFromQuery(Name = "view")]
+    public string? RequestedView { get; set; }
 
-    private DateOnly? _from;
-    private DateOnly? _to;
-    private CategoryReportResponse? _report;
-    private ApiProblem? _problem;
+    // The budget is for editors only, so its tab is the last one and simply missing for readers.
+    private List<ReportView> Views => Auth.CanEdit ? [ReportView.Categories, ReportView.Months, ReportView.Budget]
+        : [ReportView.Categories, ReportView.Months];
 
-    // Without dates the API reports the current month, and says which dates it used.
-    protected override Task OnInitializedAsync() => ChangeAsync(null, null);
+    private ReportView View =>
+        Enum.TryParse(RequestedView, ignoreCase: true, out ReportView view) && Views.Contains(view) ? view : ReportView.Categories;
 
-    private async Task ChangeAsync(DateOnly? from, DateOnly? to)
-    {
-        (_from, _to) = (from, to);
-        ApiResult<CategoryReportResponse> result = await Api.CategoryReportAsync(from, to);
-        _report = result.ValueOrDefault;
-        _problem = result.Problem;
-        if (_report is not null)
-        {
-            (_from, _to) = (_report.From, _report.To);
-        }
-    }
-
-    // Bars are relative to the largest category, the percentage to the whole.
-    private string Share(decimal total) =>
-        _report is { Total: > 0 } report ? (total / report.Total).ToString("P0", System.Globalization.CultureInfo.CurrentCulture) : "";
-
-    private string ItemsOf(string category) =>
-        Routes.ReceiptItems(new ReceiptItemListRequest { Categories = [category], From = _from, To = _to });
+    private void Show(int index) => Navigation.NavigateTo(Routes.ReportsView(Views[index]), replace: true);
 }

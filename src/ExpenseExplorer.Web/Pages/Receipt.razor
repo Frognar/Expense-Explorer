@@ -27,7 +27,13 @@ else
             <MudText Typo="Typo.h5" HtmlTag="h1" Class="text-truncate">@_receipt.Store</MudText>
             <MudText Typo="Typo.body2" Class="mud-text-secondary">@Display.Date(_receipt.PurchaseDate)</MudText>
         </div>
-        <MudText Typo="Typo.h6" Class="text-nowrap">@Display.Money(_receipt.Total)</MudText>
+        <div class="num">
+            <MudText Typo="Typo.h6" Class="text-nowrap">@Display.Money(_receipt.Total)</MudText>
+            @if (_receipt.Discount > 0)
+            {
+                <MudText Typo="Typo.caption" Color="Color.Success" Class="d-block text-nowrap">@Language.Text.Discount: @Display.Money(_receipt.Discount)</MudText>
+            }
+        </div>
         <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight" TransformOrigin="Origin.TopRight">
             @if (Auth.CanEdit)
             {

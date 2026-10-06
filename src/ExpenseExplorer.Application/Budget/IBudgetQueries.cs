@@ -9,6 +9,9 @@ public interface IBudgetQueries
     /// <summary>The period with spending from receipts so far; <c>null</c> when there is no such period.</summary>
     Task<BudgetResponse?> GetAsync(Guid periodId, DateOnly today, CancellationToken cancellationToken);
 
+    /// <summary>The last <paramref name="count"/> periods that have started by <paramref name="today"/>, oldest first.</summary>
+    Task<IReadOnlyList<PeriodResultResponse>> HistoryAsync(int count, DateOnly today, CancellationToken cancellationToken);
+
     Task<Guid?> PeriodOnAsync(DateOnly day, CancellationToken cancellationToken);
 
     Task<IReadOnlyList<GroupResponse>> GroupsAsync(CancellationToken cancellationToken);

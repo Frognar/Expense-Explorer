@@ -1,12 +1,12 @@
 @using System.Globalization
-@* The browser's own date picker: the most convenient one on phones. *@
-<MudTextField T="string" Value="@Text" ValueChanged="OnChanged" Label="@Label" InputType="InputType.Date"
-              Variant="Variant.Outlined" Margin="Margin.Dense" Clearable="@Clearable"
-              Error="@(ErrorText is not null)" ErrorText="@ErrorText" ShrinkLabel="true"/>
+@* MudBlazor's picker rather than the browser's: the browser shows dates in its own language, not the app's.
+   Tapping the field opens the calendar, so no icon takes room from the date. *@
+<MudDatePicker Date="@Date" DateChanged="OnChanged" Label="@Label" Culture="CultureInfo.CurrentCulture"
+               DateFormat="@CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern" AutoClose="true" Adornment="Adornment.None"
+               Variant="Variant.Outlined" Margin="Margin.Dense" Clearable="@Clearable" ShrinkLabel="true"
+               Error="@(ErrorText is not null)" ErrorText="@ErrorText"/>
 
 @code {
-    private const string Format = "yyyy-MM-dd";
-
     [Parameter]
     public DateOnly? Value { get; set; }
 
@@ -22,9 +22,8 @@
     [Parameter]
     public bool Clearable { get; set; }
 
-    private string? Text => Value?.ToString(Format, CultureInfo.InvariantCulture);
+    private DateTime? Date => Value?.ToDateTime(TimeOnly.MinValue);
 
-    private Task OnChanged(string? text) =>
-        ValueChanged.InvokeAsync(
-            DateOnly.TryParseExact(text, Format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateOnly date) ? date : null);
+    private Task OnChanged(DateTime? date) =>
+        ValueChanged.InvokeAsync(date is { } value ? DateOnly.FromDateTime(value) : null);
 }

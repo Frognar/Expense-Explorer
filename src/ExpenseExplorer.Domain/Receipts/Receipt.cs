@@ -28,6 +28,9 @@ public sealed class Receipt
 
     public Money Total => Money.Sum(_items.Select(item => item.Total));
 
+    /// <summary>What the discounts on all lines took off.</summary>
+    public Money Discount => Money.Sum(_items.Select(item => item.Purchase.Price.Discount));
+
     public static Receipt Create(ReceiptId id, StoreName store, PurchaseDate purchaseDate)
     {
         ArgumentNullException.ThrowIfNull(id);

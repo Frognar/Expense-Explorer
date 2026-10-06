@@ -61,6 +61,21 @@ public sealed record BudgetResponse(
     int DaysLeft,
     decimal? PerDay);
 
+/// <summary>
+/// One period in short, for comparing periods: plan and spending per group, spending outside groups,
+/// and <see cref="FreePool"/>, roughly what is left at the end.
+/// </summary>
+public sealed record PeriodResultResponse(
+    PeriodResponse Period,
+    decimal TotalFunds,
+    decimal Planned,
+    decimal Spent,
+    decimal FreePool,
+    IReadOnlyList<GroupResultResponse> Groups,
+    decimal OutsideGroups);
+
+public sealed record GroupResultResponse(Guid Id, string Name, decimal Planned, decimal Spent);
+
 public sealed record TemplateResponse(IReadOnlyList<FundResponse> Funds, IReadOnlyList<TemplateItemResponse> Items);
 
 public sealed record TemplateItemResponse(Guid Id, string Group, string Name, decimal Amount);

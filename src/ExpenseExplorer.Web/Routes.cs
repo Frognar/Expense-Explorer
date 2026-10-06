@@ -10,9 +10,12 @@ public static class Routes
 {
     public const string Reports = "reports";
 
+    public static string ReportsView(ReportView view) =>
+        Reports + (view == ReportView.Categories ? "" : new QueryString().Add<ReportView>("view", view).ToString());
+
     // "./" rather than "": links and buttons treat an empty address as no link at all.
     public static string Receipts(ReceiptListRequest? filter = null) =>
-        "./" + (filter is null ? "" : ListQueries.ToQuery(filter));
+        "./" + (filter is null ? "" : ListQueries.ToPageQuery(filter));
 
     public static string ReceiptItems(ReceiptItemListRequest? filter = null) =>
         "receipt-items" + (filter is null ? "" : ListQueries.ToQuery(filter));

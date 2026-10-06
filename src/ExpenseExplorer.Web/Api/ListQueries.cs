@@ -11,17 +11,7 @@ namespace ExpenseExplorer.Web.Api;
 public static class ListQueries
 {
     public static string ToQuery(ReceiptListRequest request) =>
-        new QueryString()
-            .Add("stores", request.Stores)
-            .Add("from", request.From)
-            .Add("to", request.To)
-            .Add("totalMin", request.TotalMin)
-            .Add("totalMax", request.TotalMax)
-            .Add("sortBy", request.SortBy)
-            .Add("direction", request.Direction)
-            .Add("page", request.Page)
-            .Add("pageSize", request.PageSize)
-            .ToString();
+        ReceiptListQuery(request, new QueryString().Add("from", request.From));
 
     public static string ToQuery(ReceiptItemListRequest request) =>
         new QueryString()
@@ -56,6 +46,28 @@ public static class ListQueries
             .Add("pageSize", request.PageSize)
             .ToString();
 
+    /// <summary>
+    /// The receipts page address. It always names "from": without it the page starts from
+    /// <see cref="DefaultReceiptsFrom"/>, and with it empty the page shows receipts of every date.
+    /// </summary>
+    public static string ToPageQuery(ReceiptListRequest request) =>
+        ReceiptListQuery(request, new QueryString().AddKeepingName("from", request.From));
+
+    /// <summary>The first day of the previous month: the whole of last month and the current one so far.</summary>
+    public static DateOnly DefaultReceiptsFrom(DateOnly today) => new DateOnly(today.Year, today.Month, 1).AddMonths(-1);
+
+    private static string ReceiptListQuery(ReceiptListRequest request, QueryString query) =>
+        query
+            .Add("stores", request.Stores)
+            .Add("to", request.To)
+            .Add("totalMin", request.TotalMin)
+            .Add("totalMax", request.TotalMax)
+            .Add("sortBy", request.SortBy)
+            .Add("direction", request.Direction)
+            .Add("page", request.Page)
+            .Add("pageSize", request.PageSize)
+            .ToString();
+
     public static ReceiptItemListRequest ReceiptItemList(QueryReader query) =>
         new()
         {
@@ -81,11 +93,11 @@ public static class ListQueries
             PageSize = query.WholeNumber("pageSize"),
         };
 
-    public static ReceiptListRequest ReceiptList(QueryReader query) =>
+    public static ReceiptListRequest ReceiptList(QueryReader query, DateOnly today) =>
         new()
         {
             Stores = query.Texts("stores"),
-            From = query.Date("from"),
+            From = query.Has("from") ? query.Date("from") : DefaultReceiptsFrom(today),
             To = query.Date("to"),
             TotalMin = query.Number("totalMin"),
             TotalMax = query.Number("totalMax"),

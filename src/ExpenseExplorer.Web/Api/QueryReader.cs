@@ -11,6 +11,8 @@ public sealed class QueryReader(string query)
 
     public static QueryReader Of(Uri uri) => new(uri.Query);
 
+    public bool Has(string name) => _values.AllKeys.Contains(name);
+
     public string? Text(string name) => _values[name] is { Length: > 0 } value ? value : null;
 
     public string[]? Texts(string name) => _values.GetValues(name) is { Length: > 0 } values ? values : null;

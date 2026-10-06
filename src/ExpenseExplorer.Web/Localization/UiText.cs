@@ -74,6 +74,20 @@ public sealed class UiText
     public required string Deleted { get; init; }
     public required string CategoryReport { get; init; }
     public required string ShowItems { get; init; }
+    public required string Discounts { get; init; }
+    public required string ByMonth { get; init; }
+    public required string Range { get; init; }
+    public required Func<int, string> LastMonths { get; init; }
+    public required Func<int, string> LastPeriods { get; init; }
+    public required string AllCategories { get; init; }
+    public required string AveragePerMonth { get; init; }
+    public required string AverageOfFullMonths { get; init; }
+    public required string SoFar { get; init; }
+    public required string Average { get; init; }
+    public required string AverageOfFinishedPeriods { get; init; }
+    public required string TotalSpent { get; init; }
+    public required Func<string, string> OfPlanned { get; init; }
+    public required string NoPeriodsYet { get; init; }
     public required string NotFound { get; init; }
     public required string UnexpectedError { get; init; }
     public required string InvalidNumber { get; init; }
@@ -201,6 +215,20 @@ public sealed class UiText
         Saved = "Zapisano.",
         Deleted = "Usunięto.",
         CategoryReport = "Wydatki według kategorii",
+        Discounts = "Rabaty",
+        ByMonth = "Miesiące",
+        Range = "Zakres",
+        LastMonths = count => $"Ostatnie {count} mies.",
+        LastPeriods = count => count is >= 2 and <= 4 ? $"Ostatnie {count} okresy" : $"Ostatnie {count} okresów",
+        AllCategories = "Wszystkie kategorie",
+        AveragePerMonth = "Średnio na miesiąc",
+        AverageOfFullMonths = "Średnia z pełnych miesięcy, bez bieżącego.",
+        SoFar = "do dziś",
+        Average = "Średnio",
+        AverageOfFinishedPeriods = "Średnio liczone z zakończonych okresów. Na czerwono: wydano więcej niż zaplanowano.",
+        TotalSpent = "Razem wydane",
+        OfPlanned = planned => $"z {planned}",
+        NoPeriodsYet = "Nie ma jeszcze okresów budżetu.",
         ShowItems = "Pokaż pozycje",
         NotFound = "Nie ma takiej strony.",
         UnexpectedError = "Coś poszło nie tak. Spróbuj ponownie.",
@@ -418,6 +446,20 @@ public sealed class UiText
         Saved = "Saved.",
         Deleted = "Deleted.",
         CategoryReport = "Spending by category",
+        Discounts = "Discounts",
+        ByMonth = "Months",
+        Range = "Range",
+        LastMonths = count => $"Last {count} months",
+        LastPeriods = count => $"Last {count} periods",
+        AllCategories = "All categories",
+        AveragePerMonth = "Average per month",
+        AverageOfFullMonths = "Average of full months, the current one left out.",
+        SoFar = "so far",
+        Average = "Average",
+        AverageOfFinishedPeriods = "Average of finished periods. In red: more spent than planned.",
+        TotalSpent = "Total spent",
+        OfPlanned = planned => $"of {planned}",
+        NoPeriodsYet = "There are no budget periods yet.",
         ShowItems = "Show items",
         NotFound = "There is no such page.",
         UnexpectedError = "Something went wrong. Please try again.",
