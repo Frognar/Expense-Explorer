@@ -10,7 +10,10 @@ public interface IDictionaryQueries
     Task<IReadOnlyList<string>> CategoriesAsync(DictionaryQuery query, CancellationToken cancellationToken);
 }
 
-/// <summary>Case-insensitive "contains" search; an empty search returns the first <see cref="Limit"/> names.</summary>
+/// <summary>
+/// Search ignoring case and Polish diacritics, falling back to similar names when none contains it (typos);
+/// an empty search returns the first <see cref="Limit"/> names.
+/// </summary>
 public sealed record DictionaryQuery(string Search, int Limit)
 {
     public const int DefaultLimit = 20;

@@ -31,15 +31,9 @@ internal sealed class DictionaryEditor(ExpenseExplorerDbContext db) : IDictionar
     public async Task<IReadOnlyList<NameUsage>> UsageAsync(NameKind kind, DictionaryQuery query, CancellationToken cancellationToken)
     {
         IQueryable<NameUse> uses = Uses(kind);
-        if (query.Search.Length > 0)
-        {
-            string pattern = $"%{DictionaryQueries.EscapeLike(query.Search)}%";
-            uses = uses.Where(use => EF.Functions.ILike(use.Name, pattern, @"\"));
-        }
+        TextMatch match = await TextSearch.MatchAsync(uses.Select(use => use.Name), query.Search, cancellationToken);
 
-        return await uses
-            .GroupBy(use => use.Name)
-            .OrderBy(name => name.Key)
+        return await match.BestFirst(match.Filter(uses, use => use.Name).GroupBy(use => use.Name), name => name.Key)
             .Take(query.Limit)
             .Select(name => new NameUsage(name.Key, name.Count(), name.Max(use => use.PurchaseDate)))
             .ToListAsync(cancellationToken);

@@ -20,21 +20,10 @@ internal sealed class DictionaryQueries(ExpenseExplorerDbContext db) : IDictiona
         DictionaryQuery query,
         CancellationToken cancellationToken)
     {
-        if (query.Search.Length > 0)
-        {
-            string pattern = $"%{EscapeLike(query.Search)}%";
-            names = names.Where(name => EF.Functions.ILike(name, pattern, @"\"));
-        }
-
-        return await names
-            .Distinct()
-            .OrderBy(name => name)
+        TextMatch match = await TextSearch.MatchAsync(names, query.Search, cancellationToken);
+        IQueryable<string> distinct = match.Filter(names, name => name).Distinct();
+        return await match.BestFirst(distinct, name => name)
             .Take(query.Limit)
             .ToListAsync(cancellationToken);
     }
-
-    public static string EscapeLike(string value) =>
-        value.Replace(@"\", @"\\", StringComparison.Ordinal)
-            .Replace("%", @"\%", StringComparison.Ordinal)
-            .Replace("_", @"\_", StringComparison.Ordinal);
 }

@@ -11,7 +11,7 @@ internal sealed class ReceiptItemQueries(ExpenseExplorerDbContext db) : IReceipt
 {
     public async Task<ReceiptItemListResponse> ListAsync(ReceiptItemListQuery query, CancellationToken cancellationToken)
     {
-        IQueryable<LineRow> filtered = Filter(Lines(), query);
+        IQueryable<LineRow> filtered = await FilterAsync(Lines(), query, cancellationToken);
 
         int totalCount = await filtered.CountAsync(cancellationToken);
         decimal totalCost = await filtered.SumAsync(line => line.Total, cancellationToken);
@@ -58,7 +58,7 @@ internal sealed class ReceiptItemQueries(ExpenseExplorerDbContext db) : IReceipt
             Description = item.Description,
         };
 
-    private static IQueryable<LineRow> Filter(IQueryable<LineRow> lines, ReceiptItemListQuery query)
+    private static async Task<IQueryable<LineRow>> FilterAsync(IQueryable<LineRow> lines, ReceiptItemListQuery query, CancellationToken cancellationToken)
     {
         lines = OneOf(lines, query.Stores, line => line.Store);
         lines = OneOf(lines, query.Items, line => line.Item);
@@ -72,8 +72,9 @@ internal sealed class ReceiptItemQueries(ExpenseExplorerDbContext db) : IReceipt
 
         if (query.Description is { } description)
         {
-            string pattern = $"%{EscapeLike(description)}%";
-            lines = lines.Where(line => line.Description != null && EF.Functions.ILike(line.Description, pattern, @"\"));
+            // Lines without a description never match: the search functions return null for null text.
+            TextMatch match = await TextSearch.MatchAsync(lines.Select(line => line.Description!), description, cancellationToken);
+            lines = match.Filter(lines, line => line.Description!);
         }
 
         return lines;
@@ -141,11 +142,6 @@ internal sealed class ReceiptItemQueries(ExpenseExplorerDbContext db) : IReceipt
         // Stable paging when many lines share the sort key.
         return sorted.ThenBy(line => line.Id);
     }
-
-    private static string EscapeLike(string text) =>
-        text.Replace(@"\", @"\\", StringComparison.Ordinal)
-            .Replace("%", @"\%", StringComparison.Ordinal)
-            .Replace("_", @"\_", StringComparison.Ordinal);
 
     /// <summary>Query-side shape; EF can filter and sort on its members before the final projection.</summary>
     private sealed class LineRow

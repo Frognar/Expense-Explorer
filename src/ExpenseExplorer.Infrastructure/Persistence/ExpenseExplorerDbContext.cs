@@ -95,6 +95,7 @@ internal sealed class ExpenseExplorerDbContext(DbContextOptions<ExpenseExplorerD
         });
 
         ConfigureBudget(builder);
+        TextSearch.Register(builder);
     }
 
     private static void ConfigureBudget(ModelBuilder builder)
