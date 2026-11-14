@@ -2,7 +2,8 @@
 @inject Language Language
 
 @* Creates a receipt, or changes the store and date of an existing one. *@
-<MudDialog>
+@* The dialog would otherwise focus itself after the field took the focus, so typing went nowhere. *@
+<MudDialog DefaultFocus="@(Receipt is null ? DefaultFocus.None : DefaultFocus.Element)">
     <DialogContent>
         <EditForm Model="this" OnSubmit="SaveAsync" id="receipt-form">
             <MudStack Spacing="3">
