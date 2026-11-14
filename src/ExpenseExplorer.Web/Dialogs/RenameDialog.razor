@@ -2,7 +2,8 @@
 @inject Language Language
 
 @* Renames a store, item or category on every receipt; a name already in use merges the two. *@
-<MudDialog>
+@* The dialog would otherwise focus itself after the field took the focus, so typing went nowhere. *@
+<MudDialog DefaultFocus="DefaultFocus.None">
     <DialogContent>
         <EditForm Model="this" OnSubmit="RenameAsync" id="rename-form">
             <MudStack Spacing="3">
